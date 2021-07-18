@@ -1,3 +1,9 @@
+---
+title: Comparison
+description: Comparisons of Solid against other frameworks.
+sort: 1
+---
+
 # Comparison with other Libraries
 
 This section cannot escape some bias but I think it is important to understand where Solid's solution sits compared to other libraries. This is not about performance. For a definitive look at performance feel free to look at the [JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark).
@@ -9,6 +15,7 @@ React has had a big influence on Solid. Its unidirectional flow and explicit seg
 However, as much as Solid aligns with React's design philosophy, it works fundamentally differently. React uses a Virtual DOM and Solid does not. React's abstraction is top down component partition where render methods are called repeatedly and diffed. Solid, instead, renders each Template once in its entirety, constructing its reactive graph and only then executes instructions related to fine-grained changes.
 
 #### Advice for migrating:
+
 Solid's update model is nothing like React, or even React + MobX. Instead of thinking of function components as the `render` function, think of them as a `constructor`. Watch out for destructuring or early property access losing reactivity. Solid's primitives have no restrictions like the Hook Rules so you are free to nest them as you see fit. You don't need explicit keys on list rows to have "keyed" behavior. Finally, there is no VDOM so imperative VDOM APIs like `React.Children` and `React.cloneElement` make no sense. I encourage finding different ways to solve problems that use these declaratively.
 
 ## Vue
@@ -18,6 +25,7 @@ Solid is not particularly influenced by Vue design-wise, but they are comparable
 Vue values easiness where Solid values transparency. Although Vue's new direction with Vue 3 aligns more with the approach Solid takes. These libraries might align more over time depending on how they continue to evolve.
 
 #### Advice for migrating:
+
 As another modern reactive library migration from Vue 3 should feel familiar. Solid's components are very much like tagging the template on the end of Vue's `setup` function. Be wary of overwrapping state derivations with computations, try a function. Reactivity is pervasive. Solid's proxies are intentionally read-only. Don't knock it before you try it.
 
 ## Svelte
@@ -39,6 +47,7 @@ Knockout's bindings are just strings in HTML which are walked over at runtime. T
 The biggest difference might be that Solid's approach to batching changes which ensures synchronicity whereas Knockout has deferUpdates which uses a deferred microtask queue.
 
 #### Advice for migrating:
+
 If you are used to Knockout, Solid's primitives might look strange to you. The read/write separation is intentional and not just to make life harder. Look to adopting a state/action (Flux) mental model. While the libraries look similar they promote different best practices.
 
 ## Lit & LighterHTML
@@ -48,6 +57,7 @@ These libraries are incredibly similar and have had some influence on Solid. Mos
 The biggest difference is that while these libraries do not use the Virtual DOM they treat rendering the same way, top down, requiring component partitioning to keep things sane. By contrast, Solid uses its fine grained Reactive Graph to only update what has changed and in doing so only shares this technique for its initial render. This approach takes advantage from the initial speed only available to native DOM and also have the most performant approach to updates.
 
 #### Advice for migrating:
+
 These libraries are pretty minimal and easy to build on top. However, keep in mind that `<MyComp/>` isn't just HTMLElement (array or function). Try to keep your things in the JSX template. Hoisting works for the most part but it is best to mentally think of this still as a render library and not a HTMLElement factory.
 
 ## S.js

@@ -1,3 +1,9 @@
+---
+title: Getting Started
+description: A guide for how to get started with Solid.
+sort: 0
+---
+
 # Getting Started
 
 ## Try Solid
@@ -32,10 +38,10 @@ Components are functions that accept a props object and return JSX elements incl
 
 ```jsx
 function MyComponent(props) {
-  return <div>Hello {props.name}</div>
+  return <div>Hello {props.name}</div>;
 }
 
-<MyComponent name="Solid" />
+<MyComponent name="Solid" />;
 ```
 
 Components are lightweight in that they are not stateful themselves and have no instances. Instead, they serve as factory functions for DOM elements and reactive primitives.
@@ -46,7 +52,7 @@ Solid's fine-grained reactivity is built on 3 simple primitives: Signals, Memos,
 const [first, setFirst] = createSignal("JSON");
 const [last, setLast] = createSignal("Bourne");
 
-createEffect(() => console.log(`${first()} ${last()}`))
+createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
 You can learn more about [Solid's Reactivity](https://www.solidjs.com/docs/latest#reactivity) and [Solid's Rendering](https://www.solidjs.com/docs/latest#rendering).
@@ -93,7 +99,10 @@ You can run them straight from the browser using [Skypack](https://www.skypack.d
 <html>
   <body>
     <script type="module">
-      import { createSignal, onCleanup } from "https://cdn.skypack.dev/solid-js";
+      import {
+        createSignal,
+        onCleanup,
+      } from "https://cdn.skypack.dev/solid-js";
       import { render } from "https://cdn.skypack.dev/solid-js/web";
       import html from "https://cdn.skypack.dev/solid-js/html";
 

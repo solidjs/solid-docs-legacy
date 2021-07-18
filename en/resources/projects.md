@@ -1,3 +1,9 @@
+---
+title: Projects
+description: Associated projects and utilities surrounding Solid.
+sort: 2
+---
+
 # Projects
 
 ## Libraries
@@ -29,10 +35,12 @@
 - [Solid TypeFu Router5](https://github.com/mikeplus64/solid-typefu-router5) A TypeScript forward router
 
 ## Components
+
 - [Lume](https://github.com/lume/lume) Toolkit that simplifies the creation of rich and interactive 2D or 3D experiences built with Solid
 - [solidjs-treeview-component](https://github.com/milahu/solidjs-treeview-component) Interactive tree of nodes, expand/collapse, fetch child nodes on demand
 
 ## Starters
+
 - [Solid Templates](https://github.com/solidjs/templates) - Official Solid Templates powered by [Vite](https://vitejs.dev/)
 - [Create Solid](https://github.com/solidjs/create-solid) Solid's port of Create React App.
 - [Solid TypeScript Rollup](https://github.com/high1/solid-typescript-rollup) - Rollup
@@ -43,9 +51,9 @@
 - [Parcel 2 Solid TS Starter](https://github.com/amoutonbrady/parcel2-solid-ts-starter) - Parcel
 - [Solid Snowpack Starter](https://github.com/amoutonbrady/solid-snowpack-starter) - Snowpack
 
-
 ## Tooling
-- [JSX-Lite](https://github.com/builderio/jsx-lite) Generalized JSX that transpiles into Solid, React, Angular, Vue, etc.  They have plugins for Figma, VSCode, & Builder.io.
+
+- [JSX-Lite](https://github.com/builderio/jsx-lite) Generalized JSX that transpiles into Solid, React, Angular, Vue, etc. They have plugins for Figma, VSCode, & Builder.io.
 - [Solid Refresh](https://github.com/solidjs/solid-refresh) Universal plugin for HMR
 - [Solid Jest](https://github.com/solidjs/solid-jest) Presets to test Solid for Browser or Node
 - [Solid Testing Library](https://github.com/solidjs/solid-testing-library) Solid's Testing Library
@@ -65,6 +73,5 @@
 - [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions)
   HyperScript API for DOM Expressions.
 - [Surplus](https://github.com/adamhaile/surplus) Original reactive JSX library
-
 
 Know any other great Solid Projects and Libraries? Please submit them. We love to see what you are working on.

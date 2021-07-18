@@ -1,3 +1,9 @@
+---
+title: Articles
+description: A collection of articles about Solid.
+sort: 0
+---
+
 # Articles
 
 ## Podcasts

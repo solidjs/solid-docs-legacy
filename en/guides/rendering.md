@@ -1,3 +1,9 @@
+---
+title: Rendering
+description: Discusses the different templating and rendering options in Solid.
+sort: 2
+---
+
 # Rendering
 
 Solid supports templating in 3 forms JSX, Tagged Template Literals and Solid's HyperScript variant, although JSX is the predominate form. Why? JSX is a great DSL made for compilation. It has clear syntax, supports TypeScript, works with Babel and supports other tooling like Code Syntax Highlighting and Prettier. It was only pragmatic to use a tool that basically gives you that all for free. As a compiled solution it provides great DX. Why struggle with custom Syntax DSLs when you can use one so widely supported?
@@ -39,6 +45,7 @@ render(() => <App />, document.getElementById("main"));
 ```
 
 > **Important** The first argument needs to be a function. Otherwise we can't properly track and schedule the reactive system. This simple ommission will cause your Effects not to run.
+
 ## Components
 
 Components in Solid are just Pascal (Capital) cased functions. Their first argument is a props object and they return real DOM nodes.
@@ -52,7 +59,7 @@ const Parent = () => (
   </section>
 );
 
-const Label = props => (
+const Label = (props) => (
   <>
     <div>{props.greeting}</div>
     {props.children}
@@ -95,7 +102,7 @@ const Parent = () => {
 Components can access properties passed to them via a `props` argument.
 
 ```jsx
-const Label = props => (
+const Label = (props) => (
   <>
     <div>{props.greeting}</div>
     {props.children}
@@ -109,7 +116,7 @@ This example shows the "correct" way of accessing props in Solid:
 
 ```jsx
 // Here, `props.name` will update like you'd expect
-const MyComponent = props => <div>{props.name}</div>;
+const MyComponent = (props) => <div>{props.name}</div>;
 ```
 
 This example shows the wrong way of accessing props in Solid:
@@ -127,7 +134,7 @@ Because unlike most JSX frameworks, Solid's function components are only execute
 ```jsx
 import { createSignal } from "solid-js";
 
-const BasicComponent = props => {
+const BasicComponent = (props) => {
   const value = props.value || "default";
 
   return <div>{value}</div>;
@@ -139,7 +146,7 @@ export default function Form() {
   return (
     <div>
       <BasicComponent value={value()} />
-      <input type="text" oninput={e => setValue(e.currentTarget.value)} />
+      <input type="text" oninput={(e) => setValue(e.currentTarget.value)} />
     </div>
   );
 }
@@ -152,7 +159,7 @@ So how can we fix our problem?
 Well, in general, we need to access `props` somewhere that Solid can observe it. Generally this means inside JSX or inside a `createMemo`, `createEffect`, or thunk(`() => ...`). Here is one solution that works as expected:
 
 ```jsx
-const BasicComponent = props => {
+const BasicComponent = (props) => {
   return <div>{props.value || "default"}</div>;
 };
 ```
@@ -160,7 +167,7 @@ const BasicComponent = props => {
 This, equivalently, can be hoisted into a function:
 
 ```jsx
-const BasicComponent = props => {
+const BasicComponent = (props) => {
   const value = () => props.value || "default";
 
   return <div>{value()}</div>;
@@ -170,7 +177,7 @@ const BasicComponent = props => {
 Another option, if it is an expensive computation, is to use `createMemo`. For example:
 
 ```jsx
-const BasicComponent = props => {
+const BasicComponent = (props) => {
   const value = createMemo(() => props.value || "default");
 
   return <div>{value()}</div>;
@@ -180,7 +187,7 @@ const BasicComponent = props => {
 Or using a helper
 
 ```jsx
-const BasicComponent = props => {
+const BasicComponent = (props) => {
   props = mergeProps({ value: "default" }, props);
 
   return <div>{props.value}</div>;
@@ -191,14 +198,14 @@ As a reminder, the following examples will _not_ work:
 
 ```jsx
 // bad
-const BasicComponent = props => {
+const BasicComponent = (props) => {
   const { value: valueProp } = props;
   const value = createMemo(() => valueProp || "default");
   return <div>{value()}</div>;
 };
 
 // bad
-const BasicComponent = props => {
+const BasicComponent = (props) => {
   const valueProp = prop.value;
   const value = createMemo(() => valueProp || "default");
   return <div>{value()}</div>;
@@ -219,7 +226,7 @@ untrack(() =>
     // dynamic expression so we wrap in a getter
     get prop2() {
       return state.dynamic;
-    }
+    },
   })
 );
 ```

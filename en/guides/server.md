@@ -1,3 +1,9 @@
+---
+title: Server
+description: An explanation of Solid's server-side capabilities.
+sort: 3
+---
+
 # Server Side Rendering
 
 Solid handles Server rendering by compiling JSX templates to ultra efficient string appending code. This can be achieved through the babel plugin or preset by passing in `generate: "ssr"`. For both client and server you need to pass in `hydratable: true` to generate the hydration compatible code.
@@ -21,7 +27,7 @@ import {
   renderToString,
   renderToStringAsync,
   renderToNodeStream,
-  renderToWebStream
+  renderToWebStream,
 } from "solid-js/web";
 
 // Synchronous string rendering
@@ -96,7 +102,7 @@ When hydrating from the document inserting assets that aren't available in the c
 
 ```jsx
 <NoHydration>
-  {manifest.map(m => (
+  {manifest.map((m) => (
     <link rel="modulepreload" href={m.href} />
   ))}
 </NoHydration>

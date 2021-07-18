@@ -1,3 +1,9 @@
+---
+title: Reactivity
+description: Full rundown of Solid's reactivity.
+sort: 1
+---
+
 # Reactivity
 
 Solid's data management is built off a set of flexible reactive primitives which are responsible for all the updates. It takes a very similar approach to MobX or Vue except it never trades its granularity for a VDOM. Dependencies are automatically tracked when you access your reactive values in your Effects and JSX View code.
@@ -53,6 +59,7 @@ Where things get more interesting is how these subscriptions happen. Solid uses 
 The trick is a global stack at runtime. Before an Effect or Memo executes (or re-executes) its developer-provided function, it pushes itself on to that stack. Then any Signal that is read checks if there is a current listener on the stack and if so adds the listener to its subscriptions.
 
 You can think of it like this:
+
 ```js
 function createSignal(value) {
   const subscribers = new Set();
@@ -61,16 +68,17 @@ function createSignal(value) {
     const listener = getCurrentListener();
     if (listener) subscribers.add(listener);
     return value;
-  }
+  };
 
   const write = (nextValue) => {
     value = nextValue;
     for (const sub of subscribers) sub.run();
-  }
+  };
 
   return [read, write];
 }
 ```
+
 Now whenever we update the Signal we know which Effects to re-run. Simple yet effective. The actual implementation is much more complicated but that is the guts of what is going on.
 
 For more detailed understanding of how Reactivity works these are useful articles:

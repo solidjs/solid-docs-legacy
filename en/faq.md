@@ -1,3 +1,9 @@
+---
+title: FAQ
+description: Frequently asked questions from the community.
+sort: 2
+---
+
 # FAQ
 
 ### 1. JSX without a VDOM? Is this vaporware? I've heard prominent voices like the authors of the other frameworks say this isn't possible.
