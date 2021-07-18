@@ -16,4 +16,6 @@ Solid's documentation is available in 3 languages including:
 
 # Support
 
-We would love contributors to our documentation. Writing clear, concise and easy to translate documentation for a project like Solid can be tricky. It takes a community to make this possible. We encourage you to submit translations and edits as PRs. Translations for Indonesian, Russian, German and Japanese would be appreciated!
+We would love contributions to our documentation. Writing clear, concise and easy to translate documentation for a project like Solid can be tricky. It takes a community to make this possible. We encourage you to submit translations and edits as PRs. Translations for Indonesian, Russian, German and Japanese would be especially nice!
+
+If you feel the documentation is missing any important detail, please feel free to open an issue.
