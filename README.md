@@ -4,16 +4,16 @@
 
 # Solid Docs
 
-This is documentation for SolidJS and associated Solid packages and projects: [https://solidjs.com/](https://solidjs.com/)
+This is documentation for SolidJS v1.0.0 and associated Solid packages and projects. You can find more information about Solid and all it's documentation at [https://solidjs.com/](https://solidjs.com/).
 
 # Translations
 
 Solid's documentation is available in 3 languages including:
 
-- [English](https://github.com/solidjs/solid/tree/main/en)
-- [Italian](https://github.com/solidjs/solid/tree/main/it) (contributed by [davedbase](https://github.com/davedbase))
-- [Chinese](https://github.com/solidjs/solid/tree/main/zh-cn) (contributed by [Gavin-Gong](https://github.com/Gavin-Gong))
+- [English](https://github.com/solidjs/solid-docs/tree/main/en)
+- [Italian](https://github.com/solidjs/solid-docs/tree/main/it) (contributed by [davedbase](https://github.com/davedbase))
+- [Chinese](https://github.com/solidjs/solid-docs/tree/main/zh-cn) (contributed by [Gavin-Gong](https://github.com/Gavin-Gong))
 
 # Support
 
-We would love contributors to our documentation. Writing clear, concise and easy to translate documentation for a project like Solid can be tricky. It takes a community to make this possible. We encourage you to submit translations and edits as PRs.
+We would love contributors to our documentation. Writing clear, concise and easy to translate documentation for a project like Solid can be tricky. It takes a community to make this possible. We encourage you to submit translations and edits as PRs. Translations for Indonesian, Russian, German and Japanese would be appreciated!
