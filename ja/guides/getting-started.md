@@ -1,16 +1,16 @@
 ---
-title: Getting Started
-description: A guide for how to get started with Solid.
+title: はじめに
+description: Solid を使い始めるためのガイド
 sort: 0
 ---
 
-# Getting Started
+# はじめに
 
-## Try Solid
+## Solid を試す
 
-By far the easiest way to get started with Solid is to try it online. Our REPL at https://playground.solidjs.com is the perfect way to try out ideas. As is https://codesandbox.io/ where you can modify any of our Examples.
+Solid を使い始める最も簡単な方法は、オンラインで試すことです。https://playground.solidjs.com の REPL は、アイデアを試すのに最適な方法です。また、いくつかのサンプルを修正できる https://codesandbox.io/ もあります。
 
-Alternatively, you can use our simple [Vite](https://vitejs.dev/) templates by runnings these commands in your terminal:
+また、ターミナルで以下のコマンドを実行して、シンプルな [Vite](https://vitejs.dev/) テンプレートを使用することもできます:
 
 ```sh
 > npx degit solidjs/templates/js my-app
@@ -19,7 +19,7 @@ Alternatively, you can use our simple [Vite](https://vitejs.dev/) templates by r
 > npm run dev # or yarn or pnpm
 ```
 
-Or for TypeScript:
+または TypeScript 向け:
 
 ```sh
 > npx degit solidjs/templates/ts my-app
@@ -28,13 +28,13 @@ Or for TypeScript:
 > npm run dev # or yarn or pnpm
 ```
 
-## Learn Solid
+## Solid を学ぶ
 
-Solid is all about small composable pieces that serve as building blocks for applications. These pieces are mostly functions which make up many shallow top-level APIs. Fortunately, you won't need to know about most of them to get started.
+Solid はアプリケーションの構成要素として機能する、合成可能な小さなピースがすべてです。これらの部品は主に、多くの浅いトップレベル API を構成する関数です。幸いなことに、これらのほとんどについて知らなくても始めることができます。
 
-The two main types of building blocks you have at your disposal are Components and Reactive Primitives.
+自由に使えるビルディングブロックには、主にコンポーネントとリアクティブプリミティブの 2 種類があります。
 
-Components are functions that accept a props object and return JSX elements including native DOM elements and other components. They can be expressed as JSX Elements in PascalCase:
+コンポーネントは、props オブジェクトを受け取り、ネイティブの DOM 要素や他のコンポーネントを含む JSX 要素を返す関数です。これらはパスカルケースの JSX 要素として表現できます:
 
 ```jsx
 function MyComponent(props) {
@@ -44,9 +44,9 @@ function MyComponent(props) {
 <MyComponent name="Solid" />;
 ```
 
-Components are lightweight in that they are not stateful themselves and have no instances. Instead, they serve as factory functions for DOM elements and reactive primitives.
+コンポーネントは、それ自体がステートフルではなく、インスタンスを持たないという点で軽量です。代わりに、DOM 要素やリアクティブプリミティブのファクトリ関数として機能します。
 
-Solid's fine-grained reactivity is built on 3 simple primitives: Signals, Memos, and Effects. Together, they form an auto-tracking synchronization engine that ensures your view stays up to date. Reactive computations take the form of simple function-wrapped expressions that execute synchronously.
+Solid のきめ細かいリアクティビティは、Signal、Memo、Effect の 3 つのシンプルなプリミティブで構築されています。これらが一緒になって、ビューを最新の状態に保つための自動追跡同期エンジンを掲載します。リアクティブな計算は、同期的に実行されるシンプルな関数でラップされた式の形をしています。
 
 ```js
 const [first, setFirst] = createSignal("JSON");
@@ -55,45 +55,45 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-You can learn more about [Solid's Reactivity](https://www.solidjs.com/docs/latest#reactivity) and [Solid's Rendering](https://www.solidjs.com/docs/latest#rendering).
+[Solid のリアクティビティ](https://www.solidjs.com/docs/latest#reactivity)と [Solid のレンダリング](https://www.solidjs.com/docs/latest#rendering)の詳細をご覧いただけます。
 
-## Think Solid
+## Solid に考える
 
-Solid's design carries several opinions on what principles and values help us best build websites and applications. It is easier to learn and use Solid when you are aware of the philosophy behind it.
+Solid のデザインには、Web サイトやアプリケーションを構築する上で、どのような原則や価値観が最適なのかといういくつもの意見が込められています。Solid の背後にある哲学を知っていれば、Solid を習得し、使うことが容易になるでしょう。
 
-### 1. Declarative Data
+### 1. 宣言型データ
 
-Declarative data is the practice of tying the description of data’s behavior to its declaration. This allows for easy composition by packaging all aspects of data’s behavior in a single place.
+宣言型データとは、データの動作の記述を宣言に結びつけることです。データの動作のすべての側面を 1 つの場所にパッケージ化することで、簡単に構成できます。
 
-### 2. Vanishing Components
+### 2. 消えるコンポーネント
 
-It's hard enough to structure your components without taking updates into consideration. Solid updates are completely independent of the components. Component functions are called once and then cease to exist. Components exist to organize your code and not much else.
+更新を考慮せずにコンポーネントを構造化することは難しいです。Solid の更新はコンポーネントから完全に独立しています。コンポーネント関数は一度呼び出されると消滅してしまいます。コンポーネントはコードを整理するために存在し、他の用途はあまりありません。
 
-### 3. Read/Write segregation
+### 3. リード/ライトの分離
 
-Precise control and predictability make for better systems. We don't need true immutability to enforce unidirectional flow, just the ability to make the conscious decision which consumers may write and which may not.
+正確な制御と予測可能性がより良いシステムを作ります。一方通行のフローを強制するための真の不変性は必要ありませんが、どの消費者が書き込んでよくて、どの消費者が書き込んではいけないかを意識的に決定する能力があればよいのです。
 
-### 4. Simple is better than easy
+### 4. シンプルはイージーに勝る
 
-A lesson that comes hard for fine-grained reactivity. Explicit and consistent conventions even if they require more effort are worth it. The aim is to provide minimal tools to serve as the basis to build upon.
+きめ細やかなリアクティビティのために苦労して得た教訓。明示的で一貫性のある規約は、より多くの努力が必要な場合でも、それだけの価値があります。目的は、基盤となる最小限のツールを提供することです。
 
-## Web Components
+## Web コンポーネント
 
-Solid was born with the desire to have Web Components as first class citizens. Over time its design has evolved and goals have changed. However, Solid is still a great way to author Web Components. [Solid Element](https://github.com/solidjs/solid/tree/main/packages/solid-element) allows you to write and wrap Solid's function components to produce small and performant Web Components. Inside Solid apps Solid Element is able to still leverage Solid's Context API, and Solid's Portals support Shadow DOM isolated styling.
+Solid は、Web コンポーネントを第一級市民として持ちたいという願望を持って生まれました。時とともに、そのデザインは進化し、目標も変わりました。しかし、Solid は依然として Web コンポーネントを作成するための優れた方法です。[Solid Element](https://github.com/solidjs/solid/tree/main/packages/solid-element) を使うと Solid の関数コンポーネントを記述、ラップして、小さくてパフォーマンスの高い Web コンポーネントを作成できます。Solid アプリの内部では、Solid Element は Solid の Context API を活用でき、Solid の Portal は Shadow DOM の隔離されたスタイルをサポートします。
 
-## Server Rendering
+## サーバーレンダリング
 
-Solid has a dynamic server side rendering solution that enables a truly isomorphic development experience. Through the use of our Resource primitive, async data requests are easily made and, more importantly, automatically serialized and synchronized between client and browser.
+Solid は、真のアイソモーフィックな開発を可能にする動的なサーバーサイドレンダリングソリューションを備えています。Solid の Resource プリミティブを使用することで非同期データのリクエストが簡単にでき、さらに重要なことに、クライアントとブラウザの間で自動的にシリアライズおよび同期されます。
 
-Since Solid supports asynchronous and stream rendering on the server, you get to write your code one way and have it execute on the server. This means that features like [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) and code splitting just work in Solid.
+Solid はサーバー上での非同期レンダリングとストリームレンダリングをサポートしているため、コードを一方的に記述し、それをサーバー上で実行できます。つまり、[render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) やコード分割などの機能が Solid でも機能するということです。
 
-For more information, read the [Server guide](https://www.solidjs.com/docs/latest#server-side-rendering).
+詳細については、[サーバーガイド](https://www.solidjs.com/docs/latest#server-side-rendering)をご覧ください。
 
-## No Compilation?
+## コンパイルなし？
 
-Dislike JSX? Don't mind doing manual work to wrap expressions, worse performance, and having larger bundle sizes? Alternatively, you can create a Solid app using Tagged Template Literals or HyperScript in non-compiled environments.
+JSX が嫌い？ 式をラップするのを手動で作業したり、パフォーマンスが低下したり、バンドルサイズが大きくなっても構わないですか？ 代わりにタグ付きテンプレートリテラルや HyperScript を使って、コンパイルされない環境で Solid アプリを作成することもできます。
 
-You can run them straight from the browser using [Skypack](https://www.skypack.dev/):
+[Skypack](https://www.skypack.dev/) を使って、ブラウザから直接実行することもできます:
 
 ```html
 <html>
@@ -118,4 +118,4 @@ You can run them straight from the browser using [Skypack](https://www.skypack.d
 </html>
 ```
 
-Remember you still need the corresponding DOM Expressions library for these to work with TypeScript. You can use Tagged Template Literals with [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) or HyperScript with [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
+これらを TypeScript で動作させるには、対応する DOM Expressions ライブラリが必要であることを覚えておいてください。タグ付きテンプレートリテラルは [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) で使用でき、HyperScript は [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions) で使用できます。
