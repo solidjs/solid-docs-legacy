@@ -46,7 +46,7 @@ function MyComponent(props) {
 
 コンポーネントは、それ自体がステートフルではなく、インスタンスを持たないという点で軽量です。代わりに、DOM 要素やリアクティブプリミティブのファクトリ関数として機能します。
 
-Solid のきめ細かいリアクティビティは、Signal、Memo、Effect の 3 つのシンプルなプリミティブで構築されています。これらが一緒になって、ビューを最新の状態に保つための自動追跡同期エンジンを掲載します。リアクティブな計算は、同期的に実行されるシンプルな関数でラップされた式の形をしています。
+Solid のきめ細かいリアクティブ性は、Signal、Memo、Effect の 3 つのシンプルなプリミティブで構築されています。これらが一緒になって、ビューを最新の状態に保つための自動追跡同期エンジンを掲載します。リアクティブな計算は、同期的に実行されるシンプルな関数でラップされた式の形をしています。
 
 ```js
 const [first, setFirst] = createSignal("JSON");
@@ -55,7 +55,7 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-[Solid のリアクティビティ](https://www.solidjs.com/docs/latest#reactivity)と [Solid のレンダリング](https://www.solidjs.com/docs/latest#rendering)の詳細をご覧いただけます。
+[Solid のリアクティブ性](https://www.solidjs.com/docs/latest#reactivity)と [Solid のレンダリング](https://www.solidjs.com/docs/latest#rendering)の詳細をご覧いただけます。
 
 ## Solid に考える
 
@@ -75,7 +75,7 @@ Solid のデザインには、Web サイトやアプリケーションを構築�
 
 ### 4. シンプルはイージーに勝る
 
-きめ細やかなリアクティビティのために苦労して得た教訓。明示的で一貫性のある規約は、より多くの努力が必要な場合でも、それだけの価値があります。目的は、基盤となる最小限のツールを提供することです。
+きめ細やかなリアクティブ性のために苦労して得た教訓。明示的で一貫性のある規約は、より多くの努力が必要な場合でも、それだけの価値があります。目的は、基盤となる最小限のツールを提供することです。
 
 ## Web コンポーネント
 

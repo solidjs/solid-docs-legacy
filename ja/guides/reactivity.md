@@ -1,16 +1,16 @@
 ---
-title: Reactivity
-description: Full rundown of Solid's reactivity.
+title: リアクティブ性
+description: Solid のリアクティブ性の完全な要約
 sort: 1
 ---
 
-# Reactivity
+# リアクティブ性
 
-Solid's data management is built off a set of flexible reactive primitives which are responsible for all the updates. It takes a very similar approach to MobX or Vue except it never trades its granularity for a VDOM. Dependencies are automatically tracked when you access your reactive values in your Effects and JSX View code.
+Solid のデータ管理は、すべての更新を担当する一連の柔軟なリアクティブプリミティブで構築されています。MobX や Vue と非常に似たアプローチをとっていますが、VDOM のために粒度を変えることはありません。Effect や JSX ビューのコードでリアクティブな値にアクセスすると、依存関係が自動的に追跡されます。
 
-Solid's primitives come in the form of `create` calls that often return tuples, where generally the first element is a readable primitive and the second is a setter. It is common to refer to only the readable part by the primitive name.
+Solid のプリミティブは、主にタプルを返す `create` 呼び出しの形で提供されています。通常、タプルの最初の要素は読み取り可能なプリミティブで、2 番目の要素はセッターです。読み取り可能な部分のみをプリミティブ名で参照するのが一般的です。
 
-Here is a basic auto incrementing counter that is updating based on setting the `count` signal.
+これは `count` Signal の代入に基づいて更新される、基本的な自動インクリメントカウンターです。
 
 ```jsx
 import { createSignal, onCleanup } from "solid-js";
@@ -27,38 +27,37 @@ const App = () => {
 render(() => <App />, document.getElementById("app"));
 ```
 
-## Introducing Primitives
+## プリミティブの紹介
 
-Solid is made up of 3 primary primitives, Signal, Memo, and Effect. At their core is the Observer pattern where Signals (and Memos) are tracked by
-wrapping Memos and Effects.
+Solid は、Signal、Memo、Effect の 3 つの主要なプリミティブで構成されています。これらのプリミティブの核となるのは、Memo と Effect をラップすることで Signal（と Memo）を追跡する Observer パターンです。
 
-Signals are the simplest primitive. They contain value, and get and set functions so we can intercept when they are read and written to.
+Signal は最もシンプルなプリミティブです。Signal には値が含まれており、読み書きされたときにインターセプトできるように get と set の関数が用意されています。
 
 ```js
 const [count, setCount] = createSignal(0);
 ```
 
-Effects are functions that wrap reads of our signal and re-execute whenever a dependent Signal's value changes. This is useful for creating side effects, like rendering.
+Effect は、Signal の読み込みをラップし、依存する Signal の値が変更されるたびに再実行する関数です。これは、レンダリングなどの副作用を作成するのに便利です。
 
 ```js
 createEffect(() => console.log("The latest count is", count()));
 ```
 
-Finally, Memos are cached derived values. They share the properties of both Signals and Effects. They track their own dependent Signals, re-executing only when those change, and are trackable Signals themselves.
+最後に、Memo はキャッシュされた派生値です。Memo は Signal と Effect の両方の特性を持っています。依存する Signal を追跡し、それらが変更されたときにのみ再実行され、Memo 自体も追跡可能な Signal です。
 
 ```js
 const fullName = createMemo(() => `${firstName()} ${lastName()}`);
 ```
 
-## How it Works
+## 動作の仕組み
 
-Signals are event emitters that hold a list of subscriptions. They notify their subscribers whenever their value changes.
+Signal は、サブスクリプションのリストを保持するイベントエミッタです。Signal は、値が変わるたびにサブスクライバーに通知します。
 
-Where things get more interesting is how these subscriptions happen. Solid uses automatic dependency tracking. Updates happen automatically as the data changes.
+さらに興味深いのは、これらのサブスクリプションがどのように行われるかということです。Solid は自動的な依存関係追跡を使用しています。データが変更されると自動的に更新されます。
 
-The trick is a global stack at runtime. Before an Effect or Memo executes (or re-executes) its developer-provided function, it pushes itself on to that stack. Then any Signal that is read checks if there is a current listener on the stack and if so adds the listener to its subscriptions.
+この秘訣は、ランタイムのグローバルスタックにあります。Effect や Memo が開発者から提供された関数を実行（または再実行）する前に、そのスタックに自分自身をプッシュします。そして、読み込まれた Signal は、スタック上に現在のリスナーがあるかどうかをチェックし、あればそのリスナーをサブスクリプションに追加します。
 
-You can think of it like this:
+このように考えることができます:
 
 ```js
 function createSignal(value) {
@@ -79,9 +78,9 @@ function createSignal(value) {
 }
 ```
 
-Now whenever we update the Signal we know which Effects to re-run. Simple yet effective. The actual implementation is much more complicated but that is the guts of what is going on.
+これで、Signal を更新するたびに、どの Effect を再実行すればよいかがわかります。シンプルで効果的です。実際の実装はもっと複雑ですが、これが、起こっていることの根幹です。
 
-For more detailed understanding of how Reactivity works these are useful articles:
+リアクティブ性の仕組みをより詳しく理解するには、以下の記事が役立ちます:
 
 [A Hands-on Introduction to Fine-Grained Reactivity](https://dev.to/ryansolid/a-hands-on-introduction-to-fine-grained-reactivity-3ndf)
 
@@ -89,14 +88,14 @@ For more detailed understanding of how Reactivity works these are useful article
 
 [SolidJS: Reactivity to Rendering](https://indepth.dev/posts/1289/solidjs-reactivity-to-rendering)
 
-## Considerations
+## 考察
 
-This approach to reactivity is very powerful and dynamic. It can handle dependencies changing on the fly through executing different branches of conditional code. It also works through many levels of indirection. Any function executed inside a tracking scope is also being tracked.
+リアクティブ性に対するこのアプローチは、非常にパワフルでダイナミックです。条件付きコードの異なるブランチを実行することで、依存関係がその場で変化することに対応できます。また、何段階もの間接参照でも機能します。追跡スコープ内で実行された関数もすべて追跡されます。
 
-However, there are some key behaviors and tradeoffs we must be aware of.
+ただし、注意しなければならない重要な動作とトレードオフがいくつかあります。
 
-1. All reactivity is tracked from function calls whether directly or hidden beneath getter/proxy and triggered by property access. This means where you access properties on reactive objects is important.
+1. すべてのリアクティブ性は、直接またはゲッター/プロキシの下に隠されているかどうかにかかわらず関数の呼び出しから追跡され、プロパティアクセスによってトリガーされます。つまり、どこでリアクティブオブジェクトのプロパティにアクセスするかが重要になります。
 
-2. Components and callbacks from control flows are not tracking scopes and only execute once. This means destructuring or doing logic top-level in your components will not re-execute. You must access these Signals, Stores, and props from within other reactive primitives or the JSX for that part of the code to re-evaluate.
+2. 制御フローからのコンポーネントやコールバックは、スコープを追跡せず、一度しか実行されません。つまり、コンポーネント内のトップレベルでロジックを実行したり分割代入しても、再実行されないということです。コードのその部分を再評価するためには、他のリアクティブプリミティブや JSX からこれらの Signal、Store、props にアクセスする必要があります。
 
-3. This approach only tracks synchronously. If you have a setTimeout or use an async function in your Effect the code that executes async after the fact won't be tracked.
+3. この方法では、同期的にしか追跡できません。Effect で setTimeout があったり、async 関数を使用したりしても、事後に非同期を実行するコードは追跡されません。
