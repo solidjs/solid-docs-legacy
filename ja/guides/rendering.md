@@ -1,42 +1,42 @@
 ---
-title: Rendering
-description: Discusses the different templating and rendering options in Solid.
+title: レンダリング
+description: Solid の様々なテンプレートとレンダリングオプションについて説明します。
 sort: 2
 ---
 
-# Rendering
+# レンダリング
 
-Solid supports templating in 3 forms JSX, Tagged Template Literals and Solid's HyperScript variant, although JSX is the predominate form. Why? JSX is a great DSL made for compilation. It has clear syntax, supports TypeScript, works with Babel and supports other tooling like Code Syntax Highlighting and Prettier. It was only pragmatic to use a tool that basically gives you that all for free. As a compiled solution it provides great DX. Why struggle with custom Syntax DSLs when you can use one so widely supported?
+Solid は、JSX、タグ付きテンプレートリテラル、および Solid の HyperScript バリアントの 3 つの形式でテンプレートをサポートしていますが、JSX が主流となっています。その理由は？ JSX は、コンパイルのために作られた優れた DSL です。明確な構文を持ち、TypeScript をサポートし、Babel と連携し、Code Syntax Highlighting や Prettier などのツールをサポートしています。基本的にすべてを無料で提供してくれるツールを使うのは現実的なことでした。コンパイルされたソリューションとして、素晴らしい DX を提供します。こんなに広くサポートされているものを使えるのに、なぜカスタム構文 DSL で苦労しているのですか？
 
-## JSX Compilation
+## JSX コンパイル
 
-Rendering involves precompilation of JSX templates into optimized native js code. The JSX code constructs:
+レンダリングは、JSX テンプレートを最適化されたネイティブな js コードに事前コンパイルすることが伴います。JSX コードは以下のように構成されます:
 
-- Template DOM elements which are cloned on each instantiation
-- A series of reference declarations using only firstChild and nextSibling
-- Fine grained computations to update the created elements.
+- インスタンス化されるたびに複製されるテンプレート DOM 要素
+- firstChild と nextSibling のみを使用する一連の参照宣言
+- 作成された要素を更新するためのきめ細かな計算
 
-This approach is both more performant and produces less code than creating each element, one by one, with document.createElement.
+このアプローチは、document.createElement を使って要素をひとつずつ作成するよりもパフォーマンスが高く、コード量も少なくて済みます。
 
-## Attributes and Props
+## 属性とプロパティ
 
-Solid attempts to reflect HTML conventions as much as possible including case insensitivity of attributes.
+Solid は、属性の大文字小文字を区別しないなど、HTML の慣習を可能な限り反映しようとしています。
 
-The majority of all attributes on native element JSX are set as DOM attributes. Static values are built right into the template that is cloned. There are a number of exceptions like `class`, `style`, `value`, `innerHTML` which provide extra functionality.
+ネイティブ要素の JSX のすべての属性の大部分は、DOM 属性として設定されます。静的な値は、複製されるテンプレートに直接組み込まれます。追加の機能を提供する `class`、`style`、`value`、`innerHTML` のようないくつかの例外もあります。
 
-However, custom elements (with exception of native built-ins) default to properties when dynamic. This is to handle more complex data types. It does this conversion by camel casing standard snake case attribute names `some-attr` to `someAttr`.
+しかし、カスタム要素（ネイティブの組み込みを除く）は動的な場合、プロパティがデフォルトとなります。これは、より複雑なデータ型を扱うためです。これは、標準的なのスネークケースの属性名 `some-attr` をキャメルケース `someAttr` に変換することで実現しています。
 
-However, it is possible to control this behavior directly with namespace directives. You can force an attribute with `attr:` or force prop `prop:`
+しかし、名前空間ディレクティブを使って、この動作を直接制御することは可能です。属性を `attr:` で強制的に指定したり、プロパティを `prop:` で強制的に指定できます:
 
 ```jsx
 <my-element prop:UniqACC={state.value} attr:title={state.title} />
 ```
 
-> **Note:** Static attributes are created as part of the html template that is cloned. Expressions fixed and dynamic are applied afterwards in JSX binding order. While this is fine for most DOM elements there are some, like input elements with `type='range'`, where order matters. Keep this in mind when binding elements.
+> **注意:** 静的属性は、複製される html テンプレートの一部として作成されます。固定および動的な式は、JSX のバインディング順に後から適用されます。ほとんどの DOM 要素では問題ありませんが、`type='range'`を持つ input 要素のように、順序が重要になるものもあります。要素をバインドする際には、この点に注意してください。
 
-## Entry
+## エントリー
 
-The easiest way to mount Solid is to import render from 'solid-js/web'. `render` takes a function as the first argument and the mounting container for the second and returns a disposal method. This `render` automatically creates the reactive root and handles rendering into the mount container. For best performance use an element with no children.
+Solid をマウントする最も簡単な方法は、'solid-js/web' から render をインポートすることです。`render` は第一引数に関数、第二引数にマウントコンテナを取り、廃棄メソッドを返します。この `render` は自動的にリアクティブルートを作成し、マウントコンテナへのレンダリングを処理します。最高のパフォーマンスを得るためには、子供のいない要素を使用してください。
 
 ```jsx
 import { render } from "solid-js/web";
@@ -44,11 +44,11 @@ import { render } from "solid-js/web";
 render(() => <App />, document.getElementById("main"));
 ```
 
-> **Important** The first argument needs to be a function. Otherwise we can't properly track and schedule the reactive system. This simple ommission will cause your Effects not to run.
+> **Important** 第一引数は関数である必要があります。そうしないと、リアクティブシステムを適切に追跡し、スケジュールできません。この単純な不備により、Effects は実行されなくなります。
 
-## Components
+## コンポーネント
 
-Components in Solid are just Pascal (Capital) cased functions. Their first argument is a props object and they return real DOM nodes.
+Solid のコンポーネントは、単なるパスカル（キャピタル）ケースの関数です。最初の引数は props オブジェクトであり、実際の DOM ノードを返します。
 
 ```jsx
 const Parent = () => (
@@ -67,11 +67,11 @@ const Label = (props) => (
 );
 ```
 
-Since all JSX nodes are actual DOM nodes, the only responsibility of top level Components is to append them to the DOM.
+すべての JSX ノードは実際の DOM ノードなので、トップレベルコンポーネントの唯一の責任は、それらを DOM に追加することです。
 
 ## Props
 
-Much like React, Vue, Angular and other frameworks, Solid allows you to define properties on your components to pass data to child components. Here a parent is passing the string "Hello" to the `Label` component via a `greeting` property.
+React や Vue、Angular やその他のフレームワークと同様に、Solid ではコンポーネントにプロパティを定義して、子コンポーネントにデータを渡すことができます。ここでは、親コンポーネントが文字列 "Hello" を `greeting` プロパティを介して `Label` コンポーネントに渡しています。
 
 ```jsx
 const Parent = () => (
@@ -83,7 +83,7 @@ const Parent = () => (
 );
 ```
 
-In the above example, the value set on `greeting` is static, but we can also set dynamic values. For example:
+上の例では、`greeting` に設定されている値は静的なものですが、動的な値を設定することもできます。例えば:
 
 ```jsx
 const Parent = () => {
@@ -99,7 +99,7 @@ const Parent = () => {
 };
 ```
 
-Components can access properties passed to them via a `props` argument.
+コンポーネントは、`props` という引数を介して渡されたプロパティにアクセスできます。
 
 ```jsx
 const Label = (props) => (
@@ -110,26 +110,26 @@ const Label = (props) => (
 );
 ```
 
-Unlike in some other frameworks, you cannot use object destructuring on the `props` of a component. This is because the `props` object, behind the scenes, relies on Object getters to lazily retrieve values. Using object destructuring breaks the reactivity of `props`.
+他のフレームワークとは異なり、コンポーネントの `props` に対してオブジェクトの分割代入を使用することはできません。舞台裏では、`props` オブジェクトが Object のゲッターに依存して、値を遅延取得するためです。分割代入を使用すると、`props` のリアクティブ性が損なわれます。
 
-This example shows the "correct" way of accessing props in Solid:
+この例は、Solid で props にアクセスする「正しい」方法を示しています:
 
 ```jsx
-// Here, `props.name` will update like you'd expect
+// ここでは、`props.name` が期待通りに更新されます
 const MyComponent = (props) => <div>{props.name}</div>;
 ```
 
-This example shows the wrong way of accessing props in Solid:
+この例は、Solid での間違った props へのアクセス方法を示しています:
 
 ```jsx
-// This is bad
-// Here, `props.name` will not update (i.e. is not reactive) as it is destructured into `name`
+// これはだめ
+// ここでは、`props.name` は `name` に分解されるため、更新されません（つまり、リアクティブではない）
 const MyComponent = ({ name }) => <div>{name}</div>;
 ```
 
-While the props object looks like a normal object when you use it (and Typescript users will note that it is typed like a normal object), in reality it is reactive – somewhat similar to a Signal. This has a few implications.
+props オブジェクトは、使っているときは普通のオブジェクトのように見えますが（Typescript ユーザーは props オブジェクトが普通のオブジェクトのように型付けされていることに気づくでしょう）、実際には Signal に似たリアクティブなオブジェクトです。これにはいくつかの意味があります。
 
-Because unlike most JSX frameworks, Solid's function components are only executed once (rather than every render cycle), the following example will not work as expected.
+多くの JSX フレームワークとは異なり、Solid の関数コンポーネントは（レンダリングサイクルごとではなく）一度しか実行されないため、以下の例は期待通りには動作しません。
 
 ```jsx
 import { createSignal } from "solid-js";
@@ -152,11 +152,11 @@ export default function Form() {
 }
 ```
 
-In this example, what we probably want to happen is for the `BasicComponent` to display the current value typed into the `input`. But, as a reminder, the `BasicComponent` function will only be executed once when the component is initially created. At this time (at creation), `props.value` will equal `''`. This means that `const value` in `BasicComponent` will resolve to `'default'` and never update. While the `props` object is reactive, accessing the props in `const value = props.value || 'default';` is outside the observable scope of Solid, so it isn't automatically re-evaluated when props change.
+この例では、おそらく `BasicComponent` が `input` に入力された現在の値を表示することを望んでいます。しかし、覚えておいてほしいのですが、`BasicComponent` 関数は、コンポーネントが最初に作成されたときに一度だけ実行されます。このとき（作成時）、`props.value` は `''` と等しくなります。これは、`BasicComponent` の `const value` が `'default'` に解決され、更新されないことを意味します。`props` オブジェクトはリアクティブですが、`const value = props.value || 'default';` で props にアクセスすることは、Solid の観察可能な範囲外であるため、props が変更されても自動的に再評価されません。
 
-So how can we fix our problem?
+では、この問題を解決するにはどうすればよいのでしょうか？
 
-Well, in general, we need to access `props` somewhere that Solid can observe it. Generally this means inside JSX or inside a `createMemo`, `createEffect`, or thunk(`() => ...`). Here is one solution that works as expected:
+一般的には、Solid が観測できる場所で `props` にアクセスする必要があります。一般的には、JSX 内部や、`createMemo`、`createEffect`、または thunk（`() => ...` 訳注: 引数を取らず値を返す関数のこと）の内部を意味します。ここでは、期待通りに動作する 1 つのソリューションを紹介します:
 
 ```jsx
 const BasicComponent = (props) => {
@@ -164,7 +164,7 @@ const BasicComponent = (props) => {
 };
 ```
 
-This, equivalently, can be hoisted into a function:
+これは、同等に、関数に巻き上げることができます:
 
 ```jsx
 const BasicComponent = (props) => {
@@ -174,7 +174,7 @@ const BasicComponent = (props) => {
 };
 ```
 
-Another option, if it is an expensive computation, is to use `createMemo`. For example:
+もうひとつの選択肢として、コストのかかる計算の場合は `createMemo` を使う方法もあります。例えば:
 
 ```jsx
 const BasicComponent = (props) => {
@@ -184,7 +184,7 @@ const BasicComponent = (props) => {
 };
 ```
 
-Or using a helper
+あるいはヘルパーを使用する
 
 ```jsx
 const BasicComponent = (props) => {
@@ -194,17 +194,17 @@ const BasicComponent = (props) => {
 };
 ```
 
-As a reminder, the following examples will _not_ work:
+注意として、以下の例は動作**しません**:
 
 ```jsx
-// bad
+// だめ
 const BasicComponent = (props) => {
   const { value: valueProp } = props;
   const value = createMemo(() => valueProp || "default");
   return <div>{value()}</div>;
 };
 
-// bad
+// だめ
 const BasicComponent = (props) => {
   const valueProp = prop.value;
   const value = createMemo(() => valueProp || "default");
@@ -212,18 +212,18 @@ const BasicComponent = (props) => {
 };
 ```
 
-Solid's Components are the key part of its performance. Solid's approach of "Vanishing" Components is made possible by lazy prop evaluation. Instead of evaluating prop expressions immediately and passing in values, execution is deferred until the prop is accessed in the child. Doing so we postpone execution until the last moment, typically right in the DOM bindings, maximizing performance. This flattens the hierarchy and removes the need to maintain a tree of Components.
+Solid のコンポーネントは、そのパフォーマンスの重要な部分です。Solid の「消える」コンポーネントのアプローチは、遅延 props 評価によって実現されています。props の式をすぐに評価して値を渡すのではなく、子で props にアクセスするまで実行を延期します。そうすることで、最後の瞬間まで実行を延期し、通常は DOM バインディングの中で実行し、パフォーマンスを最大化します。これにより、階層がフラットになり、コンポーネントのツリーを維持する必要がなくなります。
 
 ```jsx
 <Component prop1="static" prop2={state.dynamic} />;
 
-// compiles roughly to:
+// だいたいこのようにコンパイルされます:
 
-// we untrack the component body to isolate it and prevent costly updates
+// コンポーネント本体を分離し、コストのかかる更新を防ぐために、追跡を解除します
 untrack(() =>
   Component({
     prop1: "static",
-    // dynamic expression so we wrap in a getter
+    // 動的な式なので、ゲッターでラップ
     get prop2() {
       return state.dynamic;
     },
@@ -231,34 +231,34 @@ untrack(() =>
 );
 ```
 
-To help maintain reactivity Solid has a couple of prop helpers:
+リアクティブ性を維持するために、Solid にはいくつかの props ヘルパーがあります:
 
 ```jsx
-// default props
+// デフォルト props
 props = mergeProps({ name: "Smith" }, props);
 
-// clone props
+// props の複製
 const newProps = mergeProps(props);
 
-// merge props
+// props のマージ
 props = mergeProps(props, otherProps);
 
-// split props into multiple props objects
+// props を複数の props オブジェクトに分割
 const [local, others] = splitProps(props, ["className"])
 <div {...others} className={cx(local.className, theme.component)} />
 ```
 
 ## Children
 
-Solid handles JSX Children similar to React. A single child is a single value on `props.children` and multiple children is handled via an array of values. Normally, you pass them through to the JSX view. However, if you want to interact with them the suggested method is the `children` helper which resolves any downstream control flows and returns a memo.
+Solid は React と同様に JSX Children を扱います。単一の子は `props.children` の単一の値で、複数の子は値の配列で処理されます。通常は、JSX ビューにそれらを渡します。しかし、それらを操作したい場合は、下流の制御フローを解決して Memo を返す `children` ヘルパーを使用することをお勧めします。
 
 ```jsx
-// single child
+// 単一の子
 const Label = (props) => <div class="label">Hi, { props.children }</div>
 
 <Label><span>Josie</span></Label>
 
-// multi child
+// 複数の子
 const List = (props) => <div>{props.children}</div>;
 
 <List>
@@ -267,14 +267,14 @@ const List = (props) => <div>{props.children}</div>;
   <Label>Judith</Label>
 </List>
 
-// map children
+// 子の配列を map 処理
 const List = (props) => <ul>
   <For each={props.children}>{item => <li>{item}</li>}</For>
 </ul>;
 
-// modify and map children using helper
+// ヘルパーを使って、子の配列の変更と map 処理
 const List = (props) => {
-  // children helper memoizes value and resolves all intermediate reactivity
+  // children ヘルパーは値を記憶し、すべての中間的なリアクティブ性を解決します
   const memo = children(() => props.children);
   createEffect(() => {
     const children = memo();
@@ -285,4 +285,4 @@ const List = (props) => {
   </ul>;
 ```
 
-**Important:** Solid treats child tags as expensive expressions and wraps them the same way as dynamic reactive expressions. This means they evaluate lazily on `prop` access. Be careful accessing them multiple times or destructuring before the place you would use them in the view. This is because Solid doesn't have the luxury of creating Virtual DOM nodes ahead of time and then diffing them, so resolution of these `props` must be lazy and deliberate. Use `children` helper if you wish to do this as it memoizes them.
+**重要:** Solid は子タグを高価な式として扱い、動的なリアクティブ式と同じようにラップします。つまり、`prop` へのアクセス時に遅延的に評価されます。ビューで使用する前に分割代入したり、複数回アクセスすることには注意してください。これは、Solid には事前に仮想 DOM ノードを作成してから差分を取るような余裕がないため、これらの `prop` の解決は遅延的かつ慎重に行わなければならないためです。これを行いたい場合は、`children` ヘルパーを使用すると、それらがメモ化されます。
