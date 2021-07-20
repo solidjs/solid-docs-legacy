@@ -1,16 +1,16 @@
 ---
-title: Server
-description: An explanation of Solid's server-side capabilities.
+title: サーバー
+description: Solid のサーバーサイド機能についての説明
 sort: 3
 ---
 
-# Server Side Rendering
+# サーバーサイドレンダリング
 
-Solid handles Server rendering by compiling JSX templates to ultra efficient string appending code. This can be achieved through the babel plugin or preset by passing in `generate: "ssr"`. For both client and server you need to pass in `hydratable: true` to generate the hydration compatible code.
+Solid は、JSX テンプレートを超効率的な文字列付加コードにコンパイルすることで、サーバーレンダリングを処理します。これは、babel プラグインまたはプリセットで、`generate: "ssr"` を渡すことで実現できます。クライアントとサーバーの両方で、ハイドレーションに対応したコードを生成するには、`hydratable: true` を渡す必要があります。
 
-The `solid-js` and `solid-js/web` runtimes are swapped for non-reactive counterparts when running in a node environment. For other environments you will need to bundle the server code with conditional exports set to `node`. Most bundlers have a way of doing this. In general we also recommend using the `solid` export conditions as well as it is recommend that libraries ship their source under the `solid` export.
+`solid-js` と `solid-js/web` のランタイムは、node 環境で実行する場合には、非リアクティブな対照物と交換されます。他の環境では、`node` に設定された条件付きエクスポートでサーバーコードをバンドルする必要があります。ほとんどのバンドルツールは、これを行なう方法を持っています。一般的には、エクスポート条件として `solid` を使用することをお勧めします。また、ライブラリは `solid` エクスポートでソースを出荷することをお勧めします。
 
-Building for SSR definitely takes a bit more configuration because we will be generating 2 separate bundles. The client entry should use `hydrate`:
+SSR 用にビルドすると、2 つの別々のバンドルを生成することになるので、若干の設定が必要になります。クライアントのエントリーでは `hydrate` を使用します:
 
 ```jsx
 import { hydrate } from "solid-js/web";
@@ -18,9 +18,9 @@ import { hydrate } from "solid-js/web";
 hydrate(() => <App />, document);
 ```
 
-_Note: It is possible to render and hydrate from the Document root. This allows us to describe our full view in JSX._
+_注意: ドキュメントルートからレンダリングとハイドレーションを行うことが可能です。これにより、JSX ですべてのビューを記述できます。_
 
-The server entry can use one of the four rendering options offered by Solid. Each produces the output and a script tag to be inserted in the head of the document.
+サーバーのエントリーでは、Solid が提供する 4 つのレンダリングオプションのいずれかを使用できます。それぞれ、出力とドキュメントの先頭に挿入されるスクリプトタグが生成されます。
 
 ```jsx
 import {
@@ -30,35 +30,35 @@ import {
   renderToWebStream,
 } from "solid-js/web";
 
-// Synchronous string rendering
+// 同期文字列レンダリング
 const html = renderToString(() => <App />);
 
-// Asynchronous string rendering
+// 非同期文字列レンダリング
 const html = await renderToStringAsync(() => <App />);
 
 // Node Stream API
 pipeToNodeWritable(App, res);
 
-// Web Stream API (for like Cloudflare Workers)
+// Web Stream API （Cloudflare Workers など用）
 const { readable, writable } = new TransformStream();
 pipeToWritable(() => <App />, writable);
 ```
 
-For your convenience `solid-js/web` exports an `isServer` flag. This is useful as most bundlers will be able to treeshake anything under this flag or imports only used by code under this flag out of your client bundle.
+便利なように `solid-js/web` は `isServer` フラグをエクスポートします。これは、ほとんどのバンドラーが、このフラグを持つものをツリーシェイクしたり、このフラグを持つコードでのみ使用されるものをクライアントバンドルからインポートしたりできるので便利です。
 
 ```jsx
 import { isServer } from "solid-js/web";
 
 if (isServer) {
-  // only do this on the server
+  // サーバーでのみ実行
 } else {
-  // only do this in the browser
+  // ブラウザでのみ実行
 }
 ```
 
-## Hydration Script
+## ハイドレーションスクリプト
 
-In order to progressively hydrate even before Solid's runtime loads, a special script needs to be inserted on the page. It can either be generated and inserted via `generateHydrationScript`or included as part of the JSX using the `<HydrationScript />` tag.
+Solid のランタイムがロードされる前から徐々にハイドレーションさせるためには、特別なスクリプトをページに挿入する必要があります。このスクリプトは、`generateHydrationScript` で生成して挿入するか、`<HydrationScript />` タグを使用して JSX の一部として含めることができます。
 
 ```js
 import { generateHydrationScript } from "solid-js/web";
@@ -98,7 +98,7 @@ const App = () => {
 };
 ```
 
-When hydrating from the document inserting assets that aren't available in the client run also can mess things up. Solid provides a `<NoHydration>` component whose children will work as normal on the server, but not hydrate in the browser.
+クライアントの実行時に利用できないアセットを挿入するドキュメントからハイドレーションする場合、問題が発生する可能性があります。Solid は `<NoHydration>` コンポーネントを提供しており、このコンポーネントの子は、サーバー上では通常通り動作しますが、ブラウザ上ではハイドレーションされません。
 
 ```jsx
 <NoHydration>
@@ -108,34 +108,34 @@ When hydrating from the document inserting assets that aren't available in the c
 </NoHydration>
 ```
 
-## Async and Streaming SSR
+## 非同期およびストリーミング SSR
 
-These mechanisms are built on Solid's knowledge of how your application works. It does so by using Suspense and the Resource API on the server, instead of fetching ahead and then rendering. Solid fetches as it renders on the server just like it does on the client. Your code and execution patterns is written exactly the same way.
+これらのメカニズムは、アプリケーションの動作に関する Solid の知識に基づいて構築されています。先にフェッチしてからレンダリングするのではなく、サーバー上で Suspense と Resource API を使用することで実現しています。Solid は、クライアントと同様に、サーバー上でレンダリングしながらフェッチします。コードや実行パターンも全く同じように書かれています。
 
-Async rendering waits until all Suspense boundaries resolve and then sends the results (or writes them to a file in the case of Static Site Generation).
+非同期レンダリングは、すべてのサスペンス境界が解決するまで待ってから結果を送信します（静的サイト生成の場合はファイルに書き込みます）。
 
-Streaming starts flushing synchronous content to the browser immediately rendering your Suspense Fallbacks on the server. Then as the async data finishes on the server it sends the data over the same stream to the client to resolve Suspense where the browser finishes the job and replaces the fallback with real content.
+ストリーミングは、サーバー上でサスペンスのフォールバックをレンダリングすると同時に、ブラウザに同期コンテンツのフラッシュを開始します。その後、サーバー上で非同期データが終了すると、同じストリームを介してクライアントにデータを送信し、ブラウザがジョブを終了してフォールバックを実際のコンテンツに置き換えることで、サスペンスを解決します。
 
-The advantage of this approach:
+この方法の利点:
 
-- Server doesn't have to wait for Async data to respond. Assets can start loading sooner in the browser, and the user can start seeing content sooner.
-- Compared to client fetching like JAMStack, data loading starts on the server immediately and doesn't have to wait for client JavaScript to load.
-- All data is serialized and transported from server to client automatically.
+- サーバーは非同期データが応答するのを待つ必要がありません。アセットはより早くブラウザにロードされ、ユーザーはより早くコンテンツを見始めることができます。
+- JAMStack のようなクライアントフェッチに比べて、データの読み込みはサーバー上ですぐに始まり、クライアントの JavaScript の読み込みを待つ必要はありません。
+- すべてのデータはシリアル化され、サーバーからクライアントに自動的に転送されます。
 
-## SSR Caveats
+## SSR の注意点
 
-Solid's Isomorphic SSR solution is very powerful in that you can write your code mostly as single code base that runs similarly in both environments. However there are expectations that this puts on hydration. Mostly that the rendered view in the client is the same as it would be rendered on the server. It doesn't need to be exact in terms of text, but structurally the markup should be the same.
+Solid のアイソモーフィック SSR ソリューションは、どちらの環境でも同じように動作する単一のコードベースとしてコードを書くことができるという点で非常に強力です。しかし、これによってハイドレーションに期待されることがあります。ほとんどの場合、クライアントでレンダリングされるビューは、サーバーでレンダリングされるビューと同じです。テキストに関しては正確である必要はありませんが、マークアップは構造的に同じであるべきです。
 
-We use markers rendered in the server to match elements and resource locations on server. For this reason the Client and Server should have the same components. This is not typically a problem given that Solid renders the same way on client and server. But currently there is no means to render something on the server that does not get hydrated on the client. Currently, there is no way to partially hydrate a whole page, and not generate hydration markers for it. It is all or nothing. Partial Hydration is something we want to explore in the future.
+サーバーでレンダリングされたマーカーを使用して、サーバー上の要素やリソースの位置を一致させます。このため、クライアントとサーバーは同じコンポーネントを使用する必要があります。これは、Solid がクライアントとサーバーで同じようにレンダリングされることを考えると、通常は問題になりません。しかし、現在のところ、クライアントではハイドレーションされないものをサーバーでレンダリングする手段がありません。現在のところ、ページ全体を部分的にハイドレーションさせて、ハイドレーションマーカーを生成しない方法はありません。それはオール・オア・ナッシングです。部分的なハイドレーションは、将来的に検討したいと考えています。
 
-Finally, all resources need to be defined under the `render` tree. They are automatically serialized and picked up in the browser, but that works because the `render` or `pipeTo` methods keep track of the progress of the render. Something we cannot do if they are created in isolated context. Similarly there is no reactivity on the server so do not update signals on initial render and expect them to reflect higher up the tree. While we have Suspense boundaries Solid's SSR is basically top down.
+最後に、すべてのリソースは `render` ツリーで定義する必要があります。リソースは自動的にシリアライズされてブラウザに取り込まれますが、これは `render` や `pipeTo` のメソッドがレンダリングの進行状況を把握しているからです。同様に、サーバーにはリアクティブ性がないので、最初のレンダリングで Signal を更新して、ツリーの上位に反映されることを期待してはいけません。サスペンスの境界がある一方で、Solid の SSR は基本的にトップダウンです。
 
-## Getting Started with SSR
+## SSR を始める
 
-SSR configurations are tricky. We have a few examples in the [solid-ssr](https://github.com/solidjs/solid/blob/main/packages/solid-ssr) package.
+SSR の設定には注意が必要です。[solid-ssr](https://github.com/solidjs/solid/blob/main/packages/solid-ssr) パッケージにはいくつかの例があります。
 
-However, a new starter is in the works [SolidStart](https://github.com/solidjs/solid-start) that aims to make this experience much smoother.
+しかし、この経験をよりスムーズにすることを目的とした新しいスターター [SolidStart](https://github.com/solidjs/solid-start) が開発されています。
 
-## Getting Started with Static Site Generation
+## 静的サイト生成を始める
 
-[solid-ssr](https://github.com/solidjs/solid/blob/main/packages/solid-ssr) also ships with a simple utility for generating static or prerendered sites. Read the README for more information.
+[solid-ssr](https://github.com/solidjs/solid/blob/main/packages/solid-ssr) には、静的サイトや事前レンダリングされたサイトを生成するためのシンプルなユーティリティが同梱されています。詳しくは README をご覧ください。
