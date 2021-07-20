@@ -1,3 +1,9 @@
+---
+title: Server
+description: Una spiegazione delle capacità lato server di Solid.
+sort: 3
+---
+
 # Server di rendering
 
 Solid gestisce il rendering del server compilando i modelli JSX in un codice di aggiunta di stringhe ultra efficiente. Questo accade con il plugin o il preset Babel passando in `generate: "ssr"`. Con client e server è necessario passare `hydratable: true` per generare il codice compatibile con l'idratazione.
@@ -21,7 +27,7 @@ import {
   renderToString,
   renderToStringAsync,
   renderToNodeStream,
-  renderToWebStream
+  renderToWebStream,
 } from "solid-js/web";
 
 // Rendering di stringhe sincrone
@@ -96,7 +102,7 @@ Fai attenzione quando ti idrati. Anche l'inserimento di risorse che non sono dis
 
 ```jsx
 <NessunaIdratazione>
-  {manifesta.map(m => (
+  {manifesta.map((m) => (
     <link rel="modulepreload" href={m.href} />
   ))}
 </NessunaIdratazione>

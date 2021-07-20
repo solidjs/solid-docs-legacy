@@ -1,3 +1,9 @@
+---
+title: Reattività
+description: Spiegazione completa della reattività di Solid.
+sort: 1
+---
+
 # Reattività
 
 La gestione dei dati in Solid utilizza primitive reattive che sono responsabili di tutti gli aggiornamenti. Utilizza un approccio molto simile a MobX o Vue, tranne per il fatto che non scambia mai la sua granularità con un VDOM. Le dipendenze vengono tracciate automaticamente quando accedi ai tuoi valori reattivi in Effetti e codice JSX.
@@ -63,7 +69,7 @@ function createSignal(value) {
     return valore;
   };
 
-  const scrivi = nextValue => {
+  const scrivi = (nextValue) => {
     valore = valoreSuccessivo;
     for (const isc of iscritti) isc.run();
   };

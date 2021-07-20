@@ -1,3 +1,9 @@
+---
+title: Iniziare
+description: Una guida per iniziare con SolidJS
+sort: 0
+---
+
 # Iniziare
 
 ## Prova Solid
@@ -93,7 +99,10 @@ Puoi eseguirli direttamente dal browser utilizzando [Skypack](https://www.skypac
 <html>
   <body>
     <script type="module">
-      import { createSignal, onCleanup } from "https://cdn.skypack.dev/solid-js";
+      import {
+        createSignal,
+        onCleanup,
+      } from "https://cdn.skypack.dev/solid-js";
       import { render } from "https://cdn.skypack.dev/solid-js/web";
       import html from "https://cdn.skypack.dev/solid-js/html";
 

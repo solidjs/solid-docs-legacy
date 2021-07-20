@@ -1,4 +1,10 @@
-# Reattività
+---
+title: API
+description: Schema di tutte le API Solid.
+sort: 0
+---
+
+# Reattività semplice
 
 ## `createSignal`
 
@@ -21,7 +27,7 @@ leggereValore();
 assegnaValore(valoreSuccessivo);
 
 // assegna il valore con un setter di funzioni
-assegnaValore(assegnaValore => assegnaValore + successivo);
+assegnaValore((assegnaValore) => assegnaValore + successivo);
 ```
 
 Remember to access signals under a tracking scope if you wish them to react to updates. Tracking scopes are functions that are passed to computations like `createEffect` or JSX expressions.
@@ -35,7 +41,11 @@ Remember to access signals under a tracking scope if you wish them to react to u
 ## `createEffect`
 
 ```ts
-export function createEffect<T>(fn: (v: T) => T, value?: T, options?: { name?: string }): void;
+export function createEffect<T>(
+  fn: (v: T) => T,
+  value?: T,
+  options?: { name?: string }
+): void;
 ```
 
 Questo creerà un nuovo calcolo che tiene traccia automaticamente delle dipendenze. Viene eseguito dopo ogni rendering in cui è cambiata una dipendenza. È ideale per l'utilizzo di `ref`s e la gestione di altri effetti collaterali.
@@ -50,7 +60,7 @@ createEffect(() => altroAffetto(a()));
 La funzione effetto viene chiamata con il valore restituito dall'ultima esecuzione della funzione effetto. Questo valore può essere inizializzato come secondo argomento opzionale. Questo può essere utile per differenziare senza creare una chiusura aggiuntiva.
 
 ```js
-createEffect(prev => {
+createEffect((prev) => {
   const somma = a() + b();
   if (somma !== prev) console.log(somma);
   return somma;
@@ -79,7 +89,7 @@ ottenereValore();
 La funzione memo viene chiamata con il valore restituito dall'ultima esecuzione della funzione memo. Questo valore può essere inizializzato come secondo argomento opzionale. Questo è utile per ridurre i calcoli.
 
 ```js
-const somma = createMemo(somma => input() + somma, 0);
+const somma = createMemo((somma) => input() + somma, 0);
 ```
 
 ## `createResource`
@@ -195,7 +205,7 @@ export function on<T extends Array<() => any> | (() => any), U>(
 "on" è progettato per essere passato in un calcolo per rendere esplicite le sue dipendenze. Se viene passato un array di dipendenze, allora "input" e "prevInput" saranno array.
 
 ```js
-createEffect(on(a, v => console.log(v, b())));
+createEffect(on(a, (v) => console.log(v, b())));
 
 // è equivalente a:
 createEffect(() => {
@@ -208,7 +218,7 @@ Puoi anche impedire l'esecuzione immediata del calcolo. È possibile specificare
 
 ```js
 // non viene eseguito immediatamente
-createEffect(on(a, v => console.log(v), { defer: true }));
+createEffect(on(a, (v) => console.log(v), { defer: true }));
 
 setA("new"); // ora funziona
 ```
@@ -247,7 +257,10 @@ props = mergeProps(props, altreProprieta);
 ## `splitProps`
 
 ```ts
-export function splitProps<T>(props: T, ...keys: Array<(keyof T)[]>): [...parts: Partial<T>];
+export function splitProps<T>(
+  props: T,
+  ...keys: Array<(keyof T)[]>
+): [...parts: Partial<T>];
 ```
 
 Questo è un sostituto della destrutturazione. Divide un oggetto reattivo per chiavi mantenendo la reattività.
@@ -264,7 +277,10 @@ const [locale, altre] = splitProps(props, ["children"]);
 ## `useTransition`
 
 ```ts
-export function useTransition(): [() => boolean, (fn: () => void, cb?: () => void) => void];
+export function useTransition(): [
+  () => boolean,
+  (fn: () => void, cb?: () => void) => void
+];
 ```
 
 Utilizzato per eseguire in batch gli aggiornamenti asincroni in una transazione rinviando il commit fino al completamento di tutti i processi asincroni. Questo processo è legato a Suspense e tiene traccia solo delle risorse lette sotto i limiti di Suspense.
@@ -294,7 +310,7 @@ const [s, set] = createSignal(0);
 
 const obsv$ = from(observable(s));
 
-obsv$.subscribe(v => console.log(v));
+obsv$.subscribe((v) => console.log(v));
 ```
 
 ## `mapArray`
@@ -408,8 +424,8 @@ const [state, setState] = createStore({
     cognome: "Italiano",
     get nome() {
       return `${this.nome} ${this.cognome}`;
-    }
-  }
+    },
+  },
 });
 ```
 
@@ -423,8 +439,8 @@ const [stato, assegnareStato] = createStore({
     cognome: "Italiano",
     get nomeECognome() {
       return nomeECognome();
-    }
-  }
+    },
+  },
 });
 nomeECognome = createMemo(() => `${state.nome} ${state.cognome}`);
 ```
@@ -434,12 +450,15 @@ nomeECognome = createMemo(() => `${state.nome} ${state.cognome}`);
 Le modifiche possono assumere la forma di funzioni che forniscono lo stato precedente e restituiscono un nuovo stato o un valore. Gli oggetti sono sempre uniti in modo superficiale. Imposta i valori su "non definito" per eliminarli dallo Store.
 
 ```js
-const [stato, assegnareStato] = createStore({ nome: "John", cognome: "Azzuro" });
+const [stato, assegnareStato] = createStore({
+  nome: "John",
+  cognome: "Azzuro",
+});
 
 assegnareStato({ nome: "Davide", middleName: "Paolo" });
 // ({ nome: 'Davide', middleName: 'Paolo', cognome: 'Italiano' })
 
-assegnareStato(stato => ({ nomePreferito: state.nome, cognome: "Azzuro" }));
+assegnareStato((stato) => ({ nomePreferito: state.nome, cognome: "Azzuro" }));
 // ({ nome: 'Davide', nomePreferito: 'Davide', middleName: 'Paolo', cognome: 'Azzuro' })
 ```
 
@@ -525,14 +544,16 @@ assegnareStato('compiti', {}, compiti => ({ marked: true, fatta: !todo.fatta }))
 ```ts
 export function produce<T>(
   fn: (state: T) => void
-): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>;
+): (
+  state: T extends NotWrappable ? T : Store<T>
+) => T extends NotWrappable ? T : Store<T>;
 ```
 
 API ispirata a "Immer" per oggetti Solid's Store che consente la mutazione localizzata.
 
 ```js
 setState(
-  produce(s => {
+  produce((s) => {
     s.utente.nome = "Franco";
     s.lista.push("Matita");
   })
@@ -548,7 +569,9 @@ export function reconcile<T>(
     key?: string | null;
     merge?: boolean;
   } = { key: "id" }
-): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>;
+): (
+  state: T extends NotWrappable ? T : Store<T>
+) => T extends NotWrappable ? T : Store<T>;
 ```
 
 Questa utility rileva la modifica dei dati differenziali quando non è possibile applicare aggiornamenti granulari. Utile per quando si tratta di dati immutabili da negozi o risposte API di grandi dimensioni.
@@ -601,7 +624,7 @@ const persona = createMutable({
   },
   set cognome(value) {
     [this.nome, this.cognome] = valore.split(" ");
-  }
+  },
 });
 ```
 
@@ -631,15 +654,17 @@ export function Fornitrice(props) {
     stato,
     {
       incremento() {
-        assegnaStato("conta", c => c + 1);
+        assegnaStato("conta", (c) => c + 1);
       },
       decremento() {
-        assegnaStato("conta", c => c - 1);
-      }
-    }
+        assegnaStato("conta", (c) => c - 1);
+      },
+    },
   ];
 
-  return <Fornitrice.Provider value={store}>{props.children}</Fornitrice.Provider>;
+  return (
+    <Fornitrice.Provider value={store}>{props.children}</Fornitrice.Provider>
+  );
 }
 ```
 
@@ -699,7 +724,11 @@ Probabilmente non ti serviranno per la tua prima app, ma questi utili strumenti 
 ```ts
 export function createDeferred<T>(
   source: () => T,
-  options?: { timeoutMs?: number; name?: string; equals?: false | ((prev: T, next: T) => boolean) }
+  options?: {
+    timeoutMs?: number;
+    name?: string;
+    equals?: false | ((prev: T, next: T) => boolean);
+  }
 ): () => T;
 ```
 
@@ -708,7 +737,11 @@ Crea un readonly che notifica le modifiche downstream solo quando il browser è 
 ## `createComputed`
 
 ```ts
-export function createComputed<T>(fn: (v: T) => T, value?: T, options?: { name?: string }): void;
+export function createComputed<T>(
+  fn: (v: T) => T,
+  value?: T,
+  options?: { name?: string }
+): void;
 ```
 
 Crea una proprietà di sola lettura che notifica le modifiche downstream solo quando il browser è inattivo. `timeoutMs` è il tempo massimo di attesa prima di forzare l'aggiornamento.
@@ -741,7 +774,9 @@ Questo crea un segnale condizionale che notifica agli abbonati solo quando entra
 const selezionata = createSelector(selectedId);
 
 <For each={lista()}>
-  {item => <li classList={{ attivo: selezionata(item.id) }}>{articolo.nome}</li>}
+  {(item) => (
+    <li classList={{ attivo: selezionata(item.id) }}>{articolo.nome}</li>
+  )}
 </For>;
 ```
 
@@ -752,7 +787,10 @@ Queste importazioni sono esposte da `solid-js/web`.
 ## `render`
 
 ```ts
-export function render(code: () => JSX.Element, element: MountableElement): () => void;
+export function render(
+  code: () => JSX.Element,
+  element: MountableElement
+): () => void;
 ```
 
 Questo è il punto di ingresso dell'app del browser. Fornisce una definizione o una funzione del componente di primo livello e un elemento su cui montare. È consigliabile che questo elemento rimanga vuoto poiché la funzione di eliminazione restituita cancellerà tutti i figli.
@@ -764,7 +802,10 @@ const smaltire = render(App, document.getElementById("app"));
 ## `hydrate`
 
 ```ts
-export function hydrate(fn: () => JSX.Element, node: MountableElement): () => void;
+export function hydrate(
+  fn: () => JSX.Element,
+  node: MountableElement
+): () => void;
 ```
 
 Questo metodo è simile a "render" tranne che tenta di reidratare ciò che è già stato reso al DOM.
@@ -854,8 +895,14 @@ export function pipeToWritable<T>(
     eventNames?: string[];
     nonce?: string;
     noScript?: boolean;
-    onReady?: (writable: { write: (v: string) => void }, r: PipeToWritableResults) => void;
-    onComplete?: (writable: { write: (v: string) => void }, r: PipeToWritableResults) => void;
+    onReady?: (
+      writable: { write: (v: string) => void },
+      r: PipeToWritableResults
+    ) => void;
+    onComplete?: (
+      writable: { write: (v: string) => void },
+      r: PipeToWritableResults
+    ) => void;
   }
 ): void;
 ```
@@ -909,7 +956,7 @@ Semplice flusso di controllo del ciclo con chiave referenziale.
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
-  {item => <div>{item}</div>}
+  {(item) => <div>{item}</div>}
 </For>
 ```
 
@@ -947,14 +994,17 @@ Show può anche essere usato come un modo per inserire blocchi in un modello di 
 
 ```jsx
 <Show when={stato.persona} fallback={<div>Caricamento in corso...</div>}>
-  {persona => <div>{persona.nome}</div>}
+  {(persona) => <div>{persona.nome}</div>}
 </Show>
 ```
 
 ## `<Switch>`/`<Match>`
 
 ```ts
-export function Switch(props: { fallback?: JSX.Element; children: JSX.Element }): () => JSX.Element;
+export function Switch(props: {
+  fallback?: JSX.Element;
+  children: JSX.Element;
+}): () => JSX.Element;
 
 type MatchProps<T> = {
   when: T | undefined | null | false;
@@ -994,7 +1044,7 @@ L'oggetto è un segnale:
 
 ```jsx
 <Index each={stato.lista} fallback={<div>Caricamento in corso...</div>}>
-  {articolo => <div>{articolo()}</div>}
+  {(articolo) => <div>{articolo()}</div>}
 </Index>
 ```
 
@@ -1030,7 +1080,9 @@ Contiene errori non rilevati e rende il contenuto di fallback.
 Supporta anche il modulo di callback che passa per errore e una funzione di ripristino.
 
 ```jsx
-<ErrorBoundary fallback={(err, reset) => <div onClick={reset}>Error: {err}</div>}>
+<ErrorBoundary
+  fallback={(err, reset) => <div onClick={reset}>Error: {err}</div>}
+>
   <MioComponente />
 </ErrorBoundary>
 ```
@@ -1038,7 +1090,10 @@ Supporta anche il modulo di callback che passa per errore e una funzione di ripr
 ## `<Suspense>`
 
 ```ts
-export function Suspense(props: { fallback?: JSX.Element; children: JSX.Element }): JSX.Element;
+export function Suspense(props: {
+  fallback?: JSX.Element;
+  children: JSX.Element;
+}): JSX.Element;
 ```
 
 Un componente che tiene traccia di tutte le risorse lette sotto di esso e mostra uno stato segnaposto di fallback fino a quando non vengono risolte. Ciò che rende "Suspense" diverso da "Show" è che non è bloccante in quanto entrambi i rami esistono contemporaneamente anche se non sono attualmente nel DOM.
@@ -1176,7 +1231,9 @@ function App() {
 Funzione di supporto che sfrutta `element.classList.toggle`. Prende un oggetto le cui chiavi sono nomi di classe e le assegna quando il valore risolto è vero.
 
 ```jsx
-<div classList={{ active: state.active, editing: state.currentId === row.id }} />
+<div
+  classList={{ active: state.active, editing: state.currentId === row.id }}
+/>
 ```
 
 ## `style`
@@ -1211,7 +1268,7 @@ Questi metodi funzionano come i loro equivalenti di proprietà. Imposta una stri
 I gestori di eventi in Solid in genere assumono la forma di "onclick" o "onClick" a seconda dello stile. Il nome dell'evento è sempre minuscolo. Solid utilizza la delega di eventi semi-sintetici per eventi dell'interfaccia utente comuni composti e bolle. Ciò migliora le prestazioni per questi eventi comuni.
 
 ```jsx
-<div onClick={e => console.log(e.currentTarget)} />
+<div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
 Solid supporta anche il passaggio di un array al gestore eventi per associare un valore al primo argomento del gestore eventi. Questo non usa `bind` o crea una chiusura aggiuntiva, quindi è un modo altamente ottimizzato per delegare gli eventi.
@@ -1222,7 +1279,7 @@ function handler(itemId, e) {
 }
 
 <ul>
-  <For each={state.list}>{item => <li onClick={[handler, item.id]} />}</For>
+  <For each={state.list}>{(item) => <li onClick={[handler, item.id]} />}</For>
 </ul>;
 ```
 
@@ -1238,7 +1295,7 @@ Gli eventi non possono essere rimbalzati e le associazioni non sono reattive. In
 Per tutti gli altri eventi anche con nomi insoliti. Forse anche gli eventi che non desideri vengano delegati agli eventi dello spazio dei nomi. Questo aggiunge semplicemente un listener di eventi alla lettera.
 
 ```jsx
-<div on:Weird-Event={e => alert(e.detail)} />
+<div on:Weird-Event={(e) => alert(e.detail)} />
 ```
 
 ## `use:___`
@@ -1257,7 +1314,7 @@ const [name, setName] = createSignal("");
 function model(el, value) {
   const [field, setField] = value();
   createRenderEffect(() => (el.value = field()));
-  el.addEventListener("input", e => setField(e.target.value));
+  el.addEventListener("input", (e) => setField(e.target.value));
 }
 
 <input type="text" use:model={[name, setName]} />;

@@ -1,3 +1,9 @@
+---
+title: Rendering
+description: Spiega le diverse opzioni di creazione di modelli e rendering in Solid.
+sort: 2
+---
+
 # Rendering
 
 Solid supporta 3 tipi di template: JSX, Tagged Template Literals e la variante HyperScript di Solid. JSX è la forma predominante. Perché? JSX è un ottimo DSL creato per la compilazione. Ha una sintassi chiara, supporta TypeScript, funziona con Babel e supporta altri strumenti come l'evidenziazione della sintassi del codice e più carino. Era solo pragmatico usare uno strumento che fondamentalmente ti dà tutto gratuitamente. Come soluzione compilata fornisce un ottimo DX. Abbiamo scelto di non lottare con le sintassi DSL personalizzate e di usarne una ampiamente supportata.
@@ -53,7 +59,7 @@ const Primo = () => (
   </section>
 );
 
-const Secondo = props => (
+const Secondo = (props) => (
   <>
     <div>{props.saluto}</div>
     {props.children}
@@ -95,7 +101,7 @@ const Primo = () => {
 I componenti possono accedere alle proprietà passate loro tramite un argomento `props`.
 
 ```jsx
-const Label = props => (
+const Label = (props) => (
   <>
     <div>{props.greeting}</div>
     {props.children}
@@ -109,7 +115,7 @@ Questo esempio mostra il modo "corretto" di accedere agli oggetti di scena in So
 
 ```jsx
 // Qui, `props.name` si aggiornerà come ti aspetteresti
-const MioComponentene = props => <div>{props.nome}</div>;
+const MioComponentene = (props) => <div>{props.nome}</div>;
 ```
 
 Questo esempio mostra il modo sbagliato di accedere agli oggetti di scena in Solid:
@@ -127,7 +133,7 @@ A differenza della maggior parte dei framework JSX, i componenti delle funzioni 
 ```jsx
 import { createSignal } from "solid-js";
 
-const ComponenteBase = props => {
+const ComponenteBase = (props) => {
   const valore = props.value || "predefinita";
   return <div>{valore}</div>;
 };
@@ -137,7 +143,10 @@ export default function Modulo() {
   return (
     <div>
       <ComponenteBase value={valore()} />
-      <input type="text" oninput={e => impostareValore(e.currentTarget.value)} />
+      <input
+        type="text"
+        oninput={(e) => impostareValore(e.currentTarget.value)}
+      />
     </div>
   );
 }
@@ -148,7 +157,7 @@ In realtà vogliamo che il `ComponenteBase` mostri il valore corrente digitato n
 Per risolvere il problema dobbiamo accedere a "props" da qualche parte in cui Solid possa osservarlo. Generalmente questo significa all'interno di JSX o all'interno di un `createMemo`, `createEffect` o thunk(`() => ...`). Ecco una soluzione che funziona come previsto:
 
 ```jsx
-const ComponenteBase = props => {
+const ComponenteBase = (props) => {
   return <div>{props.valore || "predefinita"}</div>;
 };
 ```
@@ -156,7 +165,7 @@ const ComponenteBase = props => {
 Questo, equivalentemente, può essere issato in una funzione:
 
 ```jsx
-const ComponenteBase = props => {
+const ComponenteBase = (props) => {
   const valore = () => props.valore || "predefinita";
 
   return <div>{valore()}</div>;
@@ -166,7 +175,7 @@ const ComponenteBase = props => {
 Un'altra opzione per calcoli costosi è usare `createMemo`. Per esempio:
 
 ```jsx
-const ComponenteBase = props => {
+const ComponenteBase = (props) => {
   const valore = createMemo(() => props.valore || "predefinita");
 
   return <div>{valore()}</div>;
@@ -176,7 +185,7 @@ const ComponenteBase = props => {
 O usando un aiutante
 
 ```jsx
-const ComponenteBase = props => {
+const ComponenteBase = (props) => {
   props = mergeProps({ valore: "predefinita" }, props);
 
   return <div>{props.valore}</div>;
@@ -187,14 +196,14 @@ Come promemoria, i seguenti esempi _non_ funzioneranno:
 
 ```jsx
 // cattiva
-const ComponenteBase = props => {
+const ComponenteBase = (props) => {
   const { valore: propValore } = props;
   const valore = createMemo(() => propValore || "predefinita");
   return <div>{valore()}</div>;
 };
 
 // cattiva
-const ComponenteBase = props => {
+const ComponenteBase = (props) => {
   const propValore = prop.value;
   const valore = createMemo(() => valueProp || "predefinita");
   return <div>{valore()}</div>;
@@ -215,7 +224,7 @@ untrack(() =>
     // espressione dinamica quindi avvolgiamo in un getter
     get prop2() {
       return state.dinamica;
-    }
+    },
   })
 );
 ```
