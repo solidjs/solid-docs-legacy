@@ -1,3 +1,9 @@
+---
+title: API
+description: Solid API 纲要
+sort: 0
+---
+
 # 响应式基础
 
 ## `createSignal`
