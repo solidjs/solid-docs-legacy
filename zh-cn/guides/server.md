@@ -1,3 +1,9 @@
+---
+title: 服务端
+description: Solid 服务器端功能指南。
+sort: 3
+---
+
 # SSR
 
 Solid 通过将 JSX 模板编译为无比高效的字符串附加代码来处理服务器渲染。这可以通过传入 `generate: "ssr"` 到 babel 插件或者预设来实现。对于客户端和服务端而言，你都需要传入 `hydratable: true` 来生成注水兼容代码。

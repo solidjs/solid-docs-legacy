@@ -1,3 +1,9 @@
+---
+title: 响应性
+description: Solid 响应性完整纲要。
+sort: 1
+---
+
 # 响应性
 
 Solid 的数据管理建立在一系列灵活的响应式 primitive 之上，这些 primitive 负责所有的更新。它采用与 MobX 或 Vue 非常相似的方法，只是它没有和虚拟 DOM 进行颗粒度绑定。当你访问你的 Effects 和 JSX 视图代码中的响应式值时，它会自动跟踪依赖项。

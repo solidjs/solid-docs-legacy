@@ -1,3 +1,9 @@
+---
+title: 常见问题
+description: 来自社区的常见问题。
+sort: 2
+---
+
 # 常见问题
 
 ### 1. 没有 VDOM 的 JSX？ 这是 [雾件](https://zh.wikipedia.org/wiki/%E9%9C%A7%E4%BB%B6)吗？ 我听过像其他框架的作者强调说这是不可能的。

@@ -1,6 +1,13 @@
-# 例子
+---
+title: 示例
+description: Solid 使用示例收集。
+sort: 1
+---
+
+# 示例
 
 ## 在线代码
+
 - [Counter](https://codesandbox.io/s/8no2n9k94l) 简单计数器
 - [Simple Todos](https://codesandbox.io/s/lrm786ojqz) 具有 LocalStorage 持久层的待办清单
 - [Simple Routing](https://codesandbox.io/s/jjp8m8nlz5) 使用 'switch' 控制流进行简单路由
@@ -20,13 +27,15 @@
 - [Simple Todos Template Literals](https://codesandbox.io/s/jpm68z1q33) 使用 Lit DOM 表达式的简单待办事项
 - [Simple Todos HyperScript](https://codesandbox.io/s/0vmjlmq94v) 使用 Hyper DOM 表达式的简单待办事项
 
-## Demos
+## Demo
+
 - [TodoMVC](https://github.com/solidjs/solid-todomvc) 经典 TodoMVC 示例
 - [Real World Demo](https://github.com/solidjs/solid-realworld) Solid的真实世界演示
 - [Hacker News](https://github.com/solidjs/solid-hackernews) Hacker News Solid 复刻版
 - [Storybook](https://github.com/rturnq/storybook-solid) Solid 组合 Storybook 使用
 
-## Benchmarks
+## 基准测试
+
 - [JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark/tree/master/frameworks/keyed/solid) Solid 基准测试代码
 - [Sierpinski's Triangle Demo](https://github.com/ryansolid/solid-sierpinski-triangle-demo) Solid 实现 React Fiber demo。
 - [WebComponent Todos](https://github.com/shprink/web-components-todo/tree/main/solid) 展示 Solid 元素

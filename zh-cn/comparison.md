@@ -1,3 +1,9 @@
+---
+title: 比较
+description: Solid 与其他框架比较。
+sort: 1
+---
+
 # 与其他库进行比较
 
 本节无法避免一些偏见，但我认为了解 Solid 的解决方案与其他库的差异很重要。这与性能无关。要对性能有明确的了解，请查看 [JS 框架基准测试](https://github.com/krausest/js-framework-benchmark)。
