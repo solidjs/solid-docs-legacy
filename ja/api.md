@@ -1,10 +1,10 @@
 ---
 title: API
-description: Outline of all Solid APIs.
+description: 全 Solid API の概要
 sort: 0
 ---
 
-# Basic Reactivity
+# 基本のリアクティブ
 
 ## `createSignal`
 
@@ -15,24 +15,24 @@ export function createSignal<T>(
 ): [get: () => T, set: (v: T) => T];
 ```
 
-This is the most basic reactive primitive used to track a single value that changes over time. The create function returns a get and set pair of functions to access and update the signal.
+これは時間の経過とともに変化する単一の値を追跡するために使用される、最も基本的なリアクティブプリミティブです。create 関数は Signal にアクセスしたり更新するための get と set のペアの関数を返します。
 
 ```js
 const [getValue, setValue] = createSignal(initialValue);
 
-// read value
+// 値の読み取り
 getValue();
 
-// set value
+// 値の設定
 setValue(nextValue);
 
-// set value with a function setter
+// 関数の setter を使って値を設定
 setValue((prev) => prev + next);
 ```
 
-Remember to access signals under a tracking scope if you wish them to react to updates. Tracking scopes are functions that are passed to computations like `createEffect` or JSX expressions.
+Signal を更新に反応させたい場合は、追跡スコープの下でアクセスすることを忘れないでください。追跡スコープは、`createEffect` や JSX 式などの計算に渡される関数です。
 
-> If you wish to store a function in a Signal you must use the function form:
+> Signal に関数を格納したい場合は、関数の形式を使用する必要があります:
 >
 > ```js
 > setValue(() => myFunction);
@@ -48,16 +48,16 @@ export function createEffect<T>(
 ): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs after each render where a dependency has changed. Ideal for using `ref`s and managing other side effects.
+依存関係を自動的に追跡し、それらが変更された各レンダリングの後に実行される新しい計算を作成します。`ref` を使用したり、他の副作用を管理するのに理想的です。
 
 ```js
 const [a, setA] = createSignal(initialValue);
 
-// effect that depends on signal `a`
+// Signal `a` に依存する副作用
 createEffect(() => doSideEffect(a()));
 ```
 
-The effect function is called with the value returned from the effect function's last execution. This value can be initialized as an optional 2nd argument. This can be useful for diffing without creating an additional closure.
+effect 関数は、その effect 関数の前回実行時に返された値で呼び出されます。この値はオプションの第二引数として初期化できます。これは追加のクロージャを作成せずに差分を取る場合に便利です。
 
 ```js
 createEffect((prev) => {
@@ -77,16 +77,16 @@ export function createMemo<T>(
 ): () => T;
 ```
 
-Creates a readonly derived signal that recalculates it's value whenever the executed code's dependencies update.
+実行されたコードの依存関係が更新されるたびに、値を再計算する読み取り専用の派生 Signal を作成します。
 
 ```js
 const getValue = createMemo(() => computeExpensiveValue(a(), b()));
 
-// read value
+// 値の読み取り
 getValue();
 ```
 
-The memo function is called with the value returned from the memo function's last execution. This value can be initialized as an optional 2nd argument. This is useful for reducing computations.
+memo 関数は、その memo 関数の前回実行時に返された値で呼び出されます。この値はオプションの第二引数として初期化できます。これは、計算量を減らすのに便利です。
 
 ```js
 const sum = createMemo((prev) => input() + prev, 0);
@@ -119,30 +119,30 @@ export function createResource<T, U>(
 ): ResourceReturn<T>;
 ```
 
-Creates a signal that can manage async requests. The `fetcher` is an async function that accepts return value of the `source` if provided and returns a Promise whose resolved value is set in the resource. The fetcher is not reactive so use the optional first argument if you want it to run more than once. If the source resolves to false, null, or undefined will not to fetch.
+非同期のリクエストを管理できる Signal を作成します。`fetcher` は非同期関数で、`source` が提供されていればその戻り値を受け取り、Resource に設定された解決値を持つ Promise を返します。fetcher はリアクティブではないので、複数回実行させたい場合はオプションの第一引数を使用してください。source の解決値が false, null, undefined の場合は、フェッチしません。
 
 ```js
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
 
-// read value
+// 値の読み取り
 data();
 
-// check if loading
+// 読み込み中か確認
 data.loading;
 
-// check if errored
+// エラーが起きたか確認
 data.error;
 
-// directly set value without creating promise
+// プロミスを作成せずに直接値を設定
 mutate(optimisticValue);
 
-// refetch last request just because
+// ただ前回のリクエストを再取得
 refetch();
 ```
 
-`loading` and `error` are reactive getters and can be tracked.
+`loading` や `error` はリアクティブなゲッターなので追跡できます。
 
-# Lifecycles
+# ライフサイクル
 
 ## `onMount`
 
@@ -150,7 +150,7 @@ refetch();
 export function onMount(fn: () => void): void;
 ```
 
-Registers a method that runs after initial render and elements have been mounted. Ideal for using `ref`s and managing other one time side effects. It is equivalent to a `createEffect` which does not have any dependencies.
+初期レンダリングと要素がマウントされた後に実行されるメソッドを登録します。`ref` の使用や、その他の一度きりの副作用を管理するのに最適です。これは依存関係のない `createEffect` と同等です。
 
 ## `onCleanup`
 
@@ -158,7 +158,7 @@ Registers a method that runs after initial render and elements have been mounted
 export function onCleanup(fn: () => void): void;
 ```
 
-Registers a cleanup method that executes on disposal or recalculation of the current reactive scope. Can be used in any Component or Effect.
+現在のリアクティブスコープの廃棄または再計算時に実行されるクリーンアップメソッドを登録します。どんなコンポーネントや Effect でも使用できます。
 
 ## `onError`
 
@@ -166,11 +166,11 @@ Registers a cleanup method that executes on disposal or recalculation of the cur
 export function onError(fn: (err: any) => void): void;
 ```
 
-Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
+子スコープのエラー時に実行されるエラーハンドラメソッドを登録します。最も近いスコープのエラーハンドラーのみ実行されます。ラインをトリガーするために再スローします。
 
-# Reactive Utilities
+# リアクティブのユーティリティ
 
-These helpers provide the ability to better schedule updates and control how reactivity is tracked.
+これらのヘルパーは、更新のスケジュールをより適切に設定し、リアクティブ性の追跡方法を制御する機能を提供します。
 
 ## `untrack`
 
@@ -178,7 +178,7 @@ These helpers provide the ability to better schedule updates and control how rea
 export function untrack<T>(fn: () => T): T;
 ```
 
-Ignores tracking any of the dependencies in the executing code block and returns the value.
+実行中のコードブロック内の依存関係の追跡を無視して、値を返します。
 
 ## `batch`
 
@@ -186,7 +186,7 @@ Ignores tracking any of the dependencies in the executing code block and returns
 export function batch<T>(fn: () => T): T;
 ```
 
-Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method and Effects automatically wrap their code in a batch.
+不必要な再計算を防ぐために、ブロック内の更新を最後まで待ちます。これは、次の行の値を読んでもまだ更新されていないことを意味します。[Solid Store](#createstore) の set メソッドと Effect は、コードを自動的に batch でラップしています。
 
 ## `on`
 
@@ -198,25 +198,25 @@ export function on<T extends Array<() => any> | (() => any), U>(
 ): (prevValue?: U) => U | undefined;
 ```
 
-`on` is designed to be passed into a computation to make its dependencies explicit. If an array of dependencies is passed, `input` and `prevInput` are arrays.
+`on` は、依存関係を明示的にするため計算に渡されるよう設計されています。依存関係の配列が渡される場合、`input` と `prevInput` は配列になります。
 
 ```js
 createEffect(on(a, (v) => console.log(v, b())));
 
-// is equivalent to:
+// これと同等:
 createEffect(() => {
   const v = a();
   untrack(() => console.log(v, b()));
 });
 ```
 
-You can also not run the computation immediately and instead opt in for it to only run on change by setting the defer option to true.
+また、defer オプションを true に設定することで、すぐに計算を実行せず、変更があった場合にのみ計算を実行するように設定することもできます。
 
 ```js
-// doesn't run immediately
+// すぐには実行されません
 createEffect(on(a, (v) => console.log(v), { defer: true }));
 
-setA("new"); // now it runs
+setA("new"); // ここで実行される
 ```
 
 ## `createRoot`
@@ -225,9 +225,9 @@ setA("new"); // now it runs
 export function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-Creates a new non-tracked context that doesn't auto-dispose. This is useful for nested reactive contexts that you do not wish to release when the parent re-evaluates. It is a powerful pattern for caching.
+自動廃棄されない新しい非追跡型コンテキストを作成します。これは、親の再評価時に解放したくない、ネストされたリアクティブコンテキストなどに便利です。これは、キャッシュのための強力なパターンです。
 
-All Solid code should be wrapped in one of these top level as they ensure that all memory/computations are freed up. Normally you do not need to worry about this as `createRoot` is embedded into all `render` entry functions.
+すべての Solid のコードは、すべてのメモリ/計算が解放されることを保証するため、これらのいずれかのトップレベルでラップされる必要があります。通常は、すべての `render` エントリー関数に `createRoot` が組み込まれているので、これを気にする必要はありません。
 
 ## `mergeProps`
 
@@ -235,18 +235,18 @@ All Solid code should be wrapped in one of these top level as they ensure that a
 export function mergeProps(...sources: any): any;
 ```
 
-A reactive object `merge` method. Useful for setting default props for components in case caller doesn't provide them. Or cloning the props object including reactive properties.
+リアクティブなオブジェクトの `merge` メソッドです。呼び出し元から提供されなかった場合のために、コンポーネントにデフォルトの props を設定するのに便利です。あるいは、リアクティブなプロパティを含む props オブジェクトを複製します。
 
-This method works by using a proxy and resolving properties in reverse order. This allows for dynamic tracking of properties that aren't present when the prop object is first merged.
+このメソッドは、プロキシを使用してプロパティを逆順に解決することで動作します。これにより、prop オブジェクトが最初にマージされたときには存在しなかったプロパティを動的に追跡できます。
 
 ```js
-// default props
+// デフォルト props
 props = mergeProps({ name: "Smith" }, props);
 
-// clone props
+// props の複製
 newProps = mergeProps(props);
 
-// merge props
+// props のマージ
 props = mergeProps(props, otherProps);
 ```
 
@@ -259,7 +259,7 @@ export function splitProps<T>(
 ): [...parts: Partial<T>];
 ```
 
-This is the replacement for destructuring. It splits a reactive object by keys while maintaining reactivity.
+これは分割代入の代わりです。リアクティブ性を維持しながら、リアクティブなオブジェクトをキーで分割します。
 
 ```js
 const [local, others] = splitProps(props, ["children"]);
@@ -279,16 +279,16 @@ export function useTransition(): [
 ];
 ```
 
-Used to batch async updates in a transaction deferring commit until all async processes are complete. This is tied into Suspense and only tracks resources read under Suspense boundaries.
+すべての非同期処理が完了するまでコミットを延期するため、非同期更新をトランザクションで一括して行なうのに使用します。この機能は Suspense と連動しており、Suspense の境界下で読み込まれたリソースのみを追跡します。
 
 ```js
 const [isPending, start] = useTransition();
 
-// check if transitioning
+// トランジション中か確認
 isPending();
 
-// wrap in transition
-start(() => setSignal(newValue), () => /* transition is done */)
+// トランジションでラップ
+start(() => setSignal(newValue), () => /* トランジションが完了 */)
 ```
 
 ## `observable`
@@ -297,7 +297,7 @@ start(() => setSignal(newValue), () => /* transition is done */)
 export function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable. Consume it from the Observable library of your choice with typically with the `from` operator.
+このメソッドは Signal を受け取り、シンプルな Observable を生成します。お好みの Observable ライブラリから、通常は `from` 演算子を使って取り込みます。
 
 ```js
 import { from } from "rxjs";
@@ -318,9 +318,9 @@ export function mapArray<T, U>(
 ): () => U[];
 ```
 
-Reactive map helper that caches each item by reference to reduce unnecessary mapping on updates. It only runs the mapping function once per value and then moves or removes it as needed. The index argument is a signal. The map function itself is not tracking.
+更新時の不要なマッピングを減らすために、各アイテムを参照によってキャッシュするリアクティブなマップヘルパーです。値ごとに一度だけマッピング関数を実行し、必要に応じて移動や削除を行います。index 引数は Signal です。map 関数自体は追跡しません。
 
-Underlying helper for the `<For>` control flow.
+`<For>` 制御フローの基礎となるヘルパーです。
 
 ```js
 const mapped = mapArray(source, (model) => {
@@ -350,9 +350,9 @@ export function indexArray<T, U>(
 ): () => U[];
 ```
 
-Similar to `mapArray` except it maps by index. The item is a signal and the index is now the constant.
+`mapArray` と似ていますが、index でマッピングする点が異なります。アイテムは Signal で、index は定数となります。
 
-Underlying helper for the `<Index>` control flow.
+`<Index>` 制御フローの基礎となるヘルパーです。
 
 ```js
 const mapped = indexArray(source, (model) => {
@@ -372,7 +372,7 @@ const mapped = indexArray(source, (model) => {
 
 # Stores
 
-These APIs are available at `solid-js/store`.
+これらの API は `solid-js/store` で公開されています。
 
 ## `createStore`
 
@@ -383,33 +383,33 @@ export function createStore<T extends StoreNode>(
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
-This creates a tree of Signals as proxy that allows individual values in nested data structures to be independently tracked. The create function returns a readonly proxy object, and a setter function.
+これにより、プロキシとして Signals のツリーが作成され、ネストしたデータ構造の個々の値を個別に追跡できるようになります。create 関数は、読み取り専用のプロキシオブジェクトと、セッター関数を返します。
 
 ```js
 const [state, setState] = createStore(initialValue);
 
-// read value
+// 値の読み取り
 state.someValue;
 
-// set value
+// 値の設定
 setState({ merge: "thisValue" });
 
 setState("path", "to", "value", newValue);
 ```
 
-Store objects being proxies only track on property access. And on access Stores recursively produces nested Store objects on nested data. However it only wraps arrays and plain objects. Classes are not wrapped. So things like `Date`, `HTMLElement`, `Regexp`, `Map`, `Set` are not granularly reactive. Additionally, the top level state object cannot be tracked without accessing a property on it. So it is not suitable to use for things you iterate over as adding new keys or indexes cannot trigger updates. So put any lists on a key of state rather than trying to use the state object itself.
+プロキシであるストア オブジェクトは、プロパティへのアクセスを追跡するだけです。そして、アクセスがあると、Stores は再帰的に、ネストされたデータに対してネストされた Store オブジェクトを生成します。しかし、これは配列とプレーン オブジェクトしかラップしません。クラスはラップされません。つまり、`Date`, `HTMLElement`, `Regexp`, `Map`, `Set` のようなものは、きめ細かく反応しないということです。さらに、トップレベルの状態オブジェクトは、そのプロパティにアクセスしなければ追跡できません。そのため、新しいキーやインデックスを追加しても更新のトリガーにはならないので、反復処理を行なうものに使用するのには適していません。そのため、状態オブジェクト自体を使用するのではなく、状態のキーにリストを置くようにしてください。
 
 ```js
-// put the list as a key on the state object
+// list を状態オブジェクトのキーにする
 const [state, setState] = createStore({ list: [] });
 
-// access the `list` property on the state object
+// 状態オブジェクトの `list` プロパティにアクセス
 <For each={state.list}>{item => /*...*/}</For>
 ```
 
-### Getters
+### ゲッター
 
-Store objects support the use of getters to store calculated values.
+Store オブジェクトは、計算した値を格納するためのゲッターをサポートしています。
 
 ```js
 const [state, setState] = createStore({
@@ -423,7 +423,7 @@ const [state, setState] = createStore({
 });
 ```
 
-These are simple getters, so you still need to use a Memo if you want to cache a value;
+これらは単純なゲッターなので、値をキャッシュしたい場合は Memo を使用する必要があります;
 
 ```js
 let fullName;
@@ -439,9 +439,9 @@ const [state, setState] = createStore({
 fullName = createMemo(() => `${state.firstName} ${state.lastName}`);
 ```
 
-### Updating Stores
+### ストアの更新
 
-Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store.
+変更は、以前の状態を渡して新しい状態または値を返す関数の形をとることができます。オブジェクトは常に浅くマージされます。ストアから値を削除するには、値を `undefined` に設定します。
 
 ```js
 const [state, setState] = createStore({
@@ -456,9 +456,9 @@ setState((state) => ({ preferredName: state.firstName, lastName: "Milner" }));
 // ({ firstName: 'Johnny', preferredName: 'Johnny', middleName: 'Lee', lastName: 'Milner' })
 ```
 
-It supports paths including key arrays, object ranges, and filter functions.
+キー配列、オブジェクトの範囲、およびフィルタ関数を含むパスをサポートしています。
 
-setState also supports nested setting where you can indicate the path to the change. When nested the state you are updating may be other non Object values. Objects are still merged but other values (including Arrays) are replaced.
+setState は、変更へのパスを示すことができる、ネストされた設定もサポートしています。ネストされている場合、更新される状態は、オブジェクト以外の他の値である可能性があります。オブジェクトは引き続きマージされますが、その他の値（配列を含む）は置き換えられます。
 
 ```js
 const [state, setState] = createStore({
@@ -482,7 +482,7 @@ setState('list', 2, 'read', true);
 // }
 ```
 
-Path can be string keys, array of keys, iterating objects ({from, to, by}), or filter functions. This gives incredible expressive power to describe state changes.
+パスは、文字列キー、キーの配列、反復オブジェクト ({from, to, by})、またはフィルタ関数です。これにより、状態の変化を表す表現力が飛躍的に向上します。
 
 ```js
 const [state, setState] = createStore({
@@ -540,7 +540,7 @@ export function produce<T>(
 ) => T extends NotWrappable ? T : Store<T>;
 ```
 
-Immer inspired API for Solid's Store objects that allows for localized mutation.
+Immer にインスパイアされた Solid の Store オブジェクト用の API で、局所的なミューテーション変異を可能にします。
 
 ```js
 setState(
@@ -565,12 +565,12 @@ export function reconcile<T>(
 ) => T extends NotWrappable ? T : Store<T>;
 ```
 
-Diffs data changes when we can't apply granular updates. Useful for when dealing with immutable data from stores or large API responses.
+きめ細かい更新を適用できない場合に、データの変化を差分で表示します。ストアからの不変的なデータや、大きな API レスポンスを扱う場合に便利です。
 
-The key is used when available to match items. By default `merge` false does referential checks where possible to determine equality and replaces where items are not referentially equal. `merge` true pushes all diffing to the leaves and effectively morphs the previous data to the new value.
+アイテムをマッチさせるために、キーがあればそれを使用します。デフォルトでは、`merge` false は、可能な限り参照チェックを行って同等性を判断し、アイテムが参照的に等しくない場合には置換します。`merge` true は、すべての差分を葉ノードにプッシュし、以前のデータを新しい値に効果的に変換します。
 
 ```js
-// subscribing to an observable
+// observable の購読
 const unsubscribe = store.subscribe(({ todos }) => (
   setState('todos', reconcile(todos)));
 );
@@ -586,25 +586,25 @@ export function createMutable<T extends StoreNode>(
 ): Store<T> {
 ```
 
-Creates a new mutable Store proxy object. Stores only trigger updates on values changing. Tracking is done by intercepting property access and automatically tracks deep nesting via proxy.
+ミュータブルな Store プロキシオブジェクトを新規に作成します。ストアは、値が変化したときにのみ更新をトリガーします。追跡は、プロパティアクセスをインターセプトすることで行われ、プロキシ経由で深いネストを自動的に追跡します。
 
-Useful for integrating external systems or as a compatibility layer with MobX/Vue.
+外部システムとの統合や、MobX/Vue との互換性レイヤーとしても有効です。
 
-> **Note:** A mutable state can be passed around and mutated anywhere, which can make it harder to follow and easier to break unidirectional flow. It is generally recommended to use `createStore` instead. The `produce` modifier can give many of the same benefits without any of the downsides.
+> **注意:** ミュータブルな状態は、どこにでも渡したり変更が可能なので、追跡が困難になり、単方向フローを壊しやすくなったりします。一般的には、代わりに `createStore` を使用することをお勧めします。`produce` 修飾子を使用すると、多くの同じメリットがありますが、デメリットはありません。
 
 ```js
 const state = createMutable(initialValue);
 
-// read value
+// 値の読み取り
 state.someValue;
 
-// set value
+// 値の設定
 state.someValue = 5;
 
 state.list.push(anotherValue);
 ```
 
-Mutables support setters along with getters.
+Mutable はゲッターだけでなくセッターもサポートしています。
 
 ```js
 const user = createMutable({
@@ -619,7 +619,7 @@ const user = createMutable({
 });
 ```
 
-# Component APIs
+# コンポーネント API
 
 ## `createContext`
 
@@ -632,9 +632,9 @@ interface Context<T> {
 export function createContext<T>(defaultValue?: T): Context<T | undefined>;
 ```
 
-Context provides a form of dependency injection in Solid. It is used to save from needing to pass data as props through intermediate components.
+コンテキストは、Solid での依存性注入の方式を提供します。これは、中間コンポーネントを介してデータを props として渡す必要がないようにするために使用されます。
 
-This function creates a new context object that can be used with `useContext` and provides the `Provider` control flow. Default Context is used when no `Provider` is found above in the hierarchy.
+この関数は、`useContext` で使用できる新しいコンテキストオブジェクトを作成し、`Provider` 制御フローを提供します。階層構造の上位に `Provider` が見つからない場合には、デフォルトのコンテキストが使用されます。
 
 ```js
 export const CounterContext = createContext([{ count: 0 }, {}]);
@@ -661,7 +661,7 @@ export function CounterProvider(props) {
 }
 ```
 
-The value passed to provider is passed to `useContext` as is. That means wrapping as a reactive expression will not work. You should pass in Signals and Stores directly instead of accessing them in the JSX.
+Provider に渡された値は、そのまま `useContext` に渡されます。つまり、リアクティブな式としてのラッピングは機能しません。Signal や Store は、JSX でアクセスするのではなく、直接渡すべきです。
 
 ## `useContext`
 
@@ -669,7 +669,7 @@ The value passed to provider is passed to `useContext` as is. That means wrappin
 export function useContext<T>(context: Context<T>): T;
 ```
 
-Used to grab context to allow for deep passing of props without having to pass them through each Component function.
+コンテキストを取得するために使用され、各 Component 関数にプロップを渡すことなく、props を深く渡すことができます。
 
 ```js
 const [state, { increment, decrement }] = useContext(CounterContext);
@@ -681,12 +681,12 @@ const [state, { increment, decrement }] = useContext(CounterContext);
 export function children(fn: () => any): () => any;
 ```
 
-Used to make it easier to interact with `props.children`. This helper resolves any nested reactivity and returns a memo. Recommended approach to using `props.children` in anything other than passing directly through to JSX.
+`props.children` とのやりとりを容易にするために使用します。このヘルパーは、ネストされたリアクティブ性を解決し、Memo を返します。JSX に直接渡す以外の方法で `props.children` を使用する際に推奨されるアプローチです。
 
 ```js
 const list = children(() => props.children);
 
-// do something with them
+// それらを使って何かする
 createEffect(() => list());
 ```
 
@@ -698,19 +698,19 @@ export function lazy<T extends Component<any>>(
 ): T & { preload: () => Promise<T> };
 ```
 
-Used to lazy load components to allow for code splitting. Components are not loaded until rendered. Lazy loaded components can be used the same as its statically imported counterpart, receiving props etc... Lazy components trigger `<Suspense>`
+コードの分割を可能にするため、コンポーネントを遅延ロードするのに使用されます。コンポーネントはレンダリングされるまでロードされません。遅延ロードされたコンポーネントは、静的にインポートされたものと同じように、props などを受け取って使用できます。遅延コンポーネントは `<Suspense>` をトリガーします。
 
 ```js
-// wrap import
+// import をラップ
 const ComponentA = lazy(() => import("./ComponentA"));
 
-// use in JSX
+// JSX で使用
 <ComponentA title={props.title} />;
 ```
 
-# Secondary Primitives
+# 副次的なプリミティブ
 
-You probably won't need them for your first app, but these useful tools to have.
+おそらく初めてのアプリには必要ないでしょうが、あると便利なツールです。
 
 ## `createDeferred`
 
@@ -725,7 +725,7 @@ export function createDeferred<T>(
 ): () => T;
 ```
 
-Creates a readonly that only notifies downstream changes when the browser is idle. `timeoutMs` is the maximum time to wait before forcing the update.
+ブラウザがアイドル状態のときにダウンストリームの変更のみを通知する読み取り専用の変数を作成します。`timeoutMs` は、強制的に更新を行なうまでの最大待機時間です。
 
 ## `createComputed`
 
@@ -737,7 +737,7 @@ export function createComputed<T>(
 ): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs immediately before render. Use this to write to other reactive primitives. When possible use `createMemo` instead as writing to a signal mid update can cause other computations to need to re-calculate.
+依存関係を自動的に追跡し、レンダリングの直前に実行する新しい計算を作成します。これは他のリアクティブプリミティブに書き込むために使用します。更新の途中で Signal に書き込むと、他の計算で再計算が必要になることがあるので、可能であれば代わりに `createMemo` を使用してください。
 
 ## `createRenderEffect`
 
@@ -749,7 +749,7 @@ export function createRenderEffect<T>(
 ): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs during the render phase as DOM elements are created and updated but not necessarily connected. All internal DOM updates happen at this time.
+依存関係を自動的に追跡する新しい計算を作成し、DOM 要素が作成および更新されるが必ずしも結合されていないレンダリングフェーズで実行します。すべての内部 DOM の更新はこの時点で行われます。
 
 ## `createSelector`
 
@@ -761,7 +761,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Creates a conditional signal that only notifies subscribers when entering or exiting their key matching the value. Useful for delegated selection state. As it makes the operation O(2) instead of O(n).
+値と一致するキーが入った、または出たときにのみサブスクライバに通知する条件付き Signal を作成します。委任された選択状態に便利です。演算が O(n) ではなく O(2) になるため。
 
 ```js
 const isSelected = createSelector(selectedId);
@@ -771,9 +771,9 @@ const isSelected = createSelector(selectedId);
 </For>;
 ```
 
-# Rendering
+# レンダリング
 
-These imports are exposed from `solid-js/web`.
+これらのインポートは `solid-js/web` から公開されています。
 
 ## `render`
 
@@ -784,7 +784,7 @@ export function render(
 ): () => void;
 ```
 
-This is the browser app entry point. Provide a top level component definition or function and an element to mount to. It is recommended this element be empty as the returned dispose function will wipe all children.
+これは、ブラウザアプリのエントリーポイントです。トップレベルのコンポーネント定義または関数と、マウントする要素を指定します。返された dispose 関数がすべての子を消去するので、この element は空にすることをお勧めします。
 
 ```js
 const dispose = render(App, document.getElementById("app"));
@@ -799,7 +799,7 @@ export function hydrate(
 ): () => void;
 ```
 
-This method is similar to `render` except it attempts to rehydrate what is already rendered to the DOM. When initializing in the browser a page has already been server rendered.
+このメソッドは `render` と似ていますが、すでに DOM にレンダリングされているものを再利用しようとする点が異なります。ブラウザでの初期化時には、ページはすでにサーバーでレンダリングされています。
 
 ```js
 const dispose = hydrate(App, document.getElementById("app"));
@@ -817,7 +817,7 @@ export function renderToString<T>(
 ): string;
 ```
 
-Renders to a string synchronously. The function also generates a script tag for progressive hydration. Options include eventNames to listen to before the page loads and play back on hydration, and nonce to put on the script tag.
+文字列に同期的にレンダリングします。この関数は、プログレッシブハイドレーション用のスクリプトタグも生成します。オプションには、ページがロードされてハイドレーションの再生前に購読する eventNames と、スクリプトタグに付ける nonce があります。
 
 ```js
 const html = renderToString(App);
@@ -836,7 +836,7 @@ export function renderToStringAsync<T>(
 ): Promise<string>;
 ```
 
-Same as `renderToString` except it will wait for all `<Suspense>` boundaries to resolve before returning the results. Resource data is automatically serialized into the script tag and will be hydrated on client load.
+結果を返す前に、すべての `<Suspense>` 境界が解決するのを待つという点を除いて、`renderToString` と同じです。リソースデータは自動的にスクリプトタグにシリアライズされ、クライアントのロード時にハイドレーションされます。
 
 ```js
 const html = await renderToStringAsync(App);
@@ -863,13 +863,13 @@ export function pipeToNodeWritable<T>(
 ): void;
 ```
 
-This method renders to a Node stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data from any async resource as it completes.
+このメソッドは、Node のストリームにレンダリングします。Suspense のフォールバックプレースホルダーを含むコンテンツを同期的にレンダリングし、完了すると任意の非同期リソースからデータをストリームし続けます。
 
 ```js
 pipeToNodeWritable(App, res);
 ```
 
-The `onReady` option is useful for writing into the stream around the the core app rendering. Remember if you use `onReady` to manually call `startWriting`.
+`onReady` オプションは、コアアプリのレンダリング前後にストリームに書き込む際に便利です。`onReady` を使用する場合は、手動で `startWriting` を呼び出すことを忘れないでください。
 
 ## `pipeToWritable`
 
@@ -898,14 +898,14 @@ export function pipeToWritable<T>(
 ): void;
 ```
 
-This method renders to a web stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data from any async resource as it completes.
+このメソッドは、Web ストリームにレンダリングします。Suspense のフォールバックプレースホルダーを含むコンテンツを同期的にレンダリングし、完了すると任意の非同期リソースからデータをストリームし続けます。
 
 ```js
 const { readable, writable } = new TransformStream();
 pipeToWritable(App, writable);
 ```
 
-The `onReady` option is useful for writing into the stream around the the core app rendering. Remember if you use `onReady` to manually call `startWriting`.
+`onReady` オプションは、コアアプリのレンダリング前後にストリームに書き込む際に便利です。`onReady` を使用する場合は、手動で `startWriting` を呼び出すことを忘れないでください。
 
 ## `isServer`
 
@@ -913,25 +913,25 @@ The `onReady` option is useful for writing into the stream around the the core a
 export const isServer: boolean;
 ```
 
-This indicates that the code is being run as the server or browser bundle. As the underlying runtimes export this as a constant boolean it allows bundlers to eliminate the code and their used imports from the respective bundles.
+これは、コードがサーバーまたはブラウザのバンドルとして実行されていることを示します。基礎となるランタイムがこの値を定数のブール値としてエクスポートするため、バンドラーはコードとその使用されるインポートをそれぞれのバンドルから取り除くことができます。
 
 ```js
 if (isServer) {
-  // I will never make it to the browser bundle
+  // 私はブラウザバンドルには入れません
 } else {
-  // won't be run on the server;
+  // サーバーでは実行されません;
 }
 ```
 
-# Control Flow
+# 制御フロー
 
-Solid uses components for control flow. The reason is that with reactivity to be performant we have to control how elements are created. For example with lists, a simple `map` is inefficient as it always maps everything. This means helper functions.
+Solid では制御フローにコンポーネントを使用しています。その理由は、リアクティブ性のパフォーマンスを向上させるためには、要素の生成方法を制御する必要があるからです。例えばリストの場合、単純な `map` では、常にすべてをマッピングしてしまい、非効率です。これはヘルパー関数を意味します。
 
-Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flows.
+これらをコンポーネントでラップすることで、簡潔なテンプレートを作成するのに便利ですし、ユーザーが独自の制御フローを構成・構築することもできます。
 
-These built-in control flows will be automatically imported. All except `Portal` and `Dynamic` are exported from `solid-js`. Those two which are DOM specific are exported by `solid-js/web`.
+これらの組み込み制御フローは自動的にインポートされます。`Portal` と `Dynamic` 以外のすべては `solid-js` からエクスポートされます。DOM に特化したこれらの 2 つは、`solid-js/web` からエクスポートされます。
 
-> Note: All callback/render function children of control flow are non-tracking. This allows for nesting state creation, and better isolates reactions.
+> 注意: 制御フローのコールバック/レンダー関数の子はすべて追跡されません。これにより、状態をネストして作成でき、反応をよりよく分離できます。
 
 ## `<For>`
 
@@ -943,7 +943,7 @@ export function For<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Simple referentially keyed loop control flow.
+シンプルな参照キー付きループ制御フローです。
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -951,7 +951,7 @@ Simple referentially keyed loop control flow.
 </For>
 ```
 
-Optional second argument is an index signal:
+オプションの第二引数はインデックスの Signal です:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -973,7 +973,7 @@ function Show<T>(props: {
 }): () => JSX.Element;
 ```
 
-The Show control flow is used to conditional render part of the view. It is similar to the ternary operator(`a ? b : c`) but is ideal for templating JSX.
+Show 制御フローは、ビューの一部を条件付きでレンダリングするために使用されます。これは三項演算子（`a ? b : c`）に似ていますが、JSX のテンプレート化に最適です。
 
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
@@ -981,7 +981,7 @@ The Show control flow is used to conditional render part of the view. It is simi
 </Show>
 ```
 
-Show can also be used as a way of keying blocks to a specific data model. Ex the function is re-executed whenever the user model is replaced.
+Show は、ブロックを特定のデータモデルにキーイングする方法としても使用できます。例: ユーザーモデルが置き換えられるたびに、この関数が再実行されます。
 
 ```jsx
 <Show when={state.user} fallback={<div>Loading...</div>}>
@@ -1004,7 +1004,7 @@ type MatchProps<T> = {
 export function Match<T>(props: MatchProps<T>);
 ```
 
-Useful for when there are more than 2 mutual exclusive conditions. Can be used to do things like simple routing.
+互いに排他的な条件が 2 つ以上ある場合に便利です。単純なルーティングなどにも利用できます。
 
 ```jsx
 <Switch fallback={<div>Not Found</div>}>
@@ -1017,7 +1017,7 @@ Useful for when there are more than 2 mutual exclusive conditions. Can be used t
 </Switch>
 ```
 
-Match also supports function children to serve as keyed flow.
+Match は、キー付きフローとして機能する関数の子もサポートしています。
 
 ## `<Index>`
 
@@ -1029,9 +1029,9 @@ export function Index<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Non-keyed list iteration (rows keyed to index). This is useful when there is no conceptual key, like if the data consists of primitives and it is the index that is fixed rather than the value.
+キーを持たないリストの反復（インデックスをキーとする行）。これは、データがプリミティブで構成されていて、値ではなくインデックスが固定されている場合など、概念的なキーが存在しない場合に便利です。
 
-The item is a signal:
+item は Signal です:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1039,7 +1039,7 @@ The item is a signal:
 </Index>
 ```
 
-Optional second argument is an index number:
+オプションの第二引数はインデックスです:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1060,7 +1060,7 @@ function ErrorBoundary(props: {
 }): () => JSX.Element;
 ```
 
-Catches uncaught errors and renders fallback content.
+キャッチされなかったエラーを捕捉し、フォールバックコンテンツをレンダリングします。
 
 ```jsx
 <ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
@@ -1068,7 +1068,7 @@ Catches uncaught errors and renders fallback content.
 </ErrorBoundary>
 ```
 
-Also supports callback form which passes in error and a reset function.
+また、エラーとリセット関数を渡すコールバック方式もサポートしています。
 
 ```jsx
 <ErrorBoundary
@@ -1087,7 +1087,7 @@ export function Suspense(props: {
 }): JSX.Element;
 ```
 
-A component that tracks all resources read under it and shows a fallback placeholder state until they are resolved. What makes `Suspense` different than `Show` is it is non-blocking in that both branches exist at the same time even if not currently in the DOM.
+その下で読み込まれたすべてのリソースを追跡し、それらが解決されるまでフォールバックのプレースホルダー状態を表示するコンポーネントです。`Suspense` が `Show` と異なる点は、ノンブロッキングであることです。つまり、現在 DOM に存在しなくても、両方のブランチが同時に存在します。
 
 ```jsx
 <Suspense fallback={<div>Loading...</div>}>
@@ -1105,7 +1105,7 @@ function SuspenseList(props: {
 }): JSX.Element;
 ```
 
-`SuspenseList` allows for coordinating multiple parallel `Suspense` and `SuspenseList` components. It controls the order in which content is revealed to reduce layout thrashing and has an option to collapse or hide fallback states.
+`SuspenseList` では、複数の並列した `Suspense` と `SuspenseList` コンポーネントを調整できます。コンテンツの表示順を制御してレイアウトの乱れを抑え、フォールバックの状態を折りたたんだり非表示にするオプションも備えています。
 
 ```jsx
 <SuspenseList revealOrder="forwards" tail="collapsed">
@@ -1119,7 +1119,7 @@ function SuspenseList(props: {
 </SuspenseList>
 ```
 
-SuspenseList is still experimental and does not have full SSR support.
+SuspenseList はまだ実験的なもので、SSR を完全にはサポートしていません。
 
 ## `<Dynamic>`
 
@@ -1132,7 +1132,7 @@ function Dynamic<T>(
 ): () => JSX.Element;
 ```
 
-This component lets you insert an arbitrary Component or tag and passes the props through to it.
+このコンポーネントでは、任意のコンポーネントやタグを挿入し、その props を渡すことができます。
 
 ```jsx
 <Dynamic component={state.component} someProp={state.something} />
@@ -1149,9 +1149,9 @@ export function Portal(props: {
 }): Text;
 ```
 
-This inserts the element in the mount node. Useful for inserting Modals outside of the page layout. Events still propagate through the Component Hierarchy.
+これにより、要素がマウントノードに挿入されます。ページレイアウトの外側にモーダルを挿入するのに便利です。イベントはコンポーネント階層を伝搬します。
 
-The portal is mounted in a `<div>` unless the target is the document head. `useShadow` places the element in a Shadow Root for style isolation, and `isSVG` is required if inserting into an SVG element so that the `<div>` is not inserted.
+ターゲットがドキュメントヘッドでない限り、ポータルは `<div>` の中にマウントされます。`useShadow` はスタイルを分離するためにシャドウルートに要素を配置し、SVG 要素に挿入する場合は、`<div>` が挿入されないように、`isSVG` が必要です。
 
 ```jsx
 <Portal mount={document.getElementById("modal")}>
@@ -1159,11 +1159,11 @@ The portal is mounted in a `<div>` unless the target is the document head. `useS
 </Portal>
 ```
 
-# Special JSX Attributes
+# 特別な JSX 属性
 
-In general Solid attempts to stick to DOM conventions. Most props are treated as attributes on native elements and properties on Web Components, but a few of them have special behavior.
+一般的に、Solid は DOM の規則に忠実であろうとします。ほとんどの props は、ネイティブ要素の属性や Web Components のプロパティとして扱われますが、いくつかの props には特別な動作があります。
 
-For custom namespaced attributes with TypeScript you need to extend Solid's JSX namespace:
+TypeScript でカスタムの名前空間付き属性を使用するには、Solid の JSX 名前空間を拡張する必要があります:
 
 ```ts
 declare module "solid-js" {
@@ -1189,21 +1189,21 @@ declare module "solid-js" {
 
 ## `ref`
 
-Refs are a way of getting access to underlying DOM elements in our JSX. While it is true one could just assign an element to a variable, it is more optimal to leave components in the flow of JSX. Refs are assigned at render time but before the elements are connected to the DOM. They come in 2 flavors.
+ref は、JSX の中で基礎となる DOM 要素にアクセスするための手段です。確かに、要素を変数に割り当てることもできますが、JSX のフローの中にコンポーネントを残しておく方が最適です。ref は、要素が DOM に結合される前のレンダリング時に割り当てられます。ref には 2 つの種類があります。
 
 ```js
-// simple assignment
+// 単純な代入
 let myDiv;
 
-// use onMount or createEffect to read after connected to DOM
+// onMount または createEffect を使って、DOM に結合された後に読み取り
 onMount(() => console.log(myDiv));
 <div ref={myDiv} />
 
-// Or, callback function (called before connected to DOM)
+// もしくは、コールバック関数（DOM に結合する前に呼び出されます）
 <div ref={el => console.log(el)} />
 ```
 
-Refs can also be used on Components. They still need to be attached on the otherside.
+ref はコンポーネントにも使用できます。ただし、相手側に取り付ける必要があります。
 
 ```jsx
 function MyComp(props) {
@@ -1219,7 +1219,7 @@ function App() {
 
 ## `classList`
 
-A helper that leverages `element.classList.toggle`. It takes an object whose keys are class names and assigns them when the resolved value is true.
+`element.classList.toggle` を利用したヘルパーです。クラス名をキーにしたオブジェクトを受け取り、解決した値が true の時にクラス名を割り当てます。
 
 ```jsx
 <div
@@ -1229,26 +1229,26 @@ A helper that leverages `element.classList.toggle`. It takes an object whose key
 
 ## `style`
 
-Solid's style helper works with either a string or with an object. Unlike React's version Solid uses `element.style.setProperty` under the hood. This means support for CSS vars, but it also means we use the lower, dash-case version of properties. This actually leads to better performance and consistency with SSR output.
+Solid の style ヘルパーは、文字列とオブジェクトのどちらでも動作します。React のそれとは異なり、Solid は内部で `element.style.setProperty` を使用しています。これは、CSS 変数をサポートすることを意味しますが、同時にプロパティの小文字のダッシュケースを使用することを意味します。これは実際にパフォーマンスの向上と SSR 出力の一貫性につながります。
 
 ```jsx
-// string
+// 文字列
 <div style={`color: green; background-color: ${state.color}; height: ${state.height}px`} />
 
-// object
+// オブジェクト
 <div style={{
   color: "green",
   "background-color": state.color,
   height: state.height + "px" }}
 />
 
-// css variable
+// CSS 変数
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
 
 ## `innerHTML`/`textContent`
 
-These work the same as their property equivalent. Set a string and they will be set. **Be careful!!** Setting `innerHTML` with any data that could be exposed to an end user as it could be a vector for malicious attack. `textContent` while generally not needed is actually a performance optimization when you know the children will only be text as it bypasses the generic diffing routine.
+これらは、同等のプロパティと同じように動作します。文字列を設定すると、これらが設定されます。**注意!!** 悪意のある攻撃のベクトルとなる可能性があるため、エンドユーザーに公開される可能性のあるデータは `innerHTML` を使用してください。`textContent` は一般的には必要ありませんが、一般的な差分ルーチンをバイパスするため、子がテキストのみであることがわかっている場合には、実際にはパフォーマンスの最適化になります。
 
 ```jsx
 <div textContent={state.text} />
@@ -1256,13 +1256,13 @@ These work the same as their property equivalent. Set a string and they will be 
 
 ## `on___`
 
-Event handlers in Solid typically take the form of `onclick` or `onClick` depending on style. The event name is always lowercased. Solid uses semi-synthetic event delegation for common UI events that are composed and bubble. This improves performance for these common events.
+Solid のイベントハンドラは、スタイルに応じて、通常、`onclick` または `onClick` の形式をとります。イベント名は常に小文字で表記されます。Solid では、合成されてバブルが発生する一般的な UI イベントに対して、半合成のイベントデリゲーションを使用しています。これにより、これらの共通イベントのパフォーマンスが向上します。
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
-Solid also supports passing an array to the event handler to bind a value to the first argument of the event handler. This doesn't use `bind` or create an additional closure, so it is highly optimized way delegating events.
+Solid は、イベントハンドラの第一引数に値をバインドするために、イベントハンドラに配列を渡すこともサポートしています。これは `bind` を使用せず、追加のクロージャも作成しないため、イベントのデリゲーション方法として高度に最適化されています。
 
 ```jsx
 function handler(itemId, e) {
@@ -1274,16 +1274,16 @@ function handler(itemId, e) {
 </ul>;
 ```
 
-Events cannot be rebound and the bindings are not reactive. The reason is that it is generally more expensive to attach/detach listeners. Since events naturally are called there is no need for reactivity simply shortcut your handler if desired.
+イベントは再バインドさせることができず、バインディングはリアクティブではありません。その理由は、一般的にリスナーをアタッチ/デタッチする方がコストがかかるからです。イベントは自然に呼び出されるので、リアクティブにする必要はなく、必要に応じてハンドラーをショートカットするだけです。
 
 ```jsx
-// if defined call it, otherwised don't.
+// 定義されている場合は呼び出し、そうでない場合は呼び出さない
 <div onClick={() => props.handleClick?.()} />
 ```
 
 ## `on:___`/`oncapture:___`
 
-For any other events, perhaps ones with unusual names, or ones you wish not to be delegated there are the `on` namespace events. This simply adds an event listener verbatim.
+その他のイベント、例えば変わった名前のイベントや、デリゲートしたくないイベントには、`on` 名前空間イベントがあります。これは単に、イベントリスナーをそのまま追加するだけです。
 
 ```jsx
 <div on:Weird-Event={(e) => alert(e.detail)} />
@@ -1291,13 +1291,13 @@ For any other events, perhaps ones with unusual names, or ones you wish not to b
 
 ## `use:___`
 
-These are custom directives. In a sense this is just syntax sugar over ref but allows us to easily attach multiple directives to a single element. A directive is simply a function with the following signature:
+これらはカスタムディレクティブです。ある意味では ref のシンタックスシュガーに過ぎませんが、1 つの要素に複数のディレクティブを簡単に付けることができます．ディレクティブは、次のようなシグネチャを持つ関数に過ぎません:
 
 ```ts
 function directive(element: Element, accessor: () => any): void;
 ```
 
-Directive functions are called at render time but before being added to the DOM. You can do whatever you'd like in them including create signals, effects, register clean-up etc.
+ディレクティブ関数は、DOM に追加される前のレンダリング時に呼び出されます。Signal や Effect の作成、クリーンアップの登録など、やりたいことは何でもできます。
 
 ```js
 const [name, setName] = createSignal("");
@@ -1311,7 +1311,7 @@ function model(el, value) {
 <input type="text" use:model={[name, setName]} />;
 ```
 
-To register with TypeScript extend the JSX namespace.
+TypeScript で登録するには、JSX 名前空間を拡張します。
 
 ```ts
 declare module "solid-js" {
@@ -1325,7 +1325,7 @@ declare module "solid-js" {
 
 ## `prop:___`
 
-Forces the prop to be treated as a property instead of an attribute.
+props を属性ではなくプロパティとして処理するように強制します。
 
 ```jsx
 <div prop:scrollTop={props.scrollPos + "px"} />
@@ -1333,7 +1333,7 @@ Forces the prop to be treated as a property instead of an attribute.
 
 ## `attr:___`
 
-Forces the prop to be treated as a attribute instead of an property. Useful for Web Components where you want to set attributes.
+props をプロパティではなく属性として処理するように強制します。属性を設定する Web コンポーネントに便利です。
 
 ```jsx
 <my-element attr:status={props.status} />
@@ -1341,15 +1341,15 @@ Forces the prop to be treated as a attribute instead of an property. Useful for 
 
 ## `/* @once */`
 
-Solid's compiler uses a simple heuristic for reactive wrapping and lazy evaluation of JSX expressions. Does it contain a function call, a property access, or JSX? If yes we wrap it in a getter when passed to components or in an effect if passed to native elements.
+Solid のコンパイラは、JSX 式のリアクティブなラッピングと遅延評価にシンプルなヒューリスティックを使用しています。関数の呼び出し、プロパティへのアクセス、または JSX が含まれていますか？ そうであれば、コンポーネントに渡される場合はゲッターでラップし、ネイティブ要素に渡される場合はエフェクトでラップします。
 
-Knowing this we can reduce overhead of things we know will never change simply by accessing them outside of the JSX. A simple variable will never be wrapped. We can also tell the compiler not to wrap them by starting the expression with a comment decorator `/_ @once _/.
+これを知っていれば、JSX の外からアクセスするだけで、変更されないことがわかっているもののオーバーヘッドを減らすことができます。単純な変数がラップされることはありません。また、式の最初にコメントデコレータ `/* @once */` を付けることで、ラップしないようにコンパイラに指示できます。
 
 ```jsx
 <MyComponent static={/*@once*/ state.wontUpdate} />
 ```
 
-This also works on children.
+これは、子に対しても有効です。
 
 ```jsx
 <MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
