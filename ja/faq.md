@@ -1,71 +1,71 @@
 ---
 title: FAQ
-description: Frequently asked questions from the community.
+description: コミュニティからのよくある質問
 sort: 2
 ---
 
 # FAQ
 
-### 1. JSX without a VDOM? Is this vaporware? I've heard prominent voices like the authors of the other frameworks say this isn't possible.
+### 1. 仮想 DOM なしの JSX？ ベーパーウェア（概念だけで実態のないソフト）ですか？ 他のフレームワークの作者がこれは不可能だと言っているような有名な声を聞いたことがあります。
 
-It is possible when you don't have React's update model. JSX is a Template DSL like any other. Just one that is more flexible in certain ways. Inserting arbitrary JavaScript can be challenging at times, but no different than supporting spread operators. So no this isn't vapourware but an approach proven to be one of the most performant.
+React の更新モデルを持っていなければ可能です。JSX は他のテンプレート DSL と同じです。特定の方法ではより柔軟性があります。任意の JavaScript を挿入するのは難しい場合もありますが、スプレッド演算子をサポートするのと変わりません。つまり、これはベーパーウェアではなく、最もパフォーマンスが高いことが証明されているアプローチなのです。
 
-The real benefit comes in how extensible it is. You have the compiler working for you giving you optimal native DOM updates but you have all the freedom of a library like React to write Components using techniques like Render Props and Higher Order Components along side your reactive "hooks". Don't like how Solid's control flow works? Write your own.
+本当のメリットは、拡張性の高さにあります。コンパイラが最適なネイティブ DOM 更新を提供してくれますが、React のようなライブラリの自由度が高く、Render Props や Higher Order Components などのテクニックを使ったコンポーネントを、リアクティブな「フック」と一緒に書くことができます。Solid の制御フローがどのように機能するかが気に入らない？ 自分で書きましょう。
 
-### 2. How is Solid so performant?
+### 2. Solid どれほどパフォーマンスが優れていますか？
 
-We wish we could point to a single thing, but it really is the combination of many important design decisions:
+何か 1 つを挙げることができればいいのですが、実際には多くの重要な設計上の決定が組み合わされています。
 
-1. Explicit reactivity so only the things that should be reactive are tracked.
-2. Compile with initial creation in mind. Solid uses heuristics to loosen granularity to reduce the number of computations made but keep key updates granular and performant.
-3. Reactive expressions are just functions. This enables "Vanishing Components" with lazy prop evaluation removing unnecessary wrappers and synchronization overhead.
+1. 明示的なリアクティブ性により、リアクティブであるべきものだけを追跡する。
+2. 初期生成を考慮してコンパイルする。Solid はヒューリスティックな手法を用いて粒度を緩め、計算回数を減らす一方で、重要な更新は粒度とパフォーマンスを維持しています。
+3. リアクティブな式は単なる関数です。これにより、不要なラッパーや同期のオーバーヘッドを取り除いた遅延 props 評価による「消えるコンポーネント」が可能になります。
 
-These are currently unique techniques in a combination that give Solid an edge over the competition.
+これらは現在のところ、Solid が競合に対して優位に立つための組み合わせであり、独特な技術です。
 
-### 3. Is there React-Compat?
+### 3. React との互換性はありますか？
 
-No. And there likely never will be. While the APIs are similar and components often can be moved across with minor edits, the update model is fundamentally different. React Components render over and over so code outside of Hooks works very differently. The closures and hook rules are not only unnecessary they can be used in manners that do not work here.
+いいえ、これからもならないでしょう。API は似ていて、コンポーネントは小さな編集で移動できることが多いのですが、更新モデルは根本的に異なります。React コンポーネントは何度もレンダリングされるため、Hooks 以外のコードは非常に異なって動作します。クロージャやフックのルールは不要なだけでなく、ここでは動作しない方法で使用できます。
 
-Vue-compat on the other hand, that'd be doable. Although there are no plans to implement currently.
+一方で、Vue 互換は可能でしょう。現在のところ実装の予定はありませんが。
 
-### 4. Why does destructuring not work? I realized I can fix it by wrapping my whole component in a function.
+### 4. なぜ分割代入が動作しないのですか？ コンポーネント全体を関数でラップすれば解決できることに気づきました。
 
-Reactivity occurs on property access on Prop and Store objects. Referencing them outside of a binding or reactive computation will not be tracked. Destructuring is perfectly fine inside of those.
+リアクティブ性は Prop と Store オブジェクトのプロパティアクセスで発生します。バインディングやリアクティブな計算の外でそれらを参照しても追跡されません。これらの内部では分割代入は全く問題ありません。
 
-However, wrapping your whole component in a function is not what you want to be doing irresponsibly. Solid does not have a VDOM. So any tracked change will run the whole function again recreating everything. Don't do it.
+しかし、コンポーネント全体を関数でラップすることは、無責任に行うべきではありません。Solid には仮想 DOM がありません。そのため、追跡された変更は、関数全体を再度実行し、すべてを再作成することになります。これはやめておきましょう。
 
-### 5. Can you add support for class components? I find the lifecycles are easier to reason about.
+### 5. クラスコンポーネントのサポートを追加してくれますか？ ライフサイクルの方が推論しやすいと思います。
 
-It is not the intention to support class components. The lifecycles of Solid are tied to scheduling the reactive system and are artificial. You could make a class out of it I suppose but effectively all the non-event handler code is basically being run in the constructor, including the render function. It's just more syntax for an excuse to make your data less granular.
+クラスコンポーネントをサポートすることは意図していません。Solid のライフサイクルは、リアクティブシステムのスケジューリングに結びついており、人為的なものです。クラスを作ることはできますが、事実上、イベントハンドラ以外のコードは render 関数を含め、基本的にコンストラクタで実行されます。これは、データの粒度を小さくするための言い訳のための構文に過ぎません。
 
-Group data and its behaviors together rather than lifecycles. This is a reactive best practice that has worked for decades.
+ライフサイクルではなく、データとその振る舞いをまとめてください。これは何十年にもわたって機能してきたリアクティブなベストプラクティスです。
 
-### 6. I really dislike JSX, any chance of a Template DSL? Oh, I see you have Tagged Template Literals/HyperScript. Maybe I will use those...
+### 6. 私は JSX がとても嫌いなのですが、テンプレート DSL の可能性はありますか？ あ、タグ付きテンプレートリテラル/HyperScript があるんですね。使ってみようかな……。
 
-Don't. Stop you right there. We use JSX the way Svelte uses their templates, to create optimized DOM instructions. The Tagged Template Literal and HyperScript solutions may be really impressive in their own right, but unless you have a real reason like a no-build requirement they are inferior in every way. Larger bundles, slower performance, and the need for manual workaround wrapping values.
+やめてください。ここでやめておきましょう。Svelte がテンプレートを使って最適化された DOM 命令を作成するのと同じように JSX を使っています。タグ付きテンプレートリテラルや HyperScript のソリューションは、それ自体はとても素晴らしいものかもしれませんが、ビルド不可の要件のような現実的な理由がない限りあらゆる面で劣っています。バンドルが大きくなり、パフォーマンスが低下し、値のラップを手動で行う必要があります。
 
-It's good to have options, but Solid's JSX is really the best solution here. A Template DSL would be great as well, albeit more restrictive, but JSX gives us so much for free. TypeScript, Existing Parsers, Syntax Highlighting, TypeScript, Prettier, Code Completion, and last and not least TypeScript.
+選択肢があるのは良いことですが、Solid の JSX はここでは本当に最適なソリューションです。テンプレート DSL も制限が多いとはいえ素晴らしいですが、JSX は無料で多くのことを提供してくれます。TypeScript、既存のパーサー、シンタックスハイライト、TypeScript、Prettier、コード補完、そして最後に欠かせないのが TypeScript です。
 
-Other libraries have been adding support for these features but that has been an enormous effort and is still imperfect and a constant maintenance headache. This is really taking a pragmatic stance.
+他のライブラリもこれらの機能のサポートを追加してきましたが、それは膨大な努力を必要とし、まだ不完全で、常にメンテナンスに頭を悩ませています。これは本当に現実的なスタンスを取っています。
 
-### 7. When do I use a Signal vs Store? Why are these different?
+### 7. Signal と Store はどのような場合に使用するのですか？ なぜこれらは違うのですか？
 
-Stores automatically wrap nested values making it ideal for deep data structures, and for things like models. For most other things Signals are lightweight and do the job wonderfully.
+Store はネストされた値を自動的にラップするので、深いデータ構造やモデルのようなものに最適です。それ以外のほとんどの用途では、Signal は軽量で、素晴らしい働きをします。
 
-As much we would love to wrap these together as a single thing, you can't proxy primitives. Functions are the simplest interface and any reactive expression (including state access) can be wrapped in one on transport so this provides a universal API. You can name your signals and state as you choose and it stays minimal. Last thing we'd want to do is force typing `.get()` `.set()` on the end-user or even worse `.value`. At least the former can be aliased for brevity, whereas the latter is just the least terse way to call a function.
+これらを 1 つのものとしてまとめたいところですが、プリミティブをプロキシすることはできません。関数は最もシンプルなインターフェイスで、あらゆるリアクティブな式（状態のアクセスを含む）をトランスポート上で 1 つにまとめることができるため、ユニバーサルな API を提供します。Signal や状態に好きな名前をつけることができ、最小限の機能にとどめることができます。エンドユーザーに `.get()` `.set()` の入力を強要したり、さらに悪いことに `.value` の入力を強要したりすることは絶対に避けたいことです。少なくとも、前者は簡潔にするためにエイリアスを付けることができますが、後者は関数を呼び出すための最も簡潔な方法に過ぎません。
 
-### 8. Why can I not just assign a value to Solid's Store as I can in Vue. Svelte, or MobX? Where is the 2-way binding?
+### 8. Vue のように Solid の Store に値を割り当てることができないのはなぜですか。 Svelte、または MobX？ 双方向バインディングはどこにありますか？
 
-Reactivity is a powerful tool but also a dangerous one. MobX knows this and introduced Strict mode and Actions to limit where/when updates occur. In Solid, which deals with whole Component trees of data, it became apparent that we can learn something from React here. You don't need to be actually immutable as long as you provide the means to have the same contract.
+リアクティブ性は強力なツールですが、同時に危険なツールでもあります。MobX はこのことを理解していて、Strict モードと Actions を導入して、更新が発生する場所や時間を制限しています。データのコンポーネントツリー全体を扱う Solid では、React から何かを学べることが明らかになりました。同じ契約を持つための手段を提供する限り、実際に不変である必要はありません。
 
-Being able to pass the ability to update state is arguably even more important than deciding to pass the state. So being able to separate it is important, and only possible if reading is immutable. We also don't need to pay the cost of immutability if we can still granularly update. Luckily there are tons of prior art here between ImmutableJS and Immer. Ironically Solid acts mostly as a reverse Immer with its mutable internals and immutable interface.
+状態を更新する能力を渡せるかどうかは、状態を渡すかどうかを決めるよりも間違いなく重要です。だから、それを分離できることは重要であり、読み取りが不変である場合にのみ可能です。また、細かく更新できるのであれば、不変性のコストを払う必要はありません。幸いなことに、ImmutableJS と Immer の間には大量の先行技術があります。皮肉なことに、Solid は可変の内部と不変のインターフェイスを持つ逆 Immer のように振る舞います。
 
-### 9. Can I use Solid's reactivity on its own?
+### 9. Solid のリアクティブ性を単体で使うことはできますか？
 
-Of course. While we haven't exported a standalone package it is easy to install Solid without the compiler and just use the reactive primitives. One of the benefits of granular reactivity is it is library agnostic. For that matter, almost every reactive library works this way. That is what inspired [Solid](https://github.com/solidjs/solid) and it's underlying [DOM Expressions library](https://github.com/ryansolid/dom-expressions) in the first place to make a renderer purely from the reactive system.
+もちろんです。単体のパッケージは提供していませんが、コンパイラなしの Solid をインストールし、リアクティブプリミティブを使用することは簡単です。きめ細かいリアクティブ性の利点の 1 つは、ライブラリに依存しないことです。それどころか、ほとんどすべてのリアクティブライブラリがこの方法で動作します。それが [Solid](https://github.com/solidjs/solid) に影響を与えたものであり、その基礎となる [DOM Expressions library](https://github.com/ryansolid/dom-expressions) が純粋にリアクティブシステムからレンダラーを作るきっかけとなりました。
 
-To list a few to try: [Solid](https://github.com/solidjs/solid), [MobX](https://github.com/mobxjs/mobx), [Knockout](https://github.com/knockout/knockout), [Svelte](https://github.com/sveltejs/svelte), [S.js](https://github.com/adamhaile/S), [CellX](https://github.com/Riim/cellx), [Derivable](https://github.com/ds300/derivablejs), [Sinuous](https://github.com/luwes/sinuous), and even recently [Vue](https://github.com/vuejs/vue). Much more goes into making a reactive library than tagging it onto a renderer like, [lit-html](https://github.com/Polymer/lit-html) for example, but it's good way to get a feel.
+試しにいくつか挙げてみましょう: [Solid](https://github.com/solidjs/solid)、[MobX](https://github.com/mobxjs/mobx)、[Knockout](https://github.com/knockout/knockout)、[Svelte](https://github.com/sveltejs/svelte)、[S.js](https://github.com/adamhaile/S)、[CellX](https://github.com/Riim/cellx)、[Derivable](https://github.com/ds300/derivablejs)、[Sinuous](https://github.com/luwes/sinuous)、そして最近では [Vue](https://github.com/vuejs/vue) などです。リアクティブなライブラリを作るには、例えば [lit-html](https://github.com/Polymer/lit-html) のようにレンダラーにタグ付けするよりもはるかに多くのことが必要ですが、感触をつかむには良い方法です。
 
-### 10. Does Solid have a Next.js or Material Components like library I can use?
+### 10. Solid には、Next.js や Material Components のようなライブラリはありますか？
 
-Not to our knowledge. If you are interested in building one we are readily available on our [Discord](https://discord.com/invite/solidjs) to help build those out. We have the fundamentals and just need to build on them.
+私たちの知る限りありません。もしライブラリ構築に興味があれば、[Discord](https://discord.com/invite/solidjs) ですぐに構築のお手伝いをいたします。基本的なものは揃っているので、あとはそれをベースにしていくだけです。
