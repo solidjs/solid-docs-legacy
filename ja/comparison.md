@@ -1,73 +1,73 @@
 ---
-title: Comparison
-description: Comparisons of Solid against other frameworks.
+title: 比較
+description: Solid と他のフレームワークとの比較
 sort: 1
 ---
 
-# Comparison with other Libraries
+# 他のライブラリとの比較
 
-This section cannot escape some bias but I think it is important to understand where Solid's solution sits compared to other libraries. This is not about performance. For a definitive look at performance feel free to look at the [JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark).
+このセクションでは、多少の偏りは避けられませんが、Solid のソリューションが他のライブラリと比較してどのような位置にあるかを理解することが重要だと思っています。これはパフォーマンスの話ではありません。パフォーマンスについての決定的な情報は、[JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark) をご覧ください。
 
 ## React
 
-React has had a big influence on Solid. Its unidirectional flow and explicit segregation of read and write in its Hooks API informed Solid's API. More so than the objective of being just a "Render Library" rather than a framework. Solid has strong opinions on how to approach managing data in application development but doesn't seek to constrain its execution.
+React は Solid に大きな影響を与えました。React の単方向フローや、Hooks API における読み取りと書き込みの明示的な分離は、Solid の API に影響を与えました。フレームワークではなく、単なる「レンダリングライブラリ」であるという目的以上のものです。Solid は、アプリケーション開発におけるデータ管理のアプローチ方法について強い意見を持っていますが、その実行を制約しようとはしません。
 
-However, as much as Solid aligns with React's design philosophy, it works fundamentally differently. React uses a Virtual DOM and Solid does not. React's abstraction is top down component partition where render methods are called repeatedly and diffed. Solid, instead, renders each Template once in its entirety, constructing its reactive graph and only then executes instructions related to fine-grained changes.
+しかし、Solid は React の設計思想に沿うものであると同時に、根本的に異なる仕組みを持っています。React は仮想 DOM を使用し、Solid は使用しません。React の抽象化はトップダウンのコンポーネント分割で、レンダリングメソッドが繰り返し呼び出され、差分が発生します。一方 Solid は、各テンプレートを一度だけ全体的にレンダリングし、リアクティブグラフを構築した後、細かな変更に関連する命令を実行します。
 
-#### Advice for migrating:
+#### 移行のためのアドバイス:
 
-Solid's update model is nothing like React, or even React + MobX. Instead of thinking of function components as the `render` function, think of them as a `constructor`. Watch out for destructuring or early property access losing reactivity. Solid's primitives have no restrictions like the Hook Rules so you are free to nest them as you see fit. You don't need explicit keys on list rows to have "keyed" behavior. Finally, there is no VDOM so imperative VDOM APIs like `React.Children` and `React.cloneElement` make no sense. I encourage finding different ways to solve problems that use these declaratively.
+Solid の更新モデルは、React や、React + MobX とは全く異なります。関数コンポーネントを `render` 関数と考えるのではなく、`constructor` と考えてください。分割代入や初期のプロパティアクセスはリアクティブ性を失うことに注意してください。Solid のプリミティブにはフックルールのような制限がないので、自由にネストできます。また、リストの行に明示的なキーがなくても、「キー付き」の動作が可能です。最後に、仮想 DOM が存在しないので、`React.Children` や `React.cloneElement` のような仮想 DOM の命令的 API は意味を持ちません。これらを宣言的に使用する問題を解決する別の方法を見つけることをお勧めします。
 
 ## Vue
 
-Solid is not particularly influenced by Vue design-wise, but they are comparable in approach. They both use Proxies in their Reactive system with read based auto-tracking. But that is where the similarities end. Vue's fine grained dependency detection just feeds into a less fine-grained Virtual DOM and Component system whereas Solid keeps its granularity right down to its direct DOM updates.
+Solid は設計面では Vue の影響を特に受けていませんが、アプローチとしては同等です。どちらもリアクティブなシステムでプロキシを使用し、読み取りベースの自動追跡を行っています。しかし、似ているのはそこまでです。Vue の細かい依存関係の検出は、より細かい仮想 DOM とコンポーネントシステムに供給されるだけですが、Solid は DOM を直接更新することでその粒度を維持しています。
 
-Vue values easiness where Solid values transparency. Although Vue's new direction with Vue 3 aligns more with the approach Solid takes. These libraries might align more over time depending on how they continue to evolve.
+Vue は簡単さを重視し、Solid は透明性を重視しています。Vue 3 での Vue の新しい方向性は、Solid のアプローチとより一致しています。これらのライブラリが今後どのように進化していくかによって、時間が経てばもっと一致するかもしれません。
 
-#### Advice for migrating:
+#### 移行のためのアドバイス:
 
-As another modern reactive library migration from Vue 3 should feel familiar. Solid's components are very much like tagging the template on the end of Vue's `setup` function. Be wary of overwrapping state derivations with computations, try a function. Reactivity is pervasive. Solid's proxies are intentionally read-only. Don't knock it before you try it.
+もう 1 つの最新リアクティブライブラリである Vue 3 からの移行は、なじみ深いものになるでしょう。Solid のコンポーネントは、Vue の `setup` 関数の最後にテンプレートをタグ付けするのとよく似ています。状態の派生を計算でオーバーラッピングすることに注意して、関数を試してみてください。リアクティブ性が広く行き渡っています。Solid のプロキシは意図的に読み取り専用となっています。試す前にこきおろすのはやめましょう。
 
 ## Svelte
 
-Svelte pioneered the precompiled disappearing framework that Solid also employs to a certain degree. Both libraries are truly reactive and can produce really small execution code bundles although Svelte is the winner here for small demos. Solid requires a bit more explicitness in its declarations, relying less on implicit analysis from the compiler, but that is part of what gives Solid superior performance. Solid also keeps more in the runtime which scales better in larger apps. Solid's RealWorld demo implementation is 25% smaller than Svelte's.
+Svelte は、Solid もある程度採用しているプリコンパイルされた消えるフレームワークの先駆者です。どちらのライブラリも真にリアクティブであり、非常に小さな実行コードバンドルを生成できますが、小さなデモでは Svelte が勝っています。Solid は、宣言の際により多くの明示性を要求し、コンパイラによる暗黙の分析への依存度を下げていますが、これが Solid の優れたパフォーマンスの一因となっています。また、Solid はランタイムに多くの情報を保持しているため、大規模なアプリケーションでの拡張性に優れています。Solid の RealWorld デモの実装は、Svelte の実装よりも 25％ 小さいです。
 
-Both libraries aim to help their developers write less code but approach it completely differently. Svelte 3 focuses on the optimization of the ease of dealing with localized change focusing on plain object interaction and two-way binding. In constrast Solid focuses on the data flow by deliberately embracing CQRS and immutable interface. With functional template composition, in many cases, Solid allows developers to write even less code than Svelte although Svelte's template syntax is definitely terser.
+どちらのライブラリも開発者がより少ないコードを書けるようにすることを目的としていますが、そのアプローチは全く異なります。Svelte 3 は、局所的な変化への対応を容易にするための最適化に焦点を当てており、プレーンなオブジェクトインタラクションと双方向バインディングに重点を置いています。対して Solid は、CQRS と不変のインターフェイスを意図的に採用することで、データフローに焦点を当てています。Svelte のテンプレート構文は間違いなく簡潔ですが、Solid では機能的なテンプレート構成により、多くの場合、Svelte よりも少ないコードで開発を行うことができます。
 
-#### Advice for migrating:
+#### 移行のためのアドバイス:
 
-Developer experience is different enough that while some things are analogous it is a very different experience. Components in Solid are cheap, so don't shy away from having more of them.
+開発者体験は、いくつかの点で類似していますが、それは非常に異なる経験です。Solid のコンポーネントは安価なので、数を増やすことをためらう必要はありません。
 
 ## Knockout.js
 
-This library owes its existence to Knockout. Modernizing its model for fine grained dependency detection was the motivation for this project. Knockout was released in 2010 and supports Microsoft Explorer back to IE6 while much of Solid doesn't support IE at all.
+このライブラリは、Knockout のおかげで成り立っています。細かい依存関係の検出のために、Knockout のモデルを近代化することが、このプロジェクトの動機でした。Knockout は 2010 年にリリースされ、Microsoft Explorer を IE6 までサポートしていますが、Solid の多くは IE をまったくサポートしていません。
 
-Knockout's bindings are just strings in HTML which are walked over at runtime. They depend on cloning context ($parent etc...). Whereas Solid uses JSX or Tagged Template Literals for templating opting for an in JavaScript API.
+Knockout のバインディングは、ランタイムに読み込まれる HTML の文字列に過ぎません。これらのバインディングは、クローンのコンテキスト（$parent など）に依存します。一方、Solid はテンプレートに JSX やタグ付きテンプレートリテラルを使用し、JavaScript の API を選択しています。
 
-The biggest difference might be that Solid's approach to batching changes which ensures synchronicity whereas Knockout has deferUpdates which uses a deferred microtask queue.
+最大の違いは、Solid が変更をバッチ処理することで同期性を確保しているのに対し、Knockout は deferUpdates で遅延マイクロタスクキューを使用していることでしょう。
 
-#### Advice for migrating:
+#### 移行のためのアドバイス:
 
-If you are used to Knockout, Solid's primitives might look strange to you. The read/write separation is intentional and not just to make life harder. Look to adopting a state/action (Flux) mental model. While the libraries look similar they promote different best practices.
+Knockout に慣れている人には、Solid のプリミティブは奇妙に見えるかもしれません。読み取り/書き込みの分離は意図的なもので、ただ人生を困難にするためではありません。State/Action (Flux) メンタルモデルの採用を検討してください。これらのライブラリは似ているように見えますが、異なるベストプラクティスを推進しています。
 
 ## Lit & LighterHTML
 
-These libraries are incredibly similar and have had some influence on Solid. Mostly that Solid's compiled code uses a very similar method to performantly initially render the DOM. Cloning Template elements and using comment placeholders are something that Solid and these libraries share in common.
+これらのライブラリは非常に似ており、Solid にも影響を与えています。ほとんどの場合、Solid のコンパイルされたコードは、DOM の初期レンダリングを実行するために非常に似た方法を使用しています。テンプレート要素を複製したりコメントプレースホルダーの使用は、Solid とこれらのライブラリに共通するものです。
 
-The biggest difference is that while these libraries do not use the Virtual DOM they treat rendering the same way, top down, requiring component partitioning to keep things sane. By contrast, Solid uses its fine grained Reactive Graph to only update what has changed and in doing so only shares this technique for its initial render. This approach takes advantage from the initial speed only available to native DOM and also have the most performant approach to updates.
+最大の違いは、これらのライブラリが仮想 DOM を使用していない一方で、レンダリングをトップダウンで同じように扱い、正常な状態を維持するためコンポーネント分割を必要とすることです。これに対して Solid は、きめ細かなリアクティブグラフを使って、変更された部分だけを更新し、最初のレンダリングでのみこの手法を共有しています。このアプローチは、ネイティブ DOM ならではの初期速度を利用しており、更新に対しても最もパフォーマンスの高いアプローチとなっています。
 
-#### Advice for migrating:
+#### 移行のためのアドバイス:
 
-These libraries are pretty minimal and easy to build on top. However, keep in mind that `<MyComp/>` isn't just HTMLElement (array or function). Try to keep your things in the JSX template. Hoisting works for the most part but it is best to mentally think of this still as a render library and not a HTMLElement factory.
+これらのライブラリはかなりミニマムで、その上に構築するのも簡単です。ただし、`<MyComp/>` は単なる HTMLElement（配列や関数）ではないことに注意してください。自分のものは JSX テンプレートの中に入れておくようにしましょう。ほとんどの場合、ホイスティングは機能しますが、これは HTMLElement のファクトリではなく、レンダリングライブラリであると考えるのがベストです。
 
 ## S.js
 
-This library had the greatest influence on Solid's reactive design. Solid used S.js internally for a couple of years until the feature set placed them on diffenent paths. S.js is one of the most efficient reactive libraries to date. It models everything off synchronous time steps like a digital circuit and ensures consistency without having to do many of the more complicated mechanisms found in libraries like MobX. Solid's reactivity in the end is a sort of hybrid between S and MobX. This gives it greater performance than most reactive libraries (Knockout, MobX, Vue) while retaining the ease of mental model for the developer. S.js ultimately is still the more performant reactive library although the difference is hardly noticeable in all but the most grueling synthetic benchmarks.
+このライブラリは、Solid のリアクティブ設計に最も大きな影響を与えました。Solid は数年前から S.js を内部で使用していましたが、機能セットの違いから別々の道を歩むことになりました。S.js は、これまでで最も効率的なリアクティブライブラリの 1 つです。デジタル回路のように同期したタイムステップですべてをモデル化し、MobX のような複雑なメカニズムを多用することなく一貫性を確保しています。Solid のリアクティブ性は、最終的には S と MobX のハイブリッドのようなものです。これにより、多くのリアクティブライブラリ（Knockout、MobX、Vue）よりも高いパフォーマンスが得られる一方で、開発者のメンタルモデルは簡単に保つことができます。最終的には S.js の方がリアクティブライブラリとしての性能は高いのですが、その差は最も過酷な合成ベンチマーク以外ではほとんど気になりません。
 
 ## RxJS
 
-RxJS is a Reactive library. While Solid has a similar idea of Observable data it uses a much different application of the observer pattern. While Signals are like a simple version of an Observable (only the next), the pattern of auto dependency detection surplant's RxJS' hundred or so operators. Solid could have taken this approach, and indeed earlier, versions of the library included similar operators, but in most cases it is more straightforward to write your own transformation logic in a computation. Where Observables are cold starting, unicast and push-based, many problems on the client lend themselves to hot startup and being multicast which is Solid's default behavior.
+RxJS はリアクティブライブラリです。Solid は Observable データという似たようなアイデアを持っていますが、オブザーバーパターンのはるかに異なる応用を使用しています。Signal は Observable の単純なバージョンのようなものですが（次のものだけ）、自動的な依存関係検出のパターンは RxJS の 100 以上の演算子を凌駕しています。Solid もこのようなアプローチを取ることができましたし、実際に初期のバージョンのライブラリには同様の演算子が含まれていましたが、ほとんどの場合、計算で独自の変換ロジックを書く方が簡単です。Observable がコールドスタート、ユニキャスト、プッシュベースであるのに対し、クライアント上の多くの問題はホットスタート、マルチキャストであり、Solid のデフォルトの動作となります。
 
 ## Others
 
-Angular and a few other popular libraries are notably missing from this comparison. Lack of experience with them prevents making any adequate comparisons. Generally, Solid has little in common with larger Frameworks and it is much harder to compare them head on.
+Angular や他のいくつかの人気のあるライブラリは、この比較では注目に値しません。これらのライブラリを使用した経験がないため、適切な比較ができないのです。一般的に、Solid は大規模なフレームワークとの共通点が少なく、正面から比較することは非常に困難です。
