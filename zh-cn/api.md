@@ -252,9 +252,7 @@ props = mergeProps(props, otherProps);
 export function splitProps<T>(props: T, ...keys: Array<(keyof T)[]>): [...parts: Partial<T>];
 ```
 
-This is the replacement for destructuring. It splits a reactive object by keys while maintaining reactivity.
-
-这是解构的替代品。`splitProps` 在保持响应性的同时通过键来拆分响应式对象。
+`splitProps` 是解构的替代品。`splitProps` 在保持响应性的同时通过键来拆分响应式对象。
 
 ```js
 const [local, others] = splitProps(props, ["children"]);
