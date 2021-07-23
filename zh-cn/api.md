@@ -1,3 +1,9 @@
+---
+title: API
+description: Solid API 纲要
+sort: 0
+---
+
 # 响应式基础
 
 ## `createSignal`
@@ -9,7 +15,7 @@ export function createSignal<T>(
 ): [get: () => T, set: (v: T) => T];
 ```
 
-这是最基本的响应式 primitive，用于跟踪后续可能变化的单个值。create 函数返回一对 get 和 set 函数来访问和更新 signal。
+这是最基本的反应式原语 (primitive)，用于跟踪随时间变化的单个值。 create 函数返回一对 get 和 set 函数来访问和更新信号 (signal)。
 
 ```js
 const [getValue, setValue] = createSignal(initialValue);
@@ -24,7 +30,7 @@ setValue(nextValue);
 setValue(prev => prev + next);
 ```
 
-如果你希望值对更新做出响应，请记住在跟踪范围内访问信号。跟踪范围是指可以被传递然后计算的函数之内，如 `createEffect` 或 JSX 表达式。
+如果您希望值对更新做出响应，请记住在跟踪范围内访问信号。跟踪范围是传递给计算的函数，如 `createEffect` 或 JSX 表达式。
 
 > 如果你希望在 Signal 中存储函数，则必须使用函数的形式：
 >
@@ -38,7 +44,7 @@ setValue(prev => prev + next);
 export function createEffect<T>(fn: (v: T) => T, value?: T, options?: { name?: string }): void;
 ```
 
-创建一个新的计算来自动跟踪依赖项并在每次依赖项发生变化导致的渲染之后运行。非常适合使用 `ref` 或者管理其他副作用。
+创建一个新的计算来自动跟踪依赖项并在依赖项发生变化的每次渲染之后运行。非常适合使用 `ref`s 和管理其他副作用。
 
 ```js
 const [a, setA] = createSignal(initialValue);
@@ -246,9 +252,7 @@ props = mergeProps(props, otherProps);
 export function splitProps<T>(props: T, ...keys: Array<(keyof T)[]>): [...parts: Partial<T>];
 ```
 
-This is the replacement for destructuring. It splits a reactive object by keys while maintaining reactivity.
-
-这是解构的替代品。`splitProps` 在保持响应性的同时通过键来拆分响应式对象。
+`splitProps` 是解构的替代品。`splitProps` 在保持响应性的同时通过键来拆分响应式对象。
 
 ```js
 const [local, others] = splitProps(props, ["children"]);

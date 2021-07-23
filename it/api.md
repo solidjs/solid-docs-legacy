@@ -1352,7 +1352,7 @@ Forza l'oggetto a essere trattato come un attributo anziché come una proprietà
 
 Il compilatore di Solid utilizza una semplice euristica per il wrapping reattivo e la valutazione pigra delle espressioni JSX. L'elemento in questione contiene una chiamata di funzione, un accesso a una proprietà o forse JSX? Se sì, lo avvolgiamo in un getter quando viene passato ai componenti o in un effetto se passato agli elementi nativi.
 
-Sapendo questo, possiamo ridurre il sovraccarico di cose che sappiamo non cambieranno mai semplicemente accedendovi al di fuori del JSX. Una variabile semplice non verrà mai racchiusa. Possiamo anche dire al compilatore di non avvolgerli iniziando l'espressione con un decoratore di commenti `/_ @once _/.
+Sapendo questo, possiamo ridurre il sovraccarico di cose che sappiamo non cambieranno mai semplicemente accedendovi al di fuori del JSX. Una variabile semplice non verrà mai racchiusa. Possiamo anche dire al compilatore di non avvolgerli iniziando l'espressione con un decoratore di commenti `/_ @once _/`.
 
 ```jsx
 <MioComponent static={/*@once*/ stato.nonAggionerò} />
