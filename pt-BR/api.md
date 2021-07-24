@@ -15,7 +15,7 @@ export function createSignal<T>(
 ): [get: () => T, set: (v: T) => T];
 ```
 
-Este é o reativo primitivo mais básico usado para rastrear um único valor que muda com o tempo. A função `create` retorna um par de funções `get` e `set` para acessar e atualizar o sinal.
+Este é o reativo primitivo mais básico usado para rastrear um único valor que muda com o tempo. A função `create` retorna um par de funções `get` e `set` para acessar e atualizar o Signal.
 
 ```js
 const [getValue, setValue] = createSignal(initialValue);
@@ -53,7 +53,7 @@ Cria um novo cálculo que rastreia automaticamente as dependências e é executa
 ```js
 const [a, setA] = createSignal(initialValue);
 
-// efeito que depende do sinal `a`
+// efeito que depende do Signal `a`
 createEffect(() => doSideEffect(a()));
 ```
 
@@ -77,7 +77,7 @@ export function createMemo<T>(
 ): () => T;
 ```
 
-Cria um sinal derivado somente leitura que recalcula seu valor sempre que as dependências do código executado são atualizadas.
+Cria um Signal derivado somente leitura que recalcula seu valor sempre que as dependências do código executado são atualizadas.
 
 ```js
 const getValue = createMemo(() => computeExpensiveValue(a(), b()));
@@ -119,7 +119,7 @@ export function createResource<T, U>(
 ): ResourceReturn<T>;
 ```
 
-Cria um sinal que pode gerenciar solicitações assíncronas. O `fetcher` é uma função assíncrona que aceita o valor de retorno da `source` se fornecida e retorna um Promise cujo valor resolvido é definido no recurso. O fetcher não é reativo, portanto, use o primeiro argumento opcional se quiser que ele seja executado mais de uma vez. Se o source for falsa, null ou undefined, não será feita a busca.
+Cria um Signal que pode gerenciar solicitações assíncronas. O `fetcher` é uma função assíncrona que aceita o valor de retorno da `source` se fornecida e retorna um Promise cujo valor resolvido é definido no recurso. O fetcher não é reativo, portanto, use o primeiro argumento opcional se quiser que ele seja executado mais de uma vez. Se o source for falsa, null ou undefined, não será feita a busca.
 
 ```js
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
@@ -297,7 +297,7 @@ start(() => setSignal(newValue), () => /* transição está feita */)
 export function observable<T>(input: () => T): Observable<T>;
 ```
 
-Este método recebe um sinal e produz um Observable simples. Consuma-o da biblioteca Observable de sua escolha normalmente com o operador `from`.
+Este método recebe um Signal e produz um Observable simples. Consuma-o da biblioteca Observable de sua escolha normalmente com o operador `from`.
 
 ```js
 import { from } from "rxjs";
@@ -318,7 +318,7 @@ export function mapArray<T, U>(
 ): () => U[];
 ```
 
-Helper de mapa reativo que armazena em cache cada item por referência para reduzir o mapeamento desnecessário nas atualizações. Ele executa a função de mapeamento apenas uma vez por valor e, em seguida, move ou remove conforme necessário. O argumento do índice é um sinal. A função de mapa em si não está rastreando.
+Helper de mapa reativo que armazena em cache cada item por referência para reduzir o mapeamento desnecessário nas atualizações. Ele executa a função de mapeamento apenas uma vez por valor e, em seguida, move ou remove conforme necessário. O argumento do índice é um Signal. A função de mapa em si não está rastreando.
 
 Auxiliar subjacente para o fluxo de controle `<For>`.
 
@@ -350,7 +350,7 @@ export function indexArray<T, U>(
 ): () => U[];
 ```
 
-Semelhante ao `mapArray`, exceto que mapeia por índice. O item é um sinal e o índice agora é a constante.
+Semelhante ao `mapArray`, exceto que mapeia por índice. O item é um Signal e o índice agora é a constante.
 
 Auxiliar subjacente para o fluxo de controle `<Index>`.
 
@@ -458,7 +458,7 @@ setState((state) => ({ preferredName: state.firstName, lastName: "Milner" }));
 
 Ele oferece suporte a caminho incluindo key arrays, object ranges e funções de filtro.
 
-setState também suporta configuração aninhada onde você pode indicar o caminho para a mudança. Quando aninhado, o estado que você está atualizando pode ser outro valor não Object. Os objetos ainda são mesclados, mas outros valores (incluindo Arrays) são substituídos.
+`setState` também suporta configuração aninhada onde você pode indicar o caminho para a mudança. Quando aninhado, o estado que você está atualizando pode ser outro valor não Object. Os objetos ainda são mesclados, mas outros valores (incluindo Arrays) são substituídos.
 
 ```js
 const [state, setState] = createStore({
@@ -739,7 +739,7 @@ export function createComputed<T>(
 ): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs immediately before render. Use this to write to other reactive primitives. When possible use `createMemo` instead as writing to a signal mid update can cause other computations to need to re-calculate.
+Cria um novo cálculo que rastreia automaticamente as dependências e executa imediatamente antes da renderização. Use isso para gravar em outras primitivas reativas. Quando possível, use `createMemo` em vez de escrever para um Signal de atualização intermediária pode fazer com que outros cálculos precisem ser recalculados.
 
 ## `createRenderEffect`
 
@@ -751,7 +751,7 @@ export function createRenderEffect<T>(
 ): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs during the render phase as DOM elements are created and updated but not necessarily connected. All internal DOM updates happen at this time.
+Cria um novo cálculo que rastreia automaticamente as dependências e é executado durante a fase de renderização conforme os elementos DOM são criados e atualizados, mas não necessariamente conectados. Todas as atualizações internas do DOM acontecem neste momento.
 
 ## `createSelector`
 
@@ -763,7 +763,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Creates a conditional signal that only notifies subscribers when entering or exiting their key matching the value. Useful for delegated selection state. As it makes the operation O(2) instead of O(n).
+Cria um Signal condicional que notifica apenas os assinantes ao inserir ou sair de sua chave correspondente ao valor. Útil para estado de seleção delegado. Uma vez que faz a operação O(2) em vez de O(n).
 
 ```js
 const isSelected = createSelector(selectedId);
@@ -773,9 +773,9 @@ const isSelected = createSelector(selectedId);
 </For>;
 ```
 
-# Rendering
+# Renderização
 
-These imports are exposed from `solid-js/web`.
+Essas importações são expostas em `solid-js/web`
 
 ## `render`
 
@@ -786,7 +786,7 @@ export function render(
 ): () => void;
 ```
 
-This is the browser app entry point. Provide a top level component definition or function and an element to mount to. It is recommended this element be empty as the returned dispose function will wipe all children.
+Este é o ponto de entrada do aplicativo do navegador. Fornece uma definição ou função de componente de nível superior e um elemento para montagem. Recomenda-se que este elemento esteja vazio, pois a função de descarte retornada apagará todos os filhos.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
@@ -801,7 +801,7 @@ export function hydrate(
 ): () => void;
 ```
 
-This method is similar to `render` except it attempts to rehydrate what is already rendered to the DOM. When initializing in the browser a page has already been server rendered.
+Este método é semelhante a `render`, exceto que tenta reidratar o que já foi processado para o DOM. Ao inicializar no navegador, uma página já foi renderizada pelo servidor.
 
 ```js
 const dispose = hydrate(App, document.getElementById("app"));
@@ -819,7 +819,7 @@ export function renderToString<T>(
 ): string;
 ```
 
-Renders to a string synchronously. The function also generates a script tag for progressive hydration. Options include eventNames to listen to before the page loads and play back on hydration, and nonce to put on the script tag.
+Renderiza em uma string de forma síncrona. A função também gera uma tag de script para hidratação progressiva. As opções incluem eventNames para ouvir antes de a página carregar e reproduzir na hidratação e nonce para colocar na tag do script.
 
 ```js
 const html = renderToString(App);
@@ -838,7 +838,7 @@ export function renderToStringAsync<T>(
 ): Promise<string>;
 ```
 
-Same as `renderToString` except it will wait for all `<Suspense>` boundaries to resolve before returning the results. Resource data is automatically serialized into the script tag and will be hydrated on client load.
+O mesmo que `renderToString`, exceto que irá esperar que todos os limites de `<Suspense>` sejam resolvidos antes de retornar os resultados. Os dados do recurso são serializados automaticamente na tag do script e serão hidratados na carga do cliente.
 
 ```js
 const html = await renderToStringAsync(App);
@@ -865,13 +865,13 @@ export function pipeToNodeWritable<T>(
 ): void;
 ```
 
-This method renders to a Node stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data from any async resource as it completes.
+Este método é renderizado em um fluxo de Node. Ele renderiza o conteúdo de forma síncrona, incluindo quaisquer marcadores de substituição de Suspense e, em seguida, continua a transmitir os dados de qualquer recurso assíncrono à medida que é concluído.
 
 ```js
 pipeToNodeWritable(App, res);
 ```
 
-The `onReady` option is useful for writing into the stream around the the core app rendering. Remember if you use `onReady` to manually call `startWriting`.
+A opção `onReady` é útil para escrever no fluxo em torno da renderização do aplicativo principal. Lembre-se de usar `onReady` para chamar manualmente `startWriting`.
 
 ## `pipeToWritable`
 
@@ -900,14 +900,14 @@ export function pipeToWritable<T>(
 ): void;
 ```
 
-This method renders to a web stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data from any async resource as it completes.
+Este método é renderizado em um fluxo da web. Ele renderiza o conteúdo de forma síncrona, incluindo quaisquer marcadores de substituição de suspense e, em seguida, continua a transmitir os dados de qualquer recurso assíncrono à medida que é concluído.
 
 ```js
 const { readable, writable } = new TransformStream();
 pipeToWritable(App, writable);
 ```
 
-The `onReady` option is useful for writing into the stream around the the core app rendering. Remember if you use `onReady` to manually call `startWriting`.
+A opção `onReady` é útil para escrever no fluxo em torno da renderização do aplicativo principal. Lembre-se de usar `onReady` para chamar manualmente `startWriting`.
 
 ## `isServer`
 
@@ -915,25 +915,25 @@ The `onReady` option is useful for writing into the stream around the the core a
 export const isServer: boolean;
 ```
 
-This indicates that the code is being run as the server or browser bundle. As the underlying runtimes export this as a constant boolean it allows bundlers to eliminate the code and their used imports from the respective bundles.
+Isso indica que o código está sendo executado como servidor ou pacote de navegador. Como os tempos de execução subjacentes exportam isso como um booleano constante, permite que os bundlers eliminem o código e suas importações usadas dos respectivos bundles.
 
 ```js
 if (isServer) {
-  // I will never make it to the browser bundle
+  // Eu nunca vou chegar ao bundle do navegador
 } else {
-  // won't be run on the server;
+  // não será executado no servidor;
 }
 ```
 
-# Control Flow
+# Controle de fluxo
 
-Solid uses components for control flow. The reason is that with reactivity to be performant we have to control how elements are created. For example with lists, a simple `map` is inefficient as it always maps everything. This means helper functions.
+Solid usa componentes para controlar o fluxo. A razão é que, com a reatividade para ter desempenho, temos que controlar como os elementos são criados. Por exemplo, com listas, um simples `map` é ineficiente, pois sempre mapeia tudo. Isso significa funções auxiliares.
 
-Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flows.
+Envolvê-los em componentes é uma maneira conveniente de modelagem concisa e permite que os usuários componham e construam seus próprios fluxos de controle.
 
-These built-in control flows will be automatically imported. All except `Portal` and `Dynamic` are exported from `solid-js`. Those two which are DOM specific are exported by `solid-js/web`.
+Esses fluxos de controle integrados serão importados automaticamente. Todos, exceto `Portal` e `Dynamic` são exportados de `solid-js`. Aqueles dois que são específicos do DOM são exportados por `solid-js/web`.
 
-> Note: All callback/render function children of control flow are non-tracking. This allows for nesting state creation, and better isolates reactions.
+> Nota: Todos os filhos de função callback/render do fluxo de controle não são rastreáveis. Isso permite a criação de estados de aninhamento e isola melhor as reações.
 
 ## `<For>`
 
@@ -945,7 +945,7 @@ export function For<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Simple referentially keyed loop control flow.
+Fluxo de controle de loop referencialmente chaveado simples.
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -953,7 +953,7 @@ Simple referentially keyed loop control flow.
 </For>
 ```
 
-Optional second argument is an index signal:
+O segundo argumento opcional é um signal de índice:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -975,7 +975,7 @@ function Show<T>(props: {
 }): () => JSX.Element;
 ```
 
-The Show control flow is used to conditional render part of the view. It is similar to the ternary operator(`a ? b : c`) but is ideal for templating JSX.
+O fluxo de controle `Show` é usado para renderizar parte da visualização condicional. É semelhante ao operador ternário (`a ? b : c`), mas é ideal para modelagem JSX.
 
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
@@ -983,7 +983,7 @@ The Show control flow is used to conditional render part of the view. It is simi
 </Show>
 ```
 
-Show can also be used as a way of keying blocks to a specific data model. Ex the function is re-executed whenever the user model is replaced.
+`Show` também pode ser usado como uma forma de inserir blocos em um modelo de dados específico. Por exemplo, a função é reexecutada sempre que o modelo do usuário é substituído.
 
 ```jsx
 <Show when={state.user} fallback={<div>Loading...</div>}>
@@ -1006,7 +1006,7 @@ type MatchProps<T> = {
 export function Match<T>(props: MatchProps<T>);
 ```
 
-Useful for when there are more than 2 mutual exclusive conditions. Can be used to do things like simple routing.
+Útil para quando há mais de 2 condições exclusivas mútuas. Pode ser usado para fazer coisas como roteamento simples.
 
 ```jsx
 <Switch fallback={<div>Not Found</div>}>
@@ -1019,7 +1019,7 @@ Useful for when there are more than 2 mutual exclusive conditions. Can be used t
 </Switch>
 ```
 
-Match also supports function children to serve as keyed flow.
+Match também oferece suporte a filhos de função para servir como fluxo codificado.
 
 ## `<Index>`
 
@@ -1031,9 +1031,9 @@ export function Index<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Non-keyed list iteration (rows keyed to index). This is useful when there is no conceptual key, like if the data consists of primitives and it is the index that is fixed rather than the value.
+Iteração de lista não chaveada (linhas chaveadas para indexar). Isso é útil quando não há uma chave conceitual, como se os dados consistirem em primitivas e for o índice que é fixo em vez do valor.
 
-The item is a signal:
+O item é um signal:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1041,7 +1041,7 @@ The item is a signal:
 </Index>
 ```
 
-Optional second argument is an index number:
+O segundo argumento opcional é um número de índice:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1062,7 +1062,7 @@ function ErrorBoundary(props: {
 }): () => JSX.Element;
 ```
 
-Catches uncaught errors and renders fallback content.
+Captura erros não detectados e renderiza conteúdo substituto.
 
 ```jsx
 <ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
@@ -1070,7 +1070,7 @@ Catches uncaught errors and renders fallback content.
 </ErrorBoundary>
 ```
 
-Also supports callback form which passes in error and a reset function.
+Também suporta callback de formulário que passa em erro e uma função de redefinição.
 
 ```jsx
 <ErrorBoundary
@@ -1089,7 +1089,7 @@ export function Suspense(props: {
 }): JSX.Element;
 ```
 
-A component that tracks all resources read under it and shows a fallback placeholder state until they are resolved. What makes `Suspense` different than `Show` is it is non-blocking in that both branches exist at the same time even if not currently in the DOM.
+Um componente que rastreia todos os recursos lidos nele e mostra um estado de espaço reservado de fallback até que sejam resolvidos. O que torna `Suspense` diferente de `Show` é que ele não bloqueia, pois os dois ramos existem ao mesmo tempo, mesmo que não estejam atualmente no DOM.
 
 ```jsx
 <Suspense fallback={<div>Loading...</div>}>
@@ -1107,7 +1107,7 @@ function SuspenseList(props: {
 }): JSX.Element;
 ```
 
-`SuspenseList` allows for coordinating multiple parallel `Suspense` and `SuspenseList` components. It controls the order in which content is revealed to reduce layout thrashing and has an option to collapse or hide fallback states.
+`SuspenseList` permite a coordenação de vários componentes paralelos `Suspense` e `SuspenseList`. Ele controla a ordem em que o conteúdo é revelado para reduzir a sobrecarga do layout e tem a opção de recolher ou ocultar estados de fallback.
 
 ```jsx
 <SuspenseList revealOrder="forwards" tail="collapsed">
@@ -1121,7 +1121,7 @@ function SuspenseList(props: {
 </SuspenseList>
 ```
 
-SuspenseList is still experimental and does not have full SSR support.
+SuspenseList ainda é experimental e não tem suporte total de SSR.
 
 ## `<Dynamic>`
 
@@ -1134,7 +1134,7 @@ function Dynamic<T>(
 ): () => JSX.Element;
 ```
 
-This component lets you insert an arbitrary Component or tag and passes the props through to it.
+Este componente permite inserir um componente ou tag arbitrário e passar os props para ele.
 
 ```jsx
 <Dynamic component={state.component} someProp={state.something} />
@@ -1151,9 +1151,9 @@ export function Portal(props: {
 }): Text;
 ```
 
-This inserts the element in the mount node. Useful for inserting Modals outside of the page layout. Events still propagate through the Component Hierarchy.
+Isso insere o elemento no nó de montagem. Útil para inserir Modais fora do layout da página. Os eventos ainda se propagam pela Hierarquia de componentes.
 
-The portal is mounted in a `<div>` unless the target is the document head. `useShadow` places the element in a Shadow Root for style isolation, and `isSVG` is required if inserting into an SVG element so that the `<div>` is not inserted.
+O portal é montado em um `<div>` a menos que o destino seja o cabeçalho do documento. `useShadow` coloca o elemento em uma raiz de sombra para isolamento de estilo, e `isSVG` é necessário se inserir em um elemento SVG para que `<div>` não seja inserido.
 
 ```jsx
 <Portal mount={document.getElementById("modal")}>
@@ -1161,11 +1161,11 @@ The portal is mounted in a `<div>` unless the target is the document head. `useS
 </Portal>
 ```
 
-# Special JSX Attributes
+# Atributos JSX Especiais
 
-In general Solid attempts to stick to DOM conventions. Most props are treated as attributes on native elements and properties on Web Components, but a few of them have special behavior.
+Em geral, o Solid tenta seguir as convenções do DOM. A maioria dos props são tratados como atributos em elementos nativos e propriedades em componentes da Web, mas alguns deles têm comportamento especial.
 
-For custom namespaced attributes with TypeScript you need to extend Solid's JSX namespace:
+Para atributos de namespaces personalizados com TypeScript, você precisa estender o namespace JSX do Solid:
 
 ```ts
 declare module "solid-js" {
@@ -1191,21 +1191,21 @@ declare module "solid-js" {
 
 ## `ref`
 
-Refs are a way of getting access to underlying DOM elements in our JSX. While it is true one could just assign an element to a variable, it is more optimal to leave components in the flow of JSX. Refs are assigned at render time but before the elements are connected to the DOM. They come in 2 flavors.
+Refs são uma forma de obter acesso aos elementos DOM subjacentes em nosso JSX. Embora seja verdade que pode-se apenas atribuir um elemento a uma variável, é mais adequado deixar os componentes no fluxo do JSX. Refs são atribuídos no momento da renderização, mas antes que os elementos sejam conectados ao DOM. Eles vêm em 2 tipos.
 
 ```js
-// simple assignment
+// assinatura simples
 let myDiv;
 
-// use onMount or createEffect to read after connected to DOM
+// use onMount ou createEffect para ler depois de conectado ao DOM
 onMount(() => console.log(myDiv));
 <div ref={myDiv} />
 
-// Or, callback function (called before connected to DOM)
+// Ou, função de callback (chamada antes de ser conectada ao DOM)
 <div ref={el => console.log(el)} />
 ```
 
-Refs can also be used on Components. They still need to be attached on the otherside.
+Refs também podem ser usados em Componentes. Eles ainda precisam ser fixados no outro lado.
 
 ```jsx
 function MyComp(props) {
@@ -1221,7 +1221,7 @@ function App() {
 
 ## `classList`
 
-A helper that leverages `element.classList.toggle`. It takes an object whose keys are class names and assigns them when the resolved value is true.
+Um auxiliar que aproveita `element.classList.toggle`. Ele pega um objeto cujas chaves são nomes de classe e os atribui quando o valor resolvido é verdadeiro.
 
 ```jsx
 <div
@@ -1231,26 +1231,26 @@ A helper that leverages `element.classList.toggle`. It takes an object whose key
 
 ## `style`
 
-Solid's style helper works with either a string or with an object. Unlike React's version Solid uses `element.style.setProperty` under the hood. This means support for CSS vars, but it also means we use the lower, dash-case version of properties. This actually leads to better performance and consistency with SSR output.
+O auxiliar de estilo do Solid funciona com uma string ou com um objeto. Ao contrário da versão do React, o Solid usa `element.style.setProperty` sob o capô. Isso significa suporte para CSS vars, mas também significa que usamos a versão inferior das propriedades com dash-case. Na verdade, isso leva a um melhor desempenho e consistência com a saída SSR.
 
 ```jsx
 // string
 <div style={`color: green; background-color: ${state.color}; height: ${state.height}px`} />
 
-// object
+// objeto
 <div style={{
   color: "green",
   "background-color": state.color,
   height: state.height + "px" }}
 />
 
-// css variable
+// variável CSS
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
 
 ## `innerHTML`/`textContent`
 
-These work the same as their property equivalent. Set a string and they will be set. **Be careful!!** Setting `innerHTML` with any data that could be exposed to an end user as it could be a vector for malicious attack. `textContent` while generally not needed is actually a performance optimization when you know the children will only be text as it bypasses the generic diffing routine.
+Estes funcionam da mesma forma que seus equivalentes de propriedade. Defina uma string e eles serão definidos. **Tenha cuidado!!** Definir `innerHTML` com quaisquer dados que possam ser expostos a um usuário final, pois pode ser um vetor para um ataque malicioso. `textContent`, embora geralmente não seja necessário, é na verdade uma otimização de desempenho quando você sabe que os filhos serão apenas texto, pois ignora a rotina de diffing genérica.
 
 ```jsx
 <div textContent={state.text} />
@@ -1258,13 +1258,13 @@ These work the same as their property equivalent. Set a string and they will be 
 
 ## `on___`
 
-Event handlers in Solid typically take the form of `onclick` or `onClick` depending on style. The event name is always lowercased. Solid uses semi-synthetic event delegation for common UI events that are composed and bubble. This improves performance for these common events.
+Manipuladores de eventos em Solid normalmente assumem a forma de `onclick` ou `onClick` dependendo do estilo. O nome do evento está sempre em letras minúsculas. O Solid usa delegação de eventos semi-sintéticos para eventos de UI comuns que são compostos e borbulham. Isso melhora o desempenho para esses eventos comuns.
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
-Solid also supports passing an array to the event handler to bind a value to the first argument of the event handler. This doesn't use `bind` or create an additional closure, so it is highly optimized way delegating events.
+Solid também oferece suporte à passagem de uma matriz para o manipulador de eventos para vincular um valor ao primeiro argumento do manipulador de eventos. Isso não usa `bind` ou cria um fechamento adicional, por isso é altamente otimizado para delegar eventos.
 
 ```jsx
 function handler(itemId, e) {
@@ -1276,16 +1276,16 @@ function handler(itemId, e) {
 </ul>;
 ```
 
-Events cannot be rebound and the bindings are not reactive. The reason is that it is generally more expensive to attach/detach listeners. Since events naturally are called there is no need for reactivity simply shortcut your handler if desired.
+Os eventos não podem ser recuperados e as ligações não são reativas. O motivo é que geralmente é mais caro anexar/desanexar ouvintes. Uma vez que os eventos são chamados naturalmente, não há necessidade de reatividade, basta um atalho para o manipulador, se desejado.
 
 ```jsx
-// if defined call it, otherwised don't.
+// se definido, chame, de outra forma, não.
 <div onClick={() => props.handleClick?.()} />
 ```
 
 ## `on:___`/`oncapture:___`
 
-For any other events, perhaps ones with unusual names, or ones you wish not to be delegated there are the `on` namespace events. This simply adds an event listener verbatim.
+Para quaisquer outros eventos, talvez aqueles com nomes incomuns, ou aqueles que você não deseja que sejam delegados, existem os eventos de namespace `on`. Isso simplesmente adiciona um ouvinte de evento literalmente.
 
 ```jsx
 <div on:Weird-Event={(e) => alert(e.detail)} />
@@ -1293,13 +1293,13 @@ For any other events, perhaps ones with unusual names, or ones you wish not to b
 
 ## `use:___`
 
-These are custom directives. In a sense this is just syntax sugar over ref but allows us to easily attach multiple directives to a single element. A directive is simply a function with the following signature:
+Essas são diretivas personalizadas. Em certo sentido, isso é apenas sintaxe de açúcar sobre `ref`, mas nos permite anexar facilmente várias diretivas a um único elemento. Uma diretiva é simplesmente uma função com a seguinte assinatura:
 
 ```ts
 function directive(element: Element, accessor: () => any): void;
 ```
 
-Directive functions are called at render time but before being added to the DOM. You can do whatever you'd like in them including create signals, effects, register clean-up etc.
+As funções de diretiva são chamadas no momento da renderização, mas antes de serem adicionadas ao DOM. Você pode fazer o que quiser com eles, incluindo criar signals, efeitos, limpeza de registro, etc.
 
 ```js
 const [name, setName] = createSignal("");
@@ -1313,7 +1313,7 @@ function model(el, value) {
 <input type="text" use:model={[name, setName]} />;
 ```
 
-To register with TypeScript extend the JSX namespace.
+Para se registrar no TypeScript, estenda o namespace JSX.
 
 ```ts
 declare module "solid-js" {
@@ -1327,7 +1327,7 @@ declare module "solid-js" {
 
 ## `prop:___`
 
-Forces the prop to be treated as a property instead of an attribute.
+Força o prop a ser tratado como uma propriedade em vez de um atributo.
 
 ```jsx
 <div prop:scrollTop={props.scrollPos + "px"} />
@@ -1335,7 +1335,7 @@ Forces the prop to be treated as a property instead of an attribute.
 
 ## `attr:___`
 
-Forces the prop to be treated as a attribute instead of an property. Useful for Web Components where you want to set attributes.
+Força o prop a ser tratado como um atributo em vez de uma propriedade. Útil para Web Components onde você deseja definir atributos.
 
 ```jsx
 <my-element attr:status={props.status} />
@@ -1343,15 +1343,15 @@ Forces the prop to be treated as a attribute instead of an property. Useful for 
 
 ## `/* @once */`
 
-Solid's compiler uses a simple heuristic for reactive wrapping and lazy evaluation of JSX expressions. Does it contain a function call, a property access, or JSX? If yes we wrap it in a getter when passed to components or in an effect if passed to native elements.
+O compilador de Solid usa uma heurística simples para empacotamento reativo e avaliação preguiçosa de expressões JSX. Ele contém uma chamada de função, um acesso de propriedade ou JSX? Se sim, nós o envolvemos em um getter quando passado para componentes ou em um efeito se passado para elementos nativos.
 
-Knowing this we can reduce overhead of things we know will never change simply by accessing them outside of the JSX. A simple variable will never be wrapped. We can also tell the compiler not to wrap them by starting the expression with a comment decorator `/_ @once _/`.
+Sabendo disso, podemos reduzir a sobrecarga de coisas que sabemos que nunca mudarão simplesmente acessando-as fora do JSX. Uma variável simples nunca será quebrada. Também podemos dizer ao compilador para não envolvê-los iniciando a expressão com um decorador de comentário `/_@once_/`.
 
 ```jsx
 <MyComponent static={/*@once*/ state.wontUpdate} />
 ```
 
-This also works on children.
+Isso também funciona nos filhos.
 
 ```jsx
 <MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
