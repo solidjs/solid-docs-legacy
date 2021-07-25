@@ -13,7 +13,7 @@ Solid's documentation is available in 4 languages including:
 - [English](https://github.com/solidjs/solid-docs/tree/main/en)
 - [Italian](https://github.com/solidjs/solid-docs/tree/main/it) (contributed by [davedbase](https://github.com/davedbase))
 - [Chinese](https://github.com/solidjs/solid-docs/tree/main/zh-cn) (contributed by [Gavin-Gong](https://github.com/Gavin-Gong))
-- [Japanese](https://github.com/solidjs/solid-docs/tree/main/jp) (contributed by [Jun Shindo](https://github.com/jay-es))
+- [Japanese](https://github.com/solidjs/solid-docs/tree/main/jp) (contributed by [jay-es](https://github.com/jay-es))
 
 # Support
 
