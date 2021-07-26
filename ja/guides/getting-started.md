@@ -55,7 +55,7 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-[Solid のリアクティビティ](https://www.solidjs.com/docs/latest#reactivity)と [Solid のレンダリング](https://www.solidjs.com/docs/latest#rendering)の詳細をご覧いただけます。
+[Solid のリアクティビティ](#リアクティビティ)と [Solid のレンダリング](#レンダリング)の詳細をご覧いただけます。
 
 ## Solid に考える
 
@@ -87,7 +87,7 @@ Solid は、真のアイソモーフィックな開発を可能にする動的�
 
 Solid はサーバー上での非同期レンダリングとストリームレンダリングをサポートしているため、コードを一方的に記述し、それをサーバー上で実行できます。つまり、[render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) やコード分割などの機能が Solid でも機能するということです。
 
-詳細については、[サーバーガイド](https://www.solidjs.com/docs/latest#server-side-rendering)をご覧ください。
+詳細については、[サーバーガイド](#サーバーサイドレンダリング)をご覧ください。
 
 ## コンパイルなし？
 
