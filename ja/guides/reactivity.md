@@ -88,7 +88,7 @@ function createSignal(value) {
 
 [SolidJS: Reactivity to Rendering](https://indepth.dev/posts/1289/solidjs-reactivity-to-rendering)
 
-## 考察
+## 考慮すべき点
 
 リアクティビティに対するこのアプローチは、非常にパワフルでダイナミックです。条件付きコードの異なるブランチを実行することで、依存関係がその場で変化することに対応できます。また、何段階もの間接参照でも機能します。追跡スコープ内で実行された関数もすべて追跡されます。
 
