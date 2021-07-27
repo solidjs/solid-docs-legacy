@@ -55,7 +55,7 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-Você pode aprender mais sobre [Solid's Reactivity](https://www.solidjs.com/docs/latest#reactivity) e [Solid's Rendering](https://www.solidjs.com/docs/latest#rendering).
+Você pode aprender mais sobre [Solid's Reactivity](#reactivity) e [Solid's Rendering](#rendering).
 
 ## Pense como Solid
 
@@ -87,7 +87,7 @@ O Solid tem uma solução de renderização dinâmica do lado do servidor que pe
 
 Como o Solid oferece suporte à renderização assíncrona e de fluxo no servidor, você pode escrever seu código de uma maneira e executá-lo no servidor. Isso significa que recursos como [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) e a divisão de código funciona apenas em Solid.
 
-Para obter mais informações, leia o [Server guide](https://www.solidjs.com/docs/latest#server-side-rendering).
+Para obter mais informações, leia o [Server guide](#server-side-rendering).
 
 ## Sem Compilação?
 
