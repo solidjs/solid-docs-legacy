@@ -1,30 +1,30 @@
 [
   {
-    "lessonName": "Introduction/Basics",
+    "lessonName": "導入/基礎",
     "internalName": "introduction_basics"
   },
   {
-    "lessonName": "Introduction/JSX",
+    "lessonName": "導入/JSX",
     "internalName": "introduction_jsx"
   },
   {
-    "lessonName": "Introduction/Components",
+    "lessonName": "導入/コンポーネント",
     "internalName": "introduction_components"
   },
   {
-    "lessonName": "Introduction/Signals",
+    "lessonName": "導入/Signal",
     "internalName": "introduction_signals"
   },
   {
-    "lessonName": "Introduction/Effects",
+    "lessonName": "導入/Effect",
     "internalName": "introduction_effects"
   },
   {
-    "lessonName": "Introduction/Derived Signals",
+    "lessonName": "導入/派生 Signal",
     "internalName": "introduction_derived"
   },
   {
-    "lessonName": "Introduction/Memos",
+    "lessonName": "導入/Memo",
     "internalName": "introduction_memos"
   },
   {

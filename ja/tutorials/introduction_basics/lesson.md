@@ -1,22 +1,22 @@
-# Introduction
+# はじめに
 
-Welcome to the Solid tutorial! This tutorial will teach you everything you need to know to create performant web applications. You can also refer to the API and guides to learn more about how Solid works.
+Solid のチュートリアルへようこそ！　このチュートリアルでは、パフォーマンスの高い Web アプリケーションを作成するために必要な知識をすべて学ぶことができます。Solid の仕組みについては、API やガイドを参照してください。
 
-# What is Solid?
+# Solid とは？
 
-Solid is a JavaScript framework for making interactive web applications. It leverages a custom compiler to transform JSX, an HTML inspired JavaScript XML dialect, into optimal DOM operations. Updates are powered by a fine-grained reactivity system that reduces the overhead of diffing which results in best in class performance.
+Solid は、インタラクティブな Web アプリケーションを作成するための JavaScript フレームワークです。カスタムコンパイラを活用して、HTML にインスパイアされた JavaScript XML 方言である JSX を最適な DOM 操作に変換します。更新は、差分のオーバーヘッドを削減するきめ細かなリアクティビティシステムによって行われ、最高クラスのパフォーマンスを実現します。
 
-# Anatomy of a Solid App
+# Solid アプリの構造
 
-A Solid App is composed of functions that we call Components. Component names in Solid follow the Pascal naming convention in which the first letter of each word in a component name is capitalized. This name can then be used as tags within our JSX like `<HelloWorld />`.
+Solid アプリは、コンポーネントと呼ばれる関数で構成されています。Solid のコンポーネント名は各単語の最初の文字を大文字にするパスカルケースの命名規則に従います。この名前は、`<HelloWorld />` のように JSX 内のタグとして使用できます。
 
-A Solid app starts with a `render` function. This is our entry point. It takes 2 arguments, a function wrapping our application code and an element to mount to:
+Solid アプリは `render` 関数で始まります。これがエントリーポイントとなります。アプリケーションコードをラップした関数と、マウント先の要素の 2 つの引数を取ります:
 
 ```jsx
 render(() => <HelloWorld />, document.getElementById('app'))
 ```
-# Leveraging this Tutorial
+# このチュートリアルの活用
 
-Each lesson in the tutorial includes a simple scenario with instructions on how to complete it using the feature highlighted. At any point you can click the solve button to see the solution or click reset to start over. The code editor itself has a console and an output tab where you can see the compiled output generated from your code. Look at it if you are curious to see how Solid generates code.
+チュートリアルの各レッスンには、簡単なシナリオが用意されており、テーマとなる機能を使ってどのように完成させるかの説明が添えられています。どの時点でも solve ボタンをクリックして解決策を確認したり、reset をクリックして最初からやり直すことができます。コードエディタには、コンソールとコードから生成されたコンパイル済みの出力を見ることのできる出力タブがあります。Solid がどのようにコードを生成しているのか興味がある方はご覧ください。
 
-Have Fun and Good Luck!
+楽しんで、頑張ってください！

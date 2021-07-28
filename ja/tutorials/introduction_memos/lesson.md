@@ -1,13 +1,13 @@
-Most of the time composing derived Signals is sufficient. However, it is sometimes beneficial to cache values in order to reduce duplicated work. We can use Memos, a special primitive, to store and access the last cached value without re-evaluating it until their dependencies change. By preventing re-evaluation when the value is read we reduce work required to access expensive operations like DOM Node creation, particularly when accessed in many places, or as part of Effects that have multiple dependencies.
+ほとんどの場合、派生 Signal を合成すれば十分です。しかし、重複した作業を減らすために、値をキャッシュすると有益な場合もあります。特別なプリミティブである Memo を使って、最後にキャッシュされた値を保存し、その依存関係が変わるまで再評価せずにアクセスできます。値を読み取る際に再評価を行わないようにすることで、DOM ノードの作成などのコストのかかる操作にアクセスする際に必要な作業を減らすことができます。特に、多くの場所でアクセスされている場合や、複数の依存関係を持つ Effect の一部としてアクセスされている場合に有効です。
 
-Memos are both a tracking computation, like an Effect, and a read-only Signal. Since they are aware of both their dependencies and their observers they can ensure that they only run once for any change. This makes them preferable to registering Effects that write to Signals. Generally, what can be derived, should be derived.
+Memo は Effect のような追跡計算であると同時に、読み取り専用の Signal でもあります。Memo は依存関係とオブザーバーの両方を認識しているため、どのような変更でも一度しか実行されないことを保証できます。これにより、Signal に書き込む Effect を登録するよりも好ましいものとなります。一般的に、派生できるものは、派生させるべきです。
 
-Creating a Memo is as simple as passing a function to `createMemo` which can be imported from `solid-js`. In the example recalculating the value gets increasingly more expensive with each click. Simply wrapping it in createMemo only recalculates one per click.
+Memo の作成は、`solid-js` からインポートできる `createMemo` に関数を渡すだけで簡単です。この例では値を再計算していて、クリックするたびにコストが高くなっていきます。createMemo でラップするだけで、1 回のクリックで 1 回の再計算が行われます。
 
 ```jsx
 const fib = createMemo(() => fibonacci(count()));
 ```
-Place a console.log inside the `fib` function if you want to confirm.
+確認したい場合は、`fib` 関数内に console.log を設置してください。
 ```jsx
 const fib = createMemo(() => {
   console.log("Calculating Fibonacci");

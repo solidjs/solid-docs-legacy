@@ -1,10 +1,10 @@
-JSX is an HTML like syntax you will see inside these examples and is core to making declarative views in Solid. JSX adds dynamic expressions for attributes and insertions in the form of `{ }`. These JSX blocks in the end just compile down to a combination of JavaScript code and HTMLTemplateElements which are cloned as your code executes. This allows for the most optimal creation code in terms of size and performance.
+JSX は、これらの例の中にある HTML のような構文で、Solid で宣言的なビューを作成する際の中核となるものです。JSX は、属性や挿入のための動的な表現を `{ }` の形式で追加します。これらの JSX ブロックは、最終的には JavaScript コードと HTMLTemplateElements の組み合わせにコンパイルされ、コードの実行時に複製されます。これにより、サイズとパフォーマンスの点で最適な作成コードを実現しています。
 
-Unlike some other frameworks that use JSX, Solid attempts to stay as close to HTML standards as possible allowing simple copy and paste from answers on Stack Overflow or from template builders from your designers.
+JSX を使用する他のフレームワークとは異なり、Solid は可能な限り HTML 標準に近づけようとしており、Stack Overflow の回答やデザイナーが作成したテンプレートから簡単にコピー&ペーストできるようになっています。
 
-There are 3 main differences between JSX and HTML that prevent JSX from being seen as a superset of HTML.
-1. JSX does not have void elements. This means that all elements must have a closing tag or self close. Keep this in mind when copying over things like `<input>` or `<br>`.
-2. JSX must return a single Element. To represent multiple top level elements use an Fragment element.
+JSX と HTML の間には、JSX が HTML のスーパーセットと見なされないようにするような 3 つの主な違いがあります。
+1. JSX には void 要素がありません。つまり、すべての要素に閉じタグまたは自己終了が必要となります。`<input>` や `<br>` のようなものをコピーする際には、この点に注意してください。
+2. JSX は単一の要素を返さなければなりません。複数のトップレベル要素を表現するには、Fragment 要素を使用します。
 
 ```jsx
 <>
@@ -12,9 +12,9 @@ There are 3 main differences between JSX and HTML that prevent JSX from being se
   <p>Some Text</p>
 </>
 ```
-3. JSX doesn't support HTML Comments or special tags like DocType.
+3. JSX は HTML コメントや DocType のような特殊なタグをサポートしていません。
 
-But JSX does support SVG. Let's try copying some SVG right into our Component.
+しかし、JSX は SVG をサポートしています。それでは、SVG をコンポーネントに直接コピーしてみましょう。
 ```jsx
 <svg height="300" width="400">
   <defs>

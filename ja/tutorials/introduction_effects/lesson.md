@@ -1,8 +1,9 @@
-Signals are trackable values, but they are only one half of the equation. The other half are the observers, also known as computations. The most fundamental computations are called Effects which create side effects – the output of our system.
+Signal は追跡可能な値ですが、方程式の半分にすぎません。 残りの半分はオブザーバーであり、計算とも呼ばれます。 最も基本的な計算は、システムの出力である副作用を生み出す Effect と呼ばれます。
 
-An Effect can be created by importing `createEffect` from `solid-js`. It takes a function whose execution it watches. It automatically subscribes to any Signal that is read during its execution and re-runs any time one of those Signals value changes.
+Effect は `solid-js` から `createEffect` をインポートすることで作成できます。実行を監視する関数を受け取ります。実行中に読み取られたすべての Signal を自動的にサブスクライブし、それらの Signal の値が変更されるたびに再実行します。
 
-So let's create an Effect that re-runs whenever `count` changes.
+
+それでは、`count` が変化するたびに再実行される Effect を作成してみましょう。
 
 ```jsx
 createEffect(() => {
@@ -10,12 +11,12 @@ createEffect(() => {
 });
 ```
 
-To update our `count` Signal we are going to attach a click handler on our button.
+`Count` Signal を更新するために、ボタンにクリックハンドラをアタッチします。
 
 ```jsx
 <button onClick={() => setCount(count() + 1)}>Click Me</button>
 ```
 
-Now clicking the button should write to the console. This is a relatively simple example but to understand how Solid works you should imagine that every expression in the JSX is potentially a separately wrapped Effect that re-executes whenever its dependent Signals change. This is how all rendering works in Solid. From Solid's perspective `all rendering is just a side effect of the reactive system`.
+これで、ボタンをクリックするとコンソールに書き込まれるはずです。これは比較的簡単な例ですが、Solid の仕組みを理解するには、JSX 内のすべての式が、依存する Signal が変化するたびに再実行される、個別にラップされた Effect である可能性があることを想像する必要があります。これが、Solid でのすべてのレンダリングの仕組みです。Solid の視点では、「すべてのレンダリングは、リアクティブシステムの副作用に過ぎない」のです。
 
-Effects that developers create with `createEffect` run after rendering has completed and are mostly used for scheduling post render updates that interact with the DOM.
+開発者が `createEffect` で作成した Effect は、レンダリングが完了した後に実行され、主に DOM と相互作用するレンダリング後の更新をスケジュールするために使用されます。

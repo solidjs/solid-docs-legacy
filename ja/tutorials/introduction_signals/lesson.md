@@ -1,28 +1,28 @@
-Signals are the most core reactive primitives. They contain values that change over time.
+Signal は最もコアなリアクティブプリミティブです。 これらには、時間の経過とともに変化する値が含まれています。
 
-To create a Signal you can import `createSignal` from `solid-js` and call it from our Counter component like this:
+Signal を作成するには、`solid-js` から `createSignal` をインポートして、以下のように Counter コンポーネントから呼び出します:
 ```jsx
 const [count, setCount] = createSignal(0);
 ```
 
-The argument passed to the create call is the initial value and an array is returned with 2 functions, a getter and a setter. Using destructuring we can name these whatever we like. In this case we name the getter `count` and the setter `setCount`.
+create コールに渡される引数は初期値で、ゲッターとセッターの 2 つの関数を持つ配列が返されます。分割代入を使えば、これらに好きな名前を付けることができます。この例ではゲッターを `count`、セッターを `setCount` と名付けています。
 
-It is important to notice that the first returned value is a getter and not the value itself. This is because the framework needs to intercept wherever the value is read to automatically track for changes. So keep in mind that where the value is accessed is significant.
+ここで重要なのは、最初に返される値がゲッターであり、値そのものではないということです。これは、フレームワークが自動的に変更を追跡するために、値が読み取られる場所をインターセプトする必要があるためです。このように、値がどこでアクセスされるかは重要であることを覚えておいてください。
 
-In this lesson we will use `setInterval` to create an incrementing counter. We can update our `count` signal every second by adding this code to our Counter component.
+このレッスンでは、`setInterval` を使ってインクリメントするカウンターを作成します。以下のコードを Counter コンポーネントに追加することで、1 秒ごとに`count` Signal を更新できます。
 
 ```jsx
 setInterval(() => setCount(count() + 1), 1000);
 ```
 
-We read the previous count, add 1, and set the new value.
+前回のカウントを読み、1 を加えて、新しい値を設定します。
 
-> Solid's Signals also accept a function form where you can use the previous value to set the next value.
+> Solid の Signal は、前回の値を使って次の値を設定する関数形式も受け付けています。
 > ```jsx
 > setCount(c => c + 1)
 > ```
 
-Finally we need to read our signal in our JSX code.
+最後に、JSX コードで Signal を読み取る必要があります。
 
 ```jsx
 return <div>Count: {count()}</div>;

@@ -1,17 +1,17 @@
-Signals are simple getter functions that wrap a trackable value. There is nothing particularly special about them. This means that any function that wraps accessing a Signal is effectively a Signal and is also trackable. The same is true of any JavaScript expression you put in JSX. As long as it accesses a Signal it will update.
+Signal は、追跡可能な値をラップするシンプルなゲッター関数です。特に特別なものではありません。つまり、Signal へのアクセスをラップした関数は、実質的に Signal であり、追跡可能であるということです。JSX に記述したあらゆる JavaScript の式にも同じことが当てはまります。Signal にアクセスする限り、更新されるのです。
 
-It is important to understand that Components in Solid are just functions that execute once. The only way to ensure that anything updates is to be wrapped in a computation or JSX. However you can always hoist an expression out by wrapping it in a function. This way it can be re-used.
+Solid のコンポーネントは、一度だけ実行されるただの関数であることを理解することが重要です。何かを確実に更新する唯一の方法は、計算または JSX でラップすることです。ただし、式を関数でラップすることにより、いつでも式を取り出すことができます。そうすれば、再利用できます。
 
-Let's update our Counter to count by 2 by introducing a `doubleCount` function.
+それでは、`doubleCount` 関数を導入して、2 倍カウントするように Counter を更新してみましょう。
 
 ```jsx
 const doubleCount = () => count() * 2;
 ```
 
-We then replace where it is being read.
+次に、それが読み取られている場所を置き換えます。
 
 ```jsx
 return <div>Count: {doubleCount()}</div>;
 ```
 
-This is trivial and `doubleCount` could just be inlined, but it illustrates how to both compose Signals and how to make derived Signals transferable.
+`doubleCount` をインライン化することもできます。これは些細なことですが、Signal を合成する方法と、派生する Signal を移動可能にする方法の両方を説明しています。

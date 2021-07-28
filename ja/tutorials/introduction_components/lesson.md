@@ -1,14 +1,14 @@
-As you build your applications you will want to break apart your code for better modularity and re-usability. In Solid the main way of doing that is by creating components.
+アプリケーションを構築する際には、モジュール性や再利用性を高めるためにコードを分割する必要があります。Solid では、主にコンポーネントを作成することでこれを実現しています。
 
-Components are just functions like the one we've been using in the tutorial so far. They can be represented as tags in a parent's JSX and upon first render are executed. After that they are never called again. All updates instead are applied by Solid's reactive system which we will be covering in the next couple of lessons.
+コンポーネントは、これまでのチュートリアルで使用してきたような単なる関数です。コンポーネントは親の JSX 内でタグとして表すことができ、最初のレンダリング時に実行されます。その後、コンポーネントが呼び出されることはありません。すべての更新は、Solid のリアクティブシステムによって行われます。これについては、これからのレッスンで説明します。
 
-In this example let's add our `Nested` component to our app. We've defined it in another file but you can put multiple components in the same file. First we must import it.
+今回の例では、`Nested` コンポーネントをアプリに追加してみましょう。このコンポーネントは別のファイルで定義しましたが、複数のコンポーネントを同じファイルに入れることができます。まず、コンポーネントをインポートする必要があります。
 
 ```js
 import Nested from "./nested";
 ```
 
-Then we need to add it to our JSX. In this case we now have 2 elements we want to return so we can wrap those in a Fragment.
+そして、それを JSX に追加する必要があります。この例では、返したい要素が 2 つあるので、それらを Fragment にまとめることができます。
 
 ```jsx
 function App() {
