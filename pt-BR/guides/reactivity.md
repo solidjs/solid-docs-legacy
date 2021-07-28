@@ -94,16 +94,6 @@ Para uma compreensão mais detalhada de como funciona a reatividade, estes são 
 
 ## Considerações
 
-This approach to reactivity is very powerful and dynamic. It can handle dependencies changing on the fly through executing different branches of conditional code. It also works through many levels of indirection. Any function executed inside a tracking scope is also being tracked.
-
-However, there are some key behaviors and tradeoffs we must be aware of.
-
-1. All reactivity is tracked from function calls whether directly or hidden beneath getter/proxy and triggered by property access. This means where you access properties on reactive objects is important.
-
-2. Components and callbacks from control flows are not tracking scopes and only execute once. This means destructuring or doing logic top-level in your components will not re-execute. You must access these Signals, Stores, and props from within other reactive primitives or the JSX for that part of the code to re-evaluate.
-
-3. This approach only tracks synchronously. If you have a setTimeout or use an async function in your Effect the code that executes async after the fact won't be tracked.
-
 Essa abordagem de reatividade é muito poderosa e dinâmica. Ele pode manipular as dependências que mudam rapidamente por meio da execução de diferentes ramificações do código condicional. Ele também funciona por meio de muitos níveis de indireção. Qualquer função executada dentro de um escopo de rastreamento também está sendo rastreada.
 
 No entanto, existem alguns comportamentos e desvantagens importantes dos quais devemos estar cientes.
