@@ -46,7 +46,7 @@ function MyComponent(props) {
 
 Les Composants sont légers dans le sens où ils ne possèdent pas eux-mêmes d'état (not stateful) et n'ont pas d'instances. À la place, ils servent de fonctions de construction (factory) pour les éléments du DOM et des primitives réactives.
 
-La réactivité détaillée (fined-grained reactivity) est construite sur 3 primitives simples : "Signals", "Memos" et "Effects". Ensemble, ils forment un système de synchronisation automatiquement suivi qui s'assure que votre vue reste à jour. Le calcul de la réactivité prend forme de simple expression enrober dans des fonctions qui s'exécutent de manière synchrone.
+La réactivité de précision (fined-grained reactivity) est construite sur 3 primitives simples : Signaux, Mémos et Effets. Ensemble, ils forment un système de synchronisation automatiquement suivi qui s'assure que votre vue reste à jour. Le calcul de la réactivité prend forme de simple expression enrober dans des fonctions qui s'exécutent de manière synchrone.
 
 ```js
 const [first, setFirst] = createSignal("JSON");
