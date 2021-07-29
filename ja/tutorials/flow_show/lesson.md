@@ -1,8 +1,8 @@
-JSX allows you to use JavaScript to control the logic flow in the templates. However, without a Virtual DOM naive use of things like `Array.prototype.map` would wastefully recreate all the DOM nodes on every update. Instead it is common for Reactive libraries to use template helpers. In Solid we wrap them in components.
+JSX では、JavaScript を使ってテンプレート内のロジックフローを制御できます。しかし仮想 DOM がない場合、`Array.prototype.map` のようなものを単純に使用すると、更新のたびにすべての DOM ノードを無駄に再作成してしまいます。その代わりに、リアクティブライブラリではテンプレートヘルパーを使用するのが一般的です。Solid では、それらをコンポーネントでラップしています。
 
-The most basic control flow is the conditional. Solid's compiler is smart enough to optimally handle ternaries (`a ? b : c`) and boolean expressions (` a && b`). However, often it is more compact to use the `<Show>` component.
+最も基本的な制御フローは、条件分岐です。Solid のコンパイラは賢く、三項演算子（`a ? b : c`）やブーリアンの式（`a && b`）を最適に処理します。しかし、多くの場合は `<Show>` コンポーネントを使用する方がコンパクトになります。
 
-To only show the appropriate button to reflect the current state update the JSX to:
+現在の状態を反映する適切なボタンだけを表示するには、JSX を次のように更新します:
 ```jsx
 <Show
   when={loggedIn()}
@@ -11,6 +11,6 @@ To only show the appropriate button to reflect the current state update the JSX 
   <button onClick={toggle}>Log out</button>
 </Show>
 ```
-The `fallback` prop acts as the `else` and will show when the condition passed to `when` is not `true`.
+この `fallback` プロップは `else` の役割を果たし、`when` に渡された条件が `true` でない場合に表示されます。
 
-Now clicking the button will change back and forth like you would expect.
+これで、ボタンをクリックすると、期待通り交互に変化します。

@@ -1,4 +1,4 @@
-If you want to iterate over a list the `<For>` component is the best way for any array of non-primitive values. It is automatically keyed by reference so as data updates it is optimized to update or move rows rather than recreate them. The callback is non-tracking and passes the item and an index Signal.
+リストを反復処理したい場合、非プリミティブ値の配列に対しては `<For>` コンポーネントが最適な方法です。これは自動的に参照によってキー付けされるので、データが更新されると、行を再作成するのではなく、行を更新または移動するように最適化されます。コールバックは追跡されず、アイテムとインデックスの Signal を渡します。
 
 ```jsx
 <For each={cats()}>{(cat, i) =>
@@ -9,6 +9,6 @@ If you want to iterate over a list the `<For>` component is the best way for any
   </li>
 }</For>
 ```
-The `index` is a Signal so that it can update independently when the row is moved. The item is not a Signal as changing would mean a new reference and cause a new row to be created. The way to do nested updates is to make nested Signals or use Solid's Store proxy.
+`index` は Signal で、行が移動したときに独立して更新できるようになっています。アイテムを変更すると新しい参照が作成され、新しい行が作成されることになるので、アイテムは Signal ではありません。ネストされた更新を行うには、ネストされた Signal を作成するか、Solid の Store プロキシを使用します。
 
-You can also use `<For>` to iterate over other iterable objects that are not arrays by using methods like `Object.keys` or simple spreading into an array like `[...iterable]`.
+また、`<For>` を使用して、`Object.keys` のようなメソッドを使用したり、`[...iterable]` のように単純に配列に展開することで、配列ではない他の反復可能なオブジェクトを反復処理することもできます。

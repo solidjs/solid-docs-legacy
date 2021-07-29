@@ -1,14 +1,14 @@
-Sometimes it's beneficial to insert elements outside the normal flow of the app. Z-indexes are sometimes insufficient to deal with render contexts for floating elements like Modals.
+アプリの通常のフローの外に要素を挿入することが有益な場合があります。モーダルのようなフローティング要素のレンダリングコンテキストを処理するには、z-index では不十分な場合があります。
 
-Solid has a `<Portal>` component whose child content will be inserted at the location of your choosing. By default its elements will be rendered in a `<div>` in the `document.body`.
+Solid には `<Portal>` コンポーネントがあり、それの子コンテンツは選択した場所に挿入されます。デフォルトでは、その要素は `document.body` 内の `<div>` にレンダリングされます。
 
-In the example we see our information pop up cutoff. We can solve this by pulling it out of the flow by wrapping the element in a `<Portal>`:
+この例では、情報のポップアップが途切れています。これを解決するには、要素を `<Portal>` でラップして、フローから引き出す必要があります:
 
 ```jsx
 <Portal>
   <div class="popup">
     <h1>Popup</h1>
-    <p>Some text you might need for something or other.</p>
+    <p>何かの時に必要になるかもしれないテキスト</p>
   </div>
 </Portal>
 ```

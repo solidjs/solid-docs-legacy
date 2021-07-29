@@ -1,8 +1,8 @@
-Sometimes it doesn't make sense to use referential equality to compare rows. When dealing with primitive values or arrays of arrays, treating the value as the key we could cause a lot of unnecessary rendering. For example if we mapped a list of strings to `<input>` field that could edit each, every change to that value would cause the `<input>` to be recreated as it is seen as the unique identifier.
+行の比較に参照等式を用いることが意味をなさない場合があります。プリミティブ値や配列の配列を扱うときに、値をキーとして扱うと、多くの不要なレンダリングが発生する可能性があります。例えば、文字列のリストをそれぞれ編集可能な `<input>` フィールドにマッピングした場合、値が変更されるたびに一意の識別子とみなされて `<input>` が再作成されてしまいます。
 
-In these cases, conceptually, the array index is the actual key to the list. For that we have the `<Index>`.
+このような場合、概念的には、配列のインデックスがリストの実際のキーとなります。そのために `<Index>` があります。
 
-`<Index>` has a similar signature to `<For>` except this time the item is the signal and the index is fixed.
+`<Index>` は `<For>` と同様のシグネチャを持ちますが、今回はアイテムが Signal であり、インデックスが固定されています。
 
 ```jsx
 <Index each={cats()}>{(cat, i) =>

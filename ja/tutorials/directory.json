@@ -28,31 +28,31 @@
     "internalName": "introduction_memos"
   },
   {
-    "lessonName": "Control Flow/Show",
+    "lessonName": "制御フロー/Show",
     "internalName": "flow_show"
   },
   {
-    "lessonName": "Control Flow/For",
+    "lessonName": "制御フロー/For",
     "internalName": "flow_for"
   },
   {
-    "lessonName": "Control Flow/Index",
+    "lessonName": "制御フロー/Index",
     "internalName": "flow_index"
   },
   {
-    "lessonName": "Control Flow/Switch",
+    "lessonName": "制御フロー/Switch",
     "internalName": "flow_switch"
   },
   {
-    "lessonName": "Control Flow/Dynamic",
+    "lessonName": "制御フロー/Dynamic",
     "internalName": "flow_dynamic"
   },
   {
-    "lessonName": "Control Flow/Portal",
+    "lessonName": "制御フロー/Portal",
     "internalName": "flow_portal"
   },
   {
-    "lessonName": "Control Flow/Error Boundary",
+    "lessonName": "制御フロー/Error Boundary",
     "internalName": "flow_error_boundary"
   },
   {

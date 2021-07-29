@@ -1,8 +1,8 @@
-Sometimes you need to deal with conditionals with more than 2 mutual exclusive outcomes. For this reason we have the `<Switch>` and `<Match>` components modelled roughly after JavaScript's `switch`/`case`.
+場合によっては、2 つ以上の排他的な結果を持つ条件式を扱う必要があります。このため、JavaScript の `switch`/`case` を大まかにモデル化した `<Switch>` と `<Match>` のコンポーネントを用意しました。
 
-It will try in order to match each condition, stopping to render the first that evaluates to true. Failing all of them it will render the the fallback.
+各条件にマッチするかどうかを順に試し、最初に true と評価されたらレンダリングするために停止します。すべてに失敗した場合は、フォールバックをレンダリングします。
 
-We can replace our nested `<Show>` components with this:
+ネストした `<Show>` コンポーネントを次のように置き換えることができます:
 
 ```jsx
 <Switch fallback={<p>{x()} is between 5 and 10</p>}>

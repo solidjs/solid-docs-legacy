@@ -1,6 +1,6 @@
-A JavaScript error originating in the UI shouldn’t break the whole app. Error boundaries are components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
+UI で発生した JavaScript エラーがアプリ全体を壊してはいけません。ErrorBoundary は、子コンポーネントツリーの任意の場所で JavaScript エラーをキャッチし、それらのエラーをログに記録し、クラッシュしたコンポーネントツリーの代わりにフォールバックの UI を表示するコンポーネントです。
 
-A component has crashed our example. Let's wrap it in an Error Boundary that displays the error.
+この例では、コンポーネントがクラッシュしました。これをエラーを表示する ErrorBoundary でラップしましょう。
 
 ```jsx
 <ErrorBoundary fallback={err => err}>
