@@ -56,11 +56,11 @@
     "internalName": "flow_error_boundary"
   },
   {
-    "lessonName": "Lifecycles/onMount",
+    "lessonName": "ライフサイクル/onMount",
     "internalName": "lifecycles_onmount"
   },
   {
-    "lessonName": "Lifecycles/onCleanup",
+    "lessonName": "ライフサイクル/onCleanup",
     "internalName": "lifecycles_oncleanup"
   },
   {

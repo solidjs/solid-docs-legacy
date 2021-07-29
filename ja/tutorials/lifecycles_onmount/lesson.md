@@ -1,8 +1,8 @@
-There are only few Lifecycles in Solid as everything lives and dies by the reactive system. The reactive system is created and updates synchronously so the only scheduling comes down to Effects which are pushed to the end of the update.
+Solid では、すべてがリアクティブシステムによって生きたり死んだりするので、ライフサイクルはわずかしかありません。リアクティブシステムは同期的に作成・更新されるため、唯一のスケジュールは、更新の最後にプッシュされる Effect になります。
 
-We've found that developers doing simple tasks don't often think this way so to make things a little easier we've aliased a non-tracking (never reruns) `createEffect` call with `onMount`. It is just an Effect call but you can use it with confidence that it will only run once for your component, once all initial rendering is done.
+単純な作業をしている開発者はこのような考え方をしないことが多いので、少しでも簡単にするために、非追跡な（再実行されない） `createEffect` の呼び出しを `onMount` でエイリアス化しました。これは単なる Effect の呼び出しですが、最初のレンダリングがすべて完了した後、コンポーネントに対して一度だけ実行されることを確信して使用できます。
 
-Let's use the `onMount` hook to fetch some photos:
+それでは、`onMount` フックを使って、写真を取得してみましょう:
 ```js
 onMount(async () => {
   const res = await fetch(`https://jsonplaceholder.typicode.com/photos?_limit=20`);
@@ -10,4 +10,4 @@ onMount(async () => {
 });
 ```
 
-Lifecycles are only run in the browser so putting code in `onMount` has the benefit of not running on the server during SSR. Even though we are doing data fetching in this example, usually we use Solid's resources for true server/browser coordination.
+ライフサイクルはブラウザでしか実行されないので、`onMount` にコードを置くことで、SSR 時にサーバー上で実行されないというメリットがあります。この例ではデータのフェッチを行っていますが、通常は真のサーバー/ブラウザ連携のために Solid のリソースを使用します。
