@@ -1,8 +1,8 @@
-Sometimes your components and elements accept a variable number of attributes and it makes sense to pass them down as an object instead of individually. This is especially true when wrapping a DOM element in a component, a common practice when making design systems.
+コンポーネントや要素が不定の数の属性を受け入れる場合、それらを個別に渡すのではなく、オブジェクトとして渡す方が理にかなっている場合があります。これは、DOM 要素をコンポーネントでラップする場合に特に当てはまり、デザインシステムを作る際にはよくあることです。
 
-For this we use the spread operator `...`.
+これには、スプレッド演算子 `...` を使用します。
 
-We can pass an object with variable number of properties:
+不定の数のプロパティを持つオブジェクトを渡すことができます:
 
 ```jsx
 <Info {...pkg} />

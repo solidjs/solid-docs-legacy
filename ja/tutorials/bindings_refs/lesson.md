@@ -1,12 +1,12 @@
-You can always get a reference to an element in Solid through assignment since JSX creates DOM elements like this:
+JSX は次のように DOM 要素を作成するので、代入によって Solid の要素への参照をいつでも取得できます:
 
 ```jsx
 const myDiv = <div>My Element</div>
 ```
 
-However, there is benefit to not breaking your elements out and putting them in a single contiguous JSX template as it allows Solid to better optimize their creation.
+しかし、要素を分割せずに 1 つの連続した JSX テンプレートにまとめることで、Solid がその作成をより最適化できるというメリットがあります。
 
-Instead you can get a reference to an element in Solid using the `ref` attribute. Ref's are basically assignments like the example above that happen at creation time before they are attached to the DOM. Simply declare a variable and it will be assigned to.
+その代わりに、Solid では `ref` 属性を使用して要素への参照を取得できます。ref は基本的には、上の例のように、DOM にアタッチされる前の作成時に発生する代入です。変数を宣言するだけで、その変数に割り当てられます。
 
 ```jsx
 let myDiv;
@@ -14,14 +14,14 @@ let myDiv;
 <div ref={myDiv}>My Element</div>
 ```
 
-So let's get a reference to our canvas element and animate it:
+それでは、canvas 要素への参照を取得して、アニメーションさせてみましょう:
 
 ```jsx
 <canvas ref={canvas} width="256" height="256" />
 ```
 
-Refs can also take the form of a callback function. This can be convenient for encapsulate logic especially when you don't need to wait until the elements are attached.
+ref は、コールバック関数の形をとることもできます。これは、要素がアタッチされるまで待つ必要がない場合など、ロジックをカプセル化するのに便利です。
 
-```js
-<div ref={el => /* do something with el... */}>My Element</div>
+```jsx
+<div ref={el => /* el を使って何かする... */}>My Element</div>
 ```

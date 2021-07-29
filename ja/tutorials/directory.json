@@ -64,31 +64,31 @@
     "internalName": "lifecycles_oncleanup"
   },
   {
-    "lessonName": "Bindings/Events",
+    "lessonName": "バインディング/イベント",
     "internalName": "bindings_events"
   },
   {
-    "lessonName": "Bindings/Style",
+    "lessonName": "バインディング/style",
     "internalName": "bindings_style"
   },
   {
-    "lessonName": "Bindings/ClassList",
+    "lessonName": "バインディング/classList",
     "internalName": "bindings_classlist"
   },
   {
-    "lessonName": "Bindings/Refs",
+    "lessonName": "バインディング/ref",
     "internalName": "bindings_refs"
   },
   {
-    "lessonName": "Bindings/Forwarding Refs",
+    "lessonName": "バインディング/ref の転送",
     "internalName": "bindings_forward_refs"
   },
   {
-    "lessonName": "Bindings/Spreads",
+    "lessonName": "バインディング/スプレッド演算子",
     "internalName": "bindings_spreads"
   },
   {
-    "lessonName": "Bindings/Directives",
+    "lessonName": "バインディング/ディレクティブ",
     "internalName": "bindings_directives"
   },
   {

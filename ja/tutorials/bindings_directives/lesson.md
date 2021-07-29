@@ -1,10 +1,10 @@
-Solid supports custom directives through the `use:` namespace. This is just a syntactic sugar over `ref` but is useful in that it resembles typical bindings and there can be multiple bindings on the same element without conflict. This makes it better tool for reusable DOM element behavior.
+Solid は `use:` 名前空間を通じてカスタムディレクティブをサポートしています。これは単なる `ref` のシンタックスシュガーですが、典型的なバインディングに似ており、同じ要素に複数のバインディングがあっても衝突しないという点で有用です。これにより、再利用可能な DOM 要素の動作のための優れたツールになります。
 
-Custom directives are simply functions in the form `(element, valueAccesor)` where `valueAccessor` is a function that retrieves the bindings value. As long as the function is imported in scope you can use it with `use:`.
+カスタムディレクティブは、`(element, valueAccesor)` という形式のシンプルな関数で、`valueAccessor` はバインディングの値を取得する関数です。この関数がスコープ内にインポートされる限り、`use:` で使用できます。
 
-> Important: `use:` is detected by the compiler to be transformed, and the function is required to be in scope, so it cannot be part of spreads or applied to a component.
+> 重要: `use:` は変換されるコンパイラによって検出され、関数はスコープ内にあることが要求されるため、スプレッドの一部にしたり、コンポーネントに適用することはできません。
 
-In this example we are going to make a simple wrapper for click outside behavior to close a popup or modal. First we need to import and use our `clickOutside` directive on our element.
+この例では、ポップアップやモーダルを閉じるための「外側をクリックした時の動作」のシンプルなラッパーを作成しています。まず、要素に `clickOutside` ディレクティブをインポートして使用する必要があります。
 
 ```jsx
 <div class="modal" use:clickOutside={() => setShow(false)}>
@@ -12,7 +12,7 @@ In this example we are going to make a simple wrapper for click outside behavior
 </div>
 ```
 
-Open `click-outside.tsx` we will be defining our custom directive here. This directive defines a click handler that we bind to the body and cleanup when it is time.
+`click-outside.tsx` を開き、ここでカスタムディレクティブを定義します。このディレクティブは、body にバインドして、時間になったらクリーンアップするクリックハンドラを定義します。
 
 ```jsx
 export default function clickOutside(el, accessor) {
@@ -23,4 +23,4 @@ export default function clickOutside(el, accessor) {
 }
 ```
 
-Now you should be able to go back and forth between opening and closing the modal.
+これでモーダルを交互に開いたり閉じたりできるようになります。

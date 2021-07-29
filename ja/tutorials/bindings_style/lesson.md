@@ -1,10 +1,10 @@
-The style attribute in Solid accepts either style strings or objects. However the object form differs from `Element.prototype.style` and instead is a wrapper for calling `style.setProperty`. This means that keys take the dash case form, like "background-color" rather than "backgroundColor". However it means we have the ability to set CSS variables.
+Solid の style 属性は、スタイルの文字列かオブジェクトのどちらかを受け付けます。ただし、オブジェクトの形式は `Element.prototype.style` とは異なり、代わりに `style.setProperty` を呼び出すためのラッパーとなります。これは、キーが "backgroundColor "ではなく "background-color "のようにダッシュケース形式をとることを意味します。しかし、これは CSS 変数を設定できるということです。
 
 ```js
 <div style={{ "--my-custom-color": themeColor() }} />
 ```
 
-Let's animate our div with a few inline styles:
+それでは、いくつかのインラインスタイルを使って、div をアニメーションしてみましょう:
 ```jsx
 <div style={{
   color: `rgb(${num()}, 180, ${num()})`,

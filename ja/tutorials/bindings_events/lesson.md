@@ -1,6 +1,6 @@
-Events in Solid are attributes prefixed with `on`. They are treated specially in a few ways. Firstly, they do not follow the normal heuristics for wrapping. In many cases it is difficult to determine the difference between a Signal and an event handler. And so, since events are called and don't require reactivity to update, they are only bound initially. You can always just have your handler run different code based on the current state of your app.
+Solid のイベントは、属性の前に `on` が付いています。いくつかの点で特別に扱われています。まず、通常のラッピングのヒューリスティックスに従いません。多くの場合、Signal とイベントハンドラの違いを判断することは困難です。そして、イベントは呼び出され、更新するためのリアクティビティを必要としないので、最初にバインドされるだけです。アプリの現在の状態に応じてハンドラーに異なるコードを実行させることができます。
 
-Common UI events (which bubble and are composed) are automatically delegated to the document. To improve delegated performance Solid supports array syntax to call the handler with data (as the first argument) without creating additional closures.
+一般的な UI イベント（バブルが発生して合成されるもの）は、自動的に document に委譲されます。 委譲のパフォーマンスを向上させるために、Solid は追加のクロージャを作成せずにデータ（第一引数）を使用してハンドラを呼び出すための配列構文をサポートしています。
 
 ```jsx
 const handler = (data, event) => /*...*/
@@ -8,14 +8,14 @@ const handler = (data, event) => /*...*/
 <button onClick={[handler, data]}>Click Me</button>
 ```
 
-In this example lets attach the handler to the `mousemove` event/
+この例では、ハンドラを `mousemove` イベントにアタッチします。
 ```jsx
 <div onMouseMove={handleMouseMove}>
   The mouse position is {pos().x} x {pos().y}
 </div>
 ```
 
-All `on` bindings are case insensitive which means that event names need to be in lowercase. If you need to support other casings or not use event delegation, you can use `on:` namespace to match event handlers that follows the colon.
+すべての `on` バインディングは大文字小文字を区別しないので、イベント名は小文字である必要があります。大文字が入ったイベント名をサポートする必要がある場合や、イベントの委譲を使用しない場合は、名前空間 `on:` を使用してコロンの後に続くイベントハンドラをマッチさせることができます。
 
 ```jsx
 <button on:WierdEventName={() => /* Do something */} >Click Me</button>
