@@ -1,33 +1,33 @@
-Part of what makes Solid so performant is that our components are basically just function calls. The way we propagate updates is that the compiler wraps potentially reactive expressions in object getters. You can picture the compiler to output:
+Solid のパフォーマンスが高い理由のひとつは、コンポーネントが基本的に単なる関数呼び出しであることです。更新情報を伝達する方法は、潜在的にリアクティブな式をコンパイラがオブジェクトゲッターでラップすることです。コンパイラが出力する様子を想像してみてください:
 
 ```jsx
-// this JSX
+// この JSX が
 <MyComp dynamic={mySignal()}>
   <Child />
 </MyComp>
 
-// to become
+// こうなります
 MyComp({
   get dynamic() { return mySignal() },
   get children() { return Child() }
 });
 ```
-This means these props are evaluated lazily. Their access is deferred until where they are used. This retains reactivity without introducing extraneous wrappers or synchronization. However this means that repeat access can lead recreation in the case of child components or elements.
+これは、これらの props が遅延評価されることを意味します。これらのアクセスは、それらが使用されるまで延期されます。これにより、余計なラッパーや同期を導入することなく、リアクティビティを維持できます。しかしこれは、子コンポーネントや要素の場合、繰り返しアクセスすることで再作成につながる可能性があることを意味します。
 
-The vast majority of the time you will just be inserting these into the JSX so there is no problem. However when you need to work with the children you need to be careful.
+ほとんどの場合、これらを JSX に挿入するだけなので問題はありません。しかし、子要素を操作する必要がある場合には注意が必要です。
 
-For that reason Solid has the `children` helper. This method both creates a memo around the children access but also resolves any nested child reactive references so that you can interact with the children directly.
+そのため、Solid には `children` ヘルパーが用意されています。このメソッドは、子プロセスへのアクセスのための Memo を作成するだけでなく、ネストした子プロセスへのリアクティブな参照を解決し、子プロセスを直接操作できるようにします。
 
-In the example we have a dynamic list that we want to set their `color` style property. If we interacted with `props.children` directly not only would we create the nodes multiple times but we'd find children itself a function, the Memo returned from `<For>`.
+この例では、動的なリストの `color` スタイルプロパティを設定しています。`props.children` を直接操作してしまうと、ノードを何度も作成しなければならないだけでなく、子要素自体も関数であり、`<For>` から返された Memo であることが分かります。
 
-Instead let's use the `children` helper inside `colored-list.tsx`:
+代わりに、`colored-list.tsx` 内で `children` ヘルパーを使ってみましょう:
 ```jsx
 export default function ColoredList(props) {
   const c = children(() => props.children);
   return <>{c()}</>
 }
 ```
-Now to update our elements let's create an Effect.
+それでは、要素を更新するために、Effect を作成してみましょう。
 ```jsx
 createEffect(() => c().forEach(item => item.style.color = props.color));
 ```

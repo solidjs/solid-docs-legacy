@@ -1,10 +1,10 @@
-Props are what we call the object that is passed to our component function on execution that represents all the attributes bound to its JSX. Props objects are readonly and have reactive properties which are wrapped in Object getters. This allows them to have a consistent form regardless of whether the caller used signals, signal expressions, or simple or static values. You simply access them by `props.propName`.
+props とは、実行時にコンポーネント関数に渡されるオブジェクトのことで、JSX にバインドされたすべての属性を表します。props オブジェクトは読み取り専用で、Object ゲッターでラップされたリアクティブなプロパティを持っています。これにより、呼び出し元が Signal や Signal 式を使用しているかどうか、あるいは単純な値や静的な値を使用しているかどうかに関わらず、一貫した形式を持つことができます。`props.propName` でアクセスするだけです。
 
-For this reason it is also very important to not just destructure them as that would lose reactivity if not done within a tracking scope. In general accessing properties on the props object outside of Solid's primitives or JSX can lose reactivity. This applies not just to destructuring, but spreads and functions like `Object.assign`.
+このため、追跡スコープ内で行なわないとリアクティビティが失われてしまうので、分割代入しないことも非常に重要です。一般的に、Solid のプリミティブや JSX の外側で props オブジェクトのプロパティにアクセスすると、リアクティビティが失われます。これは分割代入だけでなく、スプレッド演算子や `Object.assign` のような関数にも当てはまります。
 
-Solid has a few utilities to help us when working with props. The first `mergeProps` is much like what it sounds. It merges potentially reactive objects together without losing reactivity. The most common case is when setting default props for our components.
+Solid には、props を扱う際に役立つユーティリティがいくつかあります。最初の `mergeProps` はその名の通りです。これは、潜在的にリアクティビティのあるオブジェクトを、リアクティビティを失うことなくマージします。最も一般的なケースは、コンポーネントにデフォルトの props を設定するときです。
 
-In the example, in `greetings.tsx`, we inlined the defaults in the template but we could also use `mergeProps` to keep reactive updates even when setting defaults.
+この例の `greetings.tsx` では、テンプレート内にデフォルト値をインライン化しましたが、`mergeProps` を使えば、デフォルトを設定している場合リアクティブな更新を維持できます。
 
 ```jsx
 const merged = mergeProps({ greeting: "Hi", name: "John" }, props);

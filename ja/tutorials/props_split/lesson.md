@@ -1,8 +1,8 @@
-Merging props is not the only operation we can do. Often we use destructuring to use some of the props on the current component but then split off others to pass through to child components.
+私達にできる操作は props をマージするだけではありません。分割代入を使い、一部の props は現在のコンポーネントで使用し、他の props を分割して子コンポーネントに渡すことがよくあります。
 
-For this purpose Solid has `splitProps`. It takes the props object and arrays of keys representing each object we want to accept those props. It returns an array per argument, plus one. The last element in the array will be an object with the rest of the remaining props that weren't specified, similar to the rest parameter.
+この目的のために、Solid には `splitProps` があります。これは、props オブジェクトと、それらの props を受け入れたい各オブジェクトを表すキーの配列を受け取ります。これは、引数ごとの配列に 1 つ加えたものを返します。配列の最後の要素は、残余引数と同様、指定されていない残りの props を持つオブジェクトになります。
 
-Our example doesn't update when we set the name because of lost reactivity when we destructred in `greeting.tsx`:
+今回の例では、`greeting.tsx` 内で分割代入したときにリアクティビティが失われたため、name を変更しても更新されません:
 ```jsx
 export default function Greeting(props) {
   const { greeting, name, ...others } = props;
@@ -10,11 +10,11 @@ export default function Greeting(props) {
 }
 ```
 
-Instead we can maintain reactivity with `splitProps`:
+代わりに `splitProps` でリアクティビティを維持できます:
 ```jsx
 export default function Greeting(props) {
   const [local, others] = splitProps(props, ["greeting", "name"]);
   return <h3 {...others}>{local.greeting} {local.name}</h3>
 }
 ```
-Now the button works as expected.
+これで、ボタンは期待通り動作するようになりました。

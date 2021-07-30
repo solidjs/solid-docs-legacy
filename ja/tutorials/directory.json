@@ -92,15 +92,15 @@
     "internalName": "bindings_directives"
   },
   {
-    "lessonName": "Props/Default Props",
+    "lessonName": "props/デフォルトの props",
     "internalName": "props_defaults"
   },
   {
-    "lessonName": "Props/Splitting Props",
+    "lessonName": "props/props の分割",
     "internalName": "props_split"
   },
   {
-    "lessonName": "Props/Children",
+    "lessonName": "props/children",
     "internalName": "props_children"
   },
   {
