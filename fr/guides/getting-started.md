@@ -119,4 +119,4 @@ Vous pouvez les exécuter directement depuis le navigateur en utilisant [Skypack
 </html>
 ```
 
-N'oubliez pas, vous aurez quand même besoin de la librairie utilisez pour l'expression du DOM pour que cela fonctionne avec TypeScript. Vous pouvez utiliser les Tagged Template Literals avec [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) ou HyperScript avec [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
+N'oubliez pas, vous aurez quand même besoin de la librairie utilisée pour l'expression du DOM pour que cela fonctionne avec TypeScript. Vous pouvez utiliser les Tagged Template Literals avec [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) ou HyperScript avec [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
