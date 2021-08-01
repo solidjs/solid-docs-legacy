@@ -8,8 +8,7 @@ sort: 0
 
 ## Essayer Solid
 
-La manière la plus simple de commencer avec Solid est d'essayer en ligne. Notre REPL sur https://playground.solidjs.com est la meilleure façon d'expérimenter. Mais aussi sur https://codesandbox.io/ où vous pouvez modifier nos différents exemples.
-
+La manière la plus simple de commencer avec Solid est d'essayer en ligne. Notre REPL sur https://playground.solidjs.com est la meilleure façon d'expérimenter, ainsi que sur https://codesandbox.io/ où vous pouvez modifier nos différents exemples.
 Sinon, vous pouvez utiliser simplement notre template [Vite](https://vitejs.dev/) en lançant ces commandes dans votre terminal :
 
 ```sh
@@ -59,11 +58,11 @@ Vous pouvez en apprendre plus sur [le système de réactivité de Solid](https:/
 
 ## Penser Solid
 
-Le design de Solid a été créé avec une certaines opinions sur les principes et les valeurs qui nous aident à créer de meilleurs sites internet et applications. Il est plus simple d'apprendre et d'utiliser Solid quand vous connaissez la philosophie derrière son design.
+Le design de Solid a été créé avec certaines opinions sur les principes et les valeurs qui nous aident à construire de meilleurs sites internet et applications. Il est plus simple d'apprendre et d'utiliser Solid quand vous connaissez la philosophie derrière son design.
 
 ### 1. Données déclaratives
 
-Les "données déclaratives" est le concept de lié la description des données au comportement de leurs déclarations. Cela permet de facilement grouper le comportement des données dans un seul endroit.
+Les "données déclaratives" est le concept de lier la description des données au comportement de leurs déclarations. Cela permet de facilement grouper le comportement des données dans un seul endroit.
 
 ### 2. Disparition de composants
 
@@ -85,7 +84,7 @@ Solid est né d'un désire de mettre les Web Components en tant qu'acteur princi
 
 ## Rendu côté serveur
 
-Solid propose une solution dynamique de rendu côté serveur qui permet une vraie expérience isomorphe. Avec l'utilisation de la primitive "Resource", les requêtes asynchrone sont facilement faite et, plus important, automatiquement sérialiser et synchroniser entre le client et le navigateur.
+Solid propose une solution dynamique de rendu côté serveur qui permet une vraie expérience isomorphe. Avec l'utilisation de la primitive "Resource", les requêtes asynchrone sont facilement faite et, plus important, automatiquement sérialisé et synchronisé entre le client et le navigateur.
 
 Comme Solid supporte le fonctionnement asynchrone et le stream rendering côté serveur, vous pouvez écrire votre code d'une seule manière et l'exécuter côté serveur. Ce qui veut dire que des fonctionnalités comme [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) et le fractionnement de code vont fonctionner sans effort avec Solid.
 
