@@ -55,7 +55,7 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-你可以在以下内容中了解更多 [Solid's Reactivity](https://www.solidjs.com/docs/latest#reactivity) 和 [Solid's Rendering](https://www.solidjs.com/docs/latest#rendering).
+你可以在以下内容中了解更多 [Solid's Reactivity](#响应性) 和 [Solid's Rendering](#渲染).
 
 ## Solid 理念
 
@@ -87,7 +87,7 @@ Solid 拥有动态的服务器端渲染解决方案，可实现真正的同构�
 
 由于 Solid 支持服务器上的异步和流式渲染，因此你可以以一种方式编写代码并让它在服务器上执行。这个特性类似 [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense)，并且代码分割特性也适用于 Solid。
 
-更多信息，请阅读 [服务端渲染指南](https://www.solidjs.com/docs/latest#server-side-rendering).
+更多信息，请阅读 [服务端渲染指南](#ssr).
 
 ## 无编译?
 

@@ -8,12 +8,14 @@ This is documentation for SolidJS v1.0.0 and associated Solid packages and proje
 
 # Translations
 
-Solid's documentation is available in 4 languages including:
+Solid's documentation is available in 6 languages including:
 
 - [English](https://github.com/solidjs/solid-docs/tree/main/en)
+- [French](https://github.com/solidjs/solid-docs/tree/main/fr) (contributed by [xstevenyung](https://github.com/xstevenyung)
 - [Italian](https://github.com/solidjs/solid-docs/tree/main/it) (contributed by [davedbase](https://github.com/davedbase))
+- [Portuguese](https://github.com/solidjs/solid-docs/tree/main/pt) (contributed by [candidosales](https://github.com/candidosales))
 - [Chinese](https://github.com/solidjs/solid-docs/tree/main/zh-cn) (contributed by [Gavin-Gong](https://github.com/Gavin-Gong))
-- [Japanese](https://github.com/solidjs/solid-docs/tree/main/jp) (contributed by [Jun Shindo](https://github.com/jay-es))
+- [Japanese](https://github.com/solidjs/solid-docs/tree/main/jp) (contributed by [jay-es](https://github.com/jay-es))
 
 # Support
 
