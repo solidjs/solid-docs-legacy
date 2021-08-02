@@ -1,12 +1,12 @@
-It's sometimes desirable to have Signal reads not be tracked, even inside a reactive context. Solid provides the `untrack` helper as a way to prevent the wrapping computation from tracking any reads.
+たとえリアクティブコンテキスト内であっても、Signal の読み取りを追跡しないことが望ましい場合があります。Solid では、ラッピングの計算で読み取りを追跡しないようにする方法として、`untrack` ヘルパーを提供しています。
 
-Let's suppose we did not want to log in our example when `b` changes. We can untrack the `b` signal by changing our effect to the following:
+この例では、`b` が変更されたときに、ログ出したくないとします。Effect を以下のように変更することで、`b` Signal の追跡を解除できます:
 
 ```js
 createEffect(() => {
   console.log(a(), untrack(b));
 });
 ```
-Since Signals are functions they can be passed directly, but untrack can wrap functions with more complex behavior.
+Signal は関数なので直接渡すことができますが、`untrack` はより複雑な動作をする関数をラップできます。
 
-Even though `untrack` disables tracking of reads, it has no effect on writes which still happen and notify their observers.
+`untrack` は読み取りの追跡を無効にしますが、書き込みには何の影響もありません。書き込みは依然として発生し、オブザーバーに通知されます。

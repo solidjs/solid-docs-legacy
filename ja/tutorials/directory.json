@@ -128,15 +128,15 @@
     "internalName": "stores_nocontext"
   },
   {
-    "lessonName": "Reactivity/Batching Updates",
+    "lessonName": "リアクティビティ/バッチ更新",
     "internalName": "reactivity_batch"
   },
   {
-    "lessonName": "Reactivity/Untrack",
+    "lessonName": "リアクティビティ/untrack",
     "internalName": "reactivity_untrack"
   },
   {
-    "lessonName": "Reactivity/On",
+    "lessonName": "リアクティビティ/on",
     "internalName": "reactivity_on"
   },
   {
