@@ -1,8 +1,8 @@
-While `lazy` and `createResource` can be used on their own, Solid also provides a mechanism for coordinating the display of multiple async events. `Suspense` serves as a boundary that can show a fallback placeholder instead of the partially loaded content as these async events resolve.
+`lazy` と `createResource` はそれぞれ単独で使用できますが、Solid は複数の非同期イベントの表示を連携するメカニズムも提供します。`Suspense` は、これらの非同期イベントが解決すると、部分的にロードされたコンテンツの代わりにフォールバックのプレースホルダーを表示できる境界として機能します。
 
-This can improve user experience by removing visual jank caused by too many intermediate and partial loading states. `Suspense` automatically detects any descendant async reads and acts accordingly. You can nest as many `Suspense` components as needed and only the nearest ancestor will transform to fallback when loading state is detected.
+これにより、中間および部分的なローディング状態が多すぎるために発生する視覚的なジャンクを取り除くことで、ユーザーエクスペリエンスを向上させることができます。`Suspense` は、子孫の非同期な読み取りを自動的に検出し、それに応じて動作します。必要な数の `Suspense` コンポーネントをネストでき、ローディング状態が検出されると、最も近い祖先だけがフォールバックに変換されます。
 
-Let's add `Suspense` component to our lazy loading example.
+遅延ロードの例に `Suspense` コンポーネントを追加してみましょう。
 
 ```jsx
 <>
@@ -13,11 +13,11 @@ Let's add `Suspense` component to our lazy loading example.
 </>
 ```
 
-Now we have a loading placeholder.
+これで、ローディングのプレースホルダーができました。
 
-It's important to note that it's the read of an async derived value that triggers `Suspense`. Not the async fetching itself. If a resource signal (including `lazy` components) is not read under the `Suspense` boundary it will not suspend.
+重要なのは、`Suspense` をトリガーするのは、非同期派生値の読み取りであるということです。非同期フェッチそのものではありません。Resource の Signal（`lazy` コンポーネントを含む）が `Suspense` の境界の下で読み取られない場合、サスペンドしません。
 
-`Suspense` in many ways is just a `Show` component that renders both branches. While `Suspense` is vital for asynchronous Server rendering do not feel the need to jump immediately to using it for client-rendered code. Solid's fine-grained rendering has no additional cost for splitting things manually.
+`Suspense` は多くの意味で、両方のブランチをレンダリングする `Show` コンポーネントに過ぎません。`Suspense` は非同期のサーバーレンダリングには欠かせないものですが、クライアントレンダリングされたコードにすぐに使う必要はありません。Solid のきめ細かなレンダリングは、手動で物事を分割するための追加コストはありません。
 
 ```jsx
 function Deferred(props) {
@@ -28,4 +28,4 @@ function Deferred(props) {
 }
 ```
 
-All work in Solid is queued independently already. No need for things like Time Slicing.
+Solid の作業はすべて独立してキューに入っています。Time Slicing のようなものは必要ありません。

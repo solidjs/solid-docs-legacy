@@ -1,19 +1,19 @@
-Resources are special Signals designed specifically to handle Async loading. Their purpose is wrap async values in a way that makes them easy to interact with in Solid's distributed execution model. This is the opposite to `async`/`await` or `generators` which provide sequential execution models. The goal is for async to not block execution and not color our code.
+Resource は、非同期のロードを処理するために特別に設計された Signal です。その目的は、Solid の分散実行モデルにおいて、非同期の値を簡単に操作できるようにラップすることです。これは、シーケンシャルな実行モデルを提供する `async`/`await` や `generators` とは正反対です。非同期が実行をブロックしたり、コードに色をつけたりしないようにするのを目標としています。
 
-Resources can be driven by a source signal that provides the query to a async data fetcher function that returns a promise. The contents of fetcher function can be anything. You can hit typical REST endpoints or GraphQL or anything that generates a promise. Resources are not opinionated on the means you load the data only that they are driven by promises.
+Resource は、Promise を返す非同期データフェッチャー関数にクエリを提供するソース Signal によって駆動できます。フェッチャー関数の内容は何でもかまいません。典型的な REST エンドポイントでも、GraphQL でも、Promise を生成するものであれば何でもいいのです。Resource は、データをロードする手段にはこだわらず、Promise によって駆動されることだけが重要です。
 
-The resulting Resource Signal, also contains reactive `loading` and `error` properties that make it easy to control our view based on the current status.
+結果として得られる Resource の Signal には、リアクティブな `loading` と `error` プロパティが含まれており、現在のステータスに基づいてビューを簡単に制御できます。
 
-So let's replace our user signal with a resource.
+それでは、user の Signal を Resource に置き換えてみましょう。
 ```js
 const [user] = createResource(userId, fetchUser);
 ```
-It is driven by the `userId` Signal and calls our fetch method on change. Not much else to it.
+これは、`userId` Signal によって駆動され、変更があると fetch メソッドを呼び出します。それ以外にはあまりありません。
 
-The second value that comes back from createResource contains a `mutate` method for directly updating the internal Signal and a `refetch` method to reload the current query even if the source hasn't changed.
+`createResource` から返ってくる 2 つ目の値には、内部の Signal を直接更新するための `mutate` メソッドと、ソースが変更されていなくても現在のクエリをリロードするための `refetch` メソッドが含まれています。
 
 ```js
 const [user, { mutate, refetch }] = createResource(userId, fetchUser);
 ```
 
-`lazy` uses `createResource` internally to manage its dynamic imports.
+`lazy` は、動的インポートを管理するために内部で `createResource` を使用しています。

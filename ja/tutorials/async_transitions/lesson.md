@@ -1,22 +1,22 @@
-Suspense allows us to show fallback content when data is loading. This is great for initial loading, but on subsequent navigation it is often worse UX to fallback to the skeleton state.
+`Suspense` を使うと、データのロード中にフォールバックコンテンツを表示できます。これは最初のローディングには最適ですが、その後のナビゲーションでは、スケルトン状態にフォールバックすると UX が悪化することがよくあります。
 
-We can avoid going back to the fallback state by leveraging `useTransition`. It provides a wrapper and a pending indicator. The wrapper puts all downstream updates in a transaction that doesn't commit until all async events complete.
+そこで、`useTransition` を利用することで、フォールバックの状態に戻るのを回避できます。これは、ラッパーと保留中のインジケーターを提供します。ラッパーはすべてのダウンストリームの更新をトランザクションに入れ、すべての非同期イベントが完了するまでコミットしません。
 
-This means that when control flow is suspended, it continues to show the current branch while rendering the next off-screen. Resource reads under existing boundaries add it to the transition. However, any new nested `Suspense` components will show "fallback" if they have not completed loading before coming into view.
+つまり、制御フローがサスペンドしている時、現在のブランチを表示し続ける一方で、次のブランチは画面外にレンダリングされるのです。既存の境界の下にある Resource の読み取りは、それをトランジションに追加します。ただし、新しくネストされた `Suspense` コンポーネントは、表示される前にロードが完了していない場合には「フォールバック」を表示します。
 
-Notice when you navigate in the example, we keep seeing the content disappear back to a loading placeholder. Let's add a transition in our `App` component. First, let's replace the `updateTab` function.
+この例では、コンテンツが非表示になってローディングのプレースホルダーに戻ってしまうことが分かります。それでは、`App` コンポーネントにトランジションを追加してみましょう。まず、`updateTab` 関数を置き換えてみましょう。
 
 ```js
 const [pending, start] = useTransition();
 const updateTab = (index) => () => start(() => setTab(index));
 ```
 
-`useTransition` returns a pending signal indicator and a method to start the transition, which we will wrap around our update.
+`useTransition`は、保留中の Signal インジケーターとトランジションを開始するメソッドを返します。このメソッドは、更新の際に使用します。
 
-We should use that pending signal to give an indicator in our UI. We can add a pending class to our tab container div:
+この保留中の Signal を使って、UI にインジケーターを表示する必要があります。タブコンテナの div に pending クラスを追加しましょう:
 
 ```js
 <div class="tab" classList={{ pending: pending() }}>
 ```
 
-And with that our tab switching should be much smoother.
+これで、タブの切り替えがよりスムーズになるはずです。

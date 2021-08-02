@@ -140,23 +140,23 @@
     "internalName": "reactivity_on"
   },
   {
-    "lessonName": "Async/Lazy Components",
+    "lessonName": "非同期/遅延コンポーネント",
     "internalName": "async_lazy"
   },
   {
-    "lessonName": "Async/Resources",
+    "lessonName": "非同期/Resource",
     "internalName": "async_resources"
   },
   {
-    "lessonName": "Async/Suspense",
+    "lessonName": "非同期/Suspense",
     "internalName": "async_suspense"
   },
   {
-    "lessonName": "Async/Suspense List",
+    "lessonName": "非同期/SuspenseList",
     "internalName": "async_suspense_list"
   },
   {
-    "lessonName": "Async/Transitions",
+    "lessonName": "非同期/トランジション",
     "internalName": "async_transitions"
   }
 ]
