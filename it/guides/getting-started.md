@@ -8,7 +8,7 @@ sort: 0
 
 ## Prova Solid
 
-Il modo migliore per imparare Solid è provarlo online. Il nostro REPL su https://playground.solidjs.com è il modo perfetto per sperimentare i concetti fondamentali. Così come https://codesandbox.io/ dove puoi modificare uno qualsiasi dei nostri esempi.
+Il modo migliore per imparare Solid è provarlo online. Il nostro REPL su https://playground.solidjs.com è il modo perfetto per sperimentare i concetti fondamentali. Così come https://codesandbox.io/ dove puoi modificare uno qualsiasi dei [nostri esempi](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
 
 In alternativa, puoi utilizzare i nostri semplici modelli [Vite](https://vitejs.dev/) eseguendo questi comandi nel tuo terminale:
 

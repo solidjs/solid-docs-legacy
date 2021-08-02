@@ -8,7 +8,7 @@ sort: 0
 
 ## Try Solid
 
-By far the easiest way to get started with Solid is to try it online. Our REPL at https://playground.solidjs.com is the perfect way to try out ideas. As is https://codesandbox.io/ where you can modify any of our Examples.
+By far the easiest way to get started with Solid is to try it online. Our REPL at https://playground.solidjs.com is the perfect way to try out ideas. As is https://codesandbox.io/ where you can modify any of [our Examples](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
 
 Alternatively, you can use our simple [Vite](https://vitejs.dev/) templates by runnings these commands in your terminal:
 
