@@ -8,7 +8,7 @@ const handler = (data, event) => /*...*/
 <button onClick={[handler, data]}>Click Me</button>
 ```
 
-In this example lets attach the handler to the `mousemove` event/
+In this example lets attach the handler to the `mousemove` event.
 ```jsx
 <div onMouseMove={handleMouseMove}>
   The mouse position is {pos().x} x {pos().y}

@@ -10,7 +10,7 @@ const [user] = createResource(userId, fetchUser);
 ```
 It is driven by the `userId` Signal and calls our fetch method on change. Not much else to it.
 
-The second value that comes back from createResource contains a `mutate` method for directly updating the internal Signal and a `refetch` method to reload the current query even if the source hasn't changed.
+The second value that comes back from `createResource` contains a `mutate` method for directly updating the internal Signal and a `refetch` method to reload the current query even if the source hasn't changed.
 
 ```js
 const [user, { mutate, refetch }] = createResource(userId, fetchUser);

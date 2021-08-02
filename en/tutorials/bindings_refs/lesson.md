@@ -22,6 +22,6 @@ So let's get a reference to our canvas element and animate it:
 
 Refs can also take the form of a callback function. This can be convenient for encapsulate logic especially when you don't need to wait until the elements are attached.
 
-```js
+```jsx
 <div ref={el => /* do something with el... */}>My Element</div>
 ```
