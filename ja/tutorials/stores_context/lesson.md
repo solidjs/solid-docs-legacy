@@ -1,10 +1,10 @@
-Solid provides a Context API to pass data around without relying on passing through props. This is useful for sharing Signals and Stores. Using Context has the benefit of being created as part of the reactive system and managed by it.
+Solid は、props を経由せずにデータを渡すための Context API を提供しています。これは、Signal やストアを共有するのに便利です。コンテキストを使うと、リアクティブシステムの一部として作成され、それによって管理されるという利点があります。
 
-To get started we create a Context object. This object contains a `Provider` component used to inject our data. However, it is common practice to wrap the `Provider` components and `useContext`consumers with versions already configured for the specific Context.
+まず始めに、Context オブジェクトを作成します。このオブジェクトには、データを注入するために使う `Provider` コンポーネントが含まれています。しかし、`Provider` コンポーネントと `useContext` コンシューマーを、特定のコンテキスト用に設定されたバージョンでラップするのが一般的な方法です。
 
-And that's exactly what we have in this tutorial. You can see the definition for a simple counter store in the `counter.tsx` file.
+このチュートリアルでは、まさにそれを実践しています。シンプルなカウンターストアの定義は、`counter.tsx` ファイルで確認できます。
 
-To use context first let's wrap our App component to provide it globally. We will use our wrapped `CounterProvider`. In this case let's give it an initial count of 1.
+コンテキストを使用するには、まず App コンポーネントをラップしてグローバルに提供します。ラップされた `CounterProvider` を使用します。この場合、初期カウントを 1 にしましょう。
 
 ```jsx
 render(() => (
@@ -14,7 +14,7 @@ render(() => (
 ), document.getElementById("app"));
 ```
 
-Next we need to consume it in our `nested.tsx` component. We do this by using the wrapped `useCounter` consumer.
+次に、それを `nested.tsx` コンポーネントで利用する必要があります。これにはラップされた `useCounter` コンシューマーを使って行います。
 
 ```jsx
 const [count, { increment, decrement }] = useCounter();

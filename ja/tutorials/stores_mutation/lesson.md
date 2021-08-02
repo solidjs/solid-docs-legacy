@@ -1,8 +1,8 @@
-Solid strongly recommends the use of shallow immutable patterns for updating state. By separating reads and writes we maintain better control over the reactivity of our system without the risk of losing track of changes to our proxy when passed through layers of components. This is much more amplified with Stores compared to Signals.
+Solid は、状態の更新に浅い不変のパターンを使用することを強く推奨します。読み込みと書き込みを分離することで、コンポーネントのレイヤーを通過する際にプロキシの変更を追跡できなくなるリスクなく、システムのリアクティビティをよりよくコントロールできます。これは、Signal に比べてストアの方がより効果的です。
 
-Sometimes, however, mutation is just easier to reason about. That's why Solid provides an Immer inspired `produce` store modifier that allows you to mutate a writable proxy version of your Store object inside your `setStore` calls.
+しかし、直接変更する方が推論しやすい場合もあります。そのため、Solid は Immer にインスパイアされた `produce` ストア修飾子を提供しており、`setStore` 呼び出し内で Store オブジェクトの書き込み可能なプロキシバージョンを変更できます。
 
-This is a nice tool to have to allow small zones of mutation without relinquishing control. Let's use `produce` on our Todos example by replacing our event handler code with:
+これは、制御を放棄せず、小さな範囲での変更を可能にするための素晴らしいツールです。Todo の例でイベントハンドラのコードを以下のように置き換えて、`produce` を使ってみましょう:
 
 ```jsx
 const addTodo = (text) => {
@@ -22,4 +22,4 @@ const toggleTodo = (id) => {
 };
 ```
 
-While `produce` with Stores probably handles the vast majority of cases, Solid also has a mutable Store object that is available from `createMutable`. While not the recommended approach for internal APIs it is sometimes useful for interopt or compatibility with 3rd party systems.
+ストアを使った `produce` はおそらく大半のケースに対応していますが、Solid には `createMutable` から利用できる、変更可能な Store オブジェクトもあります。内部 API には推奨されない方法ですが、サードパーティシステムとの相互運用や互換性のためには有用な場合があります。

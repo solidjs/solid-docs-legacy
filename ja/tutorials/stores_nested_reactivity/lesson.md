@@ -1,6 +1,6 @@
-One of the reasons for fine-grained reactivity in Solid is that it can handle nested updates independently. You can have a list of users and when we update one name we only update a single location in the DOM without diffing the list itself. Very few (even reactive) UI frameworks can do this.
+Solid でリアクティビティが細かく設定されている理由の 1 つは、ネストした更新を独立して処理できることです。ユーザーのリストを持っていて、ある名前を更新すると、リスト自体には影響を与えずに DOM 内の 1 箇所だけを更新できます。このようなことができる UI フレームワーク（しかもリアクティブ）はほとんどありません。
 
-But how do we accomplish this? In the example we have a list of todos in a signal. In order to mark todo as complete we would need to replace the todo with a clone. This is how most frameworks work, but it's wasteful as we rerun the list diffing and we recreate the DOM elements as illustrated in the `console.log`.
+しかし、どのようにこれを実現するのでしょうか？　この例では、Signal の中に Todo のリストがあります。Todo を完了済みとしてマークするためには、Todo を複製して置き換える必要があります。これは多くのフレームワークが採用している方法ですが、リストの差分を再実行したり、`console.log` に示されているように DOM 要素を再作成したりするので無駄が多いです。
 
 ```js
 const toggleTodo = (id) => {
@@ -10,7 +10,7 @@ const toggleTodo = (id) => {
 };
 ```
 
-Instead in a fine-grained library like Solid we initialize the data with nested Signals like this:
+その代わり、Solid のようなきめ細かいライブラリでは、次のようにネストした Signal でデータを初期化します:
 
 ```js
 const addTodo = (text) => {
@@ -19,7 +19,7 @@ const addTodo = (text) => {
 };
 ```
 
-Now we can update the name by calling `setCompleted` without any additional diffing. This is because we've moved the complexity to the data rather than the view. And we know exactly how the data changes.
+これで、`setCompleted` を呼び出すことで、追加の差分なしに名前を更新できるようになりました。これは、複雑さをビューではなく、データに移したからです。また、データがどのように変化するかを正確に把握しています。
 
 ```js
 const toggleTodo = (id) => {
@@ -28,6 +28,6 @@ const toggleTodo = (id) => {
   if (todo) todo.setCompleted(!todo.completed())
 }
 ```
-If you change the remaining references of `todo.completed` to `todo.completed()`, the example should now only run the `console.log` on creation and not when you toggle a todo.
+`todo.completed` の残りの参照を `todo.completed()` に変更すると、この例では Todo を切り替えたときではなく、作成時にのみ `console.log` を実行するようになります。
 
-This of course requires some manual mapping and it was the only choice available to us in the past. But now, thanks to proxies, we can do most of this work in the background without manual intervention. Continue to the next tutorials to see how.
+もちろん、これには手動でのマッピングが必要で、以前はこれが唯一の選択肢でした。しかし今ではプロキシのおかげで、この作業のほとんどを手動で行なうことなく、バックグラウンドで実行できるようになりました。次のチュートリアルに進んで、その方法を確認してください。

@@ -1,8 +1,8 @@
-Stores are most often created in Solid using Solid's Store proxies. Sometimes we wish to interface with immutable libraries like Redux, Apollo, or XState and need to perform granular updates against these.
+ストアは多くの場合、Solid のストアプロキシを使用して Solid で作成されます。時には、Redux、Apollo、XState などのイミュータブルなライブラリとインターフェイスでつなぎ、これらに対して粒度の高い更新を行う必要があります。
 
-In the example, we have a simple wrapper around Redux. You can see the implementation in `useRedux.tsx`. The definition of the store and the actions are in the remaining files.
+この例では、Redux のシンプルなラッパーを用意しています。その実装は `useRedux.tsx` で見ることができます。ストアの定義とアクションは残りのファイルにあります。
 
-The core behavior is that we created a Store object and subscribe to the Redux store to update state on update.
+中心となる動作は、Store オブジェクトを作成し、Redux のストアを購読して、更新時に状態を更新するというものです。
 
 ```js
 const [state, setState] = createStore(store.getState());
@@ -10,24 +10,24 @@ const unsubscribe = store.subscribe(
   () => setState(store.getState())
 );
 ```
-If you click around the demo adding items and checking them off it seems to work pretty well. However, what isn't obvious is that the rendering is inefficient. Notice the console.log not only on create but whenever you check the box.
+デモをクリックしてアイテムを追加したり、チェックしたりすると、かなりうまくいっているように見えます。しかし、明白でないのは、レンダリングが非効率的であるということです。作成時だけでなく、ボックスをチェックするたびに console.log が表示されていることに注目してください。
 
-The reason is Solid doesn't diff by default. It assumes the new item is new and replaces it. If your data changes granularly you don't need to diff. But what if you do?
+その理由は、Solid はデフォルトでは差分を取らないためです。新しいアイテムを新しいものとみなして置き換えてしまうのです。データが細かく変化する場合は、差分を取る必要はありません。しかし、もしやる場合は？
 
-Solid provides a diffing method `reconcile` that enhances the `setStore` call and lets us diff the data from these immutable sources only notifying the granular updates.
+Solid は差分を取るためのメソッド `reconcile` を提供しています。これは `setStore` の呼び出しを強化するもので、イミュータブルなソースからのデータを差分して、細かい更新のみを通知できます。
 
-Let's update that code to:
+では、このコードを次のように更新してみましょう:
 ```js
 const [state, setState] = createStore(store.getState());
 const unsubscribe = store.subscribe(
   () => setState(reconcile(store.getState()))
 );
 ```
-Now the example works as you'd expect only running the create code on create. This isn't the only way to solve this and you've seen some frameworks have a `key` property on their template loop flows.
+これで、この例では、create のコードを作成時にだけ実行するという、期待通りの動作になりました。この問題を解決する唯一の方法ではなく、一部のフレームワークでテンプレートループフローに `key` プロパティがあるのを見たことがあるでしょう。
 
-The problem is that by making that a default part of the templating you always need to run list reconciliation and always have to diff all the children for potential changes, even in compiled frameworks. A data centric approach not only makes this applicable outside of templating but makes it opt in. When you consider internal state management doesn't need this, it means we default to having the best performance.
+問題は、テンプレートのデフォルト部分にすることにより、リストの一致を常に実行する必要があり、コンパイル済みのフレームワークであっても、潜在的な変更のためにすべての子の差分を常に取る必要があることです。データ中心のアプローチでは、テンプレートの外でもこれを適用できるだけでなく、オプトインもできます。内部の状態管理にはこれが必要ないことを考える場合、デフォルトで最高のパフォーマンスが得られることになります。
 
-Of course, no problem using `reconcile` when you need it. Some times a simple reducer makes for a great way to organize data updates. `reconcile` shines here making your own `useReducer` primitive:
+もちろん、必要に応じて `reconcile` を使うことは問題ありません。シンプルな reducer がデータの更新を整理するのに最適な方法であることもあります。`reconcile` は、独自の `useReducer` プリミティブを作ることで、ここで威力を発揮します:
 
 ```js
 const useReducer = (reducer, state) => {
@@ -40,4 +40,4 @@ const useReducer = (reducer, state) => {
 };
 ```
 
-The behavior of `reconcile` is configurable. A custom `key` can be set and there is a `merge` option which ignores structural cloning and only diffs the leaves.
+`reconcile` の動作は設定可能です。カスタムの `key` を設定ができ、構造的に複製することを無視して葉ノードのみを差分する `merge` オプションもあります。

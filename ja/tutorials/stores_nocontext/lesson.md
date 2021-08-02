@@ -1,22 +1,22 @@
-Context is a great tool for stores. It handles injection, ties ownership to reactive graph, automatically manages disposal, and has no render overhead given Solid's fine-grained rendering.
+コンテキストはストアのための素晴らしいツールです。インジェクションを処理し、所有権をリアクティブグラフに結びつけ、廃棄を自動的に管理し、Solid のきめ細かいレンダリングにより、レンダリングのオーバーヘッドもありません。
 
-However, you could just use the reactive system directly for simple things. It's almost not worth pointing out but a simple writeable store is just a Signal:
+しかし、簡単なことならリアクティブシステムを直接使うこともできます。指摘する価値はほとんどありませんが、単純な書き込み可能なストアはただの Signal です:
 
 ```js
 import { createSignal } from 'solid-js';
 
 export default createSignal(0);
 
-// somewhere else:
+// どこか別の場所で:
 import counter from './counter';
 const [count, setCount] = counter;
 ```
 
-Solid's reactivity is a universal concept. It doesn't matter if it is inside or outside components. There is no separate concept for global vs local state. It is all the same thing.
+Solid のリアクティビティは普遍的な概念です。コンポーネントの内側か外側かは関係ありません。グローバルな状態とローカルな状態という別々の概念はありません。すべてが同じものなのです。
 
-The only restriction is that all computations (Effects/Memos) need to be created under a reactive root (`createRoot`). Solid's `render` does this automatically.
+唯一の制限は、すべての計算（Effect/Memo）がリアクティブルート（`createRoot`）の下で作成される必要があることです。Solid の `render` はこれを自動的に行います。
 
-In this tutorial `counter.tsx` is such a global store. We can use it by modifying our component in `main.tsx` to:
+このチュートリアルでは、`counter.tsx` がそのようなグローバルストアです。これを使用するには、`main.tsx` のコンポーネントを次のように変更します:
 
 ```jsx
 const { count, doubleCount, increment } = counter;
@@ -28,4 +28,4 @@ return (
 );
 ```
 
-So when using your own more complicated global stores that contain computations be sure to create a root. Or better yet, do yourself a favor and just use Context.
+したがって、計算を含む複雑な独自のグローバルストアを使用する場合は、必ずルートを作成してください。あるいは、コンテキストを使用することをお勧めします。

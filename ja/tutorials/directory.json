@@ -104,27 +104,27 @@
     "internalName": "props_children"
   },
   {
-    "lessonName": "Stores/Nested Reactivity",
+    "lessonName": "ストア/ネストしたリアクティビティ",
     "internalName": "stores_nested_reactivity"
   },
   {
-    "lessonName": "Stores/Create Store",
+    "lessonName": "ストア/ストアの作成",
     "internalName": "stores_createstore"
   },
   {
-    "lessonName": "Stores/Mutation",
+    "lessonName": "ストア/値の変更",
     "internalName": "stores_mutation"
   },
   {
-    "lessonName": "Stores/Context",
+    "lessonName": "ストア/コンテキスト",
     "internalName": "stores_context"
   },
   {
-    "lessonName": "Stores/Immutable Stores",
+    "lessonName": "ストア/イミュータブルなストア",
     "internalName": "stores_immutable"
   },
   {
-    "lessonName": "Stores/Without Context",
+    "lessonName": "ストア/コンテキストを使わない場合",
     "internalName": "stores_nocontext"
   },
   {

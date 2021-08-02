@@ -1,14 +1,14 @@
-Stores are Solid's answer to nested reactivity. They are proxy objects whose properties can be tracked and can contain other objects which automatically become wrapped in proxies themselves, and so on.
+ストアは、ネストしたリアクティビティに対する Solid の答えです。プロパティを追跡できるプロキシオブジェクトで、他のオブジェクトを含むことができ、そのオブジェクト自身は自動的にプロキシにラップされます。
 
-To keep things light Solid only creates underlying Signals for properties that are accessed under tracking scopes. And so, all Signals in Stores are created lazily as requested.
+物事をシンプルに保つために、Solid は追跡スコープでアクセスされるプロパティの基礎となる Signal のみを作成します。そのため、ストア内の Signal はすべて、要求に応じて遅延して作成されます。
 
-The `createStore` call takes the initial value and returns a read/write tuple similar to Signals. The first element is the store proxy which is readonly, and the second is a setter function.
+`createStore` の呼び出しは初期値を取り、Signal と同様の読み取り/書き込みのタプルを返します。最初の要素は読み取り専用のストアプロキシで、2 番目の要素はセッター関数です。
 
-The setter function in its most basic form takes an object whose properties will be merged with the current state. It also supports path syntax so that we can do nested updates. In this way we can still maintain control of our reactivity but do pinpoint updates.
+最も基本的な形式のセッター関数は、プロパティが現在の状態にマージされるオブジェクトを受け取ります。また、パス構文もサポートしているので、ネストした更新を行なうことができます。このようにして、リアクティビティの制御を維持しつつ、きわめて正確な更新を行なうことができます。
 
-> Solid's path syntax has many forms and includes some powerful syntax to do iteration and ranges. Refer to the API documentation for a full reference.
+> Solid のパス構文には様々な形式があり、反復や範囲を指定する強力な構文もあります。完全なリファレンスについては API ドキュメントを参照してください。
 
-Let's look at how much easier it is to achieve nested reactivity with a Store. We can replace the initialization of our component with this:
+ストアを使ってネストしたリアクティビティを実現するのがどれほど簡単か見てみましょう。コンポーネントの初期化を以下のように置き換えることができます:
 
 ```js
 const [store, setStore] = createStore({ todos: [] });
@@ -20,6 +20,6 @@ const toggleTodo = (id) => {
 };
 ```
 
-We make use of the Store's path syntax with function setters that allow us to take the previous state and return the new state on nested values.
+ストアのパス構文を利用して、関数セッターで以前の状態を取得し、ネストした値で新しい状態を返すことができます。
 
-And that's it. The rest of the template will already react granularly (check the Console on clicking the checkbox).
+これで完成です。テンプレートの残りの部分は、すでに細かく反応するようになっています（チェックボックスをクリックしてコンソールをチェックしてください）。
