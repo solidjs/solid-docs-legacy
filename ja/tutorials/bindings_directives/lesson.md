@@ -12,7 +12,7 @@ Solid は `use:` 名前空間を通じてカスタムディレクティブをサ
 </div>
 ```
 
-`click-outside.tsx` を開き、ここでカスタムディレクティブを定義します。このディレクティブは、body にバインドして、時間になったらクリーンアップするクリックハンドラを定義します。
+`click-outside.tsx` を開き、ここでカスタムディレクティブを定義します。このディレクティブは、body にバインドして、時間になったらクリーンアップするクリックハンドラーを定義します。
 
 ```jsx
 export default function clickOutside(el, accessor) {

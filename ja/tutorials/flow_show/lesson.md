@@ -11,6 +11,6 @@ JSX では、JavaScript を使ってテンプレート内のロジックフロ�
   <button onClick={toggle}>Log out</button>
 </Show>
 ```
-この `fallback` プロップは `else` の役割を果たし、`when` に渡された条件が `true` でない場合に表示されます。
+この `fallback` プロパティは `else` の役割を果たし、`when` に渡された条件が `true` でない場合に表示されます。
 
 これで、ボタンをクリックすると、期待通り交互に変化します。

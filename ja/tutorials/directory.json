@@ -112,7 +112,7 @@
     "internalName": "stores_createstore"
   },
   {
-    "lessonName": "ストア/値の変更",
+    "lessonName": "ストア/ミューテーション",
     "internalName": "stores_mutation"
   },
   {
