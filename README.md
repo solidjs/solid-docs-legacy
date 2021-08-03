@@ -4,7 +4,7 @@
 
 # Solid Docs
 
-This is documentation for SolidJS v1.0.0 and associated Solid packages and projects. You can find more information about Solid and all it's documentation at [https://solidjs.com/](https://solidjs.com/).
+This is documentation for SolidJS v1.0.0 and associated Solid packages and projects. You can find more information about Solid and all its documentation at [https://solidjs.com/](https://solidjs.com/).
 
 # Translations
 
