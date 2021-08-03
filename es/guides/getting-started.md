@@ -1,52 +1,53 @@
 ---
-title: Getting Started
-description: A guide for how to get started with Solid.
+title: Empezando
+description: Una guia sobre como comenzar con Solid.
 sort: 0
 ---
 
-# Getting Started
+# Empezando
 
-## Try Solid
+## Probando Solid
 
-By far the easiest way to get started with Solid is to try it online. Our REPL at https://playground.solidjs.com is the perfect way to try out ideas. As is https://codesandbox.io/ where you can modify any of our Examples.
+Una de las mejores maneras de comenzar con Solid es probarlo online. Nuestro REPL en https://playground.solidjs.com es la manera perfecta de probar algunas ideas. Asi como tambien https://codesandbox.io/ donde puedes modificar cualquiera de nuestros ejemplos.
 
-Alternatively, you can use our simple [Vite](https://vitejs.dev/) templates by runnings these commands in your terminal:
+Como alternativa, puedes probar una de nuestras simples plantillas en [Vite](https://vitejs.dev) corriendo estos comandos en tu terminal:
 
 ```sh
 > npx degit solidjs/templates/js my-app
 > cd my-app
-> npm i # or yarn or pnpm
-> npm run dev # or yarn or pnpm
+> npm i # o yarn o pnpm
+> npm run dev # o yarn o pnpm
 ```
 
-Or for TypeScript:
+O con TypeScript:
 
 ```sh
 > npx degit solidjs/templates/ts my-app
 > cd my-app
-> npm i # or yarn or pnpm
-> npm run dev # or yarn or pnpm
+> npm i # o yarn o pnpm
+> npm run dev # o yarn o pnpm
 ```
 
-## Learn Solid
+## Aprendiendo Solid
 
-Solid is all about small composable pieces that serve as building blocks for applications. These pieces are mostly functions which make up many shallow top-level APIs. Fortunately, you won't need to know about most of them to get started.
+Solid se trata de pequeños modulos que sirven como bloques de construccion para aplicaciones. Estas piezas son, en su mayor parte, funciones que componen multiples APis superficiales. Afortunadamente no hace falta conocer mucho sobre estas funciones para comenzar.
 
-The two main types of building blocks you have at your disposal are Components and Reactive Primitives.
+Los dos tipos de bloques de construccion que tienes a disposicion son Componentes y Primitivos Reactivos.
 
-Components are functions that accept a props object and return JSX elements including native DOM elements and other components. They can be expressed as JSX Elements in PascalCase:
+Los componentes son funciones que aceptan un objeto props y devuelven elementos JSX incluyendo elementos nativos del DOM asi como otros componentes. Estos componentes pueden ser expresados como Elementos JSX en PascalCase:
 
 ```jsx
 function MyComponent(props) {
-  return <div>Hello {props.name}</div>;
+  return <div>Hola {props.name}</div>;
 }
 
 <MyComponent name="Solid" />;
 ```
 
-Components are lightweight in that they are not stateful themselves and have no instances. Instead, they serve as factory functions for DOM elements and reactive primitives.
+Los componentes son livianos en el sentido de que no tienen estado por ellos mismos asi como tampoco tienen instancias. En lugar de eso, ellos sirven como funciones fábrica para elementos del dom y primitivas reactivas.
 
-Solid's fine-grained reactivity is built on 3 simple primitives: Signals, Memos, and Effects. Together, they form an auto-tracking synchronization engine that ensures your view stays up to date. Reactive computations take the form of simple function-wrapped expressions that execute synchronously.
+La reactividad granualar de Solid esta construida sobre 3 simples primitivas: Señales, Memos y Efectos.
+Juntas, forman un motor de sincronizacion que detecta automaticamente los cambios y se encarga de que tus vistas siempre se mantengan al dia. Los computos reactivos toman forma de simples expresiones envueltas por funciones que se ejecutan sincronicamente.
 
 ```js
 const [first, setFirst] = createSignal("JSON");
@@ -55,45 +56,45 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-You can learn more about [Solid's Reactivity](https://www.solidjs.com/docs/latest#reactivity) and [Solid's Rendering](https://www.solidjs.com/docs/latest#rendering).
+Para profundizar estos conocimientos puedes visitar [Reactividad en Solid](https://www.solidjs.com/docs/latest#reactivity) y [Renderizado en Solid](https://www.solidjs.com/docs/latest#rendering)
 
-## Think Solid
+## Pensando Solido
 
-Solid's design carries several opinions on what principles and values help us best build websites and applications. It is easier to learn and use Solid when you are aware of the philosophy behind it.
+El diseño de Solid lleva muchas opiniones sobre que principios y valores son mas utiles a la hora de construir sitios web y aplicaciones. Es mas facil aprender y usar Solid cuando eres conciente sobre la filosofia que lo acompaña.
 
-### 1. Declarative Data
+### 1. Datos declarativos
 
-Declarative data is the practice of tying the description of data’s behavior to its declaration. This allows for easy composition by packaging all aspects of data’s behavior in a single place.
+Cuando hablamos de datos declarativos hablamos de la practica de escribir una descripcion de los datos en su declaracion. Esto produce un empaquetamiento de todos los aspectos de esos datos en un solo lugar.
 
-### 2. Vanishing Components
+### 2. Componentes efimeros
 
-It's hard enough to structure your components without taking updates into consideration. Solid updates are completely independent of the components. Component functions are called once and then cease to exist. Components exist to organize your code and not much else.
+Estructurar tus componentes ya es lo suficientemente dificil sin tomar en consideracion las actualizaciones de los mismos. Por eso en Solid las actualizaciones son completamente independientes de sus componentes. Las funciones de los componentes son llamadas una sola vez y para luego dejar de existir. En resumen, los componentes existen para organizar tu codigo y no mucho mas.
 
-### 3. Read/Write segregation
+### 3. Segregacion de Lectura/Escritura
 
-Precise control and predictability make for better systems. We don't need true immutability to enforce unidirectional flow, just the ability to make the conscious decision which consumers may write and which may not.
+La predictibilidad y un control preciso hacen mejores sistemas. No necesitamos una inmutabilidad pura para forzar flujos unidireccionales, solo la habilidad para tomar la decision conciente sobre que los consumidores pueden escribir y que no.
 
-### 4. Simple is better than easy
+### 4. Simplicidad es mejor que facilidad
 
-A lesson that comes hard for fine-grained reactivity. Explicit and consistent conventions even if they require more effort are worth it. The aim is to provide minimal tools to serve as the basis to build upon.
+Una leccion que golpea duro con la reactividad granular. Las convenciones explicitas y concisas valen la pena incluso si requieren mayor esfuerzo. Apuntamos a proveer herramientas minimalistas que sirvan como base para construir sobre ellas.
 
 ## Web Components
 
-Solid was born with the desire to have Web Components as first class citizens. Over time its design has evolved and goals have changed. However, Solid is still a great way to author Web Components. [Solid Element](https://github.com/solidjs/solid/tree/main/packages/solid-element) allows you to write and wrap Solid's function components to produce small and performant Web Components. Inside Solid apps Solid Element is able to still leverage Solid's Context API, and Solid's Portals support Shadow DOM isolated styling.
+Solid nacio con el deseo de tener Web Components como ciudadanos de primera clase. Con el tiempo su diseño evoluciono y los objetivos fueron cambiando. Sin embargo, Solid sigue siendo una muy buena manera de construir Web Components. [Solid Element](https://github.com/solidjs/solid/tree/main/packages/solid-element) permite escribir y envolver un componente funcional de Solid para producir pequeños y performantes Web Components. Dentro de aplicaciones Solid, los elementos Solid pueden seguir usando la API de contexto Solid y los portales Solid, para dar soporte al estilizado de Shadow DOM en aislamiento.
 
-## Server Rendering
+## Renderizado en servidor
 
-Solid has a dynamic server side rendering solution that enables a truly isomorphic development experience. Through the use of our Resource primitive, async data requests are easily made and, more importantly, automatically serialized and synchronized between client and browser.
+Solid provee una solucion de renderizado dinamico en servidor que permite una verdadera experiencia de desarrollo isomorfico. A traves del uso de nuestros recursos primitivos, solicitudes de datos asincronas son faciles de desarrollar y, mas importante, son automaticamente serializadas y sincronizadas entre el cliente y el navegador.
 
-Since Solid supports asynchronous and stream rendering on the server, you get to write your code one way and have it execute on the server. This means that features like [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) and code splitting just work in Solid.
+Ya que solid soporta la renderizacion asyncrona y por flujos en el servidor, Solid te permite escribir tu codigo de una forma y ejecutarlo directamente en el servidor. Esto significa que funcionalidades como [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) y division de codigo simplemente funcionan en Solid.
 
-For more information, read the [Server guide](https://www.solidjs.com/docs/latest#server-side-rendering).
+Para mas informacion, consulta la [Guia de servidor](https://www.solidjs.com/docs/latest#server-side-rendering).
 
-## No Compilation?
+## Sin compilacion?
 
-Dislike JSX? Don't mind doing manual work to wrap expressions, worse performance, and having larger bundle sizes? Alternatively, you can create a Solid app using Tagged Template Literals or HyperScript in non-compiled environments.
+No te gusta JSX? No te importa realizar trabajo manual para envolver expresiones, perder rendimiento, y tener paquetes enormes en tamaño? Alternativamente, puedes crear una aplicacion en Solid utilizando plantillas literales o HyperScript en entornos no compilados.
 
-You can run them straight from the browser using [Skypack](https://www.skypack.dev/):
+Puedes correrlo directamente desde el navegador utilizando [Skypack](https://www.skypack.dev/):
 
 ```html
 <html>
@@ -118,4 +119,4 @@ You can run them straight from the browser using [Skypack](https://www.skypack.d
 </html>
 ```
 
-Remember you still need the corresponding DOM Expressions library for these to work with TypeScript. You can use Tagged Template Literals with [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) or HyperScript with [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
+Recuerda que necesitas la libreria de expresiones DOM correspondientes para que estas funcionen con Typescript. Puedes utilizar plantillas literales con [Lit Dom Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) o HyperScript con [Hyper Dom Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
