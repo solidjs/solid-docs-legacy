@@ -66,29 +66,29 @@ Les "données déclaratives" est le concept de lier la description des données 
 
 ### 2. Disparition de composants
 
-Il est déjà difficile de structurer vos composants sans prendre en compte les mises à jour de ceux-ci. Le système de mise à jour de Solid est complètement indépendant des composants. Les Composants sont des fonctions qui sont appelées une fois et ensuite cesse d'exister. Les Composants n'existent seulement dans le but d'organiser votre code et rien d'autre.
+Il est déjà difficile de structurer vos composants sans prendre en compte les mises à jour de ceux-ci. Le système de mise à jour de Solid est complètement indépendant des composants. Les Composants sont des fonctions qui sont appelées une fois et ensuite cessent d'exister. Les Composants n'existent que dans l'unique but d'organiser votre code, ni plus, ni moins.
 
 ### 3. Séparation Lecture/Écriture
 
-Le contrôle précis et la prévisibilité créent de meilleurs systèmes. Nous n'avons pas besoin d'immutabilité strict pour forcer un flux unidirectionnel, juste de la possibilité de prendre une décision consciente de savoir quelle pièce peut écrire et laquelle ne peut pas.
+Le contrôle précis et la prévisibilité créent de meilleurs systèmes. Nous n'avons pas besoin d'immutabilité stricte pour forcer un flux unidirectionnel, juste de la possibilité de prendre une décision consciente de savoir quelle pièce peut écrire et laquelle ne peut pas.
 
 ### 4. Privilégier la simplicité à la facilité
 
-Une leçon que nous apprenons à la dur avec un système de réactivité détaillé. Les conventions explicites et constantes même si elles demandent plus d'efforts en valent la peine. Le but est de fournir un minimum d'outils pour servir à la base sur la quel construire.
+Une leçon que nous apprenons à la dure avec un système de réactivité détaillé. Les conventions explicites et constantes même si elles demandent plus d'efforts en valent la peine. Le but est de fournir un minimum d'outils pour servir à la base sur la quel construire.
 
------
+---
 
 ## Web Components
 
-Solid est né d'un désire de mettre les Web Components en tant qu'acteur principal. Au fur et à mesure du temps, le design de Solid a évolué et ses objectifs ont changé. Cependant, Solid reste une bonne alternative pour les auteurs de Web Components. [Solid Element](https://github.com/solidjs/solid/tree/main/packages/solid-element) permet d'écrire et d'enrobé des fonctions Composants en Solid pour produire des Web Components petits et performant. Au sain d'une application en Solid, Solid Element est capable d'utiliser l'API de Contexte et les Portails sont supportés dans le Shadow DOM avec l'isolation de style.
+Solid est né d'un désire de mettre les Web Components en tant qu'acteur principal. Au fur et à mesure du temps, le design de Solid a évolué et ses objectifs ont changé. Cependant, Solid reste une bonne alternative pour les auteurs de Web Components. [Solid Element](https://github.com/solidjs/solid/tree/main/packages/solid-element) permets d'écrire et d'enrober des fonctions Composants en Solid pour produire des Web Components petits et performants. Au sain d'une application en Solid, Solid Element est capable d'utiliser l'API de Contexte et les Portails sont supportés dans le Shadow DOM avec l'isolation de style.
 
 ## Rendu côté serveur
 
-Solid propose une solution dynamique de rendu côté serveur qui permet une vraie expérience isomorphe. Avec l'utilisation de la primitive "Resource", les requêtes asynchrone sont facilement faite et, plus important, automatiquement sérialisé et synchronisé entre le client et le navigateur.
+Solid propose une solution dynamique de rendu côté serveur qui permet une vraie expérience isomorphe. Avec l'utilisation de la primitive "Resource", les requêtes asynchrones sont facilement faites et, plus importantes, automatiquement sérialisées et synchronisées entre le client et le navigateur.
 
 Comme Solid supporte le fonctionnement asynchrone et le stream rendering côté serveur, vous pouvez écrire votre code d'une seule manière et l'exécuter côté serveur. Ce qui veut dire que des fonctionnalités comme [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) et le fractionnement de code vont fonctionner sans effort avec Solid.
 
-Pour plus d'information, lisez le [guide serveur](https://www.solidjs.com/docs/latest#server-side-rendering).
+Pour plus d'information, n'hésitez pas à lire le [guide serveur](https://www.solidjs.com/docs/latest#server-side-rendering).
 
 ## Pas de Compilation ?
 

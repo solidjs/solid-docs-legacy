@@ -6,9 +6,9 @@ sort: 2
 
 # Rendu
 
-Solid supporte 3 formes de template JSX, Tagged Template Literals et sa propre variation de HyperScript, même si JSX est la forme prédominante. Pourquoi ? JSX est un super DSL fait pour la compilation. Il possède une syntaxe claire, supporte TypeScript, fonctionne avec Babel et supporte d'autres outils comme le Surlignage Syntaxique et Prettier. Il est pragmatique d'utilisé un outil qui vous donne tout cela inclut. En tant que solution compilée, il offre une expérience développeur génial. Pourquoi s'embêter avec une syntaxe DSL personnalisée quand vous pouvez en utiliser une qui est déjà supporté à grande échelle ?
+Solid supporte 3 formes de template JSX, Tagged Template Literals et sa propre variation de HyperScript, même si JSX est la forme prédominante. Pourquoi ? JSX est un super DSL fait pour la compilation. Il possède une syntaxe claire, supporte TypeScript, fonctionne avec Babel et supporte d'autres outils comme le Surlignage Syntaxique et Prettier. Il est pragmatique d'utiliser un outil qui vous donne tout cela inclus. En tant que solution compilée, il offre une expérience développeur géniale. Pourquoi s'embêter avec une syntaxe DSL personnalisée quand vous pouvez en utiliser une qui est déjà supportée à grande échelle ?
 
-## Compilation de JSX 
+## Compilation de JSX
 
 Le rendu implique une précompilation de template JSX en code JS natif optimisé. Le code JSX produit :
 
@@ -18,13 +18,13 @@ Le rendu implique une précompilation de template JSX en code JS natif optimisé
 
 Cette approche est plus performante et produit moins de code que la création de chaque élément, un par un, avec `document.createElement`.
 
-## Attributs and Props
+## Attributs et Props
 
 Solid essaye de refléter les conventions HTML autant que possible en incluant des noms d'attributs insensibles aux majuscules et minuscules.
 
 La majorité des attributs sur les éléments JSX natifs sont les mêmes que ceux du DOM. Les valeurs statiques sont incluses directement dans le template qui est cloné. Il y a un quelques exceptions comme `class`, `style`, `value`, `innerHTML` qui fournissent des fonctionnalités supplémentaires.
 
-Cependant, les éléments personnalisés (à l'exception des éléments natifs) vont utiliser par défaut les propriétés dynamiques. Cela permet de gérer des types de données plus complexes. On utilise la convention camelCase au lieu du standard snake-case pour les attributs, `some-attr` devient `someAttr`.
+Cependant, les éléments personnalisés (à l'exception des éléments natifs) vont utiliser par défaut les propriétés dynamiques. Cela permet de gérer des types de données plus complexes. On utilise la convention camelCase au lieu du standard snake-case pour les attributs, `some-attr` deviens `someAttr`.
 
 Il est aussi possible de contrôler le comportement directement avec un espace de noms de directives. Vous pouvez forcer un attribut `attr:` ou forcer une prop `prop:`
 
@@ -32,11 +32,11 @@ Il est aussi possible de contrôler le comportement directement avec un espace d
 <my-element prop:UniqACC={state.value} attr:title={state.title} />
 ```
 
-> **Note :** Les attributs statiques sont créés en tant que template HTML qui sont clonés. Les expressions fixe et dynamique sont appliqué après dans le l'ordre JSX associé. Bien que cela soit correct, pour la plupart des éléments du DOM,  il y en a certain, comme les champs de saisi avec `type='range'`, où l'ordre est important. Garder cela en tête pendant l'association d'élément.
+> **Note :** Les attributs statiques sont créés en tant que template HTML qui sont clonés. Les expressions fixe et dynamique sont appliquées après dans le l'ordre JSX associé. Bien que cela soit correct, pour la plupart des éléments du DOM, il y en a certain, comme les champs de saisis avec `type='range'`, où l'ordre est important. Garder cela en tête pendant l'association d'élément.
 
 ## Point d'entrée
 
-La manière la plus simple de monter Solid est d'importer `render` depuis le module `solid-js/web`. `render` prend une fonction en tant que premier argument et l'élément englobant pour le second argument et retourne une méthode de destruction. Pour de meilleure performance, utiliser un élément sans enfant.
+La manière la plus simple de monter Solid est d'importer `render` depuis le module `solid-js/web`. `render` prends une fonction en tant que premier argument et l'élément englobant pour le second argument et retourne une méthode de destruction. Pour de meilleure performance, utiliser un élément sans enfant.
 
 ```jsx
 import { render } from "solid-js/web";
@@ -44,7 +44,7 @@ import { render } from "solid-js/web";
 render(() => <App />, document.getElementById("main"));
 ```
 
-> **Important** Le premier argument a besoin d'être une fonction. Autrement, nous ne pouvons pas surveiller les propriétés et activé le système de réactivité. Ce simple oubli va faire que vos Effets ne vont pas s'exécuter.
+> **Important** Le premier argument a besoin d'être une fonction. Autrement, nous ne pouvons pas surveiller les propriétés et activer le système de réactivité. Ce simple oubli va faire que vos Effets ne vont pas s'exécuter.
 
 ## Composants
 
@@ -67,7 +67,7 @@ const Label = (props) => (
 );
 ```
 
-Comme chaque nœud JSX sont en réalité des nœuds DOM, la seule responsabilité des Composants de haut niveau est de les ajouter dans le DOM.
+Comme chaque nœud JSX est en réalité un nœud DOM, la seule responsabilité des Composants de haut niveau est de les ajouter dans le DOM.
 
 ## Props
 
@@ -84,7 +84,6 @@ const Parent = () => (
 ```
 
 Dans l'exemple au-dessus, la valeur attribuée à `greeting` est statique, mais nous pouvons aussi utilisé des valeurs dynamiques. Par exemple :
-
 
 ```jsx
 const Parent = () => {
@@ -111,16 +110,16 @@ const Label = (props) => (
 );
 ```
 
-À la différence des autres frameworks, vous ne pouvez pas utiliser la déstructuration d'objet sur les `props` d'un composant. Cela est dû au fait que l'objet `props`, en coulisse, va s'appuyer sur les Object getters pour paresseusement récupérer des valeurs. Utiliser la destructuration d'objet casse la réactivité des `props`.
+À la différence des autres frameworks, vous ne pouvez pas utiliser la déstructuration d'objet sur les `props` d'un composant. Cela est dû au fait que l'objet `props`, en coulisse, va s'appuyer sur les Object getters pour paresseusement récupérer des valeurs. Utiliser la déstructuration d'objet casse la réactivité des `props`.
 
-Cet exemple montre la "bonne" manière d'accéder au props dans Solid:
+Cet exemple montre la "bonne" manière d'accéder aux props dans Solid:
 
 ```jsx
 // Ici, `props.name` va se mettre à jour comme prévu
 const MyComponent = (props) => <div>{props.name}</div>;
 ```
 
-Cet exemple montre la mauvaise manière d'accéder au props dans Solid : 
+Cet exemple montre la mauvaise manière d'accéder aux props dans Solid :
 
 ```jsx
 // Cela n'est pas bon
@@ -128,9 +127,9 @@ Cet exemple montre la mauvaise manière d'accéder au props dans Solid :
 const MyComponent = ({ name }) => <div>{name}</div>;
 ```
 
-Même si l'objet `props` ressemble à un objet normal (et les utilisateurs de Typescript noterons que le typage est similaire à un objet normal), quand il est utilisé, il est en réalité réactif - en quelque sorte similaire aux Signaux. Cela a quelques implications.
+Même si l'objet `props` ressemble à un objet normal (et les utilisateurs de Typescript noteront que le typage est similaire à un objet normal), quand il est utilisé, il est en réalité réactif - en quelque sorte similaire aux Signaux. Cela a quelques implications.
 
-Contrairement aux autres frameworks JSX, les fonctions Composants de Solid sont seulement exécutés une fois (plutôt qu'à chaque cycle de rendu), l'exemple ci-dessous ne va pas fonctionner comme prévu.
+Contrairement aux autres frameworks JSX, les fonctions Composants de Solid sont seulement exécutées une fois (plutôt qu'à chaque cycle de rendu), l'exemple ci-dessous ne va pas fonctionner comme prévu.
 
 ```jsx
 import { createSignal } from "solid-js";
@@ -153,7 +152,7 @@ export default function Form() {
 }
 ```
 
-Dans cet exemple, nous voulons probablement que le `BasicComponent` affiche la valeur actuelle saisie dans l'`input`. Mais, comme dit plus tôt, la fonction `BasicComponent` ne va s'executer qu'une seule fois quand le composant est initialement créé. À ce moment-là (à la création),  `props.value` aura une valeur `''`. Cela veut dire que `const value` dans `BasicComponent` va être affectés `'default'` et ne jamais se mettre à jour. Pendant ce temps, l'objet `props` peut changer, accéder à props dans `const value = props.value || 'default';` est hors du champ observable de Solid, donc il ne se réévalue pas automatique quand l'objet props change.
+Dans cet exemple, nous voulons probablement que le `BasicComponent` affiche la valeur actuelle saisie dans l'`input`. Mais, comme dit plus tôt, la fonction `BasicComponent` ne va s'exécuter qu'une seule fois quand le composant est initialement créé. À ce moment-là (à la création), `props.value` aura une valeur `''`. Cela veut dire que `const value` dans `BasicComponent` va être affecté `'default'` et ne jamais se mettre à jour. Pendant ce temps, l'objet `props` peut changer, accéder à props dans `const value = props.value || 'default';` est hors du champ observable de Solid, donc il ne se réévalue pas automatique quand l'objet props change.
 
 Alors comment règle-t-on ce problème ?
 
@@ -175,7 +174,7 @@ const BasicComponent = (props) => {
 };
 ```
 
-Une autre option, lorsque le calcul est coûteux, est d'utilisé `createMemo`. Par exemple :
+Une autre option, lorsque le calcul est coûteux, est d'utiliser `createMemo`. Par exemple :
 
 ```jsx
 const BasicComponent = (props) => {
@@ -232,7 +231,7 @@ untrack(() =>
 );
 ```
 
-Pour aider à maintenir la réactivité, Solid fourni quelque fonction d'aide pour les props:
+Pour aider à maintenir la réactivité, Solid fournit quelque fonction d'aide pour les props:
 
 ```jsx
 // props par défaut
@@ -251,7 +250,7 @@ const [local, others] = splitProps(props, ["className"])
 
 ## Enfants
 
-Solid gère les enfants JSX comme React. Un enfant unique est une valeur unique dans `props.children` et plusieurs enfants sont géré comme un tableau de valeur. Normalement, vous les passez par la vue JSX. Cependant, si vous voulez interagir avec eux, la méthode suggérée est d'utilisé la fonction d'aide `children` qui va résoudre tous les contrôles de flux en aval et retourner un Mémo.
+Solid gère les enfants JSX comme React. Un enfant unique est une valeur unique dans `props.children` et plusieurs enfants sont géré comme un tableau de valeur. Normalement, vous les passez par la vue JSX. Cependant, si vous voulez interagir avec eux, la méthode suggérée est d'utiliser la fonction d'aide `children` qui va résoudre tous les contrôles de flux en aval et retourner un Mémo.
 
 ```jsx
 // enfant unique
@@ -275,7 +274,7 @@ const List = (props) => <ul>
 
 // modification et itération en utilisant la fonction d'aide
 const List = (props) => {
-  // la fonction d'aide "children" mémorise la valeur et resouds toutes les dépendances réactives intermédiaire
+  // la fonction d'aide "children" mémorise la valeur et resouds toutes les dépendances réactives intermédiaires
   const memo = children(() => props.children);
   createEffect(() => {
     const children = memo();
@@ -286,4 +285,4 @@ const List = (props) => {
   </ul>;
 ```
 
-**Important:** Le traitement des balises enfants dans Solid sont des expressions coûteuses et sont englobé de la même manière que des expressions réactive dynamique. Cela veut dire qu'ils sont évalués paresseusement sur l'accès de `prop`. Soyez prudent quand vous accédez y accéder plusieurs fois ou déstructurer avant l'endroit où vous voulez l'utiliser dans la vue. Cela est dû au fait que Solid n'a pas le luxe de se créer un des nœuds de DOM Virtuel en avance et de trouver les différences, donc la résolution de ces `props` doit être faite quand nécessaire et de manière délibérée. Utilisez la fonction d'aide `children` si vous souhaitez le faire afin de les mémorisé.
+**Important:** Le traitement des balises enfants dans Solid sont des expressions coûteuses et sont englobé de la même manière que des expressions réactives dynamiques. Cela veut dire qu'ils sont évalués paresseusement sur l'accès de `prop`. Soyez prudent quand vous accédez y accéder plusieurs fois ou déstructurer avant l'endroit où vous voulez l'utiliser dans la vue. Cela est dû au fait que Solid n'a pas le luxe de se créer un des nœuds de DOM Virtuel en avance et de trouver les différences, donc la résolution de ces `props` doit être faite quand nécessaire et de manière délibérée. Utilisez la fonction d'aide `children` si vous souhaitez le faire afin de les mémoriser.
