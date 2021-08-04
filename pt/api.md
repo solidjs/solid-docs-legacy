@@ -397,7 +397,7 @@ setState({ merge: "thisValue" });
 setState("path", "to", "value", newValue);
 ```
 
-Store objetos sendo proxies rastreiam apenas no acesso à propriedade. E no acesso Stores produz recursivamente objetos Store aninhados em dados aninhados. No entanto, ele envolve apenas matrizes e objetos simples. Classes não são agrupadas. Portanto, coisas como `Date`,` HTMLElement`, `Regexp`, `Map`, `Set` não são granularmente reativas. Além disso, o objeto de estado de nível superior não pode ser rastreado sem acessar uma propriedade nele. Portanto, não é adequado para uso em coisas nas quais você itera, pois a adição de novas chaves ou índices não pode acionar atualizações. Portanto, coloque qualquer lista em uma chave de estado em vez de tentar usar o próprio objeto de estado.
+Store objetos sendo proxies rastreiam apenas no acesso à propriedade. E no acesso Stores produz recursivamente objetos Store aninhados em dados aninhados. No entanto, ele envolve apenas matrizes e objetos simples. Classes não são agrupadas. Portanto, coisas como `Date`,` HTMLElement`, `RegExp`, `Map`, `Set` não são granularmente reativas. Além disso, o objeto de estado de nível superior não pode ser rastreado sem acessar uma propriedade nele. Portanto, não é adequado para uso em coisas nas quais você itera, pois a adição de novas chaves ou índices não pode acionar atualizações. Portanto, coloque qualquer lista em uma chave de estado em vez de tentar usar o próprio objeto de estado.
 
 ```js
 // coloque a lista como uma chave no objeto de estado

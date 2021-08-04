@@ -401,7 +401,7 @@ setState({ merge: "questoValore" });
 setState("percorso", "verso", "valore", nuovoValore);
 ```
 
-Poiché gli oggetti Store sono proxy, tengono traccia solo dell'accesso alla proprietà. All'accesso, Store produce in modo ricorsivo oggetti nidificati su dati nidificati. Questo tuttavia avvolge solo array e oggetti semplici. Le classi non sono chiuse. Elementi come "Data", "HTMLElement", "Regexp", "Mappa", "Set" non sono granularmente reattivi.
+Poiché gli oggetti Store sono proxy, tengono traccia solo dell'accesso alla proprietà. All'accesso, Store produce in modo ricorsivo oggetti nidificati su dati nidificati. Questo tuttavia avvolge solo array e oggetti semplici. Le classi non sono chiuse. Elementi come `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` non sono granularmente reattivi.
 
 Si noti che l'oggetto di stato di livello superiore non può essere tracciato senza accedere a una proprietà su di esso. Non è adatto per le cose su cui si esegue l'iterazione poiché l'aggiunta di nuove chiavi o indici non può attivare gli aggiornamenti. Quindi dovresti mettere qualsiasi elenco su una chiave di stato piuttosto che provare a usare l'oggetto di stato stesso.
 
