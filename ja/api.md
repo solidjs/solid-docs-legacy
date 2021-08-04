@@ -540,7 +540,7 @@ export function produce<T>(
 ) => T extends NotWrappable ? T : Store<T>;
 ```
 
-Immer にインスパイアされた Solid の Store オブジェクト用の API で、局所的なミューテーション変異を可能にします。
+Immer にインスパイアされた Solid の Store オブジェクト用の API で、局所的なミューテーションを可能にします。
 
 ```js
 setState(
@@ -565,7 +565,7 @@ export function reconcile<T>(
 ) => T extends NotWrappable ? T : Store<T>;
 ```
 
-きめ細かい更新を適用できない場合に、データの変化を差分で表示します。ストアからの不変的なデータや、大きな API レスポンスを扱う場合に便利です。
+きめ細かい更新を適用できない場合に、データの変化を差分で表示します。ストアからのイミュータブルなデータや、大きな API レスポンスを扱う場合に便利です。
 
 アイテムをマッチさせるために、キーがあればそれを使用します。デフォルトでは、`merge` false は、可能な限り参照チェックを行って同等性を判断し、アイテムが参照的に等しくない場合には置換します。`merge` true は、すべての差分を葉ノードにプッシュし、以前のデータを新しい値に効果的に変換します。
 
@@ -586,7 +586,7 @@ export function createMutable<T extends StoreNode>(
 ): Store<T> {
 ```
 
-ミュータブルな Store プロキシオブジェクトを新規に作成します。ストアは、値が変化したときにのみ更新をトリガーします。追跡は、プロパティアクセスをインターセプトすることで行われ、プロキシ経由で深いネストを自動的に追跡します。
+ミュータブルなストアプロキシオブジェクトを新規に作成します。ストアは、値が変化したときにのみ更新をトリガーします。追跡は、プロパティアクセスをインターセプトすることで行われ、プロキシ経由で深いネストを自動的に追跡します。
 
 外部システムとの統合や、MobX/Vue との互換性レイヤーとしても有効です。
 
@@ -661,7 +661,7 @@ export function CounterProvider(props) {
 }
 ```
 
-Provider に渡された値は、そのまま `useContext` に渡されます。つまり、リアクティブな式としてのラッピングは機能しません。Signal や Store は、JSX でアクセスするのではなく、直接渡すべきです。
+Provider に渡された値は、そのまま `useContext` に渡されます。つまり、リアクティブな式としてのラッピングは機能しません。Signal やストアは、JSX でアクセスするのではなく、直接渡すべきです。
 
 ## `useContext`
 
@@ -669,7 +669,7 @@ Provider に渡された値は、そのまま `useContext` に渡されます。
 export function useContext<T>(context: Context<T>): T;
 ```
 
-コンテキストを取得するために使用され、各 Component 関数を通過させることなく、props を深く渡すことができます。
+コンテキストを取得して、各 Component 関数を通過させることなく props を深く渡すことができるようにするために使用されます。
 
 ```js
 const [state, { increment, decrement }] = useContext(CounterContext);
