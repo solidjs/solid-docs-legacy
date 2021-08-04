@@ -1,4 +1,4 @@
-Context is a great tool for stores. It handles injection, ties ownership to reactive graph, automatically manages disposal, and has no render overhead given Solid's fine-grained rendering.
+Context is a great tool for stores. It handles injection, ties ownership to the reactive graph, automatically manages disposal, and has no render overhead given Solid's fine-grained rendering.
 
 However, you could just use the reactive system directly for simple things. It's almost not worth pointing out but a simple writeable store is just a Signal:
 
@@ -28,4 +28,4 @@ return (
 );
 ```
 
-So when using your own more complicated global stores that contain computations be sure to create a root. Or better yet, do yourself a favor and just use Context.
+So when using your own more complicated global stores that contain computations, be sure to create a root. Or better yet, do yourself a favor and just use Context.

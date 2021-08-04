@@ -2,7 +2,7 @@ Sometimes your components and elements accept a variable number of attributes an
 
 For this we use the spread operator `...`.
 
-We can pass an object with variable number of properties:
+We can pass an object with a variable number of properties:
 
 ```jsx
 <Info {...pkg} />

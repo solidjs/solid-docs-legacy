@@ -1,8 +1,8 @@
-The `<Dynamic>` tag is useful when you render from data. It lets you pass either a string for a native element or a component function to it and render that with the rest of the provided props.
+The `<Dynamic>` tag is useful when you render from data. It lets you pass either a string for a native element or a component function and it will render that with the rest of the provided props.
 
-This often is more compact than writing a number of `<Show>` or `<Switch>` components.
+This is often more compact than writing a number of `<Show>` or `<Switch>` components.
 
-In the example we can replace the `<Switch>` statement
+In the example, we can replace the `<Switch>` statement:
 
 ```jsx
 <Switch fallback={<BlueThing />}>

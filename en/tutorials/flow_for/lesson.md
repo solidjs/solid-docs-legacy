@@ -1,4 +1,4 @@
-If you want to iterate over a list the `<For>` component is the best way for any array of non-primitive values. It is automatically keyed by reference so as data updates it is optimized to update or move rows rather than recreate them. The callback is non-tracking and passes the item and an index Signal.
+If you want to iterate over a list, the `<For>` component is the best way for any array of non-primitive values. It is automatically keyed by reference, so as data updates it is optimized to update or move rows rather than recreate them. The callback is non-tracking and passes the item and an index Signal.
 
 ```jsx
 <For each={cats()}>{(cat, i) =>

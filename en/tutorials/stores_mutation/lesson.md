@@ -22,4 +22,4 @@ const toggleTodo = (id) => {
 };
 ```
 
-While `produce` with Stores probably handles the vast majority of cases, Solid also has a mutable Store object that is available from `createMutable`. While not the recommended approach for internal APIs it is sometimes useful for interopt or compatibility with 3rd party systems.
+While `produce` with Stores probably handles the vast majority of cases, Solid also has a mutable Store object that is available from `createMutable`. While not the recommended approach for internal APIs, it is sometimes useful for interop or compatibility with 3rd party systems.
