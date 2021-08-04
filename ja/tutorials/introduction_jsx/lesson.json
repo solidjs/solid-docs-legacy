@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "name": "main",
+      "content": "import { render } from 'solid-js/web';\n\nfunction App() {\n  return \"SVG をここへ\";\n}\n\nrender(() => <App />, document.getElementById('app'))\n"
+    }
+  ]
+}
