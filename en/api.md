@@ -973,7 +973,7 @@ function Show<T>(props: {
 }): () => JSX.Element;
 ```
 
-The Show control flow is used to conditional render part of the view. It is similar to the ternary operator(`a ? b : c`) but is ideal for templating JSX.
+The Show control flow is used to conditional render part of the view: it renders `children` when the `when` is truthy, an `fallback` otherwise. It is similar to the ternary operator (`when ? children : fallback`) but is ideal for templating JSX.
 
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
