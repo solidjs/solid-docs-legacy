@@ -7,6 +7,6 @@ createEffect(() => {
   console.log(a(), untrack(b));
 });
 ```
-Since Signals are functions they can be passed directly, but `untrack` can wrap functions with more complex behavior.
+Since Signals are functions, they can be passed directly, but `untrack` can wrap functions with more complex behavior.
 
 Even though `untrack` disables tracking of reads, it has no effect on writes which still happen and notify their observers.

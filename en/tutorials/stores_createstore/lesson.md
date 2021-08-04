@@ -1,6 +1,6 @@
 Stores are Solid's answer to nested reactivity. They are proxy objects whose properties can be tracked and can contain other objects which automatically become wrapped in proxies themselves, and so on.
 
-To keep things light Solid only creates underlying Signals for properties that are accessed under tracking scopes. And so, all Signals in Stores are created lazily as requested.
+To keep things light, Solid creates underlying Signals only for properties that are accessed under tracking scopes. And so, all Signals in Stores are created lazily as requested.
 
 The `createStore` call takes the initial value and returns a read/write tuple similar to Signals. The first element is the store proxy which is readonly, and the second is a setter function.
 

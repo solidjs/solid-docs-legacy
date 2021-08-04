@@ -58,7 +58,7 @@ if (isServer) {
 
 ## Hydration Script
 
-In order to progressively hydrate even before Solid's runtime loads, a special script needs to be inserted on the page. It can either be generated and inserted via `generateHydrationScript`or included as part of the JSX using the `<HydrationScript />` tag.
+In order to progressively hydrate even before Solid's runtime loads, a special script needs to be inserted on the page. It can either be generated and inserted via `generateHydrationScript` or included as part of the JSX using the `<HydrationScript />` tag.
 
 ```js
 import { generateHydrationScript } from "solid-js/web";
