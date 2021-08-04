@@ -77,7 +77,7 @@ export function createMemo<T>(
 ): () => T;
 ```
 
-Creates a readonly derived signal that recalculates it's value whenever the executed code's dependencies update.
+Creates a readonly derived signal that recalculates its value whenever the executed code's dependencies update.
 
 ```js
 const getValue = createMemo(() => computeExpensiveValue(a(), b()));
