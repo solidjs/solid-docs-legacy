@@ -6,7 +6,7 @@
 import Greeting from "./greeting";
 ```
 
-With:
+用下面的代码替换：
 
 ```js
 const Greeting = lazy(() => import("./greeting"));
