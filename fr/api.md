@@ -286,7 +286,7 @@ Utilisé pour grouper les mises à jour asynchrones dans une transition qui va r
 ```js
 const [isPending, start] = useTransition();
 
-// Vérifie si entrain de transitioner.
+// Vérifie si entrain de transitionner.
 isPending();
 
 // Enrobe dans une transition
@@ -803,7 +803,7 @@ export function hydrate(
 ): () => void;
 ```
 
-Cette méthode est similaire à `render` sauf qu'elle essaye d'hydrater ce qui est déjà rendu dans le DOM. Quand elle est initialisée dans le navigateur, une page a déjà été rendu côté serveur.
+Cette méthode est similaire à `render` sauf qu'elle essaye d'hydrater ce qui est déjà rendu dans le DOM. Quand elle est initialisée dans le navigateur, une page a déjà été rendue côté serveur.
 
 ```js
 const dispose = hydrate(App, document.getElementById("app"));
@@ -867,7 +867,7 @@ export function pipeToNodeWritable<T>(
 ): void;
 ```
 
-Cette méthode traduit en flux Node. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continues vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
+Cette méthode traduit en flux Node. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continus vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
 
 ```js
 pipeToNodeWritable(App, res);
@@ -902,7 +902,7 @@ export function pipeToWritable<T>(
 ): void;
 ```
 
-Cette méthode traduit en flux web. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continues vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
+Cette méthode traduit en flux web. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continus vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
 
 ```js
 const { readable, writable } = new TransformStream();

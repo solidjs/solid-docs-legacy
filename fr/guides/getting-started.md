@@ -9,7 +9,7 @@ sort: 0
 ## Essayer Solid
 
 La manière la plus simple de commencer avec Solid est d'essayer en ligne. Notre REPL sur https://playground.solidjs.com est la meilleure façon d'expérimenter, ainsi que sur https://codesandbox.io/ où vous pouvez modifier [nos différents exemples](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
-Sinon, vous pouvez utiliser simplement notre template [Vite](https://vitejs.dev/) en lançant ces commandes dans votre terminal :
+Sinon, vous pouvez utiliser simplement notre template [vite](https://vitejs.dev/) en lançant ces commandes dans votre terminal :
 
 ```sh
 > npx degit solidjs/templates/js mon-app
