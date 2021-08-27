@@ -10,12 +10,16 @@ This is documentation for SolidJS v1.0.0 and associated Solid packages and proje
 
 Solid's documentation is available in 6 languages including:
 
-- [English](https://github.com/solidjs/solid-docs/tree/main/en)
-- [French](https://github.com/solidjs/solid-docs/tree/main/fr) (contributed by [xstevenyung](https://github.com/xstevenyung)
-- [Italian](https://github.com/solidjs/solid-docs/tree/main/it) (contributed by [davedbase](https://github.com/davedbase))
-- [Portuguese](https://github.com/solidjs/solid-docs/tree/main/pt) (contributed by [candidosales](https://github.com/candidosales))
-- [Chinese](https://github.com/solidjs/solid-docs/tree/main/zh-cn) (contributed by [Gavin-Gong](https://github.com/Gavin-Gong))
-- [Japanese](https://github.com/solidjs/solid-docs/tree/main/jp) (contributed by [jay-es](https://github.com/jay-es))
+| Language            | API Documentation | Guides | Tutorials | Contibutors                                                                                     |
+|---------------------|-------------------|--------|-----------|-------------------------------------------------------------------------------------------------|
+| 🇫🇷  French (fr)     | 100%              | 0%     | 0%        | [xstevenyung](https://github.com/xstevenyung) and [MidouWebDev](https://github.com/midouwebdev) |
+| 🇮🇹  Italian (it)    | 100%              | 100%   | 0%        | [davedbase](https://github.com/davedbase)                                                       |
+| 🇵🇹  Portuguese (pt) | 100%              | 100%   | 0%        | [candidosales](https://github.com/candidosales)                                                 |
+| 🇨🇳  Chinese (zh-cn) | 100%              | 100%   | 100%      | [Gavin-Gong](https://github.com/Gavin-Gong)                                                     |
+| 🇯🇵  Japanese (ja)   | 100%              | 100%   | 100%      | [jay-es](https://github.com/jay-es)                                                             |
+| 🇪🇸  Spanish (es)    | 10%               | 0%     | 0%        | [jnfrati](https://github.com/jnfrati)                                                           |
+| 🇮🇩  Indonesian (id) | 100%              | 100%   | 0%        | [athif23](https://github.com/athif23)                                                           |
+| 🇩🇪  German (de)     | 50%               | 0%     | 0%        | [atk](https://github.com/atk)                                                                   |
 
 # Support
 
