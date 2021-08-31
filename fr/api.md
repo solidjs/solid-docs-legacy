@@ -16,7 +16,7 @@ export function createSignal<T>(
 ): [get: () => T, set: (v: T) => T];
 ```
 
-C'est la primitive réactive la plus basique utilisé pour surveiller une seule valeur qui change dans le temps. La fonction de création retourne une paire de fonction, une pour la lecture de la valeur et l'autre pour mettre à jour le signal.
+C'est la primitive réactive la plus basique utilisée pour surveiller une seule valeur qui change dans le temps. La fonction de création retourne une paire de fonctions, une pour la lecture de la valeur et l'autre pour mettre à jour le signal.
 
 ```js
 const [getValue, setValue] = createSignal(initialValue);
@@ -31,7 +31,7 @@ setValue(nextValue);
 setValue((prev) => prev + next);
 ```
 
-N'oublier d'accéder aux signaux sous une portée surveillée si vous souhaitez qu'elles soient réactives à la mise à jour. Les portées surveillées sont des fonctions qui sont passées à des évaluations comme `createEffect` ou des expressions JSX.
+N'oubliez pas d'accéder aux signaux sous une portée surveillée si vous souhaitez qu'elles soient réactives à la mise à jour. Les portées surveillées sont des fonctions qui sont passées à des évaluations comme `createEffect` ou des expressions JSX.
 
 > Si vous souhaitez stocker une fonction dans un Signal, vous devez utiliser la forme suivante :
 >
@@ -49,7 +49,7 @@ export function createEffect<T>(
 ): void;
 ```
 
-Créer un nouveau calcul qui va automatiquement surveiller ses dépendances et s'exécuter après chaque rendu où les dépendances ont été changé. Ceci est idéal pour l'utilisation de `ref`s et la gestion d'autres effets secondaires.
+Créer un nouveau calcul qui va automatiquement surveiller ses dépendances et s'exécuter après chaque rendu où les dépendances ont été changées. Ceci est idéal pour l'utilisation de `ref`s et la gestion d'autres effets secondaires.
 
 ```js
 const [a, setA] = createSignal(initialValue);
@@ -58,7 +58,7 @@ const [a, setA] = createSignal(initialValue);
 createEffect(() => doSideEffect(a()));
 ```
 
-La fonction effet est appelée avec la valeur retourner par la dernière exécution de la fonction passée en argument. Cette valeur peut être initialisée en tant que 2ème argument optionnel. Cela peut être utile lors de comparaison sans créer une fonction supplémentaire.
+La fonction effet est appelée avec la valeur retournée par la dernière exécution de la fonction passée en argument. Cette valeur peut être initialisée en tant que 2ème argument optionnel. Cela peut être utile lors de comparaison sans créer une fonction supplémentaire.
 
 ```js
 createEffect((prev) => {
@@ -120,7 +120,7 @@ export function createResource<T, U>(
 ): ResourceReturn<T>;
 ```
 
-Créer un signal qui peut gérer des requêtes asynchrones. `fetcher` est une fonction asynchrone qui accepte une valeur retournée par la `source` si elle est fournie et qu'elle retourne une Promesse dont la valeur renvoyée est stocké dans la ressource. La fonction de récupération (fetcher) n'est pas réactive, donc utiliser le premier argument optionnel si vous voulez l'exécuter plus d'une fois. Si la source retourne une valeur `false`, `null` ou `undefined` alors elle ne sera pas récupérée.
+Créer un signal qui peut gérer des requêtes asynchrones. `fetcher` est une fonction asynchrone qui accepte une valeur retournée par la `source` si elle est fournie et qu'elle retourne une Promesse dont la valeur renvoyée est stockée dans la ressource. La fonction de récupération (fetcher) n'est pas réactive, donc utilisez le premier argument optionnel si vous voulez l'exécuter plus d'une fois. Si la source retourne une valeur `false`, `null` ou `undefined` alors elle ne sera pas récupérée.
 
 ```js
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
@@ -142,7 +142,7 @@ mutate(optimisticValue);
 refetch();
 ```
 
-`loading` et `error` sont des propriétés réactives qui peuvent être surveillé.
+`loading` et `error` sont des propriétés réactives qui peuvent être surveillées.
 
 # Cycles de vie
 
@@ -168,7 +168,7 @@ Programme une méthode de nettoyage qui s'exécute à la destruction ou recalcul
 export function onError(fn: (err: any) => void): void;
 ```
 
-Programme une méthode de gestion d'erreur qui va s'exécuter lorsque la portée enfant lève une erreur. Seulement la portée la plus proche de l'erreur va exécuter sa fonction de gestion d'erreur. Si une erreur se reproduit, la fonction se ré-exécute.
+Programme une méthode de gestion d'erreur qui va s'exécuter lorsque la portée enfant lève une erreur. Seulement la portée la plus proche de l'erreur va exécuter sa fonction de gestion d'erreur. Si une erreur se reproduit, la fonction se réexécute.
 
 # Utilitaires réactifs
 
@@ -188,7 +188,7 @@ Ignore le suivi des dépendances dans le bloc de code exécuté et retourne la v
 export function batch<T>(fn: () => T): T;
 ```
 
-Groupe les mises à jour dans le bloc jusqu'à la fin pour éviter des calculs inutiles. Cela veut dire que la lecture de valeurs dans les lignes suivantes ne seront pas à jour. Les [Stores de Solid](https://www.solidjs.com/docs/latest/api#createstore) utilise cette méthode pour affecter des valeurs et les Effets enrobent automatiquement leur code dans un `batch`.
+Groupe les mises à jour dans le bloc jusqu'à la fin pour éviter des calculs inutiles. Cela veut dire que la lecture des valeurs dans les lignes suivantes ne seront pas à jour. Les [Stores de Solid](https://www.solidjs.com/docs/latest/api#createstore) utilise cette méthode pour affecter des valeurs et les Effets enrobent automatiquement leur code dans un `batch`.
 
 ## `on`
 
@@ -200,7 +200,7 @@ export function on<T extends Array<() => any> | (() => any), U>(
 ): (prevValue?: U) => U | undefined;
 ```
 
-`on` est fait pour passer dans une fonction de calcul qui va rendre ses dépendances explicite. Si un tableau de dépendances est passé, `input` et `prevInput` sont des tableaux.
+`on` est fait pour passer dans une fonction de calcul qui va rendre ses dépendances explicites. Si un tableau de dépendances est passé, `input` et `prevInput` sont des tableaux.
 
 ```js
 createEffect(on(a, (v) => console.log(v, b())));
@@ -229,7 +229,7 @@ export function createRoot<T>(fn: (dispose: () => void) => T): T;
 
 Créer un nouveau contexte qui ne sera pas surveillé et qui ne se détruira pas automatiquement. C'est utile pour les contextes réactifs imbriqués que vous ne voulez pas détruire lorsque le parent se réévalue. C'est un pattern puissant pour mettre en cache des données.
 
-Tous les projets Solid devrait être enrobé de cette fonction à haut niveau pour s'assurer que toute la mémoire/calcul soit libéré. Normalement, vous n'avez à vous soucier de ceci, car `createRoot` est embarqué dans la fonction d'entrée `render`.
+Tous les projets Solid devraient être enrobés de cette fonction à haut niveau pour s'assurer que toute la mémoire/calcul soit libérée. Normalement, vous n'avez à vous soucier de ceci, car `createRoot` est embarqué dans la fonction d'entrée `render`.
 
 ## `mergeProps`
 
@@ -237,9 +237,9 @@ Tous les projets Solid devrait être enrobé de cette fonction à haut niveau po
 export function mergeProps(...sources: any): any;
 ```
 
-Une méthode `merge` qui va fusionner des objets réactifs. C'est utile pour associer des valeurs par défaut au props de composants dans le cas où le parent ne les fournissent pas. Ou cloner l'objet props en incluant des propriétés réactives.
+Une méthode `merge` qui va fusionner des objets réactifs. C'est utile pour associer des valeurs par défaut aux props de composants dans le cas où le parent ne les fournit pas. Ou cloner l'objet props en incluant des propriétés réactives.
 
-Cette méthode fonctionne en utilisant les proxies et associant les propriétés dans l'ordre inverse. Cela permet de dynamiquement surveiller les propriétés qui ne sont pas présent quand l'objet prop est fusionné la première fois.
+Cette méthode fonctionne en utilisant les proxies et associant les propriétés dans l'ordre inverse. Cela permet de dynamiquement surveiller les propriétés qui ne sont pas présentes quand l'objet prop est fusionné la première fois.
 
 ```js
 // props par défault
@@ -261,7 +261,7 @@ export function splitProps<T>(
 ): [...parts: Partial<T>];
 ```
 
-C'est un remplacement de la déstructuration. Elle va séparer un objet réactive par une liste de clés pour maintenir la réactivité.
+C'est un remplacement de la déstructuration. Elle va séparer un objet réactif par une liste de clés pour maintenir la réactivité.
 
 ```js
 const [local, others] = splitProps(props, ["children"]);
@@ -281,12 +281,12 @@ export function useTransition(): [
 ];
 ```
 
-Utilisé pour grouper les mises à jour asynchrones dans une transition qui va reporter les changements jusqu'à ce que tous les processus asynchrones soit complétés. Ceci est lié au Suspense et surveille seulement les ressources lues dans les limites des Suspenses.
+Utilisé pour grouper les mises à jour asynchrones dans une transition qui va reporter les changements jusqu'à ce que tous les processus asynchrones soient complétés. Ceci est lié au Suspense et surveille seulement les ressources lues dans les limites des Suspenses.
 
 ```js
 const [isPending, start] = useTransition();
 
-// Vérifie si entrain de transitioner.
+// Vérifie si entrain de transitionner.
 isPending();
 
 // Enrobe dans une transition
@@ -320,10 +320,9 @@ export function mapArray<T, U>(
 ): () => U[];
 ```
 
-Fonction d'aide d'association réactive qui va mettre en cache chaque élément par référence pour réduire les associations inutile lors de mise à jour. Elle ne va exécuter la fonction d'association qu'une fois par valeur et va la déplacer ou supprimer en fonction du besoin. L'argument index est un signal. La fonction d'association elle-même n'est pas surveillée.
+Fonction d'aide d'association réactive qui va mettre en cache chaque élément par référence pour réduire les associations inutiles lors de mise à jour. Elle ne va exécuter la fonction d'association qu'une fois par valeur et va la déplacer ou supprimer en fonction du besoin. L'argument index est un signal. La fonction d'association elle-même n'est pas surveillée.
 
 Cette fonction d'aide est utilisée pour le contrôle de flux avec `<For />`
-
 
 ```js
 const mapped = mapArray(source, (model) => {
@@ -375,7 +374,7 @@ const mapped = indexArray(source, (model) => {
 
 # Stores
 
-Ces APIs sont disponible sous `solid-js/store`.
+Ces APIs sont disponibles sous `solid-js/store`.
 
 ## `createStore`
 
@@ -400,7 +399,7 @@ setState({ merge: "thisValue" });
 setState("path", "to", "value", newValue);
 ```
 
-Les objets Store sont des proxies qui sont surveillé seulement sur l'accès aux propriétés. Et à l'accès, les Stores produisent récursivement des objets Store imbriqués sur les données imbriquées. Cependant, ça ne peut enrober que des tableaux et de simples objets. Les classes ne sont pas enrobées. Donc les `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` ne sont pas réactifs. De plus, les objets de haut niveaux ne peuvent pas être surveillés sans accéder à une de leurs propriétés. Donc il ne convient pas de les utiliser pour des éléments sur lesquels on va itérer, car l'ajout de nouvelles clés ou d'index ne va pas engendrer une mise à jour. Donc mettez vos listes dans une clé de votre état au lieu d'essayer d'utiliser l'objet état directement.
+Les objets Store sont des proxies qui sont surveillés seulement sur l'accès aux propriétés. Et à l'accès, les Stores produisent récursivement des objets Store imbriqués sur les données imbriquées. Cependant, ça ne peut enrober que des tableaux et de simples objets. Les classes ne sont pas enrobées. Donc les `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` ne sont pas réactifs. De plus, les objets de haut niveau ne peuvent pas être surveillés sans accéder à une de leurs propriétés. Donc il ne convient pas de les utiliser pour des éléments sur lesquels on va itérer, car l'ajout de nouvelles clés ou d'index ne va pas engendrer une mise à jour. Donc mettez vos listes dans une clé de votre état au lieu d'essayer d'utiliser l'objet état directement.
 
 ```js
 // mettez la liste dans une clé sur l'objet store
@@ -412,7 +411,7 @@ const [state, setState] = createStore({ list: [] });
 
 ### Getters
 
-Les objets Store supporte l'utilisation d'accesseur pour calculer des valeurs.
+Les objets Store supportent l'utilisation d'accesseur pour calculer des valeurs.
 
 ```js
 const [state, setState] = createStore({
@@ -459,9 +458,9 @@ setState((state) => ({ preferredName: state.firstName, lastName: "Milner" }));
 // ({ firstName: 'Johnny', preferredName: 'Johnny', middleName: 'Lee', lastName: 'Milner' })
 ```
 
-Il est possible d'utilisé des chemins en utilisant les clés des tableaux, un rayon d'objet et des fonctions de filtrage.
+Il est possible d'utiliser des chemins en utilisant les clés des tableaux, un rayon d'objet et des fonctions de filtrage.
 
-`setState` supporte aussi les options imbriquées où vous pouvez indiquer le chemin du changement. L'état que vous voulez mettre à jour peut être d'autres valeurs qui ne sont pas des objets. Les objets sont fusionnés, mais les autres valeurs (tableaux inclus) sont remplacé.
+`setState` supporte aussi les options imbriquées où vous pouvez indiquer le chemin du changement. L'état que vous voulez mettre à jour peut être d'autres valeurs qui ne sont pas des objets. Les objets sont fusionnés, mais les autres valeurs (tableaux inclus) sont remplacées.
 
 ```js
 const [state, setState] = createStore({
@@ -568,9 +567,9 @@ export function reconcile<T>(
 ) => T extends NotWrappable ? T : Store<T>;
 ```
 
-La comparaison de données n'est pas appliqué lorsque l'on ne peut pas appliquer de mise à jour précise. Utile quand nous voulons gérer des données immuables depuis les stores ou grosse réponse d'API.
+La comparaison de données n'est pas appliquée lorsque l'on ne peut pas appliquer de mise à jour précise. Utile quand nous voulons gérer des données immuables depuis les stores ou grosses réponses d'API.
 
-La clé est utilisée quand les éléments associés sont disponible. Par défaut `merge: false` fait une vérification de référence quand c'est possible pour déterminer l'égalité et replace lorsque la référence n'est pas égale. `merge: true` pousse toutes les comparaisons aux feuilles de l'arbre de données et remplace la donnée précédente par la nouvelle valeur de manière efficace.
+La clé est utilisée quand les éléments associés sont disponibles. Par défaut `merge: false` fais une vérification de référence quand c'est possible pour déterminer l'égalité et replace lorsque la référence n'est pas égale. `merge: true` pousse toutes les comparaisons aux feuilles de l'arbre de données et remplace la donnée précédente par la nouvelle valeur de manière efficace.
 
 ```js
 // s'abonner à un observable
@@ -589,7 +588,7 @@ export function createMutable<T extends StoreNode>(
 ): Store<T> {
 ```
 
-Créer un nouvel objet Store mutable. Les stores se mettent à jour seulement quand les valeurs changent. Le traçage est fait par l'interception de l'accès de propriété et automatiquement tracer dans des imbrications profondes en utilisant un proxy.
+Créer un nouvel objet Store mutable. Les stores se mettent à jour seulement quand les valeurs changent. Le traçage est fait par l'interception de l'accès de propriété et automatiquement tracé dans des imbrications profondes en utilisant un proxy.
 
 Utile pour l'intégration de système externe ou en tant que couche de compatibilité avec MobX/Vue.
 
@@ -666,7 +665,6 @@ export function CounterProvider(props) {
 
 La valeur donnée au `Provider` est passée telle quelle à `useContext`. Cela signifie qu'enrober une expression réactive ne marchera pas. Vous devrez passer des Signaux ou des Stores directement au lieu d'y accéder dans le JSX.
 
-
 ## `useContext`
 
 ```ts
@@ -690,7 +688,7 @@ Utiliser pour faciliter l'interaction avec `props.children`. Cette fonction d'ai
 ```js
 const list = children(() => props.children);
 
-// faire quelques chose avec la donnée
+// faire quelque chose avec la donnée
 createEffect(() => list());
 ```
 
@@ -702,7 +700,7 @@ export function lazy<T extends Component<any>>(
 ): T & { preload: () => Promise<T> };
 ```
 
-Utiliser le chargement de composant en mode paresseux pour permettre le découpage dynamique de code. Les composants ne sont chargés  qu'une fois utilisée. Les composants chargés paresseusement peuvent être utilisé de la même manière qu'un composant importé normalement, il peut recevoir des props, etc. Les composants paresseux déclenchent les `<Suspense />`
+Utiliser le chargement de composant en mode paresseux pour permettre le découpage dynamique de code. Les composants ne sont chargés qu'une fois utilisée. Les composants chargés paresseusement peuvent être utilisé de la même manière qu'un composant importé normalement, il peut recevoir des props, etc. Les composants paresseux déclenchent les `<Suspense />`
 
 ```js
 // Enrobe l'import
@@ -714,7 +712,7 @@ const ComponentA = lazy(() => import("./ComponentA"));
 
 # Primitives secondaires
 
-Vous n'en aurez sûrement pas besoin pour votre premier app, mais ce sont des outils utiles à avoir sous le coude.
+Vous n'en aurez sûrement pas besoin pour votre première app, mais ce sont des outils utiles à avoir sous le coude.
 
 ## `createDeferred`
 
@@ -753,7 +751,7 @@ export function createRenderEffect<T>(
 ): void;
 ```
 
-Créer un nouveau calcul qui va automatiquement tracer ces dépendances et s'exécuter durant la phase de rendu pendant que les éléments de DOM sont créés et mis à jour, mais pas nécessairement connecté. Toutes les mises à jour du DOM interne se passe à ce moment-là.
+Créer un nouveau calcul qui va automatiquement tracer ces dépendances et s'exécuter durant la phase de rendu pendant que les éléments de DOM sont créés et mis à jour, mais pas nécessairement connecté. Toutes les mises à jour du DOM interne se passent à ce moment-là.
 
 ## `createSelector`
 
@@ -765,7 +763,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Créer un signal conditionnel qui va seulement notifier les abonnées quand un élément entré ou sorti correspond à la valeur de la clé. Utile pour déléguer la sélection d'état, car l'opération devient O(2) au lieu de O(n).
+Créer un signal conditionnel qui va seulement notifier les abonnées quand un élément entré ou sorti correspond à la valeur de la clé. Utile pour déléguer la sélection d'états, car l'opération devient O(2) au lieu de O(n).
 
 ```js
 const isSelected = createSelector(selectedId);
@@ -776,6 +774,7 @@ const isSelected = createSelector(selectedId);
 ```
 
 # Rendering
+
 # Rendu
 
 Ces imports sont exposés depuis `solid-js/web`.
@@ -789,7 +788,7 @@ export function render(
 ): () => void;
 ```
 
-Le point d'entré de l'application côté navigateur. Il faut fournir une définition de composant de haut niveau ou une fonction et un élément sur lequel monté l'application. Il est recommandé que cet élément soit vide, car la fonction de disposition va effacer tous les enfants.
+Le point d'entrée de l'application côté navigateur. Il faut fournir une définition de composant de haut niveau ou une fonction et un élément sur lequel monter l'application. Il est recommandé que cet élément soit vide, car la fonction de disposition va effacer tous les enfants.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
@@ -804,7 +803,7 @@ export function hydrate(
 ): () => void;
 ```
 
-Cette méthode est similaire à `render` sauf qu'elle essaye d'hydrater ce qui est déjà rendu dans le DOM. Quand elle est initialisée dans le navigateur, une page a déjà été rendu côté serveur.
+Cette méthode est similaire à `render` sauf qu'elle essaye d'hydrater ce qui est déjà rendu dans le DOM. Quand elle est initialisée dans le navigateur, une page a déjà été rendue côté serveur.
 
 ```js
 const dispose = hydrate(App, document.getElementById("app"));
@@ -868,7 +867,7 @@ export function pipeToNodeWritable<T>(
 ): void;
 ```
 
-Cette méthode traduit en flux Node. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continues vers un flux de données provenant des ressources asynchrone au fur et à mesure de leur complétion.
+Cette méthode traduit en flux Node. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continus vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
 
 ```js
 pipeToNodeWritable(App, res);
@@ -903,7 +902,7 @@ export function pipeToWritable<T>(
 ): void;
 ```
 
-Cette méthode traduit en flux web. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continues vers un flux de données provenant des ressources asynchrone au fur et à mesure de leur complétion.
+Cette méthode traduit en flux web. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continus vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
 
 ```js
 const { readable, writable } = new TransformStream();
@@ -918,7 +917,7 @@ L'option `onReady` est utile pour écrire dans le flux autour du noyau du rendu 
 export const isServer: boolean;
 ```
 
-Cela indique si le code est exécuté côté serveur ou côté navigateur. Comme le système d'exécution exporte ceci en tant que constante booléenne, cela permets aux bundlers d'éliminer le code et leurs imports de leurs bundle respectifs.
+Cela indique si le code est exécuté côté serveur ou côté navigateur. Comme le système d'exécution exporte ceci en tant que constante booléenne, cela permet aux bundlers d'éliminer le code et leurs imports de leurs bundle respectifs.
 
 ```js
 if (isServer) {
@@ -932,11 +931,11 @@ if (isServer) {
 
 Solid utilise les composants pour le contrôle de flux. Pour que la réactivité soit performante, nous avons besoin de contrôler comment les éléments sont créés. Par exemple, avec une liste, un simple `map` est inefficace, car il va toujours itérer sur chaque élément. Cela veut dire qu'on doit utiliser des fonctions d'aide.
 
-Enrobé ces composants est un moyen pratique pour réduire le templating et permettre aux utilisateurs de composer et construire leurs propres contrôles de flux.
+Enrober ces composants est un moyen pratique pour réduire le templating et permettre aux utilisateurs de composer et construire leurs propres contrôles de flux.
 
-Ces composants de contrôle de flux sont automatiquement importés. Tous à l'exception de `Portal` et `Dynamic` sont importés depuis `solid-js`. Ces deux là son spécifique au DOM et sont exportés par `solid-js/web`.
+Ces composants de contrôle de flux sont automatiquement importés. Tous à l'exception de `Portal` et `Dynamic` sont importés depuis `solid-js`. Ces deux-là son spécifique au DOM et sont exportés par `solid-js/web`.
 
-> Note : Toutes fonctions enfants au contrôle de flux sont non tracé. Cela permet d'imbriquer des créations d'état, et mieux isolé les réactions.
+> Note : Toutes fonctions enfants au contrôle de flux sont non tracées. Cela permet d'imbriquer des créations d'états, et mieux isoler les réactions.
 
 ## `<For>`
 
@@ -978,7 +977,7 @@ function Show<T>(props: {
 }): () => JSX.Element;
 ```
 
-Le contrôle de flux `Show` est utilisé pour afficher conditionnellement une partie de la vue. Ceci est similaire à un opérateur ternaire (`a ? b : c`) mais est idéal pour le templating JSX.
+Le contrôle de flux `Show` est utilisée pour afficher conditionnellement une partie de la vue. Ceci est similaire à un opérateur ternaire (`a ? b : c`) mais est idéal pour le templating JSX.
 
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
@@ -986,7 +985,7 @@ Le contrôle de flux `Show` est utilisé pour afficher conditionnellement une pa
 </Show>
 ```
 
-`Show` peut aussi être utilisé comme un moyen d'associé une clé d'un modèle de données spécifique à un bloc. Par exemple, la fonction est réexécuté quand le modèle est remplacé.
+`Show` peut aussi être utilisé comme un moyen d'associé une clé d'un modèle de données spécifique à un bloc. Par exemple, la fonction est réexécutée quand le modèle est remplacé.
 
 ```jsx
 <Show when={state.user} fallback={<div>Loading...</div>}>
@@ -1034,7 +1033,7 @@ export function Index<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Une fonction d'itération sur des listes sans clé (les lignes sont associé à un index au lieu d'une clé). Ceci est utile quand il n'y a pas de clé conceptuelle, par exemple si la donnée est composée de primitives et c'est l'index qui est fixe au lieu de la valeur.
+Une fonction d'itération sur des listes sans clé (les lignes sont associées à un index au lieu d'une clé). Ceci est utile quand il n'y a pas de clé conceptuelle, par exemple si la donnée est composée de primitives et c'est l'index qui est fixe au lieu de la valeur.
 
 L'élément est un signal :
 
@@ -1044,7 +1043,7 @@ L'élément est un signal :
 </Index>
 ```
 
-Le second argument optionnel est un index de type `number` : 
+Le second argument optionnel est un index de type `number` :
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1065,7 +1064,7 @@ function ErrorBoundary(props: {
 }): () => JSX.Element;
 ```
 
-Intercepte les erreurs qui ne sont pas traité et affiche un contenu de repli.
+Intercepte les erreurs qui ne sont pas traitées et affiche un contenu de repli.
 
 ```jsx
 <ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
@@ -1137,7 +1136,7 @@ function Dynamic<T>(
 ): () => JSX.Element;
 ```
 
-Ce composant vous laisse insérez un composant ou une balise arbitraire avec des props associées. 
+Ce composant vous laisse insérer un composant ou une balise arbitraire avec des props associées.
 
 ```jsx
 <Dynamic component={state.component} someProp={state.something} />
@@ -1166,7 +1165,7 @@ Le portail est monté dans une `<div>` à moins que la cible est un entête de d
 
 # Attributs JSX spéciaux
 
-En général, Solid essaye de respecter un maximum les conventions du DOM. La majorité des props sont traitées comme des attributs sur les éléments natifs et les propriétés dans les Web Components, mais dans quelques cas, des comportements spéciaux sont associés.
+En général, Solid essaye de respecter un maximum les conventions du DOM. La majorité des props est traitée comme des attributs sur les éléments natifs et les propriétés dans les Web Components, mais dans quelques cas, des comportements spéciaux sont associés.
 
 Pour les attributs dans un espace de noms personnalisé avec TypeScript, vous aurez besoin d'étendre l'espace de nom JSX de Solid :
 
@@ -1200,15 +1199,15 @@ Les références sont un moyen d'accéder à l'élément de DOM sous-jacent à n
 // assignation simple
 let myDiv;
 
-// utilisation de `onMount` ou `createEffect` pour lire après la connection au DOM
+// utilisation de `onMount` ou `createEffect` pour lire après la connexion au DOM
 onMount(() => console.log(myDiv));
 <div ref={myDiv} />
 
-// Ou utilisation d'une fonction (appelé avant la connection au DOM)
+// Ou utilisation d'une fonction (appelé avant la connexion au DOM)
 <div ref={el => console.log(el)} />
 ```
 
-Les références peuvent aussi être utilisées sur les Composants. Elles auront besoin d'être attachés de l'autre côté.
+Les références peuvent aussi être utilisées sur les Composants. Elles auront besoin d'être attachées de l'autre côté.
 
 ```jsx
 function MyComp(props) {
@@ -1234,7 +1233,7 @@ Un attribut d'aide pour utiliser `element.classList.toggle`. Il va prendre un ob
 
 ## `style`
 
-L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec un objet. À la différence de React, Solid utilise `element.style.setProperty` en coulisse. Cela signifie que les variables CSS sont supportées, mais aussi que nous devons utiliser la version dash-case des propriétés. Cela donne de meilleure performance et une meilleure cohésion avec le résultat du rendu côté serveur.
+L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec un objet. À la différence de React, Solid utilise `element.style.setProperty` en coulisse. Cela signifie que les variables CSS sont supportées, mais aussi que nous devons utiliser la version dash-case des propriétés. Cela donne de meilleures performances et une meilleure cohésion avec le résultat du rendu côté serveur.
 
 ```jsx
 // chaine de caractère
@@ -1253,7 +1252,7 @@ L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec 
 
 ## `innerHTML`/`textContent`
 
-Ils fonctionnent de la même manière que la propriété. Passer une chaîne de caractère et elle sera affichée. **Attention !!!** Utiliser `innerHTML` avec n'importe quelle donnée peut exposer vos utilisateurs à des risques, car cela peut être exploité comme faille de sécurité. `textContent` bien que généralement pas utiliser peut être une optimisation de performance quand vous savez que l'enfant ne sera que du texte, car il évite la comparaison générique.
+Ils fonctionnent de la même manière que la propriété. Passez une chaîne de caractère et elle sera affichée. **Attention !!!** Utiliser `innerHTML` avec n'importe quelle donnée peut exposer vos utilisateurs à des risques, car cela peut être exploité comme faille de sécurité. `textContent` bien que généralement pas utiliser peut être une optimisation de performance quand vous savez que l'enfant ne sera que du texte, car il évite la comparaison générique.
 
 ```jsx
 <div textContent={state.text} />
@@ -1261,13 +1260,13 @@ Ils fonctionnent de la même manière que la propriété. Passer une chaîne de 
 
 ## `on___`
 
-Les gestionnaires d'évènement dans Solid prennent typiquement la forme de `onclick` ou `onClick` en fonction du style du code. Le nom de l'évènement est en minuscule. Solid utilise une délégation d'évènement semi-synthétique pour les événements commun à l'interface utilisateur qui ne sont pas composé et remonté. Cela améliore les performances pour les évènements communs.
+Les gestionnaires d'évènement dans Solid prennent typiquement la forme de `onclick` ou `onClick` en fonction du style du code. Le nom de l'évènement est en minuscule. Solid utilise une délégation d'évènement semi-synthétique pour les évènements communs à l'interface utilisateur qui ne sont pas composés et remontés. Cela améliore les performances pour les évènements communs.
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
-Solid supporte aussi de fournir un tableau au gestionnaire d'évènement pour associer la valeur au premier argument de la fonction de gestion d'évènement. Cela n'utilise pas `bind` ou crée de fonction additionnelle, donc c'est un moyen très optimisé de déléguer des évènements.
+Solid supporte aussi de fournir un tableau au gestionnaire d'évènement pour associer la valeur au premier argument de la fonction de gestion d'évènement. Cela n'utilise pas `bind` ou créer de fonction additionnelle, donc c'est un moyen très optimisé de déléguer des évènements.
 
 ```jsx
 function handler(itemId, e) {
@@ -1302,7 +1301,7 @@ Il existe des directives personnalisées. C'est en quelque sorte du sucre syntax
 function directive(element: Element, accessor: () => any): void;
 ```
 
-Les fonctions directives sont appelées au moment du rendu, mais avant d'être ajouter au DOM. Vous pouvez faire ce que vous souhaitez à l'intérieur, y compris créer des signaux, effets, programmer des fonctions de nettoyage, etc.
+Les fonctions directives sont appelées au moment du rendu, mais avant d'être ajouté au DOM. Vous pouvez faire ce que vous souhaitez à l'intérieur, y compris créer des signaux, effets, programmer des fonctions de nettoyage, etc.
 
 ```js
 const [name, setName] = createSignal("");
