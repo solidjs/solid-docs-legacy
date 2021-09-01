@@ -3,15 +3,17 @@
 Welcome to the Solid tutorial! This tutorial will teach you everything you need to know to create performant web applications. You can also refer to the API and guides to learn more about how Solid works.
 
 # What is Solid?
+Solid is a JavaScript framework for making interactive web applications.
+With Solid, you can use your existing HTML and JavaScript knowledge to build components that can be reused throughout your app.
+Solid provides the tools to enhance your site with _reactivity_: declarative JavaScript code that links the user interface with the data that it uses and creates.
 
-Solid is a JavaScript framework for making interactive web applications. It leverages a custom compiler to transform JSX, an HTML inspired JavaScript XML dialect, into optimal DOM operations. Updates are powered by a fine-grained reactivity system that reduces the overhead of diffing which results in best-in-class performance.
+#Anatomy of a Solid App
 
-# Anatomy of a Solid App
+A Solid App is composed of functions that we call components. Take a look at the `HelloWorld` function on the right: it directly returns a `div`! This mix of HTML and JavaScript is called JSX. Solid ships with a compiler that turns these tags into DOM nodes later on.
 
-A Solid App is composed of functions that we call Components. Component names in Solid follow the Pascal naming convention in which the first letter of each word in a component name is capitalized. This name can then be used as tags within our JSX like `<HelloWorld />`.
+JSX allows us to use most HTML elements in our app, but it also allows us to create new elements. Once we've declared our `HelloWorld` function, we can use it as a `<HelloWorld>` tag throughout our app. 
 
-A Solid app starts with a `render` function. This is our entry point. It takes 2 arguments, a function wrapping our application code and an element to mount to:
-
+The entry point for any Solid App is the `render` function.  It takes 2 arguments, a function wrapping our application code and an existing element in the HTML to mount to:
 ```jsx
 render(() => <HelloWorld />, document.getElementById('app'))
 ```
