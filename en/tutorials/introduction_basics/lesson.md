@@ -5,7 +5,7 @@ Welcome to the Solid tutorial! This tutorial will walk you through Solid's main 
 # What is Solid?
 Solid is a JavaScript framework for making interactive web applications.
 With Solid, you can use your existing HTML and JavaScript knowledge to build components that can be reused throughout your app.
-Solid provides the tools to enhance your site with _reactivity_: declarative JavaScript code that links the user interface with the data that it uses and creates.
+Solid provides the tools to enhance your components with _reactivity_: declarative JavaScript code that links the user interface with the data that it uses and creates.
 
 #Anatomy of a Solid App
 

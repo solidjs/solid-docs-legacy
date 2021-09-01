@@ -1,6 +1,7 @@
-Signals are simple getter functions that wrap a trackable value. There is nothing particularly special about them. This means that any function that wraps accessing a Signal is effectively a Signal and is also trackable. The same is true of any JavaScript expression you put in JSX. As long as it accesses a Signal, it will update.
+We've seen that whenever we access a signal in JSX, it will automatically update the view when that signal changes. But the component function itself only executes once. 
 
-It is important to understand that Components in Solid are just functions that execute once. The only way to ensure that anything updates is to wrap it in a computation or JSX. However you can always hoist an expression out by wrapping it in a function. This way it can be re-used.
+We can create new expressions that depend on&mdash;and will be updated by&mdash;signals by wrapping a signal in a function. A function that accesses is a signal is effectively also a signal: its value changes when its wrapped signal changes, and it will in turn update its readers.
+
 
 Let's update our Counter to count by 2 by introducing a `doubleCount` function:
 
@@ -13,5 +14,3 @@ We then replace where it is being read.
 ```jsx
 return <div>Count: {doubleCount()}</div>;
 ```
-
-In this trivial example, `doubleCount` could just be inlined. But this code illustrates how to both compose Signals and how to make derived Signals transferable.
