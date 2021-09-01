@@ -21,4 +21,4 @@ function App() {
 }
 ```
 
-When the parent component first renders, it will execute the `Nested()` function, and won't call it ever again. All updates instead are applied by Solid’s reactive system which we will be covering in the next couple of lessons.
+When the parent component first renders, it will execute the `Nested()` function and won't call it ever again. All updates are applied by Solid’s reactivity system which we will cover in the next couple of lessons.

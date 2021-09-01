@@ -1,6 +1,6 @@
 # Introduction
 
-Welcome to the Solid tutorial! This tutorial will teach you everything you need to know to create performant web applications. You can also refer to the API and guides to learn more about how Solid works.
+Welcome to the Solid tutorial! This tutorial will walk you through Solid's main features. You can also refer to the API and guides to learn more about how Solid works.
 
 # What is Solid?
 Solid is a JavaScript framework for making interactive web applications.
