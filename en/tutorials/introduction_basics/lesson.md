@@ -19,6 +19,6 @@ render(() => <HelloWorld />, document.getElementById('app'))
 ```
 # Leveraging this Tutorial
 
-Each lesson in the tutorial includes a simple scenario with instructions on how to complete it using the feature highlighted. At any point you can click the solve button to see the solution or click reset to start over. The code editor itself has a console and an output tab where you can see the compiled output generated from your code. Look at it if you are curious to see how Solid generates code.
+Each lesson in the tutorial presents a Solid feature and a scenario in which to try it out. At any point you can click the solve button to see the solution or click reset to start over. The code editor itself has a console and an output tab where you can see the compiled output generated from your code. Look at it if you are curious to see how Solid generates code.
 
-Have Fun and Good Luck!
+Have fun!
