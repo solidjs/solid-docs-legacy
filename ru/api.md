@@ -473,7 +473,7 @@ const [state, setState] = createStore({
     },
   },
 });
-fullName = createMemo(() => `${state.firstName} ${state.lastName}`);
+fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 ```
 
 Структура:

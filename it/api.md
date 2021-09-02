@@ -442,7 +442,7 @@ const [stato, assegnareStato] = createStore({
     },
   },
 });
-nomeECognome = createMemo(() => `${state.nome} ${state.cognome}`);
+nomeECognome = createMemo(() => `${state.user.nome} ${state.user.cognome}`);
 ```
 
 ### Aggiornamento dei negozi Store

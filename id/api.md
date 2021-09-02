@@ -30,7 +30,7 @@ setValue(nextValue);
 setValue((prev) => prev + next);
 ```
 
-Ingat untuk mengakses signals di bawah cakupan dari pelacakan jika kamu mengharapkan mereka untuk diperbarui. Cakupan-cakupan pelacakan adalah sebuah fungsi-fungsi yang dioper ke komputasi seperti `createEffect` atau ekspresi-ekspresi JSX. 
+Ingat untuk mengakses signals di bawah cakupan dari pelacakan jika kamu mengharapkan mereka untuk diperbarui. Cakupan-cakupan pelacakan adalah sebuah fungsi-fungsi yang dioper ke komputasi seperti `createEffect` atau ekspresi-ekspresi JSX.
 
 > Jika kamu berharap untuk menyimpan sebuah fungsi di Signal kamu bisa menggunakan bentuk fungsinya:
 >
@@ -436,7 +436,7 @@ const [state, setState] = createStore({
     },
   },
 });
-fullName = createMemo(() => `${state.firstName} ${state.lastName}`);
+fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 ```
 
 ### Memperbarui Stores
@@ -567,7 +567,7 @@ export function reconcile<T>(
 
 Membandingkan perubahan data ketika kita tidak dapat menerapkan pembaruan terperinci. Berguna untuk saat menangani data immutable dari stores atau respon API yang besar.
 
-Key-nya akan digunakan ketika tersedia untuk mencocokkan item-item. Secara default `merge` false melakukan pemeriksaan referensial jika memungkinkan untuk menentukan kesetaraan dan mengganti item yang tidak sama secara referensial. `merge` true mendorong semua diff ke daun-daun (leaves) dan secara efektif mengubah data sebelumnya ke nilai baru. 
+Key-nya akan digunakan ketika tersedia untuk mencocokkan item-item. Secara default `merge` false melakukan pemeriksaan referensial jika memungkinkan untuk menentukan kesetaraan dan mengganti item yang tidak sama secara referensial. `merge` true mendorong semua diff ke daun-daun (leaves) dan secara efektif mengubah data sebelumnya ke nilai baru.
 
 ```js
 // subscribing to an observable
@@ -586,7 +586,7 @@ export function createMutable<T extends StoreNode>(
 ): Store<T> {
 ```
 
-Membuat objek proxy mutable Store baru. Stores hanya memicu pembaruan pada saat nilai-nilai berubah. Pelacakan dilakukan dengan mencegat akses properti dan secara otomatis melacak deep nesting melalui proxy. 
+Membuat objek proxy mutable Store baru. Stores hanya memicu pembaruan pada saat nilai-nilai berubah. Pelacakan dilakukan dengan mencegat akses properti dan secara otomatis melacak deep nesting melalui proxy.
 
 Berguna untuk mengintegrasi eksternal system atau sebagai lapisan kompatibilitas dengan MobX/Vue.
 
@@ -669,7 +669,7 @@ Nilai yang dioper ke provider dioper ke `useContext` secara apa adanya. Itu bera
 export function useContext<T>(context: Context<T>): T;
 ```
 
-Digunakan untuk mengambil context untuk memungkinkan pengoperan props secara dalam (deep passing of props) tanpa harus mengopernya ke tiap-tiap fungsi Komponen.   
+Digunakan untuk mengambil context untuk memungkinkan pengoperan props secara dalam (deep passing of props) tanpa harus mengopernya ke tiap-tiap fungsi Komponen.
 
 ```js
 const [state, { increment, decrement }] = useContext(CounterContext);
@@ -1163,7 +1163,7 @@ Portalnya akan di mount di sebuah `<div>` kecauli targetnya adalah document head
 
 Pada dasarnya Solid mencoba untuk tetap pada konvensi DOM. Sebagian besar props diperlaukan sebagai atribut pada elemen-elemen asli (native elements) dan properti pada Web Components, tapi ada beberapa darinya memiliki perilaku khusus.
 
-Untuk 'custom namespaced attributes' dengan TypeScript  kamu perlu memperluas (extend) namespace JSX Solid:
+Untuk 'custom namespaced attributes' dengan TypeScript kamu perlu memperluas (extend) namespace JSX Solid:
 
 ```ts
 declare module "solid-js" {
@@ -1283,7 +1283,7 @@ Events tidak dapat rebound dan binding-binding tidak reaktif. Alasannya adalah p
 
 ## `on:___`/`oncapture:___`
 
-Untuk events lainnya, mungkin mereka yang punya nama-nama yang tidak biasa, atau yang kamu tidak ingin didelegasikan, terdapat `on` namespace events. Ini hanya menambahkan event listener secara harafiah (verbatim). 
+Untuk events lainnya, mungkin mereka yang punya nama-nama yang tidak biasa, atau yang kamu tidak ingin didelegasikan, terdapat `on` namespace events. Ini hanya menambahkan event listener secara harafiah (verbatim).
 
 ```jsx
 <div on:Weird-Event={(e) => alert(e.detail)} />
