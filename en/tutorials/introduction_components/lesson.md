@@ -1,4 +1,4 @@
-As you build your applications, you will want to break apart your code for better modularity and re-usability. In Solid, the main way of doing that is by creating components.
+As you build your applications, you will want to break apart your code for better modularity and reusability. In Solid, the main way of doing that is by creating components.
 
 Components are just functions like the `HelloWorld()` one we've been using so far. What makes them special is that they typically return JSX and can be called by JSX in other components.
 
