@@ -27,7 +27,7 @@ getValue();
 setValue(nextValue);
 
 // 使用 setter 函数设置值
-setValue(prev => prev + next);
+setValue((prev) => prev + next);
 ```
 
 如果您希望值对更新做出响应，请记住在跟踪范围内访问信号。跟踪范围是传递给计算的函数，如 `createEffect` 或 JSX 表达式。
@@ -41,7 +41,11 @@ setValue(prev => prev + next);
 ## `createEffect`
 
 ```ts
-export function createEffect<T>(fn: (v: T) => T, value?: T, options?: { name?: string }): void;
+export function createEffect<T>(
+  fn: (v: T) => T,
+  value?: T,
+  options?: { name?: string }
+): void;
 ```
 
 创建一个新的计算来自动跟踪依赖项并在依赖项发生变化的每次渲染之后运行。非常适合使用 `ref`s 和管理其他副作用。
@@ -56,7 +60,7 @@ createEffect(() => doSideEffect(a()));
 effect 函数可以拿到上次执行返回的值。可以在第二个可选参数设置该值得初始化值。这可以让我们不用创建额外闭包的情况下就可以进行差异对比。
 
 ```js
-createEffect(prev => {
+createEffect((prev) => {
   const sum = a() + b();
   if (sum !== prev) console.log(sum);
   return sum;
@@ -85,7 +89,7 @@ getValue();
 使用 memo 函数上次执行返回的值调用 memo 函数。该值可以初始化为可选的第二个参数。这对于减少计算很有用。
 
 ```js
-const sum = createMemo(prev => input() + prev, 0);
+const sum = createMemo((prev) => input() + prev, 0);
 ```
 
 ## `createResource`
@@ -197,7 +201,7 @@ export function on<T extends Array<() => any> | (() => any), U>(
 `on` 主要用来将其传递到计算行为中以使其依赖项更加清晰明了。如果传递依赖项是数组，则 `input` 和 `prevInput` 也是数组。
 
 ```js
-createEffect(on(a, v => console.log(v, b())));
+createEffect(on(a, (v) => console.log(v, b())));
 
 // 等同于
 createEffect(() => {
@@ -210,7 +214,7 @@ createEffect(() => {
 
 ```js
 // 不会立即运行
-createEffect(on(a, v => console.log(v), { defer: true }));
+createEffect(on(a, (v) => console.log(v), { defer: true }));
 
 setA("new"); // 现在会运行了
 ```
@@ -249,7 +253,10 @@ props = mergeProps(props, otherProps);
 ## `splitProps`
 
 ```ts
-export function splitProps<T>(props: T, ...keys: Array<(keyof T)[]>): [...parts: Partial<T>];
+export function splitProps<T>(
+  props: T,
+  ...keys: Array<(keyof T)[]>
+): [...parts: Partial<T>];
 ```
 
 `splitProps` 是解构的替代品。`splitProps` 在保持响应性的同时通过键来拆分响应式对象。
@@ -266,7 +273,10 @@ const [local, others] = splitProps(props, ["children"]);
 ## `useTransition`
 
 ```ts
-export function useTransition(): [() => boolean, (fn: () => void, cb?: () => void) => void];
+export function useTransition(): [
+  () => boolean,
+  (fn: () => void, cb?: () => void) => void
+];
 ```
 
 用于在所有异步处理完成后在延迟提交事务中批量异步更新。这与 Suspense 有所关联，并且仅跟踪在 Suspense 边界下读取的资源。
@@ -296,7 +306,7 @@ const [s, set] = createSignal(0);
 
 const obsv$ = from(observable(s));
 
-obsv$.subscribe(v => console.log(v));
+obsv$.subscribe((v) => console.log(v));
 ```
 
 ## `mapArray`
@@ -408,8 +418,8 @@ const [state, setState] = createStore({
     lastName: "Smith",
     get fullName() {
       return `${this.firstName} ${this.lastName}`;
-    }
-  }
+    },
+  },
 });
 ```
 
@@ -423,10 +433,10 @@ const [state, setState] = createStore({
     lastName: "Smith",
     get fullName() {
       return fullName();
-    }
-  }
+    },
+  },
 });
-fullName = createMemo(() => `${state.firstName} ${state.lastName}`);
+fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 ```
 
 ### 更新 Store
@@ -434,12 +444,15 @@ fullName = createMemo(() => `${state.firstName} ${state.lastName}`);
 更改状态可以采用传递先前状态并返回新状态或值的函数的形式。对象总是浅合并的。将值设置为 `undefined` 以将属性从 Store 中删除。
 
 ```js
-const [state, setState] = createStore({ firstName: "John", lastName: "Miller" });
+const [state, setState] = createStore({
+  firstName: "John",
+  lastName: "Miller",
+});
 
 setState({ firstName: "Johnny", middleName: "Lee" });
 // ({ firstName: 'Johnny', middleName: 'Lee', lastName: 'Miller' })
 
-setState(state => ({ preferredName: state.firstName, lastName: "Milner" }));
+setState((state) => ({ preferredName: state.firstName, lastName: "Milner" }));
 // ({ firstName: 'Johnny', preferredName: 'Johnny', middleName: 'Lee', lastName: 'Milner' })
 ```
 
@@ -522,14 +535,16 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ```ts
 export function produce<T>(
   fn: (state: T) => void
-): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>;
+): (
+  state: T extends NotWrappable ? T : Store<T>
+) => T extends NotWrappable ? T : Store<T>;
 ```
 
 Immer 启发了 Solid 的 Store 对象的 `produce` API，它允许本地修改状态。
 
 ```js
 setState(
-  produce(s => {
+  produce((s) => {
     s.user.name = "Frank";
     s.list.push("Pencil Crayon");
   })
@@ -545,7 +560,9 @@ export function reconcile<T>(
     key?: string | null;
     merge?: boolean;
   } = { key: "id" }
-): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>;
+): (
+  state: T extends NotWrappable ? T : Store<T>
+) => T extends NotWrappable ? T : Store<T>;
 ```
 
 当对比数据变更时，我们不能应用粒度更新。`reconcile` 在处理来自 store 或巨大 API 响应这些不可变数据时很有用。
@@ -598,7 +615,7 @@ const user = createMutable({
   },
   set fullName(value) {
     [this.firstName, this.lastName] = value.split(" ");
-  }
+  },
 });
 ```
 
@@ -628,15 +645,19 @@ export function CounterProvider(props) {
     state,
     {
       increment() {
-        setState("count", c => c + 1);
+        setState("count", (c) => c + 1);
       },
       decrement() {
-        setState("count", c => c - 1);
-      }
-    }
+        setState("count", (c) => c - 1);
+      },
+    },
   ];
 
-  return <CounterContext.Provider value={store}>{props.children}</CounterContext.Provider>;
+  return (
+    <CounterContext.Provider value={store}>
+      {props.children}
+    </CounterContext.Provider>
+  );
 }
 ```
 
@@ -667,7 +688,7 @@ Used to make it easier to interact with `props.children`. This helper resolves a
 ```js
 const list = children(() => props.children);
 
-// 用 list 做点什么 
+// 用 list 做点什么
 createEffect(() => list());
 ```
 
@@ -698,7 +719,11 @@ const ComponentA = lazy(() => import("./ComponentA"));
 ```ts
 export function createDeferred<T>(
   source: () => T,
-  options?: { timeoutMs?: number; name?: string; equals?: false | ((prev: T, next: T) => boolean) }
+  options?: {
+    timeoutMs?: number;
+    name?: string;
+    equals?: false | ((prev: T, next: T) => boolean);
+  }
 ): () => T;
 ```
 
@@ -707,7 +732,11 @@ export function createDeferred<T>(
 ## `createComputed`
 
 ```ts
-export function createComputed<T>(fn: (v: T) => T, value?: T, options?: { name?: string }): void;
+export function createComputed<T>(
+  fn: (v: T) => T,
+  value?: T,
+  options?: { name?: string }
+): void;
 ```
 
 创建一个新的计算，自动跟踪依赖关系并在渲染之前立即运行。使用它来编写其他响应式 primitive。如果可能，请使用 `createMemo` 代替，因为写入中间更新的 signal 可能会导致其他计算需要重新计算。
@@ -739,7 +768,9 @@ export function createSelector<T, U>(
 ```js
 const isSelected = createSelector(selectedId);
 
-<For each={list()}>{item => <li classList={{ active: isSelected(item.id) }}>{item.name}</li>}</For>;
+<For each={list()}>
+  {(item) => <li classList={{ active: isSelected(item.id) }}>{item.name}</li>}
+</For>;
 ```
 
 # 渲染
@@ -751,7 +782,10 @@ These imports are exposed from `solid-js/web`.
 ## `render`
 
 ```ts
-export function render(code: () => JSX.Element, element: MountableElement): () => void;
+export function render(
+  code: () => JSX.Element,
+  element: MountableElement
+): () => void;
 ```
 
 `render` 是浏览器应用程序入口点。它需要提供顶级组件定义或函数以及需要挂载的元素。建议该元素为空，因为返回的 dispose 函数将清理所有子元素。
@@ -763,7 +797,10 @@ const dispose = render(App, document.getElementById("app"));
 ## `hydrate`
 
 ```ts
-export function hydrate(fn: () => JSX.Element, node: MountableElement): () => void;
+export function hydrate(
+  fn: () => JSX.Element,
+  node: MountableElement
+): () => void;
 ```
 
 此方法类似于 `render`，只是它会尝试重新注水到已经渲染到 DOM 的内容。在浏览器中初始化时，页面已被服务器渲染。
@@ -853,8 +890,14 @@ export function pipeToWritable<T>(
     eventNames?: string[];
     nonce?: string;
     noScript?: boolean;
-    onReady?: (writable: { write: (v: string) => void }, r: PipeToWritableResults) => void;
-    onComplete?: (writable: { write: (v: string) => void }, r: PipeToWritableResults) => void;
+    onReady?: (
+      writable: { write: (v: string) => void },
+      r: PipeToWritableResults
+    ) => void;
+    onComplete?: (
+      writable: { write: (v: string) => void },
+      r: PipeToWritableResults
+    ) => void;
   }
 ): void;
 ```
@@ -907,7 +950,7 @@ export function For<T, U extends JSX.Element>(props: {
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
-  {item => <div>{item}</div>}
+  {(item) => <div>{item}</div>}
 </For>
 ```
 
@@ -945,14 +988,17 @@ Show 还可以用来将区块控到特定数据模型。每当用户数据模型
 
 ```jsx
 <Show when={state.user} fallback={<div>Loading...</div>}>
-  {user => <div>{user.firstName}</div>}
+  {(user) => <div>{user.firstName}</div>}
 </Show>
 ```
 
 ## `<Switch>`/`<Match>`
 
 ```ts
-export function Switch(props: { fallback?: JSX.Element; children: JSX.Element }): () => JSX.Element;
+export function Switch(props: {
+  fallback?: JSX.Element;
+  children: JSX.Element;
+}): () => JSX.Element;
 
 type MatchProps<T> = {
   when: T | undefined | null | false;
@@ -992,7 +1038,7 @@ export function Index<T, U extends JSX.Element>(props: {
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
-  {item => <div>{item()}</div>}
+  {(item) => <div>{item()}</div>}
 </Index>
 ```
 
@@ -1028,7 +1074,9 @@ function ErrorBoundary(props: {
 还支持回调函数的形式传参，函数传入了错误和重置函数。
 
 ```jsx
-<ErrorBoundary fallback={(err, reset) => <div onClick={reset}>Error: {err}</div>}>
+<ErrorBoundary
+  fallback={(err, reset) => <div onClick={reset}>Error: {err}</div>}
+>
   <MyComp />
 </ErrorBoundary>
 ```
@@ -1036,7 +1084,10 @@ function ErrorBoundary(props: {
 ## `<Suspense>`
 
 ```ts
-export function Suspense(props: { fallback?: JSX.Element; children: JSX.Element }): JSX.Element;
+export function Suspense(props: {
+  fallback?: JSX.Element;
+  children: JSX.Element;
+}): JSX.Element;
 ```
 
 `<Suspense>` 是一个跟踪其下所有读取资源并显示回退占位符状态的组件，直到它们被解析。`Suspense` 与 `Show` 的不同之处在于它是非阻塞的，即使当前不在 DOM 中，两个分支也可以同时存在。
@@ -1174,7 +1225,9 @@ function App() {
 `classList` 借助于 `element.classList.toggle`。它接受一个键为 class 名的对象，并在解析值为 true 时分配它们。
 
 ```jsx
-<div classList={{ active: state.active, editing: state.currentId === row.id }} />
+<div
+  classList={{ active: state.active, editing: state.currentId === row.id }}
+/>
 ```
 
 ## `style`
@@ -1198,7 +1251,6 @@ Solid 的样式工具可以处理字符串或对象。与 React 的版本不同�
 
 ## `innerHTML`/`textContent`
 
-
 它们的工作原理与它们的等效属性相同。设置一个字符串，它们将被设置到 HTML 中。**小心!!** 任何数据设置为 `innerHTML` 都可能暴露给终端用户，因此它可能成为恶意攻击的载体。`textContent` 虽然通常不需要，但实际上是一种性能优化，因为它绕过了通用对比差异例程，因此子项将只是文本。
 
 ```jsx
@@ -1210,7 +1262,7 @@ Solid 的样式工具可以处理字符串或对象。与 React 的版本不同�
 Solid 中的事件处理程序通常采用 `onclick` 或 `onClick` 形式，具体取决于风格。事件名称总是小写。Solid 对组合和冒泡的常见 UI 事件使用半合成事件委托。这样提高了这些常见事件的性能。
 
 ```jsx
-<div onClick={e => console.log(e.currentTarget)} />
+<div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
 Solid 还支持将数组传递给事件处理句柄以将值绑定到事件处理句柄的第一个参数。这不用使用`bind` 或创建额外的闭包，因此它是一种高度优化的事件委托方式。
@@ -1221,7 +1273,7 @@ function handler(itemId, e) {
 }
 
 <ul>
-  <For each={state.list}>{item => <li onClick={[handler, item.id]} />}</For>
+  <For each={state.list}>{(item) => <li onClick={[handler, item.id]} />}</For>
 </ul>;
 ```
 
@@ -1237,7 +1289,7 @@ function handler(itemId, e) {
 对其他的事件，可能是名称不寻常或者你不希望被委托，且有 `on` 命名空间。那你只需要逐字添加事件侦听器。
 
 ```jsx
-<div on:Weird-Event={e => alert(e.detail)} />
+<div on:Weird-Event={(e) => alert(e.detail)} />
 ```
 
 ## `use:___`
@@ -1256,7 +1308,7 @@ const [name, setName] = createSignal("");
 function model(el, value) {
   const [field, setField] = value();
   createRenderEffect(() => (el.value = field()));
-  el.addEventListener("input", e => setField(e.target.value));
+  el.addEventListener("input", (e) => setField(e.target.value));
 }
 
 <input type="text" use:model={[name, setName]} />;
