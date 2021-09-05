@@ -8,7 +8,7 @@ In this example, let's add our `Nested` component to our app. We've defined it i
 import Nested from "./nested";
 ```
 
-Then we need to add the component to our JSX. Like before, we now havem multiple elements we want to return, so we wrap them in a Fragment:
+Then we need to add the component to our JSX. Like before, we now have multiple elements we want to return, so we wrap them in a Fragment:
 
 ```jsx
 function App() {
