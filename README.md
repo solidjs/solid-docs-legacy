@@ -12,7 +12,7 @@ Solid's documentation is available in 6 languages including:
 
 | Language           | API Documentation | Guides | Tutorials | Contibutors                                     |
 | ------------------ | ----------------- | ------ | --------- | ----------------------------------------------- |
-| 🇫🇷 French (fr)     | 100%              | 0%     | 0%        | [xstevenyung](https://github.com/xstevenyung)   |
+| 🇫🇷 French (fr)     | 100%              | 100%   | 0%        | [xstevenyung](https://github.com/xstevenyung)   |
 | 🇮🇹 Italian (it)    | 100%              | 100%   | 0%        | [davedbase](https://github.com/davedbase)       |
 | 🇵🇹 Portuguese (pt) | 100%              | 100%   | 0%        | [candidosales](https://github.com/candidosales) |
 | 🇨🇳 Chinese (zh-cn) | 100%              | 100%   | 100%      | [Gavin-Gong](https://github.com/Gavin-Gong)     |
