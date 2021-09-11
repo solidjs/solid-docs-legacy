@@ -1,6 +1,5 @@
 ---
 title: API
-description: Outline of all Solid APIs.
 description: Présentation de toute l'API de Solid.
 sort: 0
 ---
