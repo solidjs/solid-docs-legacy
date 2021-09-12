@@ -17,15 +17,15 @@ import { createSignal, onCleanup } from "solid-js";
 import { render } from "solid-js/web";
 
 function App() {
-    const [count, setCount] = createSignal(0);
+  const [count, setCount] = createSignal(0);
 
-    const timer = setInterval(() => {
-        setCount(count() + 1);
-    }, 1000);
+  const timer = setInterval(() => {
+    setCount(count() + 1);
+  }, 1000);
 
-    onCleanup(() => clearInterval(timer));
+  onCleanup(() => clearInterval(timer));
 
-    return <div>{count()}</div>;
+  return <div>{count()}</div>;
 }
 
 render(() => <App />, document.getElementById("app"));
@@ -65,20 +65,20 @@ const fullName = createMemo(() => `${firstName()} ${lastName()}`);
 
 ```js
 function createSignal(value) {
-    const subscribers = new Set();
+  const subscribers = new Set();
 
-    function read() {
-        const listener = getCurrentListener();
-        if (listener) subscribers.add(listener);
-        return value;
-    }
+  function read() {
+    const listener = getCurrentListener();
+    if (listener) subscribers.add(listener);
+    return value;
+  }
 
-    function write() {
-        value = nextValue;
-        for (const sub of subscribers) sub.run();
-    }
+  function write() {
+    value = nextValue;
+    for (const sub of subscribers) sub.run();
+  }
 
-    return [read, write];
+  return [read, write];
 }
 ```
 
@@ -90,7 +90,7 @@ function createSignal(value) {
 
 [Создание реактивной библиотеки с нуля](https://dev.to/ryansolid/building-a-reactive-library-from-scratch-1i0p)
 
-[От рективности до рендеринга](https://indepth.dev/posts/1289/solidjs-reactivity-to-rendering)
+[От реактивности до рендеринга](https://indepth.dev/posts/1289/solidjs-reactivity-to-rendering)
 
 ## Соображения
 
@@ -102,4 +102,4 @@ function createSignal(value) {
 
 2. Компоненты и обратные вызовы из потоков управления не отслеживают области видимости и выполняются только один раз. Это означает, что деструктуризация или выполнение логики верхнего уровня в ваших компонентах не будет выполняться повторно. Доступ к этим сигналам, сторам и пропам должен быть осуществлен внутри других реактивных примитивов или JSX, чтобы эта часть кода могла быть повторно оценена.
 
-3. В данном подходе отслеживание идет только синхронно. Если у вас есть setTimeout или же вы используете асинхрную функцию в своем createEffect, код, который будет выполняться асинхронно, не будет отслеживаться.
+3. В данном подходе отслеживание идет только синхронно. Если у вас есть setTimeout или же вы используете асинхронную функцию в своем `createEffect`, код, который будет выполняться асинхронно, не будет отслеживаться.
