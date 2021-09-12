@@ -29,10 +29,6 @@ render(() => <App />, document.getElementById("app"));
 
 ## Introduzindo Primitivos
 
-Solid is made up of 3 primary primitives, Signal, Memo, and Effect. At their core is the Observer pattern where Signals (and Memos) are tracked by wrapping Memos and Effects.
-
-Signals are the simplest primitive. They contain value, and get and set functions so we can intercept when they are read and written to.
-
 O Solid é composto de 3 primitivas primárias: Signal, Memo e Effect. Em seu núcleo está o padrão Observer, onde Signals (e Memos) são rastreados envolvendo Memos e Effects.
 
 Os Signals são os primitivos mais simples. Eles contêm valor e funções get e set para que possamos interceptar quando eles são lidos e escritos.

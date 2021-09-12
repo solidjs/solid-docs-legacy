@@ -1,8 +1,8 @@
-Signals are trackable values, but they are only one half of the equation. The other half are the observers, also known as computations. The most fundamental computations are called Effects which create side effects, including the output of our system.
+Signals are trackable values, but they are only one half of the equation. To complement those are observers that can be updated by those trackable values. An _effect_ is one such observer; it  runs a side effect that depends on signals.
 
-An Effect can be created by importing `createEffect` from `solid-js`. It takes a function whose execution it watches. It automatically subscribes to any Signal that is read during its execution and re-runs any time one of those Signal value changes.
+An effect can be created by importing `createEffect` from `solid-js` and providing it a function. The effect automatically subscribes to any signal that is read during the function's execution and reruns when any of them change.
 
-So let's create an Effect that re-runs whenever `count` changes:
+So let's create an Effect that reruns whenever `count` changes:
 
 ```jsx
 createEffect(() => {
@@ -10,12 +10,13 @@ createEffect(() => {
 });
 ```
 
-To update our `count` Signal, we are going to attach a click handler on our button:
+To update our `count` Signal, we'll attach a click handler on our button:
 
 ```jsx
 <button onClick={() => setCount(count() + 1)}>Click Me</button>
 ```
 
-Now clicking the button should write to the console. This is a relatively simple example, but to understand how Solid works, you should imagine that every expression in the JSX is potentially a separately wrapped Effect that re-executes whenever its dependent Signals change. This is how all rendering works in Solid: from Solid's perspective, *all rendering is just a side effect of the reactive system*.
+Now clicking the button writes to the console. This is a relatively simple example, but to understand how Solid works, you should imagine that every expression in JSX is its own effect that re-executes whenever its dependent signals change. This is how all rendering works in Solid: from Solid's perspective, *all rendering is just a side effect of the reactive system*.
 
-Effects that developers create with `createEffect` run after rendering has completed and are mostly used for scheduling post-render updates that interact with the DOM. If you want to modify the DOM after it is created/updated but not necessarily connected yet, use `createRenderEffect`.
+
+> Effects that developers create with `createEffect` run after rendering has completed and are mostly used for scheduling updates that interact with the DOM. If you want to modify the DOM earlier, use [`createRenderEffect`](https://www.solidjs.com/docs/latest/api#createrendereffect).
