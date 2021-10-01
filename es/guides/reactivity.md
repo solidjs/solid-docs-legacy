@@ -1,16 +1,16 @@
 ---
-title: Reactivity
-description: Full rundown of Solid's reactivity.
+title: Reactividad
+description: Resumen completo de reactividad de Solid.
 sort: 1
 ---
 
-# Reactivity
+# Reactividad
 
-Solid's data management is built off a set of flexible reactive primitives which are responsible for all the updates. It takes a very similar approach to MobX or Vue except it never trades its granularity for a VDOM. Dependencies are automatically tracked when you access your reactive values in your Effects and JSX View code.
+La gestión de datos de Solid se basa en un conjunto de primitivas reactivas flexibles que son responsables de todas las actualizaciones. Adopta un enfoque muy similar a MobX o Vue, excepto que nunca cambia su granularidad por un VDOM. Las dependencias se rastrean automáticamente cuando accede sus valores reactivos en su código de efectos y vista JSX.
 
-Solid's primitives come in the form of `create` calls that often return tuples, where generally the first element is a readable primitive and the second is a setter. It is common to refer to only the readable part by the primitive name.
+Las primitivas de Solid vienen en forma de llamadas de `create` que a menudo devuelven tuplas, donde generalmente el primer elemento es una primitiva legible y el segundo es un setter. Es común referirse solo a la parte legible por el nombre primitivo.
 
-Here is a basic auto incrementing counter that is updating based on setting the `count` signal.
+Aquí hay un contador de incremento automático básico que se actualiza según la configuración de el Signal de `count`.
 
 ```jsx
 import { createSignal, onCleanup } from "solid-js";
@@ -27,37 +27,37 @@ const App = () => {
 render(() => <App />, document.getElementById("app"));
 ```
 
-## Introducing Primitives
+## Introduciendo Primitivas
 
-Solid is made up of 3 primary primitives, Signal, Memo, and Effect. At their core is the Observer pattern where Signals (and Memos) are tracked by wrapping Memos and Effects.
+Solid se compone de 3 primitivas primarias, Signal, Memo, y Effect. En su núcleo está el patrón Observer donde los Signals (y Memos) se rastrean envolviendo los Memos y los Effects.
 
-Signals are the simplest primitive. They contain value, and get and set functions so we can intercept when they are read and written to.
+Signals son los primitivos más mas simples. Contienen valor, y funciones para obtener y establecer para que podamos interceptar cuando se leen y escriben.
 
 ```js
 const [count, setCount] = createSignal(0);
 ```
 
-Effects are functions that wrap reads of our signal and re-execute whenever a dependent Signal's value changes. This is useful for creating side effects, like rendering.
+Los efectos son funciones que envuelven las lecturas de nuestra señal y se vuelven a ejecutar cada vez que cambia el valor de una señal dependiente. Esto es útil para crear efectos secundarions, como renderizar.
 
 ```js
 createEffect(() => console.log("The latest count is", count()));
 ```
 
-Finally, Memos are cached derived values. They share the properties of both Signals and Effects. They track their own dependent Signals, re-executing only when those change, and are trackable Signals themselves.
+Finalmente, Memos son valores derivados almacenados en caché. Comparten las propiedades de Signals y Effects. Rastrea sus propias señales dependientes, se vuelve a ejecutar solo cuando hay cambios, y son señales rastreables en sí mismas.
 
 ```js
 const fullName = createMemo(() => `${firstName()} ${lastName()}`);
 ```
 
-## How it Works
+## Cómo Funciona
 
-Signals are event emitters that hold a list of subscriptions. They notify their subscribers whenever their value changes.
+Signals son emisores de eventos que contienen una lista de suscripciones. Notifican a sus suscriptores cada vez que cambia su valor.
 
-Where things get more interesting is how these subscriptions happen. Solid uses automatic dependency tracking. Updates happen automatically as the data changes.
+Donde las cosas se ponen más interesantes es cómo ocurren estas suscripciones. Solid utiliza el seguimiento automático de dependencias. Las actualizaciones ocurren automáticamente a medida que cambian los datos.
 
-The trick is a global stack at runtime. Before an Effect or Memo executes (or re-executes) its developer-provided function, it pushes itself on to that stack. Then any Signal that is read checks if there is a current listener on the stack and if so adds the listener to its subscriptions.
+El truco es una pila global en tiempo de ejecución. Antes de que un Effect o Memo ejecute (o vulva a ejecutar) su función proporcionada por el desarrollador, se empuja a esa pila. Luego, cualquier Signal que se lea verifica si hay un oyente actual en la pila, y si es así, agrega el oyente a sus suscripciones.
 
-You can think of it like this:
+Puedes pensarlo así:
 
 ```js
 function createSignal(value) {
@@ -78,9 +78,9 @@ function createSignal(value) {
 }
 ```
 
-Now whenever we update the Signal we know which Effects to re-run. Simple yet effective. The actual implementation is much more complicated but that is the guts of what is going on.
+Ahora, cada vez que actualizamos la señal, sabemos qué efectos volver a ejecutar. Simple pero efectivo. La implementación real es mucho más complicada, pero esa es la esencia de lo que está sucediendo.
 
-For more detailed understanding of how Reactivity works these are useful articles:
+Para una comprensión más detallada de cómo funciona la reactividad, estos son artículos útiles:
 
 [A Hands-on Introduction to Fine-Grained Reactivity](https://dev.to/ryansolid/a-hands-on-introduction-to-fine-grained-reactivity-3ndf)
 
@@ -88,14 +88,14 @@ For more detailed understanding of how Reactivity works these are useful article
 
 [SolidJS: Reactivity to Rendering](https://indepth.dev/posts/1289/solidjs-reactivity-to-rendering)
 
-## Considerations
+## Consideraciones
 
-This approach to reactivity is very powerful and dynamic. It can handle dependencies changing on the fly through executing different branches of conditional code. It also works through many levels of indirection. Any function executed inside a tracking scope is also being tracked.
+Este enfoque de la reactividad es muy poderoso y dinámico. Puede manejar las dependencias que cambian sobre la marcha mediante la ejecución de diferentes ramas de código condicional. También funciona a través de muchos niveles de indirección. También se realiza el seguimiento de cualquier función ejecutada dentro de un alcance de seguimiento.
 
-However, there are some key behaviors and tradeoffs we must be aware of.
+Sin embargo, hay algunos comportamientos y compensaciones clave que debemos tener en cuenta.
 
-1. All reactivity is tracked from function calls whether directly or hidden beneath getter/proxy and triggered by property access. This means where you access properties on reactive objects is important.
+1. Toda la reactividad se rastrea desde las llamadas a funciones, ya sea directamente u ocultas debajo del captador/proxy y activadas por el acceso a la propiedad. Esto significa que es importante acceder a las propiedades de los objetos reactivos.
 
-2. Components and callbacks from control flows are not tracking scopes and only execute once. This means destructuring or doing logic top-level in your components will not re-execute. You must access these Signals, Stores, and props from within other reactive primitives or the JSX for that part of the code to re-evaluate.
+2. Los componentes y las devoluciones de llamada de los flujos de control no realizan un seguimiento de los ámbitos y solo se ejecutan una vez. Esto significa que la desestructuración o la ejecución de lógica de nivel superior en sus componentes no se volverán a ejecutar. Debe acceder a estas señales, tiendas y accesorios desde otras primitivas reactivas o que el JSX de esa parte del código se reevalúe.
 
-3. This approach only tracks synchronously. If you have a setTimeout or use an async function in your Effect the code that executes async after the fact won't be tracked.
+3. Este enfoque solo realiza un seguimiento sincrónico. Si tienes un setTimeout o usas una función async en tu Effect, el código que se ejecuta async después del hecho no será rastreado.
