@@ -1,0 +1,162 @@
+[
+  {
+    "lessonName": "Einleitung/Grundlagen",
+    "internalName": "introduction_basics"
+  },
+  {
+    "lessonName": "Einleitung/JSX",
+    "internalName": "introduction_jsx"
+  },
+  {
+    "lessonName": "Einleitung/Komponenten",
+    "internalName": "introduction_components"
+  },
+  {
+    "lessonName": "Einleitung/Signale",
+    "internalName": "introduction_signals"
+  },
+  {
+    "lessonName": "Einleitung/Effekte",
+    "internalName": "introduction_effects"
+  },
+  {
+    "lessonName": "Einleitung/Abgeleitete Signale",
+    "internalName": "introduction_derived"
+  },
+  {
+    "lessonName": "Einleitung/Memos",
+    "internalName": "introduction_memos"
+  },
+  {
+    "lessonName": "Kontrollfluss/Show",
+    "internalName": "flow_show"
+  },
+  {
+    "lessonName": "Kontrollfluss/For",
+    "internalName": "flow_for"
+  },
+  {
+    "lessonName": "Kontrollfluss/Index",
+    "internalName": "flow_index"
+  },
+  {
+    "lessonName": "Kontrollfluss/Switch",
+    "internalName": "flow_switch"
+  },
+  {
+    "lessonName": "Kontrollfluss/Dynamic",
+    "internalName": "flow_dynamic"
+  },
+  {
+    "lessonName": "Kontrollfluss/Portal",
+    "internalName": "flow_portal"
+  },
+  {
+    "lessonName": "Kontrollfluss/Error Boundary",
+    "internalName": "flow_error_boundary"
+  },
+  {
+    "lessonName": "Lifecycles/onMount",
+    "internalName": "lifecycles_onmount"
+  },
+  {
+    "lessonName": "Lifecycles/onCleanup",
+    "internalName": "lifecycles_oncleanup"
+  },
+  {
+    "lessonName": "Anbindung/Events",
+    "internalName": "bindings_events"
+  },
+  {
+    "lessonName": "Anbindung/Style",
+    "internalName": "bindings_style"
+  },
+  {
+    "lessonName": "Anbindung/ClassList",
+    "internalName": "bindings_classlist"
+  },
+  {
+    "lessonName": "Anbindung/Refs",
+    "internalName": "bindings_refs"
+  },
+  {
+    "lessonName": "Anbindung/Forwarding Refs",
+    "internalName": "bindings_forward_refs"
+  },
+  {
+    "lessonName": "Anbindung/Spreads",
+    "internalName": "bindings_spreads"
+  },
+  {
+    "lessonName": "Anbindung/Directives",
+    "internalName": "bindings_directives"
+  },
+  {
+    "lessonName": "Props/Default Props",
+    "internalName": "props_defaults"
+  },
+  {
+    "lessonName": "Props/Props aufsplitten",
+    "internalName": "props_split"
+  },
+  {
+    "lessonName": "Props/Children",
+    "internalName": "props_children"
+  },
+  {
+    "lessonName": "Stores/Verschachtelte Reaktivität",
+    "internalName": "stores_nested_reactivity"
+  },
+  {
+    "lessonName": "Stores/Create Store",
+    "internalName": "stores_createstore"
+  },
+  {
+    "lessonName": "Stores/Mutation",
+    "internalName": "stores_mutation"
+  },
+  {
+    "lessonName": "Stores/Kontext",
+    "internalName": "stores_context"
+  },
+  {
+    "lessonName": "Stores/Immutable Stores",
+    "internalName": "stores_immutable"
+  },
+  {
+    "lessonName": "Stores/Ohne Context",
+    "internalName": "stores_nocontext"
+  },
+  {
+    "lessonName": "Reaktivität/Updates zusammenfassen",
+    "internalName": "reactivity_batch"
+  },
+  {
+    "lessonName": "Reaktivität/Untrack",
+    "internalName": "reactivity_untrack"
+  },
+  {
+    "lessonName": "Reaktivität/On",
+    "internalName": "reactivity_on"
+  },
+  {
+    "lessonName": "Asynchron/Nachladende Komponenten",
+    "internalName": "async_lazy"
+  },
+  {
+    "lessonName": "Asynchron/Ressourcen",
+    "internalName": "async_resources"
+  },
+  {
+    "lessonName": "Asynchron/Suspense",
+    "internalName": "async_suspense"
+  },
+  {
+    "lessonName": "Asynchron/Suspense List",
+    "internalName": "async_suspense_list"
+  },
+  {
+    "lessonName": "Asynchron/Transitionen",
+    "internalName": "async_transitions"
+  }
+]

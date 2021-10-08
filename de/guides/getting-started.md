@@ -65,9 +65,9 @@ Das Design von Solid basiert auf Ansichten über bestimmte Prinzipien und Werten
 
 Deklarative Daten ist die Praxis, die Beschreibung des Datenverhaltens an dessen Deklaration zu hängen. Das erlaubt eine einfache Zusammenstellung aller Aspekte des Datenverhaltens am gleichen Platz.
 
-### 2. Verwchwindende Komponenten
+### 2. Verschwindende Komponenten
 
-Es ist schwer genug, Komponenten zu strukturieren, ohne Aktualisierungen zu bedenken. Solids Aktualisierungslogik ist unabhängig von den Komponenten. Componenten-Funktionen werden nur einmal aufgerufen und hören dann auf, zu existieren. Komponenten existieren, um den Code zu organisieren und mehr nicht.
+Es ist schwer genug, Komponenten zu strukturieren, ohne Aktualisierungen zu bedenken. Solids Aktualisierungslogik ist unabhängig von den Komponenten. Komponenten-Funktionen werden nur einmal aufgerufen und hören dann auf, zu existieren. Komponenten existieren, um den Code zu organisieren und mehr nicht.
 
 ### 3. Trennung von Lesen/Schreiben
 
