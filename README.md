@@ -19,7 +19,7 @@ Solid's documentation is available in 6 languages including:
 | 🇯🇵 Japanese (ja)   | 100%              | 100%   | 100%      | [jay-es](https://github.com/jay-es)             |
 | 🇪🇸 Spanish (es)    | 10%               | 0%     | 0%        | [jnfrati](https://github.com/jnfrati)           |
 | 🇮🇩 Indonesian (id) | 100%              | 100%   | 0%        | [athif23](https://github.com/athif23)           |
-| 🇩🇪 German (de)     | 100%              | 100%   | 0%        | [atk](https://github.com/atk)                   |
+| 🇩🇪 German (de)     | 100%              | 100%   | 100       | [atk](https://github.com/atk)                   |
 | 🇷🇺 Russian (ru)    | 100%              | 100%   | 0%        | [Pheianox](https://github.com/pheianox)         |
 
 # Support
