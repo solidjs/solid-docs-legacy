@@ -1,7 +1,7 @@
 ---
 title: 比較
 description: Solid と他のフレームワークとの比較
-sort: 1
+sort: 4
 ---
 
 # 他のライブラリとの比較

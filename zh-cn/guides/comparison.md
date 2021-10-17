@@ -1,7 +1,7 @@
 ---
 title: 比较
 description: Solid 与其他框架比较。
-sort: 1
+sort: 4
 ---
 
 # 与其他库进行比较

@@ -1,7 +1,7 @@
 ---
 title: 常见问题
 description: 来自社区的常见问题。
-sort: 2
+sort: 5
 ---
 
 # 常见问题

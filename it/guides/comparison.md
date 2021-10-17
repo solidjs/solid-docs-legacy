@@ -1,7 +1,7 @@
 ---
 title: Confronti
 description: Confronti di Solid con altri framework.
-sort: 1
+sort: 4
 ---
 
 # Confronto con altre biblioteche
