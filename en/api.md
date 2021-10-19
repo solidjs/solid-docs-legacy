@@ -263,7 +263,7 @@ Splits a reactive object by keys.
 
 It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
 
-This can be useful when extending a component if you want to pass a subset of the parent's props directly to the child.
+This can be useful if you want to consume a subset of props and pass the rest to a child.
 
 ```js
 const [local, others] = splitProps(props, ["children"]);
