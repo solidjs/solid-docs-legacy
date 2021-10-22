@@ -82,7 +82,11 @@ async function outputTutorials(lang: string) {
     for (const [filename, outputKey] of Object.entries(outputMap)) {
       const filePath = join(tutorialsDir, name, filename);
       const fileContent = await readFile(filePath, {encoding: 'utf-8'});
-      output[outputKey] = fileContent;
+      try {
+        output[outputKey] = JSON.parse(fileContent);
+      } catch (err) {
+        output[outputKey] = fileContent;
+      }
     }
 
     return output;
