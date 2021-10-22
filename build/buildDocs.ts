@@ -5,47 +5,32 @@ import markdown from 'markdown-it';
 import anchor, {AnchorInfo} from 'markdown-it-anchor';
 import Token from 'markdown-it/lib/token';
 // import Got from 'got';
-import {basename} from 'path';
 import {existsSync} from 'fs';
-import {writeFile, mkdir, readFile, readdir} from 'fs/promises';
-import {resolve, join} from 'path'
+import {mkdir, readdir, readFile, writeFile} from 'fs/promises';
+import {join, resolve} from 'path'
 
-import {Section} from "./types";
+import {DocFile, DocPageLookup, LessonFile, LessonLookup, Section} from "./types";
 
-type DocPage = {
-  directory: string, //relative to a lang folder
-  outputName: string
-}
-
-const docPages: DocPage[] = [
+const docPages: DocPageLookup[] = [
   {
-    directory: ".",
+    subdir: ".",
     outputName: "api"
   },
   {
-    directory: "guides",
+    subdir: "guides",
     outputName: "guide"
   },
 ]
 
+const langsDir = resolve(__dirname, "../langs");
+
 async function run() {
-  const langsDir = resolve(__dirname, "../langs");
   const langs: string[] = await readdir(langsDir);
 
   for (const lang of langs) {
-    console.log("Processing", lang, "docs")
-    const langPath = join(langsDir, lang);
-
-    const outputDir = resolve(__dirname, '../dist/docs', lang);
-    if (!existsSync(outputDir)) {
-      await mkdir(outputDir, { recursive: true });
-    }
-
-    for ( const {directory, outputName} of docPages) {
-      const output = await processSections(join(langPath, directory));
-      const outputPath = join(outputDir, `${outputName}.json`);
-      await writeToPath(outputPath, output);
-    }
+    console.log("Processing", lang)
+    await outputTutorials(lang);
+    await outputDocs(lang);
   }
 }
 
@@ -58,7 +43,62 @@ async function writeToPath(path: string, release: any) {
   });
 }
 
-async function processSections(directoryPath: string) {
+async function outputDocs(lang: string) {
+  const langPath = join(langsDir, lang);
+
+  const outputDir = resolve(__dirname, '../dist/docs', lang);
+  if (!existsSync(outputDir)) {
+    await mkdir(outputDir, { recursive: true });
+  }
+
+  for ( const {subdir, outputName} of docPages) {
+    const output = await processSections(join(langPath, subdir));
+    const outputPath = join(outputDir, `${outputName}.json`);
+    await writeToPath(outputPath, output);
+  }
+}
+
+async function outputTutorials(lang: string) {
+
+  const tutorialsDir = join(langsDir, lang, "tutorials");
+
+  const lookupPath = join(tutorialsDir, "directory.json");
+
+  if (!existsSync(lookupPath)) {
+    console.log("(tutorials don't exist)")
+    return;
+  }
+
+  const lookups: LessonLookup[] = await import(lookupPath);
+
+  const combineTutorialFiles = async (name: string): Promise<LessonFile> => {
+    const outputMap: { [filename: string]: keyof LessonFile } = {
+      "lesson.json": "lesson",
+      "solved.json": "solved",
+      "lesson.md": "markdown"
+    }
+
+    const output: LessonFile = {};
+    for (const [filename, outputKey] of Object.entries(outputMap)) {
+      const filePath = join(tutorialsDir, name, filename);
+      const fileContent = await readFile(filePath, {encoding: 'utf-8'});
+      output[outputKey] = fileContent;
+    }
+
+    return output;
+  }
+
+  for (const lesson of lookups) {
+    const output = await combineTutorialFiles(lesson.internalName);
+    const outputDir = resolve(__dirname, '../dist/tutorials', lang);
+    if (!existsSync(outputDir)) {
+      await mkdir(outputDir, { recursive: true });
+    }
+    await writeToPath(`${outputDir}/${lesson.internalName}.json`, output);
+  }
+}
+
+async function processSections(directoryPath: string): Promise<DocFile> {
   const mdFiles = (await readdir(directoryPath))
     .filter(name => name.endsWith(".md"))
     .map(relative => join(directoryPath, relative));
