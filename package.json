@@ -1,0 +1,27 @@
+{
+  "name": "solid-docs",
+  "version": "1.0.0",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "repository": "git@github.com:solidjs/solid-docs.git",
+  "author": "Solid Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^16.11.3",
+    "front-matter": "^4.0.2",
+    "htmlnano": "^1.1.1",
+    "jiti": "^1.12.9",
+    "markdown-it": "^12.2.0",
+    "markdown-it-anchor": "^8.4.1",
+    "shiki": "^0.9.12",
+    "typescript": "^4.4.4"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/markdown-it": "^12.2.3"
+  }
+}
