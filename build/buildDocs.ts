@@ -100,15 +100,18 @@ async function outputTutorials(lang: string) {
     return output;
   }
 
+  const outputDir = resolve(__dirname, '../dist/tutorials', lang);
   for (const lesson of lookups) {
     const output = await combineTutorialFiles(lesson.internalName);
-    const outputDir = resolve(__dirname, '../dist/tutorials', lang);
     if (!existsSync(outputDir)) {
       await mkdir(outputDir, { recursive: true });
     }
-    await writeToPath(`${outputDir}/${lesson.internalName}.json`, output);
-    return true;
+    await writeToPath(join(outputDir,`${lesson.internalName}.json`), output);
   }
+
+  await writeToPath(join(outputDir, "directory.json"), lookups);
+
+  return true;
 }
 
 async function outputSupported({tutorials, docs}: {tutorials: string[], docs: string[]}) {
