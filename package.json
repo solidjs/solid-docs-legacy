@@ -19,7 +19,7 @@
     "typescript": "^4.4.4"
   },
   "scripts": {
-    "build": "jiti build/buildDocs.ts"
+    "build": "jiti build/buildDocs.ts && tsc"
   },
   "dependencies": {
     "@types/markdown-it": "^12.2.3"

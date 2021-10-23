@@ -9,7 +9,7 @@ import {existsSync} from 'fs';
 import {mkdir, readdir, readFile, writeFile} from 'fs/promises';
 import {join, resolve} from 'path'
 
-import {DocFile, DocPageLookup, LessonFile, LessonLookup, Section} from "./types";
+import {DocFile, DocPageLookup, LessonFile, LessonLookup, Section} from "../src/types";
 
 const docPages: DocPageLookup[] = [
   {
@@ -27,11 +27,19 @@ const langsDir = resolve(__dirname, "../langs");
 async function run() {
   const langs: string[] = await readdir(langsDir);
 
+  const tutorialLangs = [];
+  const docLangs = langs; //TODO: Don't assume that docs are fully supported for every lang
+
   for (const lang of langs) {
     console.log("Processing", lang)
-    await outputTutorials(lang);
+    if (await outputTutorials(lang)) {
+      tutorialLangs.push(lang);
+    }
     await outputDocs(lang);
   }
+
+  //Outputs to ./src, to be directly imported by index.ts
+  await outputSupported({tutorials: tutorialLangs, docs: docLangs});
 }
 
 run();
@@ -66,7 +74,7 @@ async function outputTutorials(lang: string) {
 
   if (!existsSync(lookupPath)) {
     console.log("(tutorials don't exist)")
-    return;
+    return false;
   }
 
   const lookups: LessonLookup[] = await import(lookupPath);
@@ -99,7 +107,17 @@ async function outputTutorials(lang: string) {
       await mkdir(outputDir, { recursive: true });
     }
     await writeToPath(`${outputDir}/${lesson.internalName}.json`, output);
+    return true;
   }
+}
+
+async function outputSupported({tutorials, docs}: {tutorials: string[], docs: string[]}) {
+  const supported = {
+    tutorials,
+    docs
+  }
+  const outputPath = resolve(__dirname, '../src', "supported.json");
+  await writeToPath(outputPath, supported);
 }
 
 async function processSections(directoryPath: string): Promise<DocFile> {
