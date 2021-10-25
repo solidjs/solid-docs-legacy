@@ -1,7 +1,7 @@
 ---
 title: Domande Frequenti
 description: Domande frequenti dalla community.
-sort: 2
+sort: 5
 ---
 
 # Domande Frequenti

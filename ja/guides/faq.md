@@ -1,7 +1,7 @@
 ---
 title: FAQ
 description: コミュニティからのよくある質問
-sort: 2
+sort: 5
 ---
 
 # FAQ

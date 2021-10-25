@@ -1,7 +1,7 @@
 ---
 title: FAQ
 description: Foire aux questions de la communauté.
-sort: 2
+sort: 5
 ---
 
 # FAQ

@@ -1,7 +1,7 @@
 ---
 title: FAQ
 description: Frequently asked questions from the community.
-sort: 2
+sort: 5
 ---
 
 # FAQ
