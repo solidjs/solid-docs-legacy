@@ -1,5 +1,5 @@
 {
-  "name": "solid-docs",
+  "name": "@solid.js/docs",
   "version": "1.0.0",
   "files": [
     "dist"
@@ -19,7 +19,8 @@
     "typescript": "^4.4.4"
   },
   "scripts": {
-    "build": "jiti build/buildDocs.ts && tsc"
+    "build": "jiti build/buildDocs.ts && tsc",
+    "publish": "npm publish --access public"
   },
   "dependencies": {
     "@types/markdown-it": "^12.2.3"
