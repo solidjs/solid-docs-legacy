@@ -37,6 +37,11 @@ This package serves to build the markdown files into a consumable format importe
 
 Run `yarn build` to run the build script. This compiles the markdown into various json files in the `dist` folder and turns the `index.ts` file into an entry point that accesses them. Then, to view your changes in the context of the site, clone both repositories and run `yarn link` in the solid-docs directory and `yarn link solid-docs` in the solid-site directory.
 
+### Theming
+The script mentioned above uses shiki to process the code which in turn uses VSCode tokens. Therefore any VSCode theme can be applied.
+
+All you have to do is retrieve the JSON file describing your favorite theme (see ./build/github-light.json for an example), paste it into the build folder and refer to it in the fetchReleases.ts file around line 158: const theme = await loadTheme(resolve(__dirname, 'your-theme.json'));.
+
 ## Importing Docs and Tutorials
 
 The package exposes async functions to load the documentation using dynamic imports.
