@@ -1,7 +1,7 @@
 ---
 title: FAQ
 description: Pertanyaan-pertanyaan yang sering ditanyakan di komunitas.
-sort: 2
+sort: 5
 ---
 
 # FAQ

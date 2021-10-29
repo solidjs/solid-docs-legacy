@@ -1,7 +1,7 @@
 ---
 title: Perbandingan
 description: Perbandingan Solid dengan framework-framework lainnya.
-sort: 1
+sort: 4
 ---
 
 # Perbandingan dengan Library lainnya
