@@ -10,7 +10,7 @@ sort: 0
 
 Безусловно, самый простой способ начать работу с Solid - это попробовать его онлайн. [Наш REPL](https://playground.solidjs.com) - идеальный способ опробовать ваши идеи. Также у нас есть [Sandbox](https://codesandbox.io/), где вы можете отредактировать любой из [наших примеров](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
 
-Кроме того, вы можете использовать наши простые [Vite](https://vitejs.dev/), шаблоны выполнив следующие команды в своем терминале:
+Кроме того, вы можете использовать наши простые [Vite](https://vitejs.dev/) шаблоны, выполнив следующие команды в своем терминале:
 
 ```sh
 > npx degit solidjs/templates/js my-app
