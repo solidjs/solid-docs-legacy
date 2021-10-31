@@ -9,17 +9,22 @@
   "author": "Solid Team",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-dynamic-import-vars": "^1.4.1",
+    "@rollup/plugin-json": "^4.1.0",
     "@types/node": "^16.11.3",
     "front-matter": "^4.0.2",
     "htmlnano": "^1.1.1",
     "jiti": "^1.12.9",
     "markdown-it": "^12.2.0",
     "markdown-it-anchor": "^8.4.1",
+    "rollup": "^2.58.3",
+    "rollup-plugin-typescript2": "^0.30.0",
     "shiki": "^0.9.12",
+    "tslib": "^2.3.1",
     "typescript": "^4.4.4"
   },
   "scripts": {
-    "build": "jiti build/buildDocs.ts && tsc",
+    "build": "jiti build/buildDocs.ts",
     "publish": "npm publish --access public"
   },
   "dependencies": {

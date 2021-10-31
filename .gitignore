@@ -1,3 +1,8 @@
+
+.idea
+build/out
+dist
+
 ### OSX ###
 # General
 .DS_Store

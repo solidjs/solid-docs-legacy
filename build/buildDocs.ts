@@ -54,7 +54,7 @@ async function writeToPath(path: string, release: any) {
 async function outputDocs(lang: string) {
   const langPath = join(langsDir, lang);
 
-  const outputDir = resolve(__dirname, '../dist/docs', lang);
+  const outputDir = resolve(__dirname, './out/docs', lang);
   if (!existsSync(outputDir)) {
     await mkdir(outputDir, { recursive: true });
   }
@@ -100,7 +100,7 @@ async function outputTutorials(lang: string) {
     return output;
   }
 
-  const outputDir = resolve(__dirname, '../dist/tutorials', lang);
+  const outputDir = resolve(__dirname, './out/tutorials', lang);
   for (const lesson of lookups) {
     const output = await combineTutorialFiles(lesson.internalName);
     if (!existsSync(outputDir)) {
@@ -119,7 +119,7 @@ async function outputSupported({tutorials, docs}: {tutorials: string[], docs: st
     tutorials,
     docs
   }
-  const outputPath = resolve(__dirname, '../src', "supported.json");
+  const outputPath = resolve(__dirname, './out', "supported.json");
   await writeToPath(outputPath, supported);
 }
 
