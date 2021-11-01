@@ -1,22 +1,22 @@
-`Suspense` allows us to show fallback content when data is loading. This is great for initial loading, but on subsequent navigation it is often worse UX to fallback to the skeleton state.
+`Suspense` позволяет нам фоллбек (`fallback`) при загрузке данных. Это отлично подходит для первой загрузки, но если при каждом изменении данных возвращать фоллбек то это может ухудшить UX.
 
-We can avoid going back to the fallback state by leveraging `useTransition`. It provides a wrapper and a pending indicator. The wrapper puts all downstream updates in a transaction that doesn't commit until all async events complete.
+Мы можем избежать возврата к фоллбеку, используя `useTransition`. Он предоставляет собой функцию-обертку для создания перехода и индикатор его состояния. Функция-обертка позволяет создать транзакцию, которая не фиксирует изменения пока все внутренние асинхронные события не будут завершены.
 
-This means that when control flow is suspended, it continues to show the current branch while rendering the next off-screen. Resource reads under existing boundaries add it to the transition. However, any new nested `Suspense` components will show "fallback" if they have not completed loading before coming into view.
+На практике это означает, что пока поток управления остановлен мы не меняем состояние пока не завершим все бекграунд процессы. Считывание ресурса под существующими границами добавят его к переходу. Однако любые новые вложенные компоненты `Suspense` будут показывать `fallback`, если они не завершили загрузку до того, как станут видимыми.
 
-Notice when you navigate in the example, we keep seeing the content disappear back to a loading placeholder. Let's add a transition in our `App` component. First, let's replace the `updateTab` function:
+Обратите внимание, когда вы перемещаетесь по вкладкам в нашем примере, мы продолжаем видеть, как контент исчезает и нам показывается `fallback` с индикатором загрузки. Давайте добавим переход в наш компонент `App`. Для начала создадим функцию `updateTab`:
 
 ```js
 const [pending, start] = useTransition();
 const updateTab = (index) => () => start(() => setTab(index));
 ```
 
-`useTransition` returns a pending signal indicator and a method to start the transition, which we will wrap around our update.
+`useTransition` возвращает кортеж с Сигналом - индикатором состояния, который мы назвали `pending`, а вторым аргументом мы получаем функцию-обертку `start` с помощь которой мы обернем наш `updateTab`
 
-We should use that pending signal to give an indicator in our UI. We can add a pending class to our tab container div:
+Мы используем Сигнал `pending` чтобы добавить класс в наш `div` контейнер:
 
 ```js
 <div class="tab" classList={{ pending: pending() }}>
 ```
 
-And with that our tab switching should be much smoother.
+После введения `useTransition` изменения вкладок выглядят куда более плавными.
