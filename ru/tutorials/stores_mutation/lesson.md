@@ -1,8 +1,8 @@
-Solid strongly recommends the use of shallow immutable patterns for updating state. By separating reads and writes we maintain better control over the reactivity of our system without the risk of losing track of changes to our proxy when passed through layers of components. This is much more amplified with Stores compared to Signals.
+Solid настоятельно рекомендует использовать неглубокие неизменяемые (`shallow immutable`) паттерны для обновления состояния. Разделяя чтение и запись, мы сохраняем точный контроль над реактивностью нашей системы без риска потерять отслеживание изменений в наших прокси (`proxy`) при передаче данных через несколько компонентов. Этот подход виден гораздо сильнее в Сторах по сравнению с Сигналами.
 
-Sometimes, however, mutation is just easier to reason about. That's why Solid provides an Immer inspired `produce` store modifier that allows you to mutate a writable proxy version of your Store object inside your `setStore` calls.
+Стоит заметить, что мутабельная запись читается в разы проще. Поэтому Solid дает нам функцию `produce`, которая была вдохновлена библиотекой [Immer](https://github.com/immerjs/immer). Она позволяет нам изменять наши прокси-для-записи (`writable proxy`) в наших Сторах и применятся внутри вызова `setStore`.
 
-This is a nice tool to have to allow small zones of mutation without relinquishing control. Let's use `produce` on our Todos example by replacing our event handler code with:
+Это хороший инструмент, позволяющий допускать небольшие зоны мутации, не отказываясь от реактивного контроля. Давайте воспользуемся `produce` в нашем примере Todos, заменив наш код обработчика событий на:
 
 ```jsx
 const addTodo = (text) => {
@@ -22,4 +22,4 @@ const toggleTodo = (id) => {
 };
 ```
 
-While `produce` with Stores probably handles the vast majority of cases, Solid also has a mutable Store object that is available from `createMutable`. While not the recommended approach for internal APIs, it is sometimes useful for interop or compatibility with 3rd party systems.
+Несмотря на то, что `produce` внутри Сторов, вероятно, покрывает подавляющее большинство случаев, Solid также позволяет нам создать мутабельный Стор, доступный в виде вызова ` createMutable`. Этот подход не рекомендуется для использования, но может быть полезен для совместимости со другими библиотеками.
