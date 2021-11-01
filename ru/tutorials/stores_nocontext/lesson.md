@@ -1,22 +1,20 @@
-Context is a great tool for stores. It handles injection, ties ownership to the reactive graph, automatically manages disposal, and has no render overhead given Solid's fine-grained rendering.
+Контекст - отличный инструмент для сторов. Он обрабатывает внедрение, создает реактивный графы, автоматически управляет удалением и не имеет никакой цены за использование, учитывая точный рендеринг Solid.
 
-However, you could just use the reactive system directly for simple things. It's almost not worth pointing out but a simple writeable store is just a Signal:
+Впрочем, в большинстве случаев вы можете просто использовать Сигналы для простых вещей. Как вы уже могли догадаться, простой Стор это просто Сигнал:
 
 ```js
 import { createSignal } from 'solid-js';
 
 export default createSignal(0);
 
-// somewhere else:
+// в любом месте в вашем приложении:
 import counter from './counter';
 const [count, setCount] = counter;
 ```
 
-Solid's reactivity is a universal concept. It doesn't matter if it is inside or outside components. There is no separate concept for global vs local state. It is all the same thing.
+Реактивность в Solid это универсальный концепт. Нам не важно, где мы создаем сигнал внутри компонентов или за его границами. В Solid нет разницы между глобальной и локальной областью видимости (`global vs local scope`). Единственным ограничением является то, что все реактивные примитивы (Сигналы, Эффекты, Мемо) должны быть созданы внутри реактивного корня (`createRoot`). Методы `render` в Solid делают это автоматически.
 
-The only restriction is that all computations (Effects/Memos) need to be created under a reactive root (`createRoot`). Solid's `render` does this automatically.
-
-In this tutorial `counter.tsx` is such a global store. We can use it by modifying our component in `main.tsx` to:
+В этом уроке `counter.tsx` является таким глобальным стором. Мы можем использовать его, изменив наш компонент в main.tsx на:
 
 ```jsx
 const { count, doubleCount, increment } = counter;
@@ -28,4 +26,4 @@ return (
 );
 ```
 
-So when using your own more complicated global stores that contain computations, be sure to create a root. Or better yet, do yourself a favor and just use Context.
+Поэтому при использовании ваших собственных более сложных глобальных сторов, содержащих вычисления, обязательно создайте корень. А ещё лучше просто используйте Контекст.

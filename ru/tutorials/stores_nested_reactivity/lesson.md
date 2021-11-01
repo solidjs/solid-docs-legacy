@@ -1,6 +1,6 @@
-One of the reasons for fine-grained reactivity in Solid is that it can handle nested updates independently. You can have a list of users and when we update one name we only update a single location in the DOM without diffing the list itself. Very few (even reactive) UI frameworks can do this.
+Одна из причин использования точной (`fine-grained`) реактивности в Solid заключается в том, что он может обрабатывать вложенные обновления независимо друг от друга. Например, если у нас есть список пользователей в котором обновилось одно имя, то Solid обновит лишь одно место в DOM не перерендеривая весь список. Очень немногие (даже реактивные) UI-фреймворки могут это сделать.
 
-But how do we accomplish this? In the example we have a list of todos in a signal. In order to mark a todo as complete, we would need to replace the todo with a clone. This is how most frameworks work, but it's wasteful as we rerun the list diffing and we recreate the DOM elements as illustrated in the `console.log`.
+Как мы этого добились? Давайте рассмотрим это на примере списка задач в Сигнале. Чтобы пометить задачу как выполненную, нам нужно заменить ее клоном. Несмотря на то, что так работает большинство фреймворков, это далеко от ресурсоэффективного подхода, поскольку мы повторно запускаем алгоритм вычисления различий (`diffing algorithm`) и воссоздаем элементы DOM, как показано в `console.log`.
 
 ```js
 const toggleTodo = (id) => {
@@ -10,7 +10,7 @@ const toggleTodo = (id) => {
 };
 ```
 
-Instead, in a fine-grained library like Solid, we initialize the data with nested Signals like this:
+Вместо этого в библиотеке с точной реактивностью, такой как Solid, мы инициализируем данные вложенными сигналами следующим образом:
 
 ```js
 const addTodo = (text) => {
@@ -19,7 +19,7 @@ const addTodo = (text) => {
 };
 ```
 
-Now we can update the completion state by calling `setCompleted` without any additional diffing. This is because we've moved the complexity to the data rather than the view. And we know exactly how the data changes.
+Теперь мы можем обновить данные с помощью вызова `setCompleted` без вычисления различий. Это возможно потому, что мы перенесли вычисления на уровень данных, вместо вычислений на уровне элементов DOM. Такой подход позволяет точно знать каким образом данные изменяются.
 
 ```js
 const toggleTodo = (id) => {
@@ -28,6 +28,7 @@ const toggleTodo = (id) => {
   if (todo) todo.setCompleted(!todo.completed())
 }
 ```
-If you change the remaining references of `todo.completed` to `todo.completed()`, the example should now only run the `console.log` on creation and not when you toggle a todo.
 
-This of course requires some manual mapping and it was the only choice available to us in the past. But now, thanks to proxies, we can do most of this work in the background without manual intervention. Continue to the next tutorials to see how.
+Если мы изменим все оставшиеся ссылки с `todo.completed` на Сигналы `todo.completed()`, то мы будем видеть вызов `console.log` только при создании элемента, а не при переключении.
+
+Безусловно, это требует ручного контроля и понимания как устроена ваши данные и недалеком прошлом это был единственный способ добиться эффективного рендеринга в прошлом. Но теперь, благодаря прокси мы можем выполнять большую часть этой работы в фоновом режиме без какой-либо ручной работы. В следующих главах мы рассмотрим механизм, позволяющий Solid реализовать эффективную и точную систему обновлений.
