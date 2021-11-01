@@ -1,8 +1,8 @@
-Solid's reactivity is synchronous which means, by the next line after any change, the DOM will have updated. And for the most part this is perfectly fine, as Solid's granular rendering is just a propagation of the update in the reactive system. Unrelated changes "rendering" twice don't actually mean wasted work.
+Реактивность Solid является синхронной, что означает, что после любого изменения DOM будет обновлен. Это отлично работает в случае с Solid так как все обновления в нём являются точными. Если наши несвязные компоненты будут зарендерены дважды на самом деле не означают потраченную впустую работу.
 
-What if the changes are related? Solid's `batch` helper allows to queue up multiple changes and then apply them all at the same time before notifying their observers. Within the batch, updated Signal values are not committed until completion.
+Но что делать в случае, если изменения связаны? Для этого в Solid есть функция `batch`. Она позволяет поставить в очередь несколько изменений, а затем применить их все одновременно, прежде чем уведомить своих наблюдателей (`observers`). Мы можем представить эту операцию как транзакцию, в которой обновленные значения сигналов не фиксируются до завершения.
 
-In this example, we are assigning both names on a button click and this triggers our rendered update twice. You can see the logs in the console when you click the button. So let's wrap the `set` calls in a batch.
+В этом примере мы назначаем оба имени по нажатию кнопки, и это дважды запускает обновление UI. Вы можете увидеть это в консоли, нажав на кнопку. Итак, давайте объединим вызовы `set` в `batch`:
 
 ```js
  const updateNames = () => {
@@ -14,4 +14,4 @@ In this example, we are assigning both names on a button click and this triggers
   }
 ```
 
-And that's it. Now we only notify once for the whole changeset.
+Этого достаточно для того, чтобы оптимизировать данный пример. Теперь DOM будет перерендерен только один раз.
