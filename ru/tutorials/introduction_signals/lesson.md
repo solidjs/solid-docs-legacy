@@ -6,7 +6,7 @@ _Сигналы_ являются краеугольным камнем реак
 const [count, setCount] = createSignal(0);
 ```
 
-Аргумент, переданный `createSignal`, — это начальное значение, а возвращаемое значение — это массив с двумя функциями: геттером и сеттером. С помощью [деструктурирования] (https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) мы можем называть эти функции как угодно. В этом случае мы называем геттер `count`, а сеттер - `setCount`.
+Аргумент, переданный `createSignal`, — это начальное значение, а возвращаемое значение — это массив с двумя функциями: [геттером](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Functions/get) и [сеттером](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Functions/set). С помощью [деструктуризации](https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) мы можем называть эти функции как угодно. В этом случае мы называем геттер `count`, а сеттер - `setCount`.
 
 Важно отметить, что первое возвращаемое значение - это геттер (функция, возвращающая текущее значение), а не само значение. Это потому, что фреймворк должен отслеживать, где этот Сигнал считывается, чтобы он мог соответствующим образом всё обновлять.
 
