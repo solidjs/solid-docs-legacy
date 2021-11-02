@@ -34,7 +34,7 @@ export default function ColoredList(props) {
 }
 ```
 
-Теперь, чтобы обновить наши элементы, давайте создадим Эффект:
+Теперь, чтобы обновить наши элементы, давайте создадим `Эффект`:
 
 ```jsx
 createEffect(() => c().forEach(item => (item.style.color = props.color)));
