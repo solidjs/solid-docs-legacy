@@ -11,16 +11,16 @@ sort: 0
 Это самый простой реактивный примитив, используемый для отслеживания одного значения, которое меняется с течением времени. Функция `createSignal` возвращает кортеж с функцями `get` и `set` для доступа к `Сигналу` и его дальнейшего обновления.
 
 ```js
-const [getValue, setValue] = createSignal(initialValue);
+const [getValue, setValue] = createSignal(initialValue)
 
 // Получить значение
-getValue();
+getValue()
 
 // Установить значение
-setValue(nextValue);
+setValue(nextValue)
 
 // Установить значение используя функцию с предыдущим значением
-setValue((prev) => prev + next);
+setValue(prev => prev + next)
 ```
 
 Не забудьте вызвать `Сигнал` в области отслеживания, если вы хотите, чтобы обновления срабатывали. Области отслеживания - это функции, которые передаются в вычисления, такие как `createffect` или выражения JSX.
@@ -28,7 +28,7 @@ setValue((prev) => prev + next);
 Если вы хотите хранить функцию в Сигнале, оберните ее в еще одну функцию:
 
 ```js
-setValue(() => myFunction);
+setValue(() => myFunction)
 ```
 
 Структура:
@@ -36,8 +36,8 @@ setValue(() => myFunction);
 ```ts
 export function createSignal<T>(
   value: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
-): [get: () => T, set: (v: T) => T];
+  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) },
+): [get: () => T, set: (v: T) => T]
 ```
 
 ## `createEffect`
@@ -45,30 +45,26 @@ export function createSignal<T>(
 Создает новое вычисление - `Эффект`. Оно автоматически отслеживает зависимости и выполняется после каждого рендеринга, в котором зависимость изменилась. Идеально подходит для использования `ref` и управления другими побочными эффектами.
 
 ```js
-const [a, setA] = createSignal(initialValue);
+const [a, setA] = createSignal(initialValue)
 
 // Эффект, зависящий от Сигнала `а`
-createEffect(() => doSideEffect(a()));
+createEffect(() => doSideEffect(a()))
 ```
 
 Функция `Эффекта` вызывается со значением, возвращенным в результате последнего выполнения функции эффекта. Это значение может быть инициализировано как необязательный 2-й аргумент. Это может быть полезно для получения предыдущего значения без создания дополнительного замыкания.
 
 ```js
-createEffect((prev) => {
-  const sum = a() + b();
-  if (sum !== prev) console.log(sum);
-  return sum;
-}, 0);
+createEffect(prev => {
+  const sum = a() + b()
+  if (sum !== prev) console.log(sum)
+  return sum
+}, 0)
 ```
 
 Структура:
 
 ```ts
-export function createEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
+export function createEffect<T>(fn: (v: T) => T, value?: T, options?: { name?: string }): void
 ```
 
 ## `createMemo`
@@ -76,16 +72,16 @@ export function createEffect<T>(
 Создает производный `Сигнал` - `Мемо`. Его главное отличие - возвращаемое значение доступно исключительно для чтения, который пересчитывает свое значение при каждом обновлении зависимостей.
 
 ```js
-const getValue = createMemo(() => computeExpensiveValue(a(), b()));
+const getValue = createMemo(() => computeExpensiveValue(a(), b()))
 
 // Получить значение
-getValue();
+getValue()
 ```
 
 Функция `createMemo` вызывается со значением, возвращенным в результате последнего выполнения. Это значение может быть инициализировано как необязательный 2-й аргумент. Это полезно для сокращения вычислений.
 
 ```js
-const sum = createMemo((prev) => input() + prev, 0);
+const sum = createMemo(prev => input() + prev, 0)
 ```
 
 Структура:
@@ -94,8 +90,8 @@ const sum = createMemo((prev) => input() + prev, 0);
 export function createMemo<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
-): () => T;
+  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) },
+): () => T
 ```
 
 ## `createResource`
@@ -105,22 +101,22 @@ export function createMemo<T>(
 `loading` и `error` являются реактивными геттерами и могут быть отслежены.
 
 ```js
-const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
+const [data, { mutate, refetch }] = createResource(getQuery, fetchData)
 
 // Получить значение
-data();
+data()
 
 // Получить состояние загрузки
-data.loading;
+data.loading
 
 // Получить возможные ошибки
-data.error;
+data.error
 
 // Установить значение без создания обещания
-mutate(optimisticValue);
+mutate(optimisticValue)
 
 // Повторить последний запрос
-refetch();
+refetch()
 ```
 
 Структура:
@@ -128,26 +124,26 @@ refetch();
 ```ts
 type ResourceReturn<T> = [
   {
-    (): T | undefined;
-    loading: boolean;
-    error: any;
+    (): T | undefined
+    loading: boolean
+    error: any
   },
   {
-    mutate: (v: T | undefined) => T | undefined;
-    refetch: () => void;
-  }
-];
+    mutate: (v: T | undefined) => T | undefined
+    refetch: () => void
+  },
+]
 
 export function createResource<T, U = true>(
   fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; name?: string }
-): ResourceReturn<T>;
+  options?: { initialValue?: T; name?: string },
+): ResourceReturn<T>
 
 export function createResource<T, U>(
   source: U | false | null | (() => U | false | null),
   fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; name?: string }
-): ResourceReturn<T>;
+  options?: { initialValue?: T; name?: string },
+): ResourceReturn<T>
 ```
 
 # Жизненные циклы
@@ -159,7 +155,7 @@ export function createResource<T, U>(
 Структура:
 
 ```ts
-export function onMount(fn: () => void): void;
+export function onMount(fn: () => void): void
 ```
 
 ## `onCleanup`
@@ -169,7 +165,7 @@ export function onMount(fn: () => void): void;
 Структура:
 
 ```ts
-export function onCleanup(fn: () => void): void;
+export function onCleanup(fn: () => void): void
 ```
 
 ## `onError`
@@ -179,7 +175,7 @@ export function onCleanup(fn: () => void): void;
 Структура:
 
 ```ts
-export function onError(fn: (err: any) => void): void;
+export function onError(fn: (err: any) => void): void
 ```
 
 # Реактивные утилиты
@@ -193,7 +189,7 @@ export function onError(fn: (err: any) => void): void;
 Структура:
 
 ```ts
-export function untrack<T>(fn: () => T): T;
+export function untrack<T>(fn: () => T): T
 ```
 
 ## `batch`
@@ -205,7 +201,7 @@ export function untrack<T>(fn: () => T): T;
 Структура:
 
 ```ts
-export function batch<T>(fn: () => T): T;
+export function batch<T>(fn: () => T): T
 ```
 
 ## `on`
@@ -213,23 +209,23 @@ export function batch<T>(fn: () => T): T;
 Предназначен для передачи в какое-либо вычисление для того чтобы сделать его зависимости явными. Если передается массив зависимостей, `input` и `prevInput` являются массивами.
 
 ```js
-createEffect(on(a, (v) => console.log(v, b())));
+createEffect(on(a, v => console.log(v, b())))
 
 // Эквивалентен строке выше
 createEffect(() => {
-  const v = a();
-  untrack(() => console.log(v, b()));
-});
+  const v = a()
+  untrack(() => console.log(v, b()))
+})
 ```
 
 Вы также можете запускать вычисления не сразу, а, например, только при каких-либо изменениях, установив для параметра `defer` значение `true`.
 
 ```js
 // Не запускается сразу
-createEffect(on(a, (v) => console.log(v), { defer: true }));
+createEffect(on(a, v => console.log(v), { defer: true }))
 
 // Теперь все работает
-setA("new");
+setA('new')
 ```
 
 Структура:
@@ -238,8 +234,8 @@ setA("new");
 export function on<T extends Array<() => any> | (() => any), U>(
   deps: T,
   fn: (input: T, prevInput: T, prevValue?: U) => U,
-  options: { defer?: boolean } = {}
-): (prevValue?: U) => U | undefined;
+  options: { defer?: boolean } = {},
+): (prevValue?: U) => U | undefined
 ```
 
 ## `createRoot`
@@ -248,35 +244,35 @@ export function on<T extends Array<() => any> | (() => any), U>(
 
 Весь сплошной код Solid может быть заключен в один из этих верхних уровней, поскольку они гарантируют, что вся память/вычисления будет освобождена.
 
-Обычно вам не нужно беспокоиться об этом, так как `createRoot` встроен во все функции подаваемые в метод `render`.
+Обычно вам не нужно беспокоиться об этом, так как `createRoot` встроен во все функции передаваемые в метод `render`.
 
 Структура:
 
 ```ts
-export function createRoot<T>(fn: (dispose: () => void) => T): T;
+export function createRoot<T>(fn: (dispose: () => void) => T): T
 ```
 
 ## `mergeProps`
 
-Данный метод слияет пропы компонентов. Полезно для добавления значений по умолчанию. Или же для клонирования пропов, включая реактивные свойства.
+Данный метод позволяет нам объединять пропы. Полезно для добавления значений по умолчанию. Или же для клонирования пропов, включая реактивные свойства.
 
 Этот метод работает с использованием прокси. Слияние происходит в обратном порядке. Это позволяет динамически отслеживать свойства, которых нет при первом слиянии объекта пропов.
 
 ```js
 // Установка значений по умолчанию
-props = mergeProps({ name: "Smith" }, props);
+props = mergeProps({ name: 'Smith' }, props)
 
 // Клонирование
-newProps = mergeProps(props);
+newProps = mergeProps(props)
 
 // Объединение
-props = mergeProps(props, otherProps);
+props = mergeProps(props, otherProps)
 ```
 
 Структура:
 
 ```ts
-export function mergeProps(...sources: any): any;
+export function mergeProps(...sources: any): any
 ```
 
 ## `splitProps`
@@ -295,64 +291,56 @@ const [local, others] = splitProps(props, ["children"]);
 Структура:
 
 ```ts
-export function splitProps<T>(
-  props: T,
-  ...keys: Array<(keyof T)[]>
-): [...parts: Partial<T>];
+export function splitProps<T>(props: T, ...keys: Array<(keyof T)[]>): [...parts: Partial<T>]
 ```
 
 ## `useTransition`
 
-Используется для пакетного асинхронного обновления в какой-либо отложенной до завершения всех асинхронных процессов транзакции.
-
-Это связано с `Suspense` и отслеживает он только ресурсы, полученные в границах `Suspense`.
+Используется для создания единого асинхронного обновления, которое оповестит вас когда все асинхронные процессы внутри перехода (`transition`) будут выполнены. Функционал `useTransition` связан с `Suspense` в котором отслеживаются только те ресурсы, которые были прочитаны в границах `Suspense`.
 
 ```js
 const [isPending, start] = useTransition();
 
-// Получение данных о выполнении перехода
+// Получение данных о статусе перехода
 isPending();
 
-// Обертывание
+// Обертка setSignal:
 start(() => setSignal(newValue), () => /* переход завершен */)
 ```
 
 Структура:
 
 ```ts
-export function useTransition(): [
-  () => boolean,
-  (fn: () => void, cb?: () => void) => void
-];
+export function useTransition(): [() => boolean, (fn: () => void, cb?: () => void) => void]
 ```
 
 ## `observable`
 
-Этот метод принимает Сигнал и производит тип `Observable`.
+Этот метод принимает Сигнал и производит `Observable`.
 
 Пользуйтесь любой `Observable-библиотекой` на вкус. Библиотека, как правило, будет иметь функцию `from()`.
 
 ```js
-import { from } from "rxjs";
+import { from } from 'rxjs'
 
-const [s, set] = createSignal(0);
+const [s, set] = createSignal(0)
 
-const obsv$ = from(observable(s));
+const obsv$ = from(observable(s))
 
-obsv$.subscribe((v) => console.log(v));
+obsv$.subscribe(v => console.log(v))
 ```
 
 Структура:
 
 ```ts
-export function observable<T>(input: () => T): Observable<T>;
+export function observable<T>(input: () => T): Observable<T>
 ```
 
 ## `mapArray`
 
-Реактивный мэп-помощник, который кэширует каждый элемент по его ссылке, чтобы уменьшить количество ненужной работы при обновлениях. Помощник запускает `mapFn` только один раз для каждого значения, а затем перемещает или удаляет ее по мере необходимости. Аргумент `i` является Сигналом. `mapFn` сама по себе не отслеживается.
+Реактивный помощник напоминающий `Array.map`, который кэширует каждый элемент по его ссылке, чтобы уменьшить количество ненужной работы при обновлениях. Помощник запускает `mapFn` только один раз для каждого значения, а затем перемещает или удаляет ее по мере необходимости. Аргумент `i` является Сигналом. `mapFn` сама по себе не отслеживается.
 
-Является неотъемлемым компонентом `<For>`.
+Используется в встроенном компоненте `<For>`.
 
 ```js
 const mapped = mapArray(source, (model) => {
@@ -376,17 +364,14 @@ const mapped = mapArray(source, (model) => {
 Структура:
 
 ```ts
-export function mapArray<T, U>(
-  list: () => readonly T[],
-  mapFn: (v: T, i: () => number) => U
-): () => U[];
+export function mapArray<T, U>(list: () => readonly T[], mapFn: (v: T, i: () => number) => U): () => U[]
 ```
 
 ## `indexArray`
 
-Похоже на `mapArray`, за исключением того, что он сопоставляет по индексу. Внутренний элемент является Сигналом, а индекс теперь является константой.
+Похоже на `mapArray`, за исключением того, что он сопоставляет по индексу. Внутренний элемент является `Сигналом`, а индекс теперь является константой.
 
-Является неотъемлемым компонентом `<Index>`.
+Используется в встроенном компоненте `<Index>`.
 
 ```js
 const mapped = indexArray(source, (model) => {
@@ -407,37 +392,30 @@ const mapped = indexArray(source, (model) => {
 Структура:
 
 ```ts
-export function indexArray<T, U>(
-  list: () => readonly T[],
-  mapFn: (v: () => T, i: number) => U
-): () => U[];
+export function indexArray<T, U>(list: () => readonly T[], mapFn: (v: () => T, i: number) => U): () => U[]
 ```
 
-# Сторы
+# `Сторы`
 
 Эти API-интерфейсы доступны в `solid-js/store`.
 
 ## `createStore`
 
-Создает дерево Сигналов в качестве прокси, которое позволяет независимо отслеживать отдельные значения во вложенных структурах данных. Функция `createStore` возвращает прокси-объект исключительно для чтения, а так же функцию сеттер.
+Создает дерево `Сигналов` в качестве прокси, которое позволяет независимо отслеживать отдельные значения во вложенных структурах данных. Функция `createStore` возвращает прокси-объект исключительно для чтения, а так же функцию-сеттер.
 
 ```js
-const [state, setState] = createStore(initialValue);
+const [state, setState] = createStore(initialValue)
 
 // Получить значение
-state.someValue;
+state.someValue
 
 // Установить значение
-setState({ merge: "thisValue" });
+setState({ merge: 'thisValue' })
 
-setState("path", "to", "value", newValue);
+setState('path', 'to', 'value', newValue)
 ```
 
-Объекты Store, являющиеся прокси, отслеживаются только при доступе к свойству. При доступе к какому-либо значению, Store рекурсивно создает вложенные объекты Store для вложенных данных. Однако он оборачивает только массивы и простые объекты. Классы не заворачиваются.
-
-Таким образом, такие вещи, как `Date`, `HTMLElement`, `RegExp`, `Map`, `Set`, не являются детально реактивными. Кроме того, объект состояния верхнего уровня не может быть отслежен без доступа к его свойству. Он не подходит для вещей где вы итерируете, поскольку добавление новых ключей или индексов не может запускать обновления.
-
-Поэтому помещайте любые списки на ключ состояния, не пытайтесь использовать сам объект состояния.
+`Сторы`, отслеживаются только при доступе к свойству. При доступе к какому-либо значению, Store рекурсивно создает вложенные объекты Store для вложенных данных. Однако он оборачивает только массивы и простые объекты. Классы вроде `Date`, `HTMLElement`, `RegExp`, `Map`, `Set`, не подлежат реактивной обертке. Кроме того, объект состояния верхнего уровня не может быть отслежен без доступа к его свойству. Поэтому верхний объект не подходит для вещей которые вы собираетесь итерировать, поскольку добавление новых ключей или индексов не запустит обновления. По этой причине мы рекомендуем помещать подобные списки в свойства объекта.
 
 ```js
 // Список в качестве ключа на объекте `state`
@@ -452,28 +430,28 @@ const [state, setState] = createStore({ list: [] });
 ```ts
 export function createStore<T extends StoreNode>(
   state: T | Store<T>,
-  options?: { name?: string }
-): [get: Store<T>, set: SetStoreFunction<T>];
+  options?: { name?: string },
+): [get: Store<T>, set: SetStoreFunction<T>]
 ```
 
 ### Геттеры
 
-Объекты Store поддерживают использование геттеров для хранения вычисленных значений.
+`Сторы` поддерживают использование геттеров для хранения вычисленных значений.
 
 Однако это простые геттеры, поэтому вам все равно нужно использовать `createMemo`, если вы хотите кэшировать значение
 
 ```js
-let fullName;
+let fullName
 const [state, setState] = createStore({
   user: {
-    firstName: "John",
-    lastName: "Smith",
+    firstName: 'John',
+    lastName: 'Smith',
     get fullName() {
-      return fullName();
+      return fullName()
     },
   },
-});
-fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
+})
+fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`)
 ```
 
 Структура:
@@ -481,13 +459,13 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 ```js
 const [state, setState] = createStore({
   user: {
-    firstName: "John",
-    lastName: "Smith",
+    firstName: 'John',
+    lastName: 'Smith',
     get fullName() {
-      return `${this.firstName} ${this.lastName}`;
+      return `${this.firstName} ${this.lastName}`
     },
   },
-});
+})
 ```
 
 ### Обновление сторов
@@ -496,18 +474,18 @@ const [state, setState] = createStore({
 
 ```js
 const [state, setState] = createStore({
-  firstName: "John",
-  lastName: "Miller",
-});
+  firstName: 'John',
+  lastName: 'Miller',
+})
 
-setState({ firstName: "Johnny", middleName: "Lee" });
+setState({ firstName: 'Johnny', middleName: 'Lee' })
 // ({ firstName: 'Johnny', middleName: 'Lee', lastName: 'Miller' })
 
-setState((state) => ({ preferredName: state.firstName, lastName: "Milner" }));
+setState(state => ({ preferredName: state.firstName, lastName: 'Milner' }))
 // ({ firstName: 'Johnny', preferredName: 'Johnny', middleName: 'Lee', lastName: 'Milner' })
 ```
 
-Так же имеется поддержка `путей`, включая массивы ключей, диапазоны объектов и функции фильтрации.
+Так же имеется поддержка `путей` (`paths`), включая массивы ключей, диапазоны объектов и функции фильтрации.
 
 `setState` также поддерживает вложенные настройки, в которых вы можете указать путь к изменению. При вложенном состоянии, которое вы обновляете, могут быть другие значения, не являющиеся объектами. Объекты по-прежнему объединяются, но другие значения (включая массивы) заменяются.
 
@@ -533,7 +511,7 @@ setState('list', 2, 'read', true);
 // }
 ```
 
-`Путь` может быть строковыми ключами, массивом ключей, повторяющимися объектами ({от, до, по}) или функциями фильтрации. Это дает невероятную выразительную силу для описания изменений состояния.
+`Путь` может быть строкой, массивом ключей, повторяющимися объектами ({от, до, по}) или функциями фильтрации. Это дает невероятную выразительную силу для описания изменений состояния.
 
 ```js
 const [state, setState] = createStore({
@@ -583,32 +561,30 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 
 ## `produce`
 
-Вдохновленный Immer API для объектов хранилища Solid, который допускает локализованную мутацию.
+Вдохновленный `Immer` API для объектов `Сторов` Solid, который допускает мутабельную запись изменений.
 
 ```js
 setState(
-  produce((s) => {
-    s.user.name = "Frank";
-    s.list.push("Pencil Crayon");
-  })
-);
+  produce(s => {
+    s.user.name = 'Frank'
+    s.list.push('Pencil Crayon')
+  }),
+)
 ```
 
 Структура:
 
 ```ts
 export function produce<T>(
-  fn: (state: T) => void
-): (
-  state: T extends NotWrappable ? T : Store<T>
-) => T extends NotWrappable ? T : Store<T>;
+  fn: (state: T) => void,
+): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>
 ```
 
 ## `reconcile`
 
-Ищет различия в изменении данных, когда мы не можем применить **мелкозернистые** обновления. Полезно при работе с неизменяемыми из Store или большими из API данными.
+Ищет различия в изменении данных, когда мы не можем применить точные обновления. Полезно при работе с иммутабельными контейнерами (вроде `Redux`) или большими из API данными.
 
-Ключ используется, когда он доступен для сопоставления элементов. По умолчанию `merge: false` выполняет ссылочные проверки, где это возможно, для определения равенства и заменяет, где элементы не являются ссылочно равными. `merge: true` переносит все различия на листья и эффективно преобразовывает предыдущие данные в новое значение.
+Ключ используется, когда он доступен для сопоставления элементов. По умолчанию `merge: false` выполняет ссылочные проверки, где это возможно, для определения равенства и заменяет, где элементы не являются ссылочно равными. `merge: true` переносит все различия и эффективно преобразовывает предыдущие данные в новое значение.
 
 ```js
 // Подписка на объект наблюдения
@@ -624,47 +600,45 @@ onCleanup(() => unsubscribe());
 export function reconcile<T>(
   value: T | Store<T>,
   options?: {
-    key?: string | null;
-    merge?: boolean;
-  } = { key: "id" }
-): (
-  state: T extends NotWrappable ? T : Store<T>
-) => T extends NotWrappable ? T : Store<T>;
+    key?: string | null
+    merge?: boolean
+  } = { key: 'id' },
+): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>
 ```
 
 ## `createMutable`
 
-Создает новый изменяемый прокси-объект Store. Стор запускает обновления только при изменении значений. Отслеживание осуществляется путем перехвата доступа к свойствам и автоматическим отслеживаем глубокой вложенности с помощью прокси.
+Создает новый изменяемый прокси `Стор`. `Стор` запускает обновления только при изменении значений. Отслеживание осуществляется путем перехвата доступа к свойствам и автоматическим отслеживаем глубокой вложенности с помощью прокси.
 
 Полезно для интеграции внешних систем или в качестве слоя для совместимости с `MobX` или `Vue`.
 
 > **Замечание:** Изменяемое состояние может передаваться и видоизменяться где угодно, что может усложнить отслеживание и облегчить нарушение однонаправленного потока. Обычно вместо этого рекомендуется использовать `createStore`. Модификатор `produce` может дать многие из тех же преимуществ без каких-либо недостатков.
 
 ```js
-const state = createMutable(initialValue);
+const state = createMutable(initialValue)
 
 // Получить значение
-state.someValue;
+state.someValue
 
 // Установить значение
-state.someValue = 5;
+state.someValue = 5
 
-state.list.push(anotherValue);
+state.list.push(anotherValue)
 ```
 
 Изменяемые объекты поддерживают сеттеры вместе с геттерами.
 
 ```js
 const user = createMutable({
-  firstName: "John",
-  lastName: "Smith",
+  firstName: 'John',
+  lastName: 'Smith',
   get fullName() {
-    return `${this.firstName} ${this.lastName}`;
+    return `${this.firstName} ${this.lastName}`
   },
   set fullName(value) {
-    [this.firstName, this.lastName] = value.split(" ");
+    ;[this.firstName, this.lastName] = value.split(' ')
   },
-});
+})
 ```
 
 Структура:
@@ -685,27 +659,23 @@ export function createMutable<T extends StoreNode>(
 `createContext` создает новый объект контекста, который можно использовать с `useContext`, и обеспечивает поток управления `Provider`. Контекст установленный по умолчанию будет использован, если Provider не будет найден выше в иерархии.
 
 ```js
-export const CounterContext = createContext([{ count: 0 }, {}]);
+export const CounterContext = createContext([{ count: 0 }, {}])
 
 export function CounterProvider(props) {
-  const [state, setState] = createStore({ count: props.count || 0 });
+  const [state, setState] = createStore({ count: props.count || 0 })
   const store = [
     state,
     {
       increment() {
-        setState("count", (c) => c + 1);
+        setState('count', c => c + 1)
       },
       decrement() {
-        setState("count", (c) => c - 1);
+        setState('count', c => c - 1)
       },
     },
-  ];
+  ]
 
-  return (
-    <CounterContext.Provider value={store}>
-      {props.children}
-    </CounterContext.Provider>
-  );
+  return <CounterContext.Provider value={store}>{props.children}</CounterContext.Provider>
 }
 ```
 
@@ -715,11 +685,11 @@ export function CounterProvider(props) {
 
 ```ts
 interface Context<T> {
-  id: symbol;
-  Provider: (props: { value: T; children: any }) => any;
-  defaultValue: T;
+  id: symbol
+  Provider: (props: { value: T; children: any }) => any
+  defaultValue: T
 }
-export function createContext<T>(defaultValue?: T): Context<T | undefined>;
+export function createContext<T>(defaultValue?: T): Context<T | undefined>
 ```
 
 ## `useContext`
@@ -727,13 +697,13 @@ export function createContext<T>(defaultValue?: T): Context<T | undefined>;
 Используется для получения контекста. Подробнее выше в разделе `createContext`.
 
 ```js
-const [state, { increment, decrement }] = useContext(CounterContext);
+const [state, { increment, decrement }] = useContext(CounterContext)
 ```
 
 Структура:
 
 ```ts
-export function useContext<T>(context: Context<T>): T;
+export function useContext<T>(context: Context<T>): T
 ```
 
 ## `children`
@@ -741,15 +711,15 @@ export function useContext<T>(context: Context<T>): T;
 Используется для упрощения взаимодействия с `props.children`. Этот помощник разрешает любую вложенную реактивность и возвращает Мемо. Рекомендуемый подход к использованию `props.children` где угодно, кроме прямого перехода к `JSX`.
 
 ```js
-const list = children(() => props.children);
+const list = children(() => props.children)
 
-createEffect(() => list());
+createEffect(() => list())
 ```
 
 Структура:
 
 ```ts
-export function children(fn: () => any): () => any;
+export function children(fn: () => any): () => any
 ```
 
 ## `lazy`
@@ -758,18 +728,16 @@ export function children(fn: () => any): () => any;
 
 ```js
 // Обвернуть импорт (ленивый импорт)
-const ComponentA = lazy(() => import("./ComponentA"));
+const ComponentA = lazy(() => import('./ComponentA'))
 
 // Использование в JSX
-<ComponentA title={props.title} />;
+;<ComponentA title={props.title} />
 ```
 
 Структура:
 
 ```ts
-export function lazy<T extends Component<any>>(
-  fn: () => Promise<{ default: T }>
-): T & { preload: () => Promise<T> };
+export function lazy<T extends Component<any>>(fn: () => Promise<{ default: T }>): T & { preload: () => Promise<T> }
 ```
 
 # Вторичные примитивы
@@ -788,11 +756,11 @@ export function lazy<T extends Component<any>>(
 export function createDeferred<T>(
   source: () => T,
   options?: {
-    timeoutMs?: number;
-    name?: string;
-    equals?: false | ((prev: T, next: T) => boolean);
-  }
-): () => T;
+    timeoutMs?: number
+    name?: string
+    equals?: false | ((prev: T, next: T) => boolean)
+  },
+): () => T
 ```
 
 ## `createComputed`
@@ -802,11 +770,7 @@ export function createDeferred<T>(
 Структура:
 
 ```ts
-export function createComputed<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
+export function createComputed<T>(fn: (v: T) => T, value?: T, options?: { name?: string }): void
 ```
 
 ## `createRenderEffect`
@@ -816,11 +780,7 @@ export function createComputed<T>(
 Структура:
 
 ```ts
-export function createRenderEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
+export function createRenderEffect<T>(fn: (v: T) => T, value?: T, options?: { name?: string }): void
 ```
 
 ## `createSelector`
@@ -828,11 +788,9 @@ export function createRenderEffect<T>(
 Создает условный Сигнал, который уведомляет подписчиков только при вводе или выходе их ключа, соответствующего значению. Полезно для делегированного состояния выбора, поскольку он выполняет операцию O(2) вместо O(n).
 
 ```js
-const isSelected = createSelector(selectedId);
+const isSelected = createSelector(selectedId)
 
-<For each={list()}>
-  {(item) => <li classList={{ active: isSelected(item.id) }}>{item.name}</li>}
-</For>;
+;<For each={list()}>{item => <li classList={{ active: isSelected(item.id) }}>{item.name}</li>}</For>
 ```
 
 Структура:
@@ -841,8 +799,8 @@ const isSelected = createSelector(selectedId);
 export function createSelector<T, U>(
   source: () => T,
   fn?: (a: U, b: T) => boolean,
-  options?: { name?: string }
-): (k: U) => boolean;
+  options?: { name?: string },
+): (k: U) => boolean
 ```
 
 # Рендеринг
@@ -854,16 +812,13 @@ export function createSelector<T, U>(
 Это точка входа в приложение для браузера. Принимает в качестве аргументов определение компонента или функцию верхнего уровня и элемент для подключения. Рекомендуется, чтобы этот элемент был пустым, так как возвращенная функция удаления стирает все дочерние элементы.
 
 ```js
-const dispose = render(App, document.getElementById("app"));
+const dispose = render(App, document.getElementById('app'))
 ```
 
 Структура:
 
 ```ts
-export function render(
-  code: () => JSX.Element,
-  element: MountableElement
-): () => void;
+export function render(code: () => JSX.Element, element: MountableElement): () => void
 ```
 
 ## `hydrate`
@@ -871,16 +826,13 @@ export function render(
 Этот метод похож на `render`, за исключением того, что он пытается повторно гидрировать то, что уже визуализировано в DOM.
 
 ```js
-const dispose = hydrate(App, document.getElementById("app"));
+const dispose = hydrate(App, document.getElementById('app'))
 ```
 
 Структура:
 
 ```ts
-export function hydrate(
-  fn: () => JSX.Element,
-  node: MountableElement
-): () => void;
+export function hydrate(fn: () => JSX.Element, node: MountableElement): () => void
 ```
 
 ## `renderToString`
@@ -888,7 +840,7 @@ export function hydrate(
 Выполняет синхронный рендеринг в строку. А также генерирует тег скрипта для прогрессивной гидрации. Параметры включают в себя `eventNames` для прослушивания перед загрузкой страницы и воспроизведением при гидрации, а так же `nonce` для добавления тега скрипта.
 
 ```js
-const html = renderToString(App);
+const html = renderToString(App)
 ```
 
 Структура:
@@ -897,10 +849,10 @@ const html = renderToString(App);
 export function renderToString<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
-    nonce?: string;
-  }
-): string;
+    eventNames?: string[]
+    nonce?: string
+  },
+): string
 ```
 
 ## `renderToStringAsync`
@@ -908,7 +860,7 @@ export function renderToString<T>(
 То же, что и `renderToString`, за исключением того, что данный метод будет ждать успешного выполнения `<Suspense>` перед возвратом результатов. Данные ресурса автоматически стерилизуются в тег скрипта и будут гидрироваться при загрузке клиента.
 
 ```js
-const html = await renderToStringAsync(App);
+const html = await renderToStringAsync(App)
 ```
 
 Структура:
@@ -917,11 +869,11 @@ const html = await renderToStringAsync(App);
 export function renderToStringAsync<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
-    timeoutMs?: number;
-    nonce?: string;
-  }
-): Promise<string>;
+    eventNames?: string[]
+    timeoutMs?: number
+    nonce?: string
+  },
+): Promise<string>
 ```
 
 ## `pipeToNodeWritable`
@@ -929,7 +881,7 @@ export function renderToStringAsync<T>(
 Этот метод выполняет рендеринг в `Node stream`. Он отображает контент синхронно, включая любые заполнители `Suspense`, а затем продолжает потоковую передачу данных из любого асинхронного ресурса по завершении.
 
 ```js
-pipeToNodeWritable(App, res);
+pipeToNodeWritable(App, res)
 ```
 
 Параметр `onReady` полезен для записи в поток вокруг рендеринга основного приложения. Не забудьте вручную вызвать `startWriting`, если вы используете `onReady`.
@@ -938,21 +890,21 @@ pipeToNodeWritable(App, res);
 
 ```ts
 export type PipeToWritableResults = {
-  startWriting: () => void;
-  write: (v: string) => void;
-  abort: () => void;
-};
+  startWriting: () => void
+  write: (v: string) => void
+  abort: () => void
+}
 export function pipeToNodeWritable<T>(
   fn: () => T,
   writable: { write: (v: string) => void },
   options?: {
-    eventNames?: string[];
-    nonce?: string;
-    noScript?: boolean;
-    onReady?: (r: PipeToWritableResults) => void;
-    onComplete?: (r: PipeToWritableResults) => void | Promise<void>;
-  }
-): void;
+    eventNames?: string[]
+    nonce?: string
+    noScript?: boolean
+    onReady?: (r: PipeToWritableResults) => void
+    onComplete?: (r: PipeToWritableResults) => void | Promise<void>
+  },
+): void
 ```
 
 ## `pipeToWritable`
@@ -960,8 +912,8 @@ export function pipeToNodeWritable<T>(
 Этот метод выполняет рендеринг в веб-поток. Он отображает контент синхронно, включая `fallback` в `Suspense`, а затем продолжает потоковую передачу данных из любого асинхронного ресурса по завершении.
 
 ```js
-const { readable, writable } = new TransformStream();
-pipeToWritable(App, writable);
+const { readable, writable } = new TransformStream()
+pipeToWritable(App, writable)
 ```
 
 Параметр `onReady` полезен для записи в поток вокруг рендеринга основного приложения. Не забудьте вручную вызвать `startWriting`, если вы используете `onReady`.
@@ -970,27 +922,21 @@ pipeToWritable(App, writable);
 
 ```ts
 export type PipeToWritableResults = {
-  write: (v: string) => void;
-  abort: () => void;
-  script: string;
-};
+  write: (v: string) => void
+  abort: () => void
+  script: string
+}
 export function pipeToWritable<T>(
   fn: () => T,
   writable: WritableStream,
   options?: {
-    eventNames?: string[];
-    nonce?: string;
-    noScript?: boolean;
-    onReady?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-    onComplete?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-  }
-): void;
+    eventNames?: string[]
+    nonce?: string
+    noScript?: boolean
+    onReady?: (writable: { write: (v: string) => void }, r: PipeToWritableResults) => void
+    onComplete?: (writable: { write: (v: string) => void }, r: PipeToWritableResults) => void
+  },
+): void
 ```
 
 ## `isServer`
@@ -1008,7 +954,7 @@ if (isServer) {
 Структура:
 
 ```ts
-export const isServer: boolean;
+export const isServer: boolean
 ```
 
 # Поток управления
@@ -1027,7 +973,7 @@ Solid использует компоненты для управления по
 
 ```jsx
 <For each={state.list} fallback={<div>Загрузка...</div>}>
-  {(item) => <div>{item}</div>}
+  {item => <div>{item}</div>}
 </For>
 ```
 
@@ -1047,10 +993,10 @@ Solid использует компоненты для управления по
 
 ```ts
 export function For<T, U extends JSX.Element>(props: {
-  each: readonly T[];
-  fallback?: JSX.Element;
-  children: (item: T, index: () => number) => U;
-}): () => U[];
+  each: readonly T[]
+  fallback?: JSX.Element
+  children: (item: T, index: () => number) => U
+}): () => U[]
 ```
 
 ## `<Show>`
@@ -1067,7 +1013,7 @@ export function For<T, U extends JSX.Element>(props: {
 
 ```jsx
 <Show when={state.user} fallback={<div>Загрузка...</div>}>
-  {(user) => <div>{user.firstName}</div>}
+  {user => <div>{user.firstName}</div>}
 </Show>
 ```
 
@@ -1075,10 +1021,10 @@ export function For<T, U extends JSX.Element>(props: {
 
 ```ts
 function Show<T>(props: {
-  when: T | undefined | null | false;
-  fallback?: JSX.Element;
-  children: JSX.Element | ((item: T) => JSX.Element);
-}): () => JSX.Element;
+  when: T | undefined | null | false
+  fallback?: JSX.Element
+  children: JSX.Element | ((item: T) => JSX.Element)
+}): () => JSX.Element
 ```
 
 ## `<Switch>`/`<Match>`
@@ -1087,10 +1033,10 @@ function Show<T>(props: {
 
 ```jsx
 <Switch fallback={<div>Страница не найдена</div>}>
-  <Match when={state.route === "home"}>
+  <Match when={state.route === 'home'}>
     <Home />
   </Match>
-  <Match when={state.route === "settings"}>
+  <Match when={state.route === 'settings'}>
     <Settings />
   </Match>
 </Switch>
@@ -1101,16 +1047,13 @@ function Show<T>(props: {
 Структура:
 
 ```ts
-export function Switch(props: {
-  fallback?: JSX.Element;
-  children: JSX.Element;
-}): () => JSX.Element;
+export function Switch(props: { fallback?: JSX.Element; children: JSX.Element }): () => JSX.Element
 
 type MatchProps<T> = {
-  when: T | undefined | null | false;
-  children: JSX.Element | ((item: T) => JSX.Element);
-};
-export function Match<T>(props: MatchProps<T>);
+  when: T | undefined | null | false
+  children: JSX.Element | ((item: T) => JSX.Element)
+}
+export function Match<T>(props: MatchProps<T>)
 ```
 
 ## `<Index>`
@@ -1121,7 +1064,7 @@ export function Match<T>(props: MatchProps<T>);
 
 ```jsx
 <Index each={state.list} fallback={<div>Загрузка...</div>}>
-  {(item) => <div>{item()}</div>}
+  {item => <div>{item()}</div>}
 </Index>
 ```
 
@@ -1141,10 +1084,10 @@ export function Match<T>(props: MatchProps<T>);
 
 ```ts
 export function Index<T, U extends JSX.Element>(props: {
-  each: readonly T[];
-  fallback?: JSX.Element;
-  children: (item: () => T, index: number) => U;
-}): () => U[];
+  each: readonly T[]
+  fallback?: JSX.Element
+  children: (item: () => T, index: number) => U
+}): () => U[]
 ```
 
 ## `<ErrorBoundary>`
@@ -1160,9 +1103,7 @@ export function Index<T, U extends JSX.Element>(props: {
 Также поддерживает форму обратного вызова, которая передает ошибку, и функцию сброса.
 
 ```jsx
-<ErrorBoundary
-  fallback={(err, reset) => <div onClick={reset}>Error: {err.toString()}</div>}
->
+<ErrorBoundary fallback={(err, reset) => <div onClick={reset}>Error: {err.toString()}</div>}>
   <MyComp />
 </ErrorBoundary>
 ```
@@ -1171,9 +1112,9 @@ export function Index<T, U extends JSX.Element>(props: {
 
 ```ts
 function ErrorBoundary(props: {
-  fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element);
-  children: JSX.Element;
-}): () => JSX.Element;
+  fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element)
+  children: JSX.Element
+}): () => JSX.Element
 ```
 
 ## `<Suspense>`
@@ -1191,10 +1132,7 @@ function ErrorBoundary(props: {
 Структура:
 
 ```ts
-export function Suspense(props: {
-  fallback?: JSX.Element;
-  children: JSX.Element;
-}): JSX.Element;
+export function Suspense(props: { fallback?: JSX.Element; children: JSX.Element }): JSX.Element
 ```
 
 ## `<SuspenseList>` (Экспериментальный)
@@ -1202,7 +1140,7 @@ export function Suspense(props: {
 Позволяет координировать несколько параллельных компонентов `Suspense` и вложенных `SuspenseList`. Управляет порядком отображения контента, чтобы уменьшить разбиение лэйаута. Имеет возможность свернуть или скрыть `fallback`.
 
 ```jsx
-<SuspenseList revealOrder="forwards" tail="collapsed">
+<SuspenseList revealOrder='forwards' tail='collapsed'>
   <ProfileDetails user={resource.user} />
   <Suspense fallback={<h2>Загрузка постов...</h2>}>
     <ProfileTimeline posts={resource.posts} />
@@ -1219,10 +1157,10 @@ export function Suspense(props: {
 
 ```ts
 function SuspenseList(props: {
-  children: JSX.Element;
-  revealOrder: "forwards" | "backwards" | "together";
-  tail?: "collapsed" | "hidden";
-}): JSX.Element;
+  children: JSX.Element
+  revealOrder: 'forwards' | 'backwards' | 'together'
+  tail?: 'collapsed' | 'hidden'
+}): JSX.Element
 ```
 
 ## `<Dynamic>`
@@ -1238,10 +1176,10 @@ function SuspenseList(props: {
 ```ts
 function Dynamic<T>(
   props: T & {
-    children?: any;
-    component?: Component<T> | string | keyof JSX.IntrinsicElements;
-  }
-): () => JSX.Element;
+    children?: any
+    component?: Component<T> | string | keyof JSX.IntrinsicElements
+  },
+): () => JSX.Element
 ```
 
 ## `<Portal>`
@@ -1251,7 +1189,7 @@ function Dynamic<T>(
 Портал монтируется в `<div>`, если целью не является заголовок документа. `useShadow` помещает элемент в теневой корень для изоляции стиля, а `isSVG` требуется при вставке в элемент `SVG`.
 
 ```jsx
-<Portal mount={document.getElementById("modal")}>
+<Portal mount={document.getElementById('modal')}>
   <div>Мой контент</div>
 </Portal>
 ```
@@ -1259,12 +1197,7 @@ function Dynamic<T>(
 Структура:
 
 ```ts
-export function Portal(props: {
-  mount?: Node;
-  useShadow?: boolean;
-  isSVG?: boolean;
-  children: JSX.Element;
-}): Text;
+export function Portal(props: { mount?: Node; useShadow?: boolean; isSVG?: boolean; children: JSX.Element }): Text
 ```
 
 # Специальные атрибуты JSX
@@ -1274,7 +1207,7 @@ export function Portal(props: {
 Для настраиваемых атрибутов с помощью `TypeScript` вам необходимо расширить пространство имен `Solid JSX`:
 
 ```ts
-declare module "solid-js" {
+declare module 'solid-js' {
   namespace JSX {
     interface Directives {
       // use:____
@@ -1315,13 +1248,13 @@ onMount(() => console.log(myDiv));
 
 ```jsx
 function MyComp(props) {
-  return <div ref={props.ref} />;
+  return <div ref={props.ref} />
 }
 
 function App() {
-  let myDiv;
-  onMount(() => console.log(myDiv.clientWidth));
-  return <MyComp ref={myDiv} />;
+  let myDiv
+  onMount(() => console.log(myDiv.clientWidth))
+  return <MyComp ref={myDiv} />
 }
 ```
 
@@ -1330,9 +1263,7 @@ function App() {
 Помощник, который использует `element.classList.toggle`. Он принимает объект, ключи которого являются именами классов, и назначает их, когда значение ключа истинно.
 
 ```jsx
-<div
-  classList={{ active: state.active, editing: state.currentId === row.id }}
-/>
+<div classList={{ active: state.active, editing: state.currentId === row.id }} />
 ```
 
 ## `style`
@@ -1375,7 +1306,7 @@ function App() {
 Solid использует полусинтетическое делегирование событий для общих событий пользовательского интерфейса, которые состоят из пузырьков. Это улучшает производительность.
 
 ```jsx
-<div onClick={(e) => console.log(e.currentTarget)} />
+<div onClick={e => console.log(e.currentTarget)} />
 ```
 
 Solid также поддерживает передачу массива обработчику событий для привязки значения к первому аргументу обработчика событий. При этом не используется `bind` или создается дополнительное смыкание, поэтому делегирование событий сильно оптимизировано.
@@ -1385,9 +1316,9 @@ function handler(itemId, e) {
   /*...*/
 }
 
-<ul>
-  <For each={state.list}>{(item) => <li onClick={[handler, item.id]} />}</For>
-</ul>;
+;<ul>
+  <For each={state.list}>{item => <li onClick={[handler, item.id]} />}</For>
+</ul>
 ```
 
 События не могут быть повторно связаны, и привязки не являются реактивными. Причина в том, что подключение/отключение слушателей обычно обходится дороже. Поскольку события вызываются естественным образом, нет необходимости в реактивности, просто сокращайте свой обработчик, если хотите.
@@ -1402,7 +1333,7 @@ function handler(itemId, e) {
 Для любых других событий, возможно, с необычными именами или тех, которые вы не хотите делегировать, для этого есть события пространства имен `on`. Данный атрибут просто добавит слушатель к нужному событию.
 
 ```jsx
-<div on:Weird-Event={(e) => alert(e.detail)} />
+<div on:Weird-Event={e => alert(e.detail)} />
 ```
 
 ## `use:___`
@@ -1410,30 +1341,30 @@ function handler(itemId, e) {
 Это настраиваемые директивы. В некотором смысле это просто синтаксический сахар. По сравнению с `ref`, но он позволяет нам легко прикреплять несколько директив к одному элементу. Директива - это просто функция со следующей структурой:
 
 ```ts
-function directive(element: Element, accessor: () => any): void;
+function directive(element: Element, accessor: () => any): void
 ```
 
 Директивные функции вызываются во время рендеринга, перед добавлением в DOM. Вы можете делать в них все, что захотите, включая создание Сигналов, эффектов, чистку регистров и т. Д.
 
 ```js
-const [name, setName] = createSignal("");
+const [name, setName] = createSignal('')
 
 function model(el, value) {
-  const [field, setField] = value();
-  createRenderEffect(() => (el.value = field()));
-  el.addEventListener("input", (e) => setField(e.target.value));
+  const [field, setField] = value()
+  createRenderEffect(() => (el.value = field()))
+  el.addEventListener('input', e => setField(e.target.value))
 }
 
-<input type="text" use:model={[name, setName]} />;
+;<input type='text' use:model={[name, setName]} />
 ```
 
 Чтобы зарегистрировать в TypeScript, расширьте пространство имен JSX.
 
 ```ts
-declare module "solid-js" {
+declare module 'solid-js' {
   namespace JSX {
     interface Directives {
-      model: [() => any, (v: any) => any];
+      model: [() => any, (v: any) => any]
     }
   }
 }
@@ -1444,7 +1375,7 @@ declare module "solid-js" {
 Воспринимает проп как свойство, а не как атрибут.
 
 ```jsx
-<div prop:scrollTop={props.scrollPos + "px"} />
+<div prop:scrollTop={props.scrollPos + 'px'} />
 ```
 
 ## `attr:___`
