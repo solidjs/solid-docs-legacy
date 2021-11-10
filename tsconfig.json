@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "ESNext",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "moduleResolution": "node",
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "newLine": "lf",
+    "sourceMap": true,
+    "jsxImportSource": "solid-js",
+    "skipLibCheck": true,
+    "strict": true,
+    "lib": ["ESNext", "DOM"],
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules/"]
+}
