@@ -1,7 +1,7 @@
 ---
 title: FAQ
 description: Häufig gestellte Fragen aus der Gemeinschaft.
-sort: 2
+sort: 5
 ---
 
 # FAQ
