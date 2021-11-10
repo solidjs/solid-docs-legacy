@@ -376,18 +376,18 @@ const mapped = indexArray(source, (model) => {
 
 # Stores
 
-These APIs are available at `solid-js/store`.
+These APIs are available at `solid-js/store`. They allow the creation of stores: [proxy objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) that allow a tree of signals to be independently tracked and modified.
 
-## `createStore`
+## Using Stores
 
+### `createStore`
 ```ts
 export function createStore<T extends StoreNode>(
   state: T | Store<T>,
-  options?: { name?: string }
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
-This creates a tree of Signals as proxy that allows individual values in nested data structures to be independently tracked. The create function returns a readonly proxy object, and a setter function.
+The create function takes an initial state, wraps it in a store, and returns a readonly proxy object and a setter function.
 
 ```js
 const [state, setState] = createStore(initialValue);
@@ -401,8 +401,11 @@ setState({ merge: "thisValue" });
 setState("path", "to", "value", newValue);
 ```
 
-Store objects being proxies only track on property access. And on access Stores recursively produces nested Store objects on nested data. However it only wraps arrays and plain objects. Classes are not wrapped. So things like `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` are not granularly reactive. Additionally, the top level state object cannot be tracked without accessing a property on it. So it is not suitable to use for things you iterate over as adding new keys or indexes cannot trigger updates. So put any lists on a key of state rather than trying to use the state object itself.
+As proxies, store objects only track when a property is accessed. 
 
+When nested objects are accessed, stores will produce nested store objects, and this applies all the way down the tree. However, this only applies to arrays and plain objects. Classes are not wrapped, so objects like `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` won't be granularly reactive as properties on a store. 
+
+The top level state object cannot be tracked, so put any lists on a key of state rather than using the state object itself.
 ```js
 // put the list as a key on the state object
 const [state, setState] = createStore({ list: [] });
@@ -427,7 +430,7 @@ const [state, setState] = createStore({
 });
 ```
 
-These are simple getters, so you still need to use a Memo if you want to cache a value;
+These are simple getters, so you still need to use a memo if you want to cache a value:
 
 ```js
 let fullName;
@@ -534,7 +537,8 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 // }
 ```
 
-## `produce`
+## Store Utilities
+### `produce`
 
 ```ts
 export function produce<T>(
@@ -555,7 +559,7 @@ setState(
 );
 ```
 
-## `reconcile`
+### `reconcile`
 
 ```ts
 export function reconcile<T>(
@@ -581,7 +585,7 @@ const unsubscribe = store.subscribe(({ todos }) => (
 onCleanup(() => unsubscribe());
 ```
 
-## `createMutable`
+### `createMutable`
 
 ```ts
 export function createMutable<T extends StoreNode>(
