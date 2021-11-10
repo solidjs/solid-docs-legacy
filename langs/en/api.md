@@ -718,7 +718,7 @@ const ComponentA = lazy(() => import("./ComponentA"));
 
 # Secondary Primitives
 
-You probably won't need them for your first app, but these useful tools to have.
+You probably won't need them for your first app, but these are useful tools to have.
 
 ## `createDeferred`
 
