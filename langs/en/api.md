@@ -1270,7 +1270,7 @@ Event handlers in Solid typically take the form of `onclick` or `onClick` depend
 <div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
-Solid also supports passing an array to the event handler to bind a value to the first argument of the event handler. This doesn't use `bind` or create an additional closure, so it is highly optimized way delegating events.
+Solid also supports passing an array to the event handler to bind a value to the first argument of the event handler. This doesn't use `bind` or create an additional closure, so it is a highly optimized way of delegating events.
 
 ```jsx
 function handler(itemId, e) {
