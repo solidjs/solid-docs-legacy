@@ -1282,7 +1282,8 @@ function handler(itemId, e) {
 </ul>;
 ```
 
-Events cannot be rebound and the bindings are not reactive. The reason is that it is generally more expensive to attach/detach listeners. Since events naturally are called there is no need for reactivity simply shortcut your handler if desired.
+Events are never rebound and the bindings are not reactive, as it is expensive to attach and detach listeners. 
+Since event handlers are called like any other function each time an event fires, there is no need for reactivity; simply shortcut your handler if desired.
 
 ```jsx
 // if defined call it, otherwised don't.
