@@ -1,6 +1,6 @@
 {
   "name": "@solid.js/docs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "files": [
     "dist"
   ],
@@ -8,6 +8,7 @@
   "repository": "git@github.com:solidjs/solid-docs.git",
   "author": "Solid Team",
   "license": "MIT",
+  "types": "dist/src/index.d.ts",
   "devDependencies": {
     "@rollup/plugin-dynamic-import-vars": "^1.4.1",
     "@rollup/plugin-json": "^4.1.0",
