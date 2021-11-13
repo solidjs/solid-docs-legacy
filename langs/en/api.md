@@ -1264,13 +1264,15 @@ These work the same as their property equivalent. Set a string and they will be 
 
 ## `on___`
 
-Event handlers in Solid typically take the form of `onclick` or `onClick` depending on style. The event name is always lowercased. Solid uses semi-synthetic event delegation for common UI events that are composed and bubble. This improves performance for these common events.
+Event handlers in Solid typically take the form of `onclick` or `onClick` depending on style. 
+
+Solid uses semi-synthetic event delegation for common UI events that are composed and bubble. This improves performance for these common events.
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
-Solid also supports passing an array to the event handler to bind a value to the first argument of the event handler. This doesn't use `bind` or create an additional closure, so it is highly optimized way delegating events.
+Solid also supports passing an array to the event handler to bind a value to the first argument of the event handler. This doesn't use `bind` or create an additional closure, so it is a highly optimized way of delegating events.
 
 ```jsx
 function handler(itemId, e) {
@@ -1282,13 +1284,15 @@ function handler(itemId, e) {
 </ul>;
 ```
 
-Events cannot be rebound and the bindings are not reactive. The reason is that it is generally more expensive to attach/detach listeners. Since events naturally are called there is no need for reactivity simply shortcut your handler if desired.
+Events are never rebound and the bindings are not reactive, as it is expensive to attach and detach listeners. 
+Since event handlers are called like any other function each time an event fires, there is no need for reactivity; simply shortcut your handler if desired.
 
 ```jsx
 // if defined call it, otherwised don't.
 <div onClick={() => props.handleClick?.()} />
 ```
 
+Note that `onChange` and `onInput` work according to their native behavior. `onInput` will fire immediately after the value has changed; for `<input>` fields, `onChange` will only fire after the field loses focus.
 ## `on:___`/`oncapture:___`
 
 For any other events, perhaps ones with unusual names, or ones you wish not to be delegated there are the `on` namespace events. This simply adds an event listener verbatim.

@@ -16,7 +16,17 @@ However, as much as Solid aligns with React's design philosophy, it works fundam
 
 #### Advice for migrating:
 
-Solid's update model is nothing like React, or even React + MobX. Instead of thinking of function components as the `render` function, think of them as a `constructor`. Watch out for destructuring or early property access losing reactivity. Solid's primitives have no restrictions like the Hook Rules so you are free to nest them as you see fit. You don't need explicit keys on list rows to have "keyed" behavior. Finally, there is no VDOM so imperative VDOM APIs like `React.Children` and `React.cloneElement` make no sense. I encourage finding different ways to solve problems that use these declaratively.
+Solid's update model is nothing like React, or even React + MobX. Instead of thinking of function components as the `render` function, think of them as a `constructor`. 
+
+In Solid, props and stores are [proxy objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) that rely on property access for tracking and reactive updates. Watch out for destructuring or early property access, which can cause these properties to lose reactivity or trigger at the wrong time.
+
+Solid's primitives have no restrictions like the Hook Rules so you are free to nest them as you see fit. 
+
+You don't need explicit keys on list rows to have "keyed" behavior. 
+
+In React, `onChange` fires whenever an input field is modified, but this isn't how `onChange` [works natively](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange). In Solid, use `onInput` to subscribe to each value change.
+
+Finally, there is no VDOM so imperative VDOM APIs like `React.Children` and `React.cloneElement` have no equivalent in Solid. Instead of creating or modifying DOM elements directly, express your intentions declaratively.
 
 ## Vue
 
