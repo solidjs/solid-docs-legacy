@@ -381,6 +381,7 @@ These APIs are available at `solid-js/store`. They allow the creation of stores:
 ## Using Stores
 
 ### `createStore`
+
 ```ts
 export function createStore<T extends StoreNode>(
   state: T | Store<T>,
@@ -390,6 +391,7 @@ export function createStore<T extends StoreNode>(
 The create function takes an initial state, wraps it in a store, and returns a readonly proxy object and a setter function.
 
 ```js
+import { createStore } from "solid-js/store";
 const [state, setState] = createStore(initialValue);
 
 // read value
