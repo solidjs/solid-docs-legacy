@@ -419,6 +419,7 @@ const [state, setState] = createStore({ list: [] });
 Store objects support the use of getters to store calculated values.
 
 ```js
+import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
   user: {
     firstName: "John",
@@ -451,6 +452,7 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store.
 
 ```js
+import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
   firstName: "John",
   lastName: "Miller",
