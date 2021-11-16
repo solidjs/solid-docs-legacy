@@ -11,8 +11,8 @@ sort: 0
 ```ts
 export function createSignal<T>(
   value: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
-): [get: () => T, set: (v: T) => T];
+  options?: { equals?: false | ((prev: T, next: T) => boolean) }
+): [get: () => T, set:(v: T) => T];
 ```
 
 This is the most basic reactive primitive used to track a single value that changes over time. The create function returns a get and set pair of functions to access and update the signal.
@@ -44,7 +44,6 @@ Remember to access signals under a tracking scope if you wish them to react to u
 export function createEffect<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string }
 ): void;
 ```
 
@@ -73,7 +72,7 @@ createEffect((prev) => {
 export function createMemo<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
+  options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): () => T;
 ```
 
@@ -109,13 +108,13 @@ type ResourceReturn<T> = [
 
 export function createResource<T, U = true>(
   fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; name?: string }
+  options?: { initialValue?: T; }
 ): ResourceReturn<T>;
 
 export function createResource<T, U>(
   source: U | false | null | (() => U | false | null),
   fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; name?: string }
+  options?: { initialValue?: T; }
 ): ResourceReturn<T>;
 ```
 
@@ -594,7 +593,6 @@ onCleanup(() => unsubscribe());
 ```ts
 export function createMutable<T extends StoreNode>(
   state: T | Store<T>,
-  options?: { name?: string }
 ): Store<T> {
 ```
 
@@ -731,7 +729,6 @@ export function createDeferred<T>(
   source: () => T,
   options?: {
     timeoutMs?: number;
-    name?: string;
     equals?: false | ((prev: T, next: T) => boolean);
   }
 ): () => T;
@@ -745,7 +742,6 @@ Creates a readonly that only notifies downstream changes when the browser is idl
 export function createComputed<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string }
 ): void;
 ```
 
@@ -757,7 +753,6 @@ Creates a new computation that automatically tracks dependencies and runs immedi
 export function createRenderEffect<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string }
 ): void;
 ```
 
@@ -769,7 +764,6 @@ Creates a new computation that automatically tracks dependencies and runs during
 export function createSelector<T, U>(
   source: () => T,
   fn?: (a: U, b: T) => boolean,
-  options?: { name?: string }
 ): (k: U) => boolean;
 ```
 
