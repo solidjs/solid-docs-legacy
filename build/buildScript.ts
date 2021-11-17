@@ -1,10 +1,12 @@
-const langsDir = resolve(__dirname, "../langs");
 
 import { outputTutorials, outputDocs, writeToPath } from "./buildDocs";
 import { readdir } from "fs/promises";
-import { resolve } from "path";
+import { resolve, join, sep } from "path";
+import  watch from "node-watch";
 
-async function run() {
+const langsDir = resolve(__dirname, "../langs");
+
+async function buildAll() {
   const langs: string[] = await readdir(langsDir);
 
   const tutorialLangs = [];
@@ -22,6 +24,23 @@ async function run() {
   await outputSupported({tutorials: tutorialLangs, docs: docLangs});
 }
 
+async function watchAll() {
+  const langs: string[] = await readdir(langsDir);
+  for (const lang of langs) {
+    const langDir = join(langsDir, lang);
+    watch(langDir, { recursive: true }, async (event, name) => {
+      const relative = name.split(langDir)[1];
+      if (relative.startsWith(sep + "tutorials")) {
+        console.log("Rebuilding tutorials for", lang)
+        await outputTutorials(lang);
+      } else {
+        console.log("Rebuilding docs for", lang)
+        await outputDocs(lang);
+      }
+    });
+  }
+}
+
 async function outputSupported({tutorials, docs}: {tutorials: string[], docs: string[]}) {
   const supported = {
     tutorials,
@@ -31,4 +50,11 @@ async function outputSupported({tutorials, docs}: {tutorials: string[], docs: st
   await writeToPath(outputPath, supported);
 }
 
-run();
+
+if (process.argv[2] === "--watch") {
+  watchAll()
+} else {
+  buildAll();
+}
+
+// run();

@@ -18,6 +18,7 @@
     "jiti": "^1.12.9",
     "markdown-it": "^12.2.0",
     "markdown-it-anchor": "^8.4.1",
+    "npm-run-all": "^4.1.5",
     "rollup": "^2.58.3",
     "rollup-plugin-typescript2": "^0.30.0",
     "shiki": "^0.9.12",
@@ -26,9 +27,13 @@
   },
   "scripts": {
     "build": "jiti build/buildScript.ts && rollup --config",
+    "build:watch": "jiti build/buildScript.ts --watch",
+    "rollup:watch": "rollup --config --watch",
+    "watch": "run-p build:watch rollup:watch",
     "publish": "npm publish --access public"
   },
   "dependencies": {
-    "@types/markdown-it": "^12.2.3"
+    "@types/markdown-it": "^12.2.3",
+    "node-watch": "^0.7.2"
   }
 }
