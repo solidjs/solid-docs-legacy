@@ -2,7 +2,7 @@ You now know how to render lists in Solid with `<For>`, but Solid also provides 
 
 When the array updates, the `<For>` component uses referential equality to compare elements to the last state of the array. But this isn't always desired. 
 
-In JavaScript, primitives (like strings and numbers) are always compared by value. When using `<For>` with primitive values or arrays of arrays, we could cause a lot of unnecessary rendering. If we used `<For>` to map a list of strings to an `<input>` field that could edit it, every change to that value would cause the `<input>` to be recreated. 
+In JavaScript, primitives (like strings and numbers) are always compared by value. When using `<For>` with primitive values or arrays of arrays, we could cause a lot of unnecessary rendering. If we used `<For>` to map a list of strings to `<input>` field that could edit each, every change to that value would cause the `<input>` to be recreated. 
 
 The `<Index>` component is provided for these cases. As a rule of thumb, when working with primitives use `<Index>`. 
 
