@@ -22,36 +22,17 @@ const docPages: DocPageLookup[] = [
   },
 ]
 
+
 const langsDir = resolve(__dirname, "../langs");
 
-async function run() {
-  const langs: string[] = await readdir(langsDir);
-
-  const tutorialLangs = [];
-  const docLangs = langs; //TODO: Don't assume that docs are fully supported for every lang
-
-  for (const lang of langs) {
-    console.log("Processing", lang)
-    if (await outputTutorials(lang)) {
-      tutorialLangs.push(lang);
-    }
-    await outputDocs(lang);
-  }
-
-  //Outputs to ./src, to be directly imported by index.ts
-  await outputSupported({tutorials: tutorialLangs, docs: docLangs});
-}
-
-run();
-
 // Write the file to a specific path
-async function writeToPath(path: string, release: any) {
+export async function writeToPath(path: string, release: any) {
   await writeFile(path, JSON.stringify(release, null, 2), {
     encoding: 'utf-8',
   });
 }
 
-async function outputDocs(lang: string) {
+export async function outputDocs(lang: string) {
   const langPath = join(langsDir, lang);
 
   const outputDir = resolve(__dirname, './out/docs', lang);
@@ -66,7 +47,7 @@ async function outputDocs(lang: string) {
   }
 }
 
-async function outputTutorials(lang: string) {
+export async function outputTutorials(lang: string) {
 
   const tutorialsDir = join(langsDir, lang, "tutorials");
 
@@ -114,14 +95,6 @@ async function outputTutorials(lang: string) {
   return true;
 }
 
-async function outputSupported({tutorials, docs}: {tutorials: string[], docs: string[]}) {
-  const supported = {
-    tutorials,
-    docs
-  }
-  const outputPath = resolve(__dirname, './out', "supported.json");
-  await writeToPath(outputPath, supported);
-}
 
 async function processSections(directoryPath: string): Promise<DocFile> {
   const mdFiles = (await readdir(directoryPath))
