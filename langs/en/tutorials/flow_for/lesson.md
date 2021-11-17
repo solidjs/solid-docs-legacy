@@ -1,4 +1,4 @@
-If you want to iterate over a list, the `<For>` component is the best way for any array of non-primitive values. It is automatically keyed by reference, so as data updates it is optimized to update or move rows rather than recreate them. The callback is non-tracking and passes the item and an index Signal.
+The `<For>` component is the best way to loop over an array of objects. As the array changes, `<For>` updates or moves items in the DOM rather than recreating them. Let's look at an example. 
 
 ```jsx
 <For each={cats()}>{(cat, i) =>
@@ -9,6 +9,12 @@ If you want to iterate over a list, the `<For>` component is the best way for an
   </li>
 }</For>
 ```
-The `index` is a Signal so that it can update independently when the row is moved. The item is not a Signal as changing would mean a new reference and cause a new row to be created. The way to do nested updates is to make nested Signals or use Solid's Store proxy.
 
-You can also use `<For>` to iterate over other iterable objects that are not arrays by using methods like `Object.keys` or simple spreading into an array like `[...iterable]`.
+There is one prop on the `<For>` component: `each`, where you pass the array to loop over.
+
+Then, instead of writing nodes directly between `<For>` and `<For/>`, you a pass a _callback_. This is a function similar to JavaScript's [`map` callback](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map#parameters). For each element in the array, the callback is called with the element as the first argument and the index as the second. (`cat` and `i` in this example.) You can then make use of those in the callback, which should return a node to be rendered.
+
+Note that the index is a _signal_, not a constant number. This is because `<For>` is "keyed by reference": each node that it renders is coupled to an element in the array. In other words, if an element changes placement in the array, rather than being destroyed and recreated, the affected node will move too and its index will change.
+
+
+The `each` prop expects an array, but you can turn other iterable objects into arrays with utilities like [`Array.from`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from), [`Object.keys`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys), or [spread syntax](`https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax`).
