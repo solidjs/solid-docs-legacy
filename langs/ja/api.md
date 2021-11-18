@@ -11,8 +11,8 @@ sort: 0
 ```ts
 export function createSignal<T>(
   value: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
-): [get: () => T, set: (v: T) => T];
+  options?: { equals?: false | ((prev: T, next: T) => boolean) }
+): [get: () => T, set:(v: T) => T];
 ```
 
 これは時間の経過とともに変化する単一の値を追跡するために使用される、最も基本的なリアクティブプリミティブです。create 関数は Signal にアクセスしたり更新するための get と set のペアの関数を返します。
@@ -44,7 +44,6 @@ Signal を更新に反応させたい場合は、追跡スコープの下でア�
 export function createEffect<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string }
 ): void;
 ```
 
@@ -73,7 +72,7 @@ createEffect((prev) => {
 export function createMemo<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
+  options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): () => T;
 ```
 
@@ -109,13 +108,13 @@ type ResourceReturn<T> = [
 
 export function createResource<T, U = true>(
   fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; name?: string }
+  options?: { initialValue?: T; }
 ): ResourceReturn<T>;
 
 export function createResource<T, U>(
   source: U | false | null | (() => U | false | null),
   fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; name?: string }
+  options?: { initialValue?: T; }
 ): ResourceReturn<T>;
 ```
 
@@ -259,7 +258,11 @@ export function splitProps<T>(
 ): [...parts: Partial<T>];
 ```
 
-これは分割代入の代わりです。リアクティビティを維持しながら、リアクティブなオブジェクトをキーで分割します。
+リアクティブオブジェクトをキーで分割します。
+
+リアクティブオブジェクトと任意の数のキーの配列を取ります。キーの配列ごとに、元のオブジェクトのプロパティだけを持つリアクティブオブジェクトが返されます。返された配列の最後のリアクティブオブジェクトは、元のオブジェクトの残りのプロパティがあります。
+
+これは、props のサブセットを利用し、残りを子に渡したい場合に便利です。
 
 ```js
 const [local, others] = splitProps(props, ["children"]);
@@ -372,20 +375,22 @@ const mapped = indexArray(source, (model) => {
 
 # ストア
 
-これらの API は `solid-js/store` で公開されています。
+これらの API は `solid-js/store` で公開されています。これにより、Signal のツリーを個別に追跡・変更できる[プロキシオブジェクト](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy)であるストアを作成できます。
 
-## `createStore`
+## ストアの使用
+
+### `createStore`
 
 ```ts
 export function createStore<T extends StoreNode>(
   state: T | Store<T>,
-  options?: { name?: string }
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
-これにより、プロキシとして Signals のツリーが作成され、ネストしたデータ構造の個々の値を個別に追跡できるようになります。create 関数は、読み取り専用のプロキシオブジェクトと、セッター関数を返します。
+create 関数は初期状態を受け取り、それをストアでラップし、読み取り専用のプロキシオブジェクトとセッター関数を返します。
 
 ```js
+import { createStore } from "solid-js/store";
 const [state, setState] = createStore(initialValue);
 
 // 値の読み取り
@@ -397,8 +402,11 @@ setState({ merge: "thisValue" });
 setState("path", "to", "value", newValue);
 ```
 
-プロキシである Store オブジェクトは、プロパティへのアクセスを追跡するだけです。そしてアクセスがあると、ストアは再帰的に、ネストされたデータに対してネストされた Store オブジェクトを生成します。しかし、これは配列とプレーンオブジェクトしかラップしません。クラスはラップされません。つまり、`Date`, `HTMLElement`, `RegExp`, `Map`, `Set` のようなものは、きめ細かく反応しないということです。さらに、トップレベルの状態オブジェクトは、そのプロパティにアクセスしなければ追跡できません。そのため、新しいキーやインデックスを追加しても更新のトリガーにはならないので、反復処理を行なうものに使用するのには適していません。そのため、状態オブジェクト自体を使用するのではなく、状態のキーにリストを置くようにしてください。
+プロキシとしてのストアオブジェクトは、プロパティがアクセスされたときのみ追跡します。
 
+ネストしたオブジェクトがアクセスされると、ストアはネストしたストアオブジェクトを生成し、これはツリーの下まで適用されます。ただし、これは配列とプレーンオブジェクトにのみ適用されます。クラスはラップされないので、`Date`, `HTMLElement`, `RegExp`, `Map`, `Set` といったオブジェクトは、ストアのプロパティとしてきめ細かく反応しません。
+
+トップレベルの状態オブジェクトは追跡できないので、状態オブジェクト自体を使用するのではなく、状態のキーにリストを置くようにしてください。
 ```js
 // list を状態オブジェクトのキーにする
 const [state, setState] = createStore({ list: [] });
@@ -412,6 +420,7 @@ const [state, setState] = createStore({ list: [] });
 Store オブジェクトは、計算した値を格納するためのゲッターをサポートしています。
 
 ```js
+import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
   user: {
     firstName: "John",
@@ -423,7 +432,7 @@ const [state, setState] = createStore({
 });
 ```
 
-これらは単純なゲッターなので、値をキャッシュしたい場合は Memo を使用する必要があります;
+これらは単純なゲッターなので、値をキャッシュしたい場合は Memo を使用する必要があります:
 
 ```js
 let fullName;
@@ -444,6 +453,7 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 変更は、以前の状態を渡して新しい状態または値を返す関数の形をとることができます。オブジェクトは常に浅くマージされます。ストアから値を削除するには、値を `undefined` に設定します。
 
 ```js
+import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
   firstName: "John",
   lastName: "Miller",
@@ -530,7 +540,8 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 // }
 ```
 
-## `produce`
+## ストアユーティリティ
+### `produce`
 
 ```ts
 export function produce<T>(
@@ -551,7 +562,7 @@ setState(
 );
 ```
 
-## `reconcile`
+### `reconcile`
 
 ```ts
 export function reconcile<T>(
@@ -577,12 +588,11 @@ const unsubscribe = store.subscribe(({ todos }) => (
 onCleanup(() => unsubscribe());
 ```
 
-## `createMutable`
+### `createMutable`
 
 ```ts
 export function createMutable<T extends StoreNode>(
   state: T | Store<T>,
-  options?: { name?: string }
 ): Store<T> {
 ```
 
@@ -719,7 +729,6 @@ export function createDeferred<T>(
   source: () => T,
   options?: {
     timeoutMs?: number;
-    name?: string;
     equals?: false | ((prev: T, next: T) => boolean);
   }
 ): () => T;
@@ -733,7 +742,6 @@ export function createDeferred<T>(
 export function createComputed<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string }
 ): void;
 ```
 
@@ -745,7 +753,6 @@ export function createComputed<T>(
 export function createRenderEffect<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string }
 ): void;
 ```
 
@@ -757,7 +764,6 @@ export function createRenderEffect<T>(
 export function createSelector<T, U>(
   source: () => T,
   fn?: (a: U, b: T) => boolean,
-  options?: { name?: string }
 ): (k: U) => boolean;
 ```
 
@@ -973,7 +979,7 @@ function Show<T>(props: {
 }): () => JSX.Element;
 ```
 
-Show 制御フローは、ビューの一部を条件付きでレンダリングするために使用されます。これは三項演算子（`a ? b : c`）に似ていますが、JSX のテンプレート化に最適です。
+Show 制御フローは、ビューの一部を条件付きでレンダリングするために使用されます。これは `when` が truthy の場合には `children` を、そうでない場合は `fallback` をレンダリングします。これは三項演算子（`when ? children : fallback`）に似ていますが、JSX のテンプレート化に最適です。
 
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
@@ -1256,13 +1262,15 @@ Solid の style ヘルパーは、文字列とオブジェクトのどちらで�
 
 ## `on___`
 
-Solid のイベントハンドラは、スタイルに応じて、通常、`onclick` または `onClick` の形式をとります。イベント名は常に小文字で表記されます。Solid では、合成されてバブルが発生する一般的な UI イベントに対して、半合成のイベントデリゲーションを使用しています。これにより、これらの共通イベントのパフォーマンスが向上します。
+Solid のイベントハンドラは、スタイルに応じて、通常、`onclick` または `onClick` の形式をとります。
+
+Solid では、合成されてバブルが発生する一般的な UI イベントに対して、半合成のイベント委譲を使用しています。これにより、これらの共通イベントのパフォーマンスが向上します。
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
-Solid は、イベントハンドラの第一引数に値をバインドするために、イベントハンドラに配列を渡すこともサポートしています。これは `bind` を使用せず、追加のクロージャも作成しないため、イベントのデリゲーション方法として高度に最適化されています。
+Solid は、イベントハンドラの第一引数に値をバインドするために、イベントハンドラに配列を渡すこともサポートしています。これは `bind` を使用せず、追加のクロージャも作成しないため、イベントを委譲するための高度に最適化された方法です。
 
 ```jsx
 function handler(itemId, e) {
@@ -1274,16 +1282,18 @@ function handler(itemId, e) {
 </ul>;
 ```
 
-イベントは再バインドさせることができず、バインディングはリアクティブではありません。その理由は、一般的にリスナーをアタッチ/デタッチする方がコストがかかるからです。イベントは自然に呼び出されるので、リアクティブにする必要はなく、必要に応じてハンドラーをショートカットするだけです。
+リスナーのアタッチ/デタッチにはコストがかかるため、イベントは再バインドされず、バインディングはリアクティブではありません。
+イベントハンドラーは、イベントが発生するたびに他の関数と同様に呼び出されるので、リアクティビティは必要ありません。必要に応じてハンドラーをショートカットするだけです。
 
 ```jsx
 // 定義されている場合は呼び出し、そうでない場合は呼び出さない
 <div onClick={() => props.handleClick?.()} />
 ```
 
+`onChange` と `onInput` はそれぞれのネイティブな動作に基づいて動作することに注意してください。`onInput` は、値が変更された直後に発生します。`<input>` フィールドの場合、`onChange` はフィールドがフォーカスを失った後にのみ発生します。
 ## `on:___`/`oncapture:___`
 
-その他のイベント、例えば変わった名前のイベントや、デリゲートしたくないイベントには、`on` 名前空間イベントがあります。これは単に、イベントリスナーをそのまま追加するだけです。
+その他のイベント、例えば変わった名前のイベントや、委譲したくないイベントには、`on` 名前空間イベントがあります。これは単に、イベントリスナーをそのまま追加するだけです。
 
 ```jsx
 <div on:Weird-Event={(e) => alert(e.detail)} />
