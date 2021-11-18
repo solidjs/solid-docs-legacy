@@ -29,11 +29,20 @@ No. And there likely never will be. While the APIs are similar and components of
 
 Vue-compat on the other hand, that'd be doable; although there are no plans to implement it currently.
 
-### Why doesn't destructuring work with props or stores? I realized I can fix it by wrapping my whole component in a function.
+### Why shouldn't I use `map` in my template, and what's the difference between `<For>` and `<Index>`?
 
-With props and store objects, reactivity is tracked on property access: when you call `props.whatever`, it tells Solid to )Referencing them outside of a binding or reactive computation will not be tracked. Destructuring is perfectly fine inside of those.
+If your array is static, there's nothing wrong with using map. But if you're looping over a signal or reactive property, `map` is inefficient: if the array changes for any reason, _the entire map_ will rerun and all of the nodes will be recreated.
 
-However, wrapping your whole component in a function is not what you want to be doing irresponsibly. Solid does not have a VDOM. So any tracked change will run the whole function again recreating everything. Don't do it.
+`<For>` and `<Index>` both provide a loop solution that is smarter than this. They couple each rendered node with an element in the array, so when an array element changes, only the corresponding node will rerender.
+
+`<Index>` will do this _by index_: each node corresponds to an index in the array; `<For>` will do this _by value_: each node corresponds to a piece of data in the array. This is why, in the callback, `<Index>` gives you a signal for the item: the index for each item is considered fixed, but the data at that index can change. On the other hand, `<For>` gives you a signal for the index: the content of the item is considered fixed, but it can move around if elements get moved in the array. 
+
+For example, if two elements in the array are swapped, `<For>` will reposition the two corresponding DOM nodes and update their `index()` signals along the way. `<Index>` won't reposition any DOM nodes, but will update the `item()` signals for the two DOM nodes and cause them to rerender. 
+
+For an in-depth demonstration of the difference, see [this segment](https://www.youtube.com/watch?v=YxroH_MXuhw&t=2164s) of Ryan's stream.
+### Why doesn't destructuring work with props or stores?
+
+With props and store objects, reactivity is tracked on property access: when you call `props.whatever` within a reactive context, it tells Solid to keep track of that context and update it when the prop changes. By destructuring, you separate the value from the object, giving you the value at that point in time and losing reactivity.
 
 ### Why isn't my `onChange` event handler firing on time?
 
@@ -44,7 +53,7 @@ It is not the intention to support class components. The lifecycles of Solid are
 
 Group data and its behaviors together rather than lifecycles. This is a reactive best practice that has worked for decades.
 
-### I really dislike JSX, any chance of a Template DSL? Oh, I see you have Tagged Template Literals/HyperScript. Maybe I will use those...
+### I really dislike JSX, any chance of a different template language? Oh, I see you have Tagged Template Literals/HyperScript. Maybe I will use those...
 
 Don't. Stop you right there. We use JSX the way Svelte uses their templates, to create optimized DOM instructions. The Tagged Template Literal and HyperScript solutions may be really impressive in their own right, but unless you have a real reason like a no-build requirement they are inferior in every way. Larger bundles, slower performance, and the need for manual workaround wrapping values.
 
