@@ -37,6 +37,7 @@ However, wrapping your whole component in a function is not what you want to be 
 ### 5. Why isn't my `onChange` event handler firing on time?
 
 In some frameworks, the `onChange` event for inputs is modified so that it fires on every key press. But this isn't how the `onChange` event [works natively](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange): it is meant to reflect a _commited_ change to the input and will usually fire when the input loses focus. To handle all changes to the value of an input, use `onInput`.
+
 ### 6. Can you add support for class components? I find the lifecycles are easier to reason about.
 
 It is not the intention to support class components. The lifecycles of Solid are tied to scheduling the reactive system and are artificial. You could make a class out of it I suppose but effectively all the non-event handler code is basically being run in the constructor, including the render function. It's just more syntax for an excuse to make your data less granular.

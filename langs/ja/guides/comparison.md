@@ -16,7 +16,17 @@ React は Solid に大きな影響を与えました。React の単方向フロ�
 
 #### 移行のためのアドバイス:
 
-Solid の更新モデルは、React や、React + MobX とは全く異なります。関数コンポーネントを `render` 関数と考えるのではなく、`constructor` と考えてください。分割代入や初期のプロパティアクセスはリアクティビティを失うことに注意してください。Solid のプリミティブにはフックルールのような制限がないので、自由にネストできます。また、リストの行に明示的なキーがなくても、「キー付き」の動作が可能です。最後に、仮想 DOM が存在しないので、`React.Children` や `React.cloneElement` のような仮想 DOM の命令的 API は意味を持ちません。これらを宣言的に使用する問題を解決する別の方法を見つけることをお勧めします。
+Solid の更新モデルは、React や、React + MobX とは全く異なります。関数コンポーネントを `render` 関数と考えるのではなく、`constructor` と考えてください。
+
+Solid では、プロパティとストアは[プロキシ・オブジェクト](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Proxy)であり、追跡とリアクティブの更新のためにプロパティアクセスに依存しています。分割代入や初期のプロパティアクセスにより、これらのプロパティのリアクティビティが失われたり、誤ったタイミングでトリガーされたりすることがあるので注意が必要です。
+
+Solid のプリミティブにはフックルールのような制限がないので、自由にネストできます。
+
+リストの行に明示的なキーがなくても、「キー付き」の動作が可能です。
+
+React では、入力フィールドが変更されるたびに `onChange` が発生しますが、これは `onChange` の[ネイティブな動作方法](https://developer.mozilla.org/ja/docs/Web/API/GlobalEventHandlers/onchange)ではありません。Solid では、`onInput` を使用して値の変更をサブスクライブします。
+
+最後に、仮想 DOM が存在しないので、`React.Children` や `React.cloneElement` のような仮想 DOM の命令的 API は Solid にはありません。DOM 要素を直接作成したり変更したりするのではなく、宣言的に意図を表現しましょう。
 
 ## Vue
 
