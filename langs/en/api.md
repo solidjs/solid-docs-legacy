@@ -15,7 +15,11 @@ export function createSignal<T>(
 ): [get: () => T, set:(v: T) => T];
 ```
 
-This is the most basic reactive primitive used to track a single value that changes over time. The create function returns a get and set pair of functions to access and update the signal.
+This is the most basic reactive primitive used to track a single value that changes over time. The `createSignal` function returns a pair of functions as an array: a getter (or _accessor_) and a setter. 
+
+The getter returns the current value of the signal. When called within a tracking scope (like functions passed to `createEffect` or used in JSX expressions), the calling context will rerun when the signal is updated.
+
+The setter updates the signal. As its only argument, it takes either the new value for the signal, or a function that maps the last value of the signal to a new value. The setter returns the updated value.
 
 ```js
 const [getValue, setValue] = createSignal(initialValue);
@@ -30,13 +34,29 @@ setValue(nextValue);
 setValue((prev) => prev + next);
 ```
 
-Remember to access signals under a tracking scope if you wish them to react to updates. Tracking scopes are functions that are passed to computations like `createEffect` or JSX expressions.
 
 > If you wish to store a function in a Signal you must use the function form:
 >
 > ```js
 > setValue(() => myFunction);
 > ```
+
+### Options
+Several primitives in Solid take an "options" object as an optional last argument. `createSignal`'s options object allows you to provide an `equals` option.
+
+```js
+const [getValue, setValue] = createSignal(initialValue, { equals: false });
+```
+
+By default, when a signal's setter is called, dependencies are only rerun if the new value is actually different than the old value. You can set `equals` to `false` to always rerun dependencies after the setter is called, or you can pass your own equality function.
+
+```js
+const [myString, setMyString] = createSignal("string", { equals: (newVal, oldVal) => newVal.length === oldVal.length });
+
+setMyString("strung") //is considered equal by the function and won't cause updates
+setMyString("stranger") //is considered different and will cause updates
+```
+
 
 ## `createEffect`
 
@@ -65,6 +85,8 @@ createEffect((prev) => {
   return sum;
 }, 0);
 ```
+
+Signal changes inside effects _batch_: no update to a signal will propogate until the effect finishes executing. 
 
 ## `createMemo`
 
