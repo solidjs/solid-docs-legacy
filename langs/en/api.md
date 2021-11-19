@@ -51,9 +51,11 @@ const [getValue, setValue] = createSignal(initialValue, { equals: false });
 By default, when a signal's setter is called, dependencies are only rerun if the new value is actually different than the old value. You can set `equals` to `false` to always rerun dependencies after the setter is called, or you can pass your own equality function.
 
 ```js
-const [myString, setMyString] = createSignal("string", { equals: (newVal, oldVal) => newVal.length === oldVal.length });
+const [myString, setMyString] = createSignal("string", {
+   equals: (newVal, oldVal) => newVal.length === oldVal.length 
+});
 
-setMyString("strung") //is considered equal by the function and won't cause updates
+setMyString("strung") //is considered equal to the last value and won't cause updates
 setMyString("stranger") //is considered different and will cause updates
 ```
 
@@ -67,7 +69,7 @@ export function createEffect<T>(
 ): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs after each render where a dependency has changed. Ideal for using `ref`s and managing other side effects.
+Creates a new computation that automatically tracks dependencies and runs after each render in which a dependency has changed. Ideal for using `ref`s and managing other side effects.
 
 ```js
 const [a, setA] = createSignal(initialValue);
