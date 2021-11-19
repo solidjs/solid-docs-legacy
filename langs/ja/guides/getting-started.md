@@ -3,12 +3,10 @@ title: はじめに
 description: Solid を使い始めるためのガイド
 sort: 0
 ---
-
 # はじめに
-
 ## Solid を試す
 
-Solid を使い始める最も簡単な方法は、オンラインで試すことです。https://playground.solidjs.com の REPL は、アイデアを試すのに最適な方法です。また、いくつかのサンプルを編集できる https://codesandbox.io/ もあります。
+Solid を使い始める最も簡単な方法は、オンラインで試すことです。https://playground.solidjs.com の REPL は、アイデアを試すのに最適な方法です。また、いくつかの[サンプル](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md)を編集できる https://codesandbox.io/ もあります。
 
 また、ターミナルで以下のコマンドを実行して、シンプルな [Vite](https://vitejs.dev/) テンプレートを使用することもできます:
 

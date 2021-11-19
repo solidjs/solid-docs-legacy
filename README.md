@@ -37,6 +37,8 @@ This package serves to build the markdown files into a consumable format importe
 
 Run `yarn build` to run the build script. This compiles the markdown into various json files in the `dist` folder and turns the `index.ts` file into an entry point that accesses them. Then, to view your changes in the context of the site, clone both repositories and run `yarn link` in the solid-docs directory and `yarn link solid-docs` in the solid-site directory.
 
+After linking, run `yarn watch` in solid-docs to recompile your changes as you make them. Note that adding a new language or a new tutorial directory for a language that didn't have one won't trigger the watcher; run `yarn build` first.
+
 ### Theming
 The script mentioned above uses shiki to process the code which in turn uses VSCode tokens. Therefore any VSCode theme can be applied.
 

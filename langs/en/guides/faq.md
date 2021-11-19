@@ -10,7 +10,6 @@ sort: 5
 
 It is possible when you don't have React's update model. JSX is a template language like any other—just one that is more flexible in certain ways. Inserting arbitrary JavaScript can be challenging at times, but no different than supporting spread operators. So, no: this isn't vapourware, but an approach proven to be one of the most performant.
 
-
 The real benefit comes in how extensible it is. We have a compiler working for you to give you optimal native DOM updates, but you have all the freedom of a library like React. You can write components using standard techniques like [render props](https://reactjs.org/docs/render-props.html) and higher order components along side your reactive "hooks". Don't like how Solid's control flow works? Write your own.
 
 ### How is Solid so performant?
@@ -47,6 +46,7 @@ With props and store objects, reactivity is tracked on property access: when you
 ### Why isn't my `onChange` event handler firing on time?
 
 In some frameworks, the `onChange` event for inputs is modified so that it fires on every key press. But this isn't how the `onChange` event [works natively](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange): it is meant to reflect a _commited_ change to the input and will usually fire when the input loses focus. To handle all changes to the value of an input, use `onInput`.
+
 ### Can you add support for class components? I find the lifecycles are easier to reason about.
 
 It is not the intention to support class components. The lifecycles of Solid are tied to scheduling the reactive system and are artificial. You could make a class out of it I suppose but effectively all the non-event handler code is basically being run in the constructor, including the render function. It's just more syntax for an excuse to make your data less granular.
