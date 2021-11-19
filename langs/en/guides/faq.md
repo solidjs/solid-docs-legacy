@@ -8,7 +8,7 @@ sort: 5
 
 ### JSX without a virtual DOM? Is this vaporware? I've heard prominent voices say that this isn't possible.
 
-It is possible when you don't have React's update model. JSX is a template language like any other—just one that is more flexible in certain ways. Inserting arbitrary JavaScript can be challenging at times, but no different than supporting spread operators. So, no: this isn't vapourware, but an approach proven to be one of the most performant.
+It is possible when you don't have React's update model. JSX is a template language those in Svelte or Vue—just one that is more flexible in certain ways. Inserting arbitrary JavaScript can be challenging at times, but no different than supporting spread operators. So, no: this isn't vaporware, but an approach proven to be one of the most performant.
 
 The real benefit comes in how extensible it is. We have a compiler working for you to give you optimal native DOM updates, but you have all the freedom of a library like React. You can write components using standard techniques like [render props](https://reactjs.org/docs/render-props.html) and higher order components along side your reactive "hooks". Don't like how Solid's control flow works? Write your own.
 
@@ -17,8 +17,8 @@ The real benefit comes in how extensible it is. We have a compiler working for y
 We wish we could point to a single thing, but it really is the combination of several important design decisions:
 
 1. Explicit reactivity, so only the things that should be reactive are tracked.
-2. Compilation with initial creation in mind. Solid uses heuristics to loosen granularity to reduce the number of computations made but keep key updates granular and performant.
-3. Reactive expressions are just functions. This enables "Vanishing Components" with lazy prop evaluation removing unnecessary wrappers and synchronization overhead.
+2. Compilation with initial creation in mind. Solid uses heuristics and combines the right expressions to reduce the number of computations, but keep key updates granular and performant.
+3. Reactive expressions are just functions. This enables "vanishing components" with lazy prop evaluation removing unnecessary wrappers and synchronization overhead.
 
 These are currently unique techniques in a combination that gives Solid an edge over the competition.
 
@@ -49,9 +49,9 @@ In some frameworks, the `onChange` event for inputs is modified so that it fires
 
 ### Can you add support for class components? I find the lifecycles are easier to reason about.
 
-It is not the intention to support class components. The lifecycles of Solid are tied to scheduling the reactive system and are artificial. You could make a class out of it I suppose but effectively all the non-event handler code is basically being run in the constructor, including the render function. It's just more syntax for an excuse to make your data less granular.
+We don't intend to support class components. The lifecycles of components in Solid are tied to the scheduling of the reactive system and are artificial. You could make a class out of it, but effectively all of the non-event handler code would be run in the constructor, including the render function. It's just more syntax for an excuse to make your data less granular.
 
-Group data and its behaviors together rather than lifecycles. This is a reactive best practice that has worked for decades.
+Group data and its behaviors together, rather than lifecycles. This is a reactive best practice that has worked for decades.
 
 ### I really dislike JSX, any chance of a different template language? Oh, I see you have Tagged Template Literals/HyperScript. Maybe I will use those...
 
