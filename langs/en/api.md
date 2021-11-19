@@ -931,11 +931,11 @@ if (isServer) {
 
 # Control Flow
 
-Solid uses components for control flow. The reason is that with reactivity to be performant we have to control how elements are created. For example with lists, a simple `map` is inefficient as it always maps everything. This means helper functions.
+ For reactive contriol flow to be performant, we have to control how elements are created. For example, with lists, a simple `map` is inefficient as it always maps the entire array. 
+ 
+This means helper functions. Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flow components.
 
-Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flows.
-
-These built-in control flows will be automatically imported. All except `Portal` and `Dynamic` are exported from `solid-js`. Those two which are DOM specific are exported by `solid-js/web`.
+These built-in control flow components will be automatically imported. All except `Portal` and `Dynamic` are exported from `solid-js`. Those two, which are DOM-specific, are exported by `solid-js/web`.
 
 > Note: All callback/render function children of control flow are non-tracking. This allows for nesting state creation, and better isolates reactions.
 
@@ -949,7 +949,7 @@ export function For<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Simple referentially keyed loop control flow.
+Simple referentially keyed loop. The callback takes the current item as the first argument:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -957,7 +957,7 @@ Simple referentially keyed loop control flow.
 </For>
 ```
 
-Optional second argument is an index signal:
+The optional second argument is an index signal:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -1035,7 +1035,7 @@ export function Index<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Non-keyed list iteration (rows keyed to index). This is useful when there is no conceptual key, like if the data consists of primitives and it is the index that is fixed rather than the value.
+Non-keyed list iteration (rendered nodes are keyed to an array index). This is useful when there is no conceptual key, like if the data consists of primitives and it is the index that is fixed rather than the value.
 
 The item is a signal:
 
