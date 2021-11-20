@@ -1,8 +1,13 @@
-# Testing your Solid code
+---
+title: Testing Solid 
+description: An explanation of Solid's server-side capabilities.
+sort: 4
+---
+# Testing Solid 
 
 To use your Solid code in production, it needs to be tested. Since you don't want to test everything manually, you need automated tests. Testing Solid code can be simple, once you got everything set up and know a few useful patterns for testing.
 
-## Testing setup
+## Testing Setup
 
 Before you set up testing, you need to choose your test runner. There is an abundance of choices, but we'll focus on two very different projects that are opposite extremes, jest and uvu. Jest is heavily integrated, uvu only brings the bare necessities. If you want to use another test runner, the setup for uvu should work for most other test runners.
 
@@ -128,7 +133,7 @@ Then setup your test script in `package.json`:
 
 Additional setup files can be added via `-r setup.ts`, ignore non-tests with `-i not-a-test.test.ts`.
 
-### coverage reports
+### Coverage Reports
 
 If you want to check code coverage of your tests, the favorite tool for uvu is c8. To install and set it up, run:
 
@@ -141,7 +146,7 @@ Now if you `npm run test:coverage`, you'll see the test coverage.
 
 If you want nice HTML coverage reports, you 
 
-### watch mode
+### Watch Mode
 
 Neither `uvu` nor `tape` have a watch mode out of the box, but you can use `chokidar-cli` to do the same:
 
@@ -198,7 +203,7 @@ Also don't forget to include the types in `tsconfig.json`:
 }
 ```
 
-# solid-dom-testing
+### solid-dom-testing
 
 If you are using another test runner, e.g. uvu or tape, there are a few assertion helpers in `solid-dom-testing` that support similar assertions:
 
@@ -208,11 +213,11 @@ If you are using another test runner, e.g. uvu or tape, there are a few assertio
 
 There's no setup required, you can just import and use the helpers in your tests as you see fit.
 
-## Testing patterns and best practices
+## Testing Patterns and Best Practices
 
 Now that you have installed your testing tools, you should start to use them. In order to make this easier, solid supports a few nice patterns.
 
-### Testing reactive state
+### Testing Reactive State
 
 You may want to keep parts of your state separate from the components for ease of maintenance or being able to support multiple views. In this case, the interface against which you are testing is the state itself. Keep in mind that out of a [reactive root](https://www.solidjs.com/docs/latest/api#createroot) your state is not tracked and updates won't trigger effects and memos.
 
@@ -234,7 +239,7 @@ export function createLocalStore<T>(initState: T): [Store<T>, SetStoreFunction<T
 
 Instead of creating a TODO component, we can test this model in isolation; when we do that, we need to keep in mind that 1. reactive changes only work when they have a tracking context provided by `render` or `createRoot` and 2. are asynchronous, but we can use `createEffect` to catch them. Using `createRoot` has the advantage that we can trigger the disposal manually:
 
-#### Testing in jest
+#### Testing in Jest
 
 ```ts
 import { createLocalStore } from "./main.tsx";
@@ -324,7 +329,7 @@ todoTest.run();
 
 We could now create a component and use the directive in there, but then we'd be testing the use of directives instead of directly testing the directive. It's simpler to test the surface of the directive by providing a mounted node and the accessor:
 
-#### Testing in jest
+#### Testing in Jest
 
 ```ts
 // click-outside.test.ts
@@ -439,7 +444,7 @@ export const Counter: Component = () => {
 
 You should definitely install `solid-testing-library`, if you haven't already done that; it's most important helpers are `render` to render a component to the dom in a managed way, `fireEvent` to dispatch events in a way that resembles actual user events and `screen` to provide global selectors. If you use jest, you should also install `@testing-library/jest-dom` and set it up to have some helpful assertions, otherwise install `solid-dom-testing` as described above.
 
-#### Testing in jest
+#### Testing in Jest
 
 ```ts
 // main.test.tsx
