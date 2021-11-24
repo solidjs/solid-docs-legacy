@@ -1,5 +1,5 @@
 
-import { outputTutorials, outputDocs, writeToPath } from "./buildDocs";
+import { outputTutorials, outputDocs, writeToPath } from "../build/buildDocs";
 import { readdir } from "fs/promises";
 import { resolve, join, sep } from "path";
 import  watch from "node-watch";
@@ -46,7 +46,7 @@ async function outputSupported({tutorials, docs}: {tutorials: string[], docs: st
     tutorials,
     docs
   }
-  const outputPath = resolve(__dirname, './out', "supported.json");
+  const outputPath = resolve(__dirname, '../build/out', "supported.json");
   await writeToPath(outputPath, supported);
 }
 

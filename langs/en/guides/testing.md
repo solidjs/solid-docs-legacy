@@ -11,7 +11,7 @@ To use your Solid code in production, it needs to be tested. Since you don't wan
 
 Before you set up testing, you need to choose your test runner. There is an abundance of choices, but we'll focus on two very different projects that are opposite extremes, jest and uvu. Jest is heavily integrated, uvu only brings the bare necessities. If you want to use another test runner, the setup for uvu should work for most other test runners.
 
-### Setting up jest
+### Setting up Jest
 
 Unfortunately, integrated though it may be, jest will not support esm or typescript out of the box, but needs its transformer configuration set up.
 
@@ -104,7 +104,7 @@ And then configure it in `package.json`:
 }
 ```
 
-### TypeScript and jest
+### TypeScript and Jest
 
 Since jest is injecting its testing facilities into the global scope, you need to load its types into tsconfig.json to satisfy the typescript compiler:
 
