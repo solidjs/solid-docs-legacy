@@ -1,7 +1,6 @@
 We've seen that whenever we access a signal in JSX, it will automatically update the view when that signal changes. But the component function itself only executes once. 
 
-We can create new expressions that depend on signals by wrapping a signal in a function. A function that accesses a signal is effectively also a signal:  when its wrapped signal changes it will in turn update its readers.
-
+We can create new expressions that depend on signals by wrapping a signal in a function. A function that accesses a signal is effectively also a signal: when its wrapped signal changes it will in turn update its readers.
 
 Let's update our Counter to count by 2 by introducing a `doubleCount` function:
 
