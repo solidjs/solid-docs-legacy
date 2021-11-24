@@ -14,6 +14,7 @@
     "@rollup/plugin-json": "^4.1.0",
     "@types/node": "^16.11.3",
     "front-matter": "^4.0.2",
+    "gitlog": "^4.0.4",
     "htmlnano": "^1.1.1",
     "jiti": "^1.12.9",
     "markdown-it": "^12.2.0",
