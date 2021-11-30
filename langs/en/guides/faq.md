@@ -57,7 +57,7 @@ Group data and its behaviors together, rather than lifecycles. This is a reactiv
 
 Don't. Stop you right there. We use JSX the way Svelte uses their templates, to create optimized DOM instructions. The Tagged Template Literal and HyperScript solutions may be really impressive in their own right, but unless you have a real reason like a no-build requirement they are inferior in every way. Larger bundles, slower performance, and the need for manual workaround wrapping values.
 
-It's good to have options, but Solid's JSX is really the best solution here. A Template DSL would be great as well, albeit more restrictive, but JSX gives us so much for free. TypeScript, Existing Parsers, Syntax Highlighting, TypeScript, Prettier, Code Completion, and last and not least TypeScript.
+It's good to have options, but Solid's JSX is really the best solution here. A Template DSL would be great as well, albeit more restrictive, but JSX gives us so much for free. Existing Parsers, Syntax Highlighting, Prettier, Code Completion, and last but not least TypeScript.
 
 Other libraries have been adding support for these features but that has been an enormous effort and is still imperfect and a constant maintenance headache. This is really taking a pragmatic stance.
 
