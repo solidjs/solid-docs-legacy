@@ -165,7 +165,7 @@ refetch();
 
 Ang `loading` at `error` ay mga reactive na getter at maaaring i-track.
 
-# Lifecycles
+# Mga Lifecycle
 
 ## `onMount`
 
@@ -173,7 +173,7 @@ Ang `loading` at `error` ay mga reactive na getter at maaaring i-track.
 export function onMount(fn: () => void): void;
 ```
 
-Registers a method that runs after initial render and elements have been mounted. Ideal for using `ref`s and managing other one time side effects. It is equivalent to a `createEffect` which does not have any dependencies.
+Magre-register ng method na tatakbo pagkatapos ng unang render at kapag naikarga na ang mga element. Mainam katuwang ng mga `ref` at pagma-manage ng iba pang mga side effect na tatakbo lamang nang isang beses. Katumbas ito ng `createEffect` na walang mga dependency.
 
 ## `onCleanup`
 
@@ -181,7 +181,7 @@ Registers a method that runs after initial render and elements have been mounted
 export function onCleanup(fn: () => void): void;
 ```
 
-Registers a cleanup method that executes on disposal or recalculation of the current reactive scope. Can be used in any Component or Effect.
+Magre-register ng cleanup method na tatakbo tuwing disposal o kaya ng recalculation ng reactive scope kung saan ito kabilang. Maaaring gamitin sa anumang Component o Effect. 
 
 ## `onError`
 
@@ -189,11 +189,11 @@ Registers a cleanup method that executes on disposal or recalculation of the cur
 export function onError(fn: (err: any) => void): void;
 ```
 
-Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
+Magre-register ng error handler method na tatakbo kapag nakatanggap ng error kahit saan sa child scope. Tatakbo lamang ang error handler sa pinakamalapit na scope. Ibato muli ang error para maipasa paitaas sa mga scope.
 
-# Reactive Utilities
+# Mga Reactive Utility
 
-These helpers provide the ability to better schedule updates and control how reactivity is tracked.
+Nagbibigay ang mga helper na ito ng kakayahan upang makapag-schedule ng mga update nang mas maayos, at kontroling kung papaano tinatrack ang reactivity. 
 
 ## `untrack`
 
@@ -201,7 +201,7 @@ These helpers provide the ability to better schedule updates and control how rea
 export function untrack<T>(fn: () => T): T;
 ```
 
-Ignores tracking any of the dependencies in the executing code block and returns the value.
+Binabalewala ang tracking ng anumang dependency sa code block na tumatakbo at nagbibigay ng value.
 
 ## `batch`
 
@@ -209,7 +209,7 @@ Ignores tracking any of the dependencies in the executing code block and returns
 export function batch<T>(fn: () => T): T;
 ```
 
-Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method and Effects automatically wrap their code in a batch.
+Iniipon ang mga update sa loob ng block hanggang sa huli upang maiwasan ang sobrang recalculation. Ibig sabihin, hindi pa maga-update ang pagkuha ng value sa susunod na linya. Automatic na nakapaloob ang set method ng [Solid Store](#createstore) at mga Effect sa isang batch.
 
 ## `on`
 
@@ -221,25 +221,25 @@ export function on<T extends Array<() => any> | (() => any), U>(
 ): (prevValue?: U) => U | undefined;
 ```
 
-`on` is designed to be passed into a computation to make its dependencies explicit. If an array of dependencies is passed, `input` and `prevInput` are arrays.
+Dinisenyo ang `on` para ipasa sa loob ng computation upang gawing hayagan ang mga dependency nito. Kung array ng mga dependency ang ipinasa, magiging array rin ang `input` at `prevInput`.
 
 ```js
 createEffect(on(a, (v) => console.log(v, b())));
 
-// is equivalent to:
+// ay katumbas ng:
 createEffect(() => {
   const v = a();
   untrack(() => console.log(v, b()));
 });
 ```
 
-You can also not run the computation immediately and instead opt in for it to only run on change by setting the defer option to true.
+Maaari ring huwag munang gawin ang computation kaagad at sa halip ay gawin ito kapag nagbago ang mga dependency sa pamamagitan ng paglalagay ng defer option sa true.
 
 ```js
-// doesn't run immediately
+// hindi kaagad tatakbo
 createEffect(on(a, (v) => console.log(v), { defer: true }));
 
-setA("new"); // now it runs
+setA("new"); // ngayon tatakbo na ito
 ```
 
 ## `createRoot`
@@ -248,9 +248,9 @@ setA("new"); // now it runs
 export function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-Creates a new non-tracked context that doesn't auto-dispose. This is useful for nested reactive contexts that you do not wish to release when the parent re-evaluates. It is a powerful pattern for caching.
+Gumagawa ng bagong non-tracked context na hindi kaagad mago-auto-dispose. Magagamit ito sa mga nested na reactive context kung saan hindi dapat ire-release kapag nag-re-evaluate ang parent. Mabisa ito para sa caching.
 
-All Solid code should be wrapped in one of these top level as they ensure that all memory/computations are freed up. Normally you do not need to worry about this as `createRoot` is embedded into all `render` entry functions.
+Dapat naka-wrap ang lahat ng Solid code sa ganitong top level wrapper dahil sinisiguro nito na lahat ng memory/mga computation ay freed up na. Madalas, hindi na kailangang gawin ang ganito dahil ang lahat ng `render` entry function ay may kasama nang `createRoot` sa loob.
 
 ## `mergeProps`
 
@@ -258,18 +258,18 @@ All Solid code should be wrapped in one of these top level as they ensure that a
 export function mergeProps(...sources: any): any;
 ```
 
-A reactive object `merge` method. Useful for setting default props for components in case caller doesn't provide them. Or cloning the props object including reactive properties.
+Isang method para sa reactive object `merge`. Magagamito ito sa pagse-set ng mga default prop ng mga component sa tuwing hindi ibinigay ng caller ang mga ito. O kaya naman ay pagko-clone ng props object kasama ng mga reactive property.
 
-This method works by using a proxy and resolving properties in reverse order. This allows for dynamic tracking of properties that aren't present when the prop object is first merged.
+Gumagana ang method na ito gamit ang proxy at nire-resolve nito ang mga property nang pabaligtad. Ito ang makapagbibigay ng kakayahan upang maisagawa ang dynamic tracking ng mga property na hindi kasama noong unang minerge ang prop object.
 
 ```js
-// default props
+// defaul na mga prop
 props = mergeProps({ name: "Smith" }, props);
 
-// clone props
+// i-clone ang mga prop
 newProps = mergeProps(props);
 
-// merge props
+// i-merge ang mga prop
 props = mergeProps(props, otherProps);
 ```
 
@@ -282,11 +282,11 @@ export function splitProps<T>(
 ): [...parts: Partial<T>];
 ```
 
-Splits a reactive object by keys. 
+Hinahati ang reactive object gamit ang mga key.
 
-It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
+Tumatanggap ito ng reactive object at kahit ilang array ng key; sa bawat array ng key, magbabalik ito ng reactive object na meron lamang property nung orihinal na object. Itong reactive object ay maglalaman lamang ng mga property na kasama ang key sa mga ibinigay sa mga array. Ang huling reactive object sa ibinalik na array ay maglalaman ng mga natirang property.
 
-This can be useful if you want to consume a subset of props and pass the rest to a child.
+Magagamit ito kung ninanais na kumuha lamang ng iilang mga prop at ipasa ang natitira sa isang child.
 
 ```js
 const [local, others] = splitProps(props, ["children"]);
@@ -306,15 +306,15 @@ export function useTransition(): [
 ];
 ```
 
-Used to batch async updates in a transaction deferring commit until all async processes are complete. This is tied into Suspense and only tracks resources read under Suspense boundaries.
+Ginagamit ito upang i-batch ang mga async update sa isang transaction, at ihihinto ang mga commit pansamantala hanggang matapos ang lahat ng async process. Katuwang nito ang Suspense at tinatrack lamang ang mga resource na ginagamit sa loob ng mga Suspense boundary.
 
 ```js
 const [isPending, start] = useTransition();
 
-// check if transitioning
+// i-check kung nagta-transitioning
 isPending();
 
-// wrap in transition
+// i-wrap sa loob ng transition
 start(() => setSignal(newValue), () => /* transition is done */)
 ```
 
@@ -324,7 +324,7 @@ start(() => setSignal(newValue), () => /* transition is done */)
 export function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable. Consume it from the Observable library of your choice with typically with the `from` operator.
+Tumatanggap ang method na ito ng isang signal at nagbabalik ng simpleng Observable. Gamitin ito sa napipiling Observable library sa pamamagitan ng `from` operator.
 
 ```js
 import { from } from "rxjs";
@@ -345,9 +345,9 @@ export function mapArray<T, U>(
 ): () => U[];
 ```
 
-Reactive map helper that caches each item by reference to reduce unnecessary mapping on updates. It only runs the mapping function once per value and then moves or removes it as needed. The index argument is a signal. The map function itself is not tracking.
+Reactive map helper na nagka-cache ng bawat item by reference upang bawasan ang karagdagang mapping sa mga update. Tumatakbo lamang ang mapping function isang beses sa bawat value na nililipat o tinatanggal kung kinakailangan. Isang signal ang index argument. Hindi nagta-track mismo ang map function.
 
-Underlying helper for the `<For>` control flow.
+Ginagamit ito ng `<For>` control flow.
 
 ```js
 const mapped = mapArray(source, (model) => {
@@ -377,9 +377,9 @@ export function indexArray<T, U>(
 ): () => U[];
 ```
 
-Similar to `mapArray` except it maps by index. The item is a signal and the index is now the constant.
+Katulad ng `mapArray`, ngunit nagma-map ito gamit ang index. Isang signal ang item, at constant na ngayon ang index.
 
-Underlying helper for the `<Index>` control flow.
+Ginagamit ito ng `<Index>` control flow.
 
 ```js
 const mapped = indexArray(source, (model) => {
