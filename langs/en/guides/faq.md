@@ -24,7 +24,7 @@ These are currently unique techniques in a combination that gives Solid an edge 
 
 ### Is there React-Compat, or some way to use my React libraries in Solid?
 
-No. And there likely never will be. While the APIs are similar and components often can be moved across with minor edits, the update model is fundamentally different. React Ccmponents render over and over so code outside of Hooks works very differently. The closures and hook rules are not only unnecessary in Solid: they can prescribe code that does not work here.
+No. And there likely never will be. While the APIs are similar and components often can be moved across with minor edits, the update model is fundamentally different. React Components render over and over so code outside of Hooks works very differently. The closures and hook rules are not only unnecessary in Solid: they can prescribe code that does not work here.
 
 Vue-compat on the other hand, that'd be doable; although there are no plans to implement it currently.
 
