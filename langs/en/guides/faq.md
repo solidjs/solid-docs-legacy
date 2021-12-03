@@ -8,7 +8,7 @@ sort: 5
 
 ### JSX without a virtual DOM? Is this vaporware? I've heard prominent voices say that this isn't possible.
 
-It is possible when you don't have React's update model. JSX is a template language those in Svelte or Vue—just one that is more flexible in certain ways. Inserting arbitrary JavaScript can be challenging at times, but no different than supporting spread operators. So, no: this isn't vaporware, but an approach proven to be one of the most performant.
+It is possible when you don't have React's update model. JSX is a template language like those in Svelte or Vue—just one that is more flexible in certain ways. Inserting arbitrary JavaScript can be challenging at times, but no different than supporting spread operators. So, no: this isn't vaporware, but an approach proven to be one of the most performant.
 
 The real benefit comes in how extensible it is. We have a compiler working for you to give you optimal native DOM updates, but you have all the freedom of a library like React. You can write components using standard techniques like [render props](https://reactjs.org/docs/render-props.html) and higher order components along side your reactive "hooks". Don't like how Solid's control flow works? Write your own.
 
