@@ -206,7 +206,7 @@ const BasicComponent = (props) => {
 
 // bad
 const BasicComponent = (props) => {
-  const valueProp = prop.value;
+  const valueProp = props.value;
   const value = createMemo(() => valueProp || "default");
   return <div>{value()}</div>;
 };
