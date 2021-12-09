@@ -49,7 +49,7 @@ All you have to do is retrieve the JSON file describing your favorite theme (see
 
 The package exposes async functions to load the documentation using dynamic imports.
 
-### `getDoc(lang: string, resource: string): Promise<DocFile | false>`
+### getDoc(lang: string, resource: string): Promise<DocFile | false>
 
 Takes a language code matching a `langs` subdirectory and a resource name and returns a documentation file (see `src/types.ts`) if it exists. There are currently two existing resources, `api` and `guide`.
 
