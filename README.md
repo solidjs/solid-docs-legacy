@@ -53,13 +53,13 @@ The package exposes async functions to load the documentation using dynamic impo
 
 Takes a language code matching a `langs` subdirectory and a resource name and returns a documentation file (see `src/types.ts`) if it exists. There are currently two existing resources, `api` and `guide`.
 
-### `getTutorial(lang: string, lesson: string): Promise<LessonFile | false>`
+### getTutorial(lang: string, lesson: string): Promise<LessonFile | false>
 
 Takes a language code and a lesson name and returns a lesson file if it exists. Each tutorial file has the `lesson` code files (the starting state of the code editor); the `solved` files, which show up when the user clicks the Solve button; and the lesson markdown itself.
 
 Lesson names come from a lang folder's `tutorials/directory.json` file which can be imported using the following function.
 
-### `getTutorialDirectory(lang: string): Promise<LessonLookup[] | false>`
+### getTutorialDirectory(lang: string): Promise<LessonLookup[] | false>
 
 Returns the directory object for language if it provides tutorials.
 
