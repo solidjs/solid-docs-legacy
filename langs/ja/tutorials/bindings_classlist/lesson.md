@@ -1,11 +1,11 @@
 Solid は、要素の `className` プロパティを設定するのに、`class` と `className` の両方の使用をサポートしています。しかし、条件付きでクラスを設定するのが便利な場合もあります。そのため、Solid には組み込みの `classList` JSX 属性があり、キーがクラス名、値が真偽の式であるオブジェクトを受け取ります。true の場合はクラスが適用され、false の場合はクラスが削除されます。
 
-これは:
+この例では、これを:
 
 ```jsx
 <button
-	class={current() === 'foo' ? 'selected' : ''}
-	onClick={() => setCurrent('foo')}
+  class={current() === 'foo' ? 'selected' : ''}
+  onClick={() => setCurrent('foo')}
 >foo</button>
 ```
 
@@ -13,12 +13,12 @@ Solid は、要素の `className` プロパティを設定するのに、`class`
 
 ```jsx
 <button
-	classList={{selected: current() === 'foo'}}
-	onClick={() => setCurrent('foo')}
+  classList={{selected: current() === 'foo'}}
+  onClick={() => setCurrent('foo')}
 >foo</button>
 ```
 
-CSS モジュールで受け取る時と同じように、動的に名前を付けられることを忘れないでください。
+CSS モジュールで受け取る時と同じように、動的に名前を付けられることを覚えておいてください:
 
 ```jsx
 import { active } from "./style.module.css"
