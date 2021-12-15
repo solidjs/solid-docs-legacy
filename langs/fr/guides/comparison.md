@@ -14,22 +14,22 @@ Cette section sera implicitement biaisée, mais je pense qu’il est important d
 
 React a eu une grande influence sur Solid. Son flux unidirectionnel et sa séparation explicite de lecture et écriture dans l’API des Hooks ont influencé l’API de Solid bien plus que l’objectif d’être juste une "librairie de Rendu" au lieu d’un framework. Solid possède des opinions bien arrêtées sur la manière d’approcher la gestion des données dans le développement d’application, mais ne cherche pas à contraindre dans son exécution.
 
-Bien que Solid s’aligne sur la philosophie de React, Solid fonctionne fondamentalement différemment. React utilise un Virtual DOM alors que Solid non. L’abstraction de React est une approche des composants du haut vers le bas en appelant les méthodes de rendu de manière répéter en ensuite en faisant une différence.
-Solid calcule le rendu de chaque template une fois dans son ensemble, en construisant une graphique de ses réactivités et n’exécuté seulement les instructions liées aux changements détectés.
+Bien que Solid s’aligne sur la philosophie de React, Solid fonctionne fondamentalement différemment. React utilise un Virtual DOM alors que Solid non. L’abstraction de React est une approche des composants du haut vers le bas en appelant les méthodes de rendu de manière répétée en faisant ensuite une différence.
+Solid calcule le rendu de chaque template une fois dans son ensemble, en construisant un graphique de ses réactivités et n’exécute seulement les instructions liées aux changements détectés.
 
 ### Conseil de migration:
 
-La modèle de mise à jour de Solid n’a rien à voir avec React, ou même React + MobX. À la place de penser aux fonctions composantes comme des fonctions de rendue, il faut les considérer comme des constructeurs. Faites attention à la décomposition ou l’accès prématuré des propriétés réactive. Les primitives de Solid n’ont pas de restrictions comme les Hook donc nous sommes libre de les imbriqué comme bon vous semble. Vous n’avez pas besoin de clés explicites sur les lignes d’une liste pour avec le comportement "keyed" des autres frameworks. Enfin, il n'y a pas de VDOM (Virtual DOM), donc les opérations sur l’API VDOM comme `React.Children` ou `React.cloneElement` n'ont pas de sens. Il est encouragé de trouver différent moyen de résoudre ces problèmes en utilisant qui utilise une approche plus déclarative.
+La modèle de mise à jour de Solid n’a rien à voir avec React, ou même React + MobX. Au lieu de penser aux fonctions composantes comme des fonctions de rendu, il faut les considérer comme des constructeurs. Faites attention à la décomposition ou l’accès prématuré des propriétés réactives. Les primitives de Solid n’ont pas de restriction comme les Hooks, ainsi, elles peuvent librement être imbriquées. Plus besoin de clés explicites sur les lignes d’une liste avec le comportement "keyed" des autres frameworks. Enfin, il n'y a pas de VDOM (Virtual DOM), donc les opérations sur l’API VDOM comme `React.Children` ou `React.cloneElement` n'ont plus de sens. Il est encouragé de trouver différents moyens de résoudre ces problèmes en utilisant une approche plus déclarative.
 
 ## Vue
 
-Solid n’est pas particulièrement influencé par Vue d’un point de vue design, mais ils utilisent tous les deux des approches comparables. Les deux frameworks utilisent les Proxies dans leurs systèmes de réactivité avec de l’auto-traçabilité basée sur la lecture. Mais c’est là que les similarités s’arrêtent. La détection de dépendances se base sur une approche utilisant un Virtual DOM et un système de composant alors que Solid gardent un plus grand contrôle avec ses mises à jour directement dans sur le DOM.
+Solid n’est pas particulièrement influencé par Vue d’un point de vue design, mais ils utilisent tous les deux des approches comparables. Les deux frameworks utilisent les Proxies dans leurs systèmes de réactivité avec de l’auto-traçabilité basée sur la lecture. Mais c’est là que les similarités s’arrêtent. La détection de dépendances de Vue se base sur une approche utilisant un Virtual DOM et un système de composant alors que Solid gardent un plus grand contrôle avec ses mises à jour directement dans sur le DOM.
 
-Vue met en avant la facilité du framework là où Solid préfère une approche plus transparente. Bien que Vue s’aligne sur l’approche de Solid depuis Vue 3, ces librairies pourraient s’aligner de plus en plus avec le temps en fonction de leurs évolutions dans le futur.
+Vue met en avant la facilité du framework là où Solid préfère une approche plus transparente. Bien que Vue s’aligne sur l’approche de Solid avec sa version 3, ces librairies pourraient s’aligner de plus en plus avec le temps en fonction de leurs évolutions dans le futur.
 
 ### Conseil de migration:
 
-Comme Vue 3 est une autre librairie réactive moderne, la migration devrait être familière. Les composants de Solid ressemble beaucoup à un marquage à la fin de Vue fonction `setup`. Faites attention à ne pas trop enrober vos dérivations d’état avec des calculs, essayer plutôt d’utiliser des fonctions. La réactivité est persuasive. Les proxies dans Solid sont intentionnellement en lecture seule. Ne jugez pas avant d’avoir essayé !
+Comme Vue 3 est une autre librairie réactive moderne, la migration devrait être familière. Les composants de Solid ressemblent beaucoup au template JSX retournée par la function `setup` des composants Vue. Attention à ne pas enrober de trop vos dérivations d’état avec des calculs, les fonctions simples sont à privilégier. La réactivité est persuasive. Les proxies dans Solid sont intentionnellement en lecture seule. Ne jugez pas avant d’avoir essayé !
 
 ## Svelte
 
@@ -55,9 +55,9 @@ Si vous avez utilisé Knockout, les primitives de Solid pourrait paraître étra
 
 ## Lit & LighterHTML
 
-Ces librairies sont incroyablement similaires et ont eu une influence sur Solid. En majorité, car le code compilé généré par Solid utilise une méthode très similaire pour initialiser de manière performante le rendu du DOM. Cloner les éléments du template et utiliser des commentaires placeholders est un des points commun que Solid et ses librairies partagent.
+Ces librairies sont incroyablement similaires et ont eu une influence sur Solid. En majorité, car le code compilé généré par Solid utilise une méthode très similaire pour initialiser de manière performante le rendu du DOM. Cloner les éléments du template et utiliser des commentaires placeholders est un des points commun que Solid et ces librairies partagent.
 
-La plus grosse différence est que bien que ces librairies n’utilise pas de Virtual DOM, elles traitent le rendu de la même manière, du haut vers le bas, en ayant besoin de partitionner les composants pour les rendre gérable. Alors que Solid utilise une approche de Graphique Réactif détaillée qui ne met à jour ce qui a été changé et partage ainsi cette technique avec pour le rendu initial. Cette approche tire avantage de la vitesse du rendu initial seulement disponible aux éléments natifs du DOM et est l’approche la plus performante pour les mises à jour.
+La plus grosse différence est que bien que ces librairies n’utilisent pas de Virtual DOM, elles traitent le rendu de la même manière, du haut vers le bas, en ayant besoin de partitionner les composants pour les rendre gérables. Alors que Solid utilise une approche de Graphique Réactif détaillée qui ne met à jour que ce qui a été changé et partage ainsi cette technique avec pour le rendu initial. Cette approche tire avantage de la vitesse du rendu initial seulement disponible aux éléments natifs du DOM et est l’approche la plus performante pour les mises à jour.
 
 ### Conseil de migration:
 
