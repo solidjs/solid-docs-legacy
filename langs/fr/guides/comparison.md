@@ -15,7 +15,7 @@ Cette section sera implicitement biaisée, mais je pense qu’il est important d
 React a eu une grande influence sur Solid. Son flux unidirectionnel et sa séparation explicite de lecture et écriture dans l’API des Hooks ont influencé l’API de Solid bien plus que l’objectif d’être juste une "librairie de Rendu" au lieu d’un framework. Solid possède des opinions bien arrêtées sur la manière d’approcher la gestion des données dans le développement d’application, mais ne cherche pas à contraindre dans son exécution.
 
 Bien que Solid s’aligne sur la philosophie de React, Solid fonctionne fondamentalement différemment. React utilise un Virtual DOM alors que Solid non. L’abstraction de React est une approche des composants du haut vers le bas en appelant les méthodes de rendu de manière répétée en faisant ensuite une différence.
-Solid calcule le rendu de chaque template une fois dans son ensemble, en construisant un graphique de ses réactivités et n’exécute seulement les instructions liées aux changements détectés.
+Solid calcule le rendu de chaque template une fois dans son ensemble, en construisant un graphe de ses réactivités et n’exécute que les instructions liées aux changements détectés.
 
 ### Conseil de migration:
 
