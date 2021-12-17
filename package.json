@@ -31,8 +31,7 @@
     "build:watch": "jiti scripts/build.ts --watch",
     "rollup:watch": "rollup --config --watch",
     "watch": "run-p build:watch rollup:watch",
-    "publish": "npm publish --access public",
-    "todos": "jiti scripts/translationTodos.ts"
+    "publish": "npm publish --access public"
   },
   "dependencies": {
     "@types/markdown-it": "^12.2.3",

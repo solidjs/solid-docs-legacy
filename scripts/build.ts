@@ -14,9 +14,9 @@ async function buildAll() {
 
   for (const lang of langs) {
     console.log("Processing", lang)
-    if (await outputTutorials(lang)) {
-      tutorialLangs.push(lang);
-    }
+    // if (await outputTutorials(lang)) {
+    //   tutorialLangs.push(lang);
+    // }
     await outputDocs(lang);
   }
 

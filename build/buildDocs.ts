@@ -7,26 +7,34 @@ import Token from 'markdown-it/lib/token';
 // import Got from 'got';
 import {existsSync} from 'fs';
 import {mkdir, readdir, readFile, writeFile} from 'fs/promises';
-import {join, resolve} from 'path'
+import {join, resolve, basename, dirname} from 'path'
 
 import {DocFile, DocPageLookup, LessonFile, LessonLookup, Section} from "../src/types";
 
-const docPages: DocPageLookup[] = [
+export const docPages: DocPageLookup[] = [
   {
     subdir: ".",
-    outputName: "api"
+    outputName: "api",
+    combine: true
   },
   {
     subdir: "guides",
-    outputName: "guide"
+    outputName: "guides",
+    combine: false
   },
 ]
 
+type ProcessedMarkdown = {
+  sections: Section[],
+  html: string,
+  attributes: any
+}
 
 const langsDir = resolve(__dirname, "../langs");
 
 // Write the file to a specific path
 export async function writeToPath(path: string, release: any) {
+  await mkdir(dirname(path), {recursive: true});
   await writeFile(path, JSON.stringify(release, null, 2), {
     encoding: 'utf-8',
   });
@@ -36,14 +44,25 @@ export async function outputDocs(lang: string) {
   const langPath = join(langsDir, lang);
 
   const outputDir = resolve(__dirname, './out/docs', lang);
-  if (!existsSync(outputDir)) {
-    await mkdir(outputDir, { recursive: true });
-  }
 
-  for ( const {subdir, outputName} of docPages) {
-    const output = await processSections(join(langPath, subdir));
-    const outputPath = join(outputDir, `${outputName}.json`);
-    await writeToPath(outputPath, output);
+  // await mkdir(outputDir, { recursive: true });
+
+  for ( const {subdir, outputName, combine} of docPages) {
+    const path = join(langPath, subdir);
+    console.log("got here", subdir, outputName, combine);
+    if (combine) {
+      const output = await processSections(path);
+      const outputPath = join(outputDir, `${outputName}.json`);
+      await writeToPath(outputPath, output);
+      continue;
+    }
+
+    const files = await mdInDir(path);
+
+    for (const [name, markdown] of Object.entries(files)) {
+      const outputPath = join(outputDir, outputName, `${name}.json`);
+      await writeToPath(outputPath, markdown);
+    }
   }
 }
 
@@ -96,16 +115,26 @@ export async function outputTutorials(lang: string) {
 }
 
 
-async function processSections(directoryPath: string): Promise<DocFile> {
-  const mdFiles = (await readdir(directoryPath))
+async function mdInDir(dirPath: string) {
+  const mdFiles = (await readdir(dirPath))
     .filter(name => name.endsWith(".md"))
-    .map(relative => join(directoryPath, relative));
+    .map(relative => join(dirPath, relative));
 
-  let results = [];
+  let results: {
+    [name: string]: ProcessedMarkdown
+  } = {}
+
   for (const mdFile of mdFiles) {
     const fileContent = await readFile(mdFile, {encoding: 'utf-8'});
-    results.push(await processMarkdown(fileContent));
+    const fileName = basename(mdFile, ".md");
+    results[fileName] = (await processMarkdown(fileContent));
   }
+
+  return results;
+}
+
+async function processSections(directoryPath: string): Promise<DocFile> {
+  const results = Object.values(await mdInDir(directoryPath));
 
   results.sort(
     (a: any, b: any) => (
@@ -126,7 +155,7 @@ async function processSections(directoryPath: string): Promise<DocFile> {
 }
 
 // Parse individual markdown files
-async function processMarkdown(mdToProcess: string) {
+async function processMarkdown(mdToProcess: string): Promise<ProcessedMarkdown> {
   const { attributes, body } = frontmatter(mdToProcess);
   const theme = await loadTheme(resolve(__dirname, 'github-light.json'));
   const highlighter = await getHighlighter({ theme });
