@@ -9,19 +9,32 @@ const langsDir = resolve(__dirname, "../langs");
 async function buildAll() {
   const langs: string[] = await readdir(langsDir);
 
-  const tutorialLangs = [];
-  const docLangs = langs; //TODO: Don't assume that docs are fully supported for every lang
+  type stringKeyed = { [key: string]: stringKeyed | string[] };
+  const supported: stringKeyed = {};
+
+  function addSupported(resource: string, lang: string) {
+    const path = resource.split("/");
+    let pointer: any = supported;
+    for (let i = 0; i < path.length - 1; i++) {
+      pointer = pointer[path[i]] || (pointer[path[i]] = {});
+    }
+    const lastSegment = path[path.length - 1];
+    if (pointer[lastSegment]) {
+      pointer[lastSegment].push(lang);
+    } else {
+      pointer[lastSegment] = [lang];
+    }
+  }
 
   for (const lang of langs) {
     console.log("Processing", lang)
-    // if (await outputTutorials(lang)) {
-    //   tutorialLangs.push(lang);
-    // }
-    await outputDocs(lang);
+    const supportedTutorials = await outputTutorials(lang);
+    if (supportedTutorials) supportedTutorials.forEach(resource => addSupported(resource, lang));
+    (await outputDocs(lang)).forEach(resource => addSupported(resource, lang));
   }
 
-  //Outputs to ./src, to be directly imported by index.ts
-  await outputSupported({tutorials: tutorialLangs, docs: docLangs});
+  const outputPath = resolve(__dirname, '../build/out', "supported.json");
+  await writeToPath(outputPath, supported);
 }
 
 async function watchAll() {
@@ -40,16 +53,6 @@ async function watchAll() {
     });
   }
 }
-
-async function outputSupported({tutorials, docs}: {tutorials: string[], docs: string[]}) {
-  const supported = {
-    tutorials,
-    docs
-  }
-  const outputPath = resolve(__dirname, '../build/out', "supported.json");
-  await writeToPath(outputPath, supported);
-}
-
 
 if (process.argv[2] === "--watch") {
   watchAll()

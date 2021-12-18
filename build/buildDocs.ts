@@ -10,6 +10,7 @@ import {mkdir, readdir, readFile, writeFile} from 'fs/promises';
 import {join, resolve, basename, dirname} from 'path'
 
 import {DocFile, DocPageLookup, LessonFile, LessonLookup, Section} from "../src/types";
+import {create} from "domain";
 
 export const docPages: DocPageLookup[] = [
   {
@@ -47,13 +48,15 @@ export async function outputDocs(lang: string) {
 
   // await mkdir(outputDir, { recursive: true });
 
+  const createdResources = [];
+
   for ( const {subdir, outputName, combine} of docPages) {
     const path = join(langPath, subdir);
-    console.log("got here", subdir, outputName, combine);
     if (combine) {
       const output = await processSections(path);
       const outputPath = join(outputDir, `${outputName}.json`);
       await writeToPath(outputPath, output);
+      createdResources.push(outputName);
       continue;
     }
 
@@ -61,9 +64,12 @@ export async function outputDocs(lang: string) {
 
     for (const [name, markdown] of Object.entries(files)) {
       const outputPath = join(outputDir, outputName, `${name}.json`);
+      createdResources.push(`${outputName}/${name}`);
       await writeToPath(outputPath, markdown);
     }
   }
+
+  return createdResources;
 }
 
 export async function outputTutorials(lang: string) {
@@ -101,6 +107,7 @@ export async function outputTutorials(lang: string) {
   }
 
   const outputDir = resolve(__dirname, './out/tutorials', lang);
+
   for (const lesson of lookups) {
     const output = await combineTutorialFiles(lesson.internalName);
     if (!existsSync(outputDir)) {
@@ -111,7 +118,7 @@ export async function outputTutorials(lang: string) {
 
   await writeToPath(join(outputDir, "directory.json"), lookups);
 
-  return true;
+  return lookups.map(({internalName}) => `tutorials/${internalName}`);
 }
 
 
