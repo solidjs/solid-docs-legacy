@@ -3,7 +3,7 @@ import {DocFile, LessonFile, LessonLookup, StringKeyed, ResourceMetadata} from "
 
 export { supported, ResourceMetadata, DocFile, LessonFile, LessonLookup }
 
-function traverse(resourcePath: string[]): StringKeyed | false | string[]{
+function traversePath(resourcePath: string[]): StringKeyed | false | string[]{
   let cursor = supported;
   for (const part of resourcePath) {
     // @ts-ignore
@@ -31,7 +31,7 @@ export async function getGuides(lang: string) {
 }
 
 export function getSupported(resourcePath: string, lang: string) {
-  const cursor = traverse(resourcePath.split('/'));
+  const cursor = traversePath(resourcePath.split('/'));
   if (!cursor) {
     return false;
   }
@@ -51,9 +51,27 @@ export function getSupported(resourcePath: string, lang: string) {
   }
 }
 
+export function getAllResourcePaths(lang: string) {
+  const paths: string[] = [];
+  const traverse = (resourcePath: string[], cursor: StringKeyed | string[]) => {
+    if (Array.isArray(cursor)) {
+      if (cursor.includes(lang)) {
+        paths.push(resourcePath.join('/'));
+      }
+      return;
+    }
+    for (const [key, value] of Object.entries(cursor)) {
+      traverse(resourcePath.concat(key), value);
+    }
+  };
+  traverse([], supported);
+  return paths;
+}
+
+
 export async function getDoc(lang: string, resource: string): Promise<DocFile | false> {
   const resourcePath = resource.split('/');
-  const cursor = traverse(resourcePath);
+  const cursor = traversePath(resourcePath);
   if (!Array.isArray(cursor) || !cursor.includes(lang)) {
     return false;
   }
@@ -68,7 +86,7 @@ export async function getDoc(lang: string, resource: string): Promise<DocFile | 
 }
 
 export async function getTutorial(lang: string, lesson: string): Promise<LessonFile | false> {
-  const cursor = traverse(['tutorials', lesson]);
+  const cursor = traversePath(['tutorials', lesson]);
   if (!Array.isArray(cursor) || !cursor.includes(lang)) {
     return false;
   }
