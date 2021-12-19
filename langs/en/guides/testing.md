@@ -1,6 +1,6 @@
 ---
 title: Testing Solid 
-description: An explanation of Solid's server-side capabilities.
+description: How to test your Solid app
 sort: 4
 ---
 # Testing Solid 
