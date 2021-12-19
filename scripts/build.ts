@@ -6,11 +6,12 @@ import  watch from "node-watch";
 
 const langsDir = resolve(__dirname, "../langs");
 
+import {StringKeyed} from "../src/types";
+
 async function buildAll() {
   const langs: string[] = await readdir(langsDir);
 
-  type stringKeyed = { [key: string]: stringKeyed | string[] };
-  const supported: stringKeyed = {};
+  const supported: StringKeyed = {};
 
   function addSupported(resource: string, lang: string) {
     const path = resource.split("/");

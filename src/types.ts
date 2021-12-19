@@ -5,6 +5,11 @@ export interface Section {
   children?: Section[];
 }
 
+export type ResourceMetadata = {
+  sort: number,
+  title: string,
+  description: string
+}
 export type DocPageLookup = {
   subdir: string, //relative to a lang folder
   outputName: string,
@@ -16,7 +21,7 @@ export type DocPageLookup = {
 }
 export type DocFile = {
   sections: any[],
-  content: string
+  html: string
 }
 export type LessonLookup = {
   lessonName: string,
@@ -30,3 +35,6 @@ export type LessonFile = {
   solved?: any,
   markdown?: string,
 }
+
+export type StringKeyed = { [key: string]: StringKeyed | string[] };
+

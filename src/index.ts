@@ -1,10 +1,9 @@
 import supported from "../build/out/supported.json"
-import {DocFile, LessonFile, LessonLookup} from "./types";
+import {DocFile, LessonFile, LessonLookup, StringKeyed, ResourceMetadata} from "./types";
 
 export { supported }
 
-type stringKeyed = { [key: string]: stringKeyed | string[] };
-function traverse(resourcePath: string[]): stringKeyed | false | string[]{
+function traverse(resourcePath: string[]): StringKeyed | false | string[]{
   let cursor = supported;
   for (const part of resourcePath) {
     // @ts-ignore
@@ -14,6 +13,21 @@ function traverse(resourcePath: string[]): stringKeyed | false | string[]{
     }
   }
   return cursor;
+}
+
+export async function getGuides(lang: string) {
+  const metadata = (await import(`../build/out/docs/${lang}/guides/_metadata.json`)).default as {
+    [resource: string]: ResourceMetadata
+  };
+  if (metadata) {
+    return Object.entries(metadata)
+      .filter( ([resource, metadata]) => metadata.title)
+      .sort((a, b) => (a[1].sort - b[1].sort))
+      .map( ([resource, {description, title}]) => ({
+        resource: "guides/" + resource,
+        description, title
+    }))
+  }
 }
 
 export function getSupported(resourcePath: string, lang: string) {
@@ -45,10 +59,10 @@ export async function getDoc(lang: string, resource: string): Promise<DocFile | 
   }
   // We have to have each depth explicitly for rollup dynamic imports to work
   if (resourcePath.length == 1) {
-    return await import(`../build/out/docs/${lang}/${resourcePath[0]}.json`) as DocFile;
+    return (await import(`../build/out/docs/${lang}/${resourcePath[0]}.json`)).default as DocFile;
   }
   if (resourcePath.length == 2) {
-    return await import(`../build/out/docs/${lang}/${resourcePath[0]}/${resourcePath[1]}.json`) as DocFile;
+    return (await import(`../build/out/docs/${lang}/${resourcePath[0]}/${resourcePath[1]}.json`)).default as DocFile;
   }
   return false;
 }
@@ -58,13 +72,13 @@ export async function getTutorial(lang: string, lesson: string): Promise<LessonF
   if (!Array.isArray(cursor) || !cursor.includes(lang)) {
     return false;
   }
-  const lessonFile = await import(`../build/out/tutorials/${lang}/${lesson}.json`) as LessonFile;
+  const lessonFile = (await import(`../build/out/tutorials/${lang}/${lesson}.json`)).default as LessonFile;
   return lessonFile;
   return false;
 }
 
 export async function getTutorialDirectory(lang: string): Promise<LessonLookup[] | false> {
-  const directory = await import(`../build/out/tutorials/${lang}/directory.json`);
+  const directory = (await import(`../build/out/tutorials/${lang}/directory.json`)).default;
   if (directory)
     return directory.default;
   return false;

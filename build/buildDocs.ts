@@ -62,11 +62,15 @@ export async function outputDocs(lang: string) {
 
     const files = await mdInDir(path);
 
+    const metadata: { [name: string]: object } = {};
     for (const [name, markdown] of Object.entries(files)) {
       const outputPath = join(outputDir, outputName, `${name}.json`);
       createdResources.push(`${outputName}/${name}`);
       await writeToPath(outputPath, markdown);
+      metadata[name] = markdown.attributes;
     }
+    await writeToPath(join(outputDir, outputName, `_metadata.json`), metadata);
+
   }
 
   return createdResources;
@@ -121,7 +125,6 @@ export async function outputTutorials(lang: string) {
   return lookups.map(({internalName}) => `tutorials/${internalName}`);
 }
 
-
 async function mdInDir(dirPath: string) {
   const mdFiles = (await readdir(dirPath))
     .filter(name => name.endsWith(".md"))
@@ -148,16 +151,16 @@ async function processSections(directoryPath: string): Promise<DocFile> {
       a.attributes ? a.attributes.sort : 0) - (b.attributes ? b.attributes.sort : 0)
   );
 
-  let content = '';
+  let html = '';
   let sections = [];
   for (let i in results) {
-    content += results[i].html;
+    html += results[i].html;
     sections.push(...results[i].sections);
   }
 
   return {
     sections,
-    content
+    html
   }
 }
 
