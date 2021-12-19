@@ -1,7 +1,7 @@
 import supported from "../build/out/supported.json"
 import {DocFile, LessonFile, LessonLookup, StringKeyed, ResourceMetadata} from "./types";
 
-export { supported }
+export { supported, ResourceMetadata, DocFile, LessonFile, LessonLookup }
 
 function traverse(resourcePath: string[]): StringKeyed | false | string[]{
   let cursor = supported;
