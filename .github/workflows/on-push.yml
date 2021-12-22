@@ -10,4 +10,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: git log
+      - run: npm install
+      - run: npm run build
+      - run: npm run todos
+      - uses: EndBug/add-and-commit@v7
+        with:
+          message: 'bot: update language todos'

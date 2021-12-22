@@ -207,47 +207,5 @@ async function updateTodoData(sinceHash?: string) {
   }
 }
 
-
-(async () => {
-  const fileMap = await getFileMap();
-  initializeTodoData();
-  // return;
-  // console.log(await filePaths("tutorials/props_split", "en"));
-
-
-
-  // const data = await updateTodoData("1d65088afae4b6fd351499975c7b88078a6322b0");
-  // console.log(data);
-
-  // getAllResourcePaths("en").map(async (path) => {
-  //
-  //   const enFiles = await filePaths(path, "en");
-  //   const enLatest = enFiles.map(commitInfo);
-  //
-  //   for (const lang of langs) {
-  //     const isSupported = getSupported(path, lang);
-  //     if (isSupported) {
-  //       const langFiles = await filePaths(path, lang);
-  //       const langLatest = langFiles.map(commitInfo);
-  //       for (let i = 0; i < enFiles.length; i++) {
-  //         if ( enLatest[i].date > langLatest[i].date) {
-  //           console.log(`${lang} ${path} ${langLatest[i].file} is out of date`)
-  //         }
-  //       }
-  //     }
-  //   }
-  //   // console.log(commitInfo);
-  // })
-
-
-  // for (const lang of langs) {
-  //   getAllResourcePaths(lang).map(path => {
-  //     const isSupported = getSupported(path, lang);
-  //     if (isSupported) {
-  //       gitlog()
-  //     }
-  //   })
-  // }
-
-})();
+initializeTodoData();
 
