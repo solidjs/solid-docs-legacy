@@ -1,4 +1,6 @@
 
-import { getSupported } from "../src";
+import { getSupported, getTutorialDirectory } from "../src";
 
-console.log(getSupported("guides/comparison", "fr"));
+(async () => {
+  console.log(await getTutorialDirectory("ja"))
+})()
