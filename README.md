@@ -48,8 +48,27 @@ All you have to do is retrieve the JSON file describing your favorite theme (see
 
 The package exposes async functions to load the documentation using dynamic imports.
 
+### `getSupported(resourcePath: string, lang?: string)`
+Takes a _resource path_ and returns a list of language codes that support that resource.
+If passed a language code, it will return `true` if that language supports the resource.
+
+```js
+getSupported("tutorials/async_lazy") //[ 'de', 'en', 'ja', 'ru', 'zh-cn' ]
+getSupported("guides/comparison", "fr") // true
+```
+Resource paths follow the directory structure of the language folders.
+Currently, there are guide resources (`guides/name`), tutorial resources (`tutorials/name`), and the API resource (`api`).
+
+### `getAllResourcePaths(lang: string): Promise<string[]>`
+Returns a list of all resource paths for a given language.
+
+### `getGuides(lang: string): Promise<Array<{resource: string, title: string, description: string}>>`
+Takes a language code and returns an array of metadata for all supported guides. The array is sorted by the sort number in the
+guide metadata.
+
 ### `getDoc(lang: string, resource: string): Promise<DocFile | false>` 
-Takes a language code matching a `langs` subdirectory and a resource name and returns a documentation file (see `src/types.ts`) if it exists. There are currently two existing resources, `api` and `guide`.
+Takes a language code matching a `langs` subdirectory and a resource name and returns a documentation file (see `src/types.ts`) if it exists. 
+Use this to get the compiled output for all resources except tutorials.
 
 ### `getTutorial(lang: string, lesson: string): Promise<LessonFile | false>`
 Takes a language code and a lesson name and returns a lesson file if it exists. Each tutorial file has the `lesson` code files (the starting state of the code editor); the `solved` files, which show up when the user clicks the Solve button; and the lesson markdown itself.
@@ -58,8 +77,6 @@ Lesson names come from a lang folder's `tutorials/directory.json` file which can
 
 ### `getTutorialDirectory(lang: string): Promise<LessonLookup[] | false>`
 Returns the directory object for language if it provides tutorials.
-
-The package also exposes two arrays, `supportedTutorials` and `supportedDocs`, which tell you what language codes are supported for each.
 
 # Thank You
 
