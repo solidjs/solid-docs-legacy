@@ -30,14 +30,19 @@ export async function getGuides(lang: string) {
   }
 }
 
-export function getSupported(resourcePath: string, lang: string) {
+export function getSupported(resourcePath: string, lang?: string) {
   const cursor = traversePath(resourcePath.split('/'));
   if (!cursor) {
     return false;
   }
   if (Array.isArray(cursor)) {
-    return cursor.includes(lang);
+    if (lang) {
+      return cursor.includes(lang);
+    }
+    return cursor;
   }
+
+  if (!lang) { return false; }
 
   const keys = Object.keys(cursor);
 
