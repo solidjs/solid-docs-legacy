@@ -31,6 +31,14 @@ To start a translation project, create a folder with the language code in the `l
 
 If you feel the documentation is missing anything important, please feel free to open an issue or submit a modifying PR.
 
+# Language READMEs
+Each language folder has a `README.md` file that lets you know what changes have been made to the English documentation since the language has been updated.
+The tables are automatically updated using [`markdown-magic`](https://github.com/DavidWells/markdown-magic) when a commit is made to the main branch.
+Note that the READMEs are only updated on the main branch.
+
+(If you create a new language folder, it will automatically get a `README.md` file when the PR is merged.)
+
+These READMEs are also a place for translation maintainers to write any notes about their translation.
 # Building
 
 This package serves to build the markdown files into a consumable format imported by [solid-site](https://github.com/solidjs/solid-site).
@@ -45,7 +53,7 @@ The script mentioned above uses shiki to process the code which in turn uses VSC
 All you have to do is retrieve the JSON file describing your favorite theme (see ./build/github-light.json for an example), paste it into the build folder and refer to it in the fetchReleases.ts file around line 158: const theme = await loadTheme(resolve(__dirname, 'your-theme.json'));.
 
 ## Importing Docs and Tutorials
-
+This section probably won't be relevant unless you're working on solid-site.
 The package exposes async functions to load the documentation using dynamic imports.
 
 ### `getSupported(resourcePath: string, lang?: string)`
