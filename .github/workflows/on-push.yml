@@ -15,4 +15,5 @@ jobs:
       - run: npm run todos
       - uses: EndBug/add-and-commit@v7
         with:
+          add: 'langs/*/README.md'
           message: 'bot: update language todos'

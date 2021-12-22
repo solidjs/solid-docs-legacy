@@ -127,7 +127,7 @@ export async function outputTutorials(lang: string) {
 
 async function mdInDir(dirPath: string) {
   const mdFiles = (await readdir(dirPath))
-    .filter(name => name.endsWith(".md"))
+    .filter(name => name.endsWith(".md") && name !== "README.md")
     .map(relative => join(dirPath, relative));
 
   let results: {
