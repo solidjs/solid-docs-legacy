@@ -1,0 +1,19 @@
+name: on-push
+on: [push]
+jobs:
+  run-todos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with: 
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: npm install
+      - run: npm run build
+      - run: npm run todos
+      - uses: EndBug/add-and-commit@v7
+        with:
+          add: 'langs/*/README.md'
+          message: 'bot: update language todos'

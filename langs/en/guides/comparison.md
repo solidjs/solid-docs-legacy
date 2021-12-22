@@ -1,7 +1,7 @@
 ---
 title: Comparison
 description: Comparisons of Solid against other frameworks.
-sort: 4
+sort: 5
 ---
 
 # Comparison with other Libraries

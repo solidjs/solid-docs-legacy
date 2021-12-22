@@ -5,13 +5,23 @@ export interface Section {
   children?: Section[];
 }
 
+export type ResourceMetadata = {
+  sort: number,
+  title: string,
+  description: string
+}
 export type DocPageLookup = {
   subdir: string, //relative to a lang folder
-  outputName: string
+  outputName: string,
+  /*
+    if true, the markdown files will be output as a single file with outputName; if not, outputName
+    will be the name of an output directory containing each processed markdown file
+   */
+  combine: boolean,
 }
 export type DocFile = {
   sections: any[],
-  content: string
+  html: string
 }
 export type LessonLookup = {
   lessonName: string,
@@ -25,3 +35,6 @@ export type LessonFile = {
   solved?: any,
   markdown?: string,
 }
+
+export type StringKeyed = { [key: string]: StringKeyed | string[] };
+
