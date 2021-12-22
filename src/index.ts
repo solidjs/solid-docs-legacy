@@ -103,7 +103,11 @@ export async function getTutorial(lang: string, lesson: string): Promise<LessonF
 
 export async function getTutorialDirectory(lang: string): Promise<LessonLookup[] | false> {
   const directory = (await import(`../build/out/tutorials/${lang}/directory.json`));
-  if (directory)
+  if (directory?.default) {
+    return directory.default;
+  }
+  if (directory) {
     return directory;
+  }
   return false;
 }
