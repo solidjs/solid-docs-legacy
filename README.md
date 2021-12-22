@@ -1,5 +1,5 @@
-<p align="center">
-  <img width="75px" src="https://github.com/solidjs/solid-site/raw/master/src/assets/logo.png" alt="Solid logo">
+<p>
+  <img width="100%" src="https://github.com/solidjs/solid-docs/blob/main/banner.png" alt="Solid Docs">
 </p>
 
 # Solid Docs
@@ -48,9 +48,10 @@ Run `yarn build` to run the build script. This compiles the markdown into variou
 After linking, run `yarn watch` in solid-docs to recompile your changes as you make them. Note that adding a new language or a new tutorial directory for a language that didn't have one won't trigger the watcher; run `yarn build` first.
 
 ### Theming
+
 The script mentioned above uses shiki to process the code which in turn uses VSCode tokens. Therefore any VSCode theme can be applied.
 
-All you have to do is retrieve the JSON file describing your favorite theme (see ./build/github-light.json for an example), paste it into the build folder and refer to it in the fetchReleases.ts file around line 158: const theme = await loadTheme(resolve(__dirname, 'your-theme.json'));.
+All you have to do is retrieve the JSON file describing your favorite theme (see ./build/github-light.json for an example), paste it into the build folder and refer to it in the fetchReleases.ts file around line 158: const theme = await loadTheme(resolve(\_\_dirname, 'your-theme.json'));.
 
 ## Importing Docs and Tutorials
 This section probably won't be relevant unless you're working on solid-site.
@@ -78,12 +79,14 @@ guide metadata.
 Takes a language code matching a `langs` subdirectory and a resource name and returns a documentation file (see `src/types.ts`) if it exists. 
 Use this to get the compiled output for all resources except tutorials.
 
-### `getTutorial(lang: string, lesson: string): Promise<LessonFile | false>`
+### getTutorial(lang: string, lesson: string): Promise<LessonFile | false>
+
 Takes a language code and a lesson name and returns a lesson file if it exists. Each tutorial file has the `lesson` code files (the starting state of the code editor); the `solved` files, which show up when the user clicks the Solve button; and the lesson markdown itself.
 
 Lesson names come from a lang folder's `tutorials/directory.json` file which can be imported using the following function.
 
-### `getTutorialDirectory(lang: string): Promise<LessonLookup[] | false>`
+### getTutorialDirectory(lang: string): Promise<LessonLookup[] | false>
+
 Returns the directory object for language if it provides tutorials.
 
 # Thank You

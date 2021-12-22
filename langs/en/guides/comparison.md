@@ -72,7 +72,7 @@ These libraries are pretty minimal and easy to build on top. However, keep in mi
 
 ## S.js
 
-This library had the greatest influence on Solid's reactive design. Solid used S.js internally for a couple of years until the feature set placed them on diffenent paths. S.js is one of the most efficient reactive libraries to date. It models everything off synchronous time steps like a digital circuit and ensures consistency without having to do many of the more complicated mechanisms found in libraries like MobX. Solid's reactivity in the end is a sort of hybrid between S and MobX. This gives it greater performance than most reactive libraries (Knockout, MobX, Vue) while retaining the ease of mental model for the developer. S.js ultimately is still the more performant reactive library although the difference is hardly noticeable in all but the most grueling synthetic benchmarks.
+This library had the greatest influence on Solid's reactive design. Solid used S.js internally for a couple of years until the feature set placed them on different paths. S.js is one of the most efficient reactive libraries to date. It models everything off synchronous time steps like a digital circuit and ensures consistency without having to do many of the more complicated mechanisms found in libraries like MobX. Solid's reactivity in the end is a sort of hybrid between S and MobX. This gives it greater performance than most reactive libraries (Knockout, MobX, Vue) while retaining the ease of mental model for the developer. S.js ultimately is still the more performant reactive library although the difference is hardly noticeable in all but the most grueling synthetic benchmarks.
 
 ## RxJS
 
