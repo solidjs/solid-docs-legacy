@@ -15,10 +15,14 @@ function traversePath(resourcePath: string[]): StringKeyed | false | string[]{
   return cursor;
 }
 
-export async function getGuides(lang: string) {
+export async function getGuides(lang: string): Promise<ResourceMetadata[] | undefined> {
   const metadata = (await import(`../build/out/docs/${lang}/guides/_metadata.json`)).default as {
-    [resource: string]: ResourceMetadata
+    [resource: string]: {
+    sort: number,
+    title: string,
+    description: string }
   };
+
   if (metadata) {
     return Object.entries(metadata)
       .filter( ([resource, metadata]) => metadata.title)
