@@ -178,8 +178,7 @@ async function processMarkdown(mdToProcess: string): Promise<ProcessedMarkdown> 
     },
   });
   const sections: Section[] = [];
-  let first: Section;
-  let second: Section | undefined;
+  const current: Array<Section | undefined> = Array(6).fill(undefined);
   md.use(anchor, {
     permalink: true,
     permalinkBefore: true,
@@ -189,16 +188,13 @@ async function processMarkdown(mdToProcess: string): Promise<ProcessedMarkdown> 
       const level = Number.parseInt(token.tag[1], 10);
       const section: Section = { slug, title, level, children: [] };
       if (level === 1) {
-        first = section;
-        second = undefined;
-        sections.push(first);
-      } else if (level === 2) {
-        second = section;
-        first.children!.push(second);
-      } else {
-        if (!second) return;
-        else second.children!.push(section);
+        current[0] = section;
+        sections.push(section);
+        return;
       }
+      if (!current[level - 2]) return;
+      current[level - 1] = section;
+      current[level - 2]!.children!.push(section);
     },
   });
   const renderedMarkdown = md.render(body)
