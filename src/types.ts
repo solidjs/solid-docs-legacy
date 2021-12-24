@@ -6,10 +6,11 @@ export interface Section {
 }
 
 export type ResourceMetadata = {
-  sort: number,
   title: string,
-  description: string
+  description: string,
+  resource: string
 }
+
 export type DocPageLookup = {
   subdir: string, //relative to a lang folder
   outputName: string,
