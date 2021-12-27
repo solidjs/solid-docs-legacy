@@ -8,7 +8,7 @@ This is documentation for SolidJS v1.0.0 and associated Solid packages and proje
 
 # Translations
 
-Solid's documentation is available in 6 languages including:
+Solid's documentation is available in 9 languages:
 
 | Language           | API Documentation | Guides | Tutorials | Contibutors                                                                                                                                                                |
 | ------------------ | ----------------- | ------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
