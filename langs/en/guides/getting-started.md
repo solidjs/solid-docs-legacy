@@ -8,7 +8,7 @@ sort: 0
 
 By far the easiest way to get started with Solid is to try it online. Our REPL at https://playground.solidjs.com is the perfect way to try out ideas. As is https://codesandbox.io/ where you can modify any of [our Examples](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
 
-Alternatively, you can use our simple [Vite](https://vitejs.dev/) templates by runnings these commands in your terminal:
+Alternatively, you can use our simple [Vite](https://vitejs.dev/) templates by running these commands in your terminal:
 
 ```sh
 > npx degit solidjs/templates/js my-app
@@ -89,7 +89,7 @@ For more information, read the [Server guide](#server-side-rendering).
 
 ## No Compilation?
 
-Dislike JSX? Don't mind doing manual work to wrap expressions, worse performance, and having larger bundle sizes? Alternatively, you can create a Solid app using Tagged Template Literals or HyperScript in non-compiled environments.
+Dislike JSX? Don't mind doing manual work to wrap expressions, experiencing worse performance, and having larger bundle sizes? Alternatively, you can create a Solid app using Tagged Template Literals or HyperScript in non-compiled environments.
 
 You can run them straight from the browser using [Skypack](https://www.skypack.dev/):
 
