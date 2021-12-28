@@ -41,7 +41,7 @@ setValue((prev) => prev + next);
 > setValue(() => myFunction);
 > ```
 
-### Options
+##### Options
 Several primitives in Solid take an "options" object as an optional last argument. `createSignal`'s options object allows you to provide an `equals` option.
 
 ```js
