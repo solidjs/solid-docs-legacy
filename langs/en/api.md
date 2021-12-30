@@ -115,6 +115,8 @@ The memo function is called with the value returned from the memo function's las
 const sum = createMemo((prev) => input() + prev, 0);
 ```
 
+The memo function should not change other signals by calling setters (it should be "pure"). This enables the execution order of memos to be optimized according to read dependencies.
+
 ## `createResource`
 
 ```ts
