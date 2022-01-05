@@ -221,7 +221,7 @@ Now that you have installed your testing tools, you should start to use them. In
 
 You may want to keep parts of your state separate from the components for ease of maintenance or being able to support multiple views. In this case, the interface against which you are testing is the state itself. Keep in mind that out of a [reactive root](https://www.solidjs.com/docs/latest/api#createroot) your state is not tracked and updates won't trigger effects and memos.
 
-Also, since effects trigger asynchronously, it can help to wrap our assertions in an effect themselves:
+Also, since effects trigger asynchronously, it can help to wrap our assertions in a final effect. Alternatively, to observe a sequence of effects over multiple changes, it can help to return the necessary tools from `createRoot` and execute them in an async test function (as `createRoot` itself cannot take an `async` function).
 
 As an example, let's test `createLocalStorage` from the [todo example](https://www.solidjs.com/examples/todos):
 
@@ -266,7 +266,7 @@ describe("createLocalStore", () => {
   test("it stores new state to localStorage", () => createRoot(dispose => {
     const [state, setState] = createLocalStore(initialState);
     setState("newTitle", "updated");
-    // to catch an effect, we need an effect
+    // to catch an effect, use an effect
     return new Promise<void>((resolve) => createEffect(() => {
       expect(JSON.parse(localStorage.todos || ""))
         .toEqual({ todos: [], newTitle: "updated" });
@@ -274,6 +274,23 @@ describe("createLocalStore", () => {
       resolve();
     }));
   }));
+
+  test("it updates state multiple times", async () => {
+    const {dispose, setState} = createRoot(dispose => {
+      const [state, setState] = createLocalStore(initialState);
+      return {dispose, setState};
+    });
+    setState("newTitle", "first");
+    // wait a tick to resolve all effects
+    await new Promise((done) => setTimeout(done, 0));
+    expect(JSON.parse(localStorage.todos || ""))
+      .toEqual({ todos: [], newTitle: "first" });
+    setState("newTitle", "second");
+    await new Promise((done) => setTimeout(done, 0));
+    expect(JSON.parse(localStorage.todos || ""))
+      .toEqual({ todos: [], newTitle: "first" });
+    dispose();
+  });
 });
 ```
 
