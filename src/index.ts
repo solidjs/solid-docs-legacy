@@ -15,23 +15,28 @@ function traversePath(resourcePath: string[]): StringKeyed | false | string[]{
   return cursor;
 }
 
-export async function getGuides(lang: string): Promise<ResourceMetadata[] | undefined> {
-  const metadata = (await import(`../build/out/docs/${lang}/guides/_metadata.json`)).default as {
-    [resource: string]: {
-    sort: number,
-    title: string,
-    description: string }
-  };
+export async function getGuides(lang: string, defaultToEnglish = false): Promise<ResourceMetadata[] | undefined> {
+  const supported = getSupported("guides", lang);
+  if (Array.isArray(supported) && supported.length) {
+    const metadata = (await import(`../build/out/docs/${lang}/guides/_metadata.json`)).default as {
+      [resource: string]: {
+        sort: number,
+        title: string,
+        description: string }
+    };
 
-  if (metadata) {
-    return Object.entries(metadata)
-      .filter( ([resource, metadata]) => metadata.title)
-      .sort((a, b) => (a[1].sort - b[1].sort))
-      .map( ([resource, {description, title}]) => ({
-        resource: "guides/" + resource,
-        description, title
-    }))
+    if (metadata) {
+      return Object.entries(metadata)
+        .filter( ([resource, metadata]) => metadata.title)
+        .sort((a, b) => (a[1].sort - b[1].sort))
+        .map( ([resource, {description, title}]) => ({
+          resource: "guides/" + resource,
+          description, title
+        }))
+    }
   }
+
+  return defaultToEnglish ? getGuides("en") : []
 }
 
 export function getSupported(resourcePath: string, lang?: string) {
