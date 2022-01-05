@@ -12,10 +12,10 @@ sort: 0
 export function createSignal<T>(
   value: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
-): [get: () => T, set:(v: T) => T];
+): [get: () => T, set: (v: T) => T];
 ```
 
-This is the most basic reactive primitive used to track a single value that changes over time. The `createSignal` function returns a pair of functions as an array: a getter (or _accessor_) and a setter. 
+This is the most basic reactive primitive used to track a single value that changes over time. The `createSignal` function returns a pair of functions as an array: a getter (or _accessor_) and a setter.
 
 The getter returns the current value of the signal. When called within a tracking scope (like functions passed to `createEffect` or used in JSX expressions), the calling context will rerun when the signal is updated.
 
@@ -34,7 +34,6 @@ setValue(nextValue);
 setValue((prev) => prev + next);
 ```
 
-
 > If you wish to store a function in a Signal you must use the function form:
 >
 > ```js
@@ -42,6 +41,7 @@ setValue((prev) => prev + next);
 > ```
 
 ##### Options
+
 Several primitives in Solid take an "options" object as an optional last argument. `createSignal`'s options object allows you to provide an `equals` option.
 
 ```js
@@ -52,21 +52,17 @@ By default, when a signal's setter is called, dependencies are only rerun if the
 
 ```js
 const [myString, setMyString] = createSignal("string", {
-   equals: (newVal, oldVal) => newVal.length === oldVal.length 
+  equals: (newVal, oldVal) => newVal.length === oldVal.length,
 });
 
-setMyString("strung") //is considered equal to the last value and won't cause updates
-setMyString("stranger") //is considered different and will cause updates
+setMyString("strung"); //is considered equal to the last value and won't cause updates
+setMyString("stranger"); //is considered different and will cause updates
 ```
-
 
 ## `createEffect`
 
 ```ts
-export function createEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-): void;
+export function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 Creates a new computation that automatically tracks dependencies and runs after each render in which a dependency has changed. Ideal for using `ref`s and managing other side effects.
@@ -88,7 +84,7 @@ createEffect((prev) => {
 }, 0);
 ```
 
-Signal changes inside effects _batch_: no update to a signal will propogate until the effect finishes executing. 
+Signal changes inside effects _batch_: no update to a signal will propogate until the effect finishes executing.
 
 ## `createMemo`
 
@@ -126,19 +122,25 @@ type ResourceReturn<T> = [
   },
   {
     mutate: (v: T | undefined) => T | undefined;
-    refetch: () => void;
+    refetch: (info: unknown) => Promise<T> | T;
   }
 ];
 
 export function createResource<T, U = true>(
-  fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; }
+  fetcher: (
+    k: U,
+    info: { value: T | undefined; refetching: boolean | unknown }
+  ) => T | Promise<T>,
+  options?: { initialValue?: T }
 ): ResourceReturn<T>;
 
 export function createResource<T, U>(
   source: U | false | null | (() => U | false | null),
-  fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; }
+  fetcher: (
+    k: U,
+    info: { value: T | undefined; refetching: boolean | unknown }
+  ) => T | Promise<T>,
+  options?: { initialValue?: T }
 ): ResourceReturn<T>;
 ```
 
@@ -248,9 +250,25 @@ setA("new"); // now it runs
 export function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-Creates a new non-tracked context that doesn't auto-dispose. This is useful for nested reactive contexts that you do not wish to release when the parent re-evaluates. It is a powerful pattern for caching.
+Creates a new non-tracked owner scope that doesn't auto-dispose. This is useful for nested reactive scopes that you do not wish to release when the parent re-evaluates.
 
 All Solid code should be wrapped in one of these top level as they ensure that all memory/computations are freed up. Normally you do not need to worry about this as `createRoot` is embedded into all `render` entry functions.
+
+## `getOwner`
+
+```ts
+export function getOwner(): Owner;
+```
+
+Gets the current owning computation for the running reactive scope. This scope isn't necessarily tracking but the one that is responsible for disposal of the current execution block.
+
+## `runWithOwner`
+
+```ts
+export function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
+```
+
+Executes the code under the provided owner before restoring it to the owner of the outer scope.
 
 ## `mergeProps`
 
@@ -282,7 +300,7 @@ export function splitProps<T>(
 ): [...parts: Partial<T>];
 ```
 
-Splits a reactive object by keys. 
+Splits a reactive object by keys.
 
 It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
 
@@ -301,8 +319,8 @@ const [local, others] = splitProps(props, ["children"]);
 
 ```ts
 export function useTransition(): [
-  () => boolean,
-  (fn: () => void, cb?: () => void) => void
+  pending: () => boolean,
+  startTransition: (fn: () => void) => Promise<void>
 ];
 ```
 
@@ -317,6 +335,16 @@ isPending();
 // wrap in transition
 start(() => setSignal(newValue), () => /* transition is done */)
 ```
+
+## `startTransition`
+
+_New in v1.1_
+
+```ts
+export function startTransition: (fn: () => void) => Promise<void>;
+```
+
+Similar to `useTransition` except there is no associated pending state. This one can just be used directly to start the Transition.
 
 ## `observable`
 
@@ -335,6 +363,39 @@ const obsv$ = from(observable(s));
 
 obsv$.subscribe((v) => console.log(v));
 ```
+
+## `from`
+
+_New in v1.1_
+
+```ts
+export function from<T>(
+  producer:
+    | ((setter: (v: T) => T) => () => void)
+    | {
+        subscribe: (
+          fn: (v: T) => void
+        ) => (() => void) | { unsubscribe: () => void };
+      }
+): () => T;
+```
+
+A simple helper to make it easier to interopt with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
+
+```js
+const signal = from(obsv$);
+```
+
+It can also take a custom producer function where the function is passed a setter function returns a unsubscribe function:
+
+```js
+const clock = from((set) => {
+  const t = setInterval(() => set(1), 1000);
+  return () => clearInterval(t);
+});
+```
+
+> Note: Signals created by `from` have equality checks turned off to interface better with external streams and sources.
 
 ## `mapArray`
 
@@ -407,7 +468,7 @@ These APIs are available at `solid-js/store`. They allow the creation of stores:
 
 ```ts
 export function createStore<T extends StoreNode>(
-  state: T | Store<T>,
+  state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
@@ -426,11 +487,12 @@ setState({ merge: "thisValue" });
 setState("path", "to", "value", newValue);
 ```
 
-As proxies, store objects only track when a property is accessed. 
+As proxies, store objects only track when a property is accessed.
 
-When nested objects are accessed, stores will produce nested store objects, and this applies all the way down the tree. However, this only applies to arrays and plain objects. Classes are not wrapped, so objects like `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` won't be granularly reactive as properties on a store. 
+When nested objects are accessed, stores will produce nested store objects, and this applies all the way down the tree. However, this only applies to arrays and plain objects. Classes are not wrapped, so objects like `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` won't be granularly reactive as properties on a store.
 
 The top level state object cannot be tracked, so put any lists on a key of state rather than using the state object itself.
+
 ```js
 // put the list as a key on the state object
 const [state, setState] = createStore({ list: [] });
@@ -565,6 +627,7 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ```
 
 ## Store Utilities
+
 ### `produce`
 
 ```ts
@@ -611,6 +674,14 @@ const unsubscribe = store.subscribe(({ todos }) => (
 );
 onCleanup(() => unsubscribe());
 ```
+
+### `unwrap`
+
+```ts
+export function unwrap(store: Store<T>): T;
+```
+
+Returns the underlying data in the store without a proxy.
 
 ### `createMutable`
 
@@ -742,6 +813,20 @@ const ComponentA = lazy(() => import("./ComponentA"));
 <ComponentA title={props.title} />;
 ```
 
+## `createUniqueId`
+
+```ts
+export function createUniqueId(): string;
+```
+
+A universal id generator that is stable across server/browser.
+
+```js
+const id = createUniqueId();
+```
+
+> **Note** on the server this only works under hydratable components
+
 # Secondary Primitives
 
 You probably won't need them for your first app, but these are useful tools to have.
@@ -763,10 +848,7 @@ Creates a readonly that only notifies downstream changes when the browser is idl
 ## `createComputed`
 
 ```ts
-export function createComputed<T>(
-  fn: (v: T) => T,
-  value?: T,
-): void;
+export function createComputed<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 Creates a new computation that automatically tracks dependencies and runs immediately before render. Use this to write to other reactive primitives. When possible use `createMemo` instead as writing to a signal mid update can cause other computations to need to re-calculate.
@@ -774,20 +856,40 @@ Creates a new computation that automatically tracks dependencies and runs immedi
 ## `createRenderEffect`
 
 ```ts
-export function createRenderEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-): void;
+export function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 Creates a new computation that automatically tracks dependencies and runs during the render phase as DOM elements are created and updated but not necessarily connected. All internal DOM updates happen at this time.
+
+## `createReaction`
+
+```ts
+export function createReaction(
+  onInvalidate: () => void
+): (fn: () => void) => void;
+```
+
+Sometimes it is useful to separate tracking from re-execution. This primitive registers a side effect that is run the first time the expression wrapped by the returned tracking function is notified of a change.
+
+```js
+const [s, set] = createSignal("start");
+
+const track = createReaction(() => console.log("something"));
+
+// next time s changes run the reaction
+track(() => s());
+
+set("end"); // "something"
+
+set("final"); // no-op as reaction only runs on first update, need to call track again.
+```
 
 ## `createSelector`
 
 ```ts
 export function createSelector<T, U>(
   source: () => T,
-  fn?: (a: U, b: T) => boolean,
+  fn?: (a: U, b: T) => boolean
 ): (k: U) => boolean;
 ```
 
@@ -841,13 +943,15 @@ const dispose = hydrate(App, document.getElementById("app"));
 export function renderToString<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
     nonce?: string;
+    renderId?: string;
   }
 ): string;
 ```
 
 Renders to a string synchronously. The function also generates a script tag for progressive hydration. Options include eventNames to listen to before the page loads and play back on hydration, and nonce to put on the script tag.
+
+`renderId` is used to namespace renders when having multiple top level roots.
 
 ```js
 const html = renderToString(App);
@@ -859,8 +963,8 @@ const html = renderToString(App);
 export function renderToStringAsync<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
     timeoutMs?: number;
+    renderId?: string;
     nonce?: string;
   }
 ): Promise<string>;
@@ -868,74 +972,45 @@ export function renderToStringAsync<T>(
 
 Same as `renderToString` except it will wait for all `<Suspense>` boundaries to resolve before returning the results. Resource data is automatically serialized into the script tag and will be hydrated on client load.
 
+`renderId` is used to namespace renders when having multiple top level roots.
+
 ```js
 const html = await renderToStringAsync(App);
 ```
 
-## `pipeToNodeWritable`
+## `renderToStream`
+
+_New in v1.3_
 
 ```ts
-export type PipeToWritableResults = {
-  startWriting: () => void;
-  write: (v: string) => void;
-  abort: () => void;
-};
-export function pipeToNodeWritable<T>(
+export function renderToStream<T>(
   fn: () => T,
-  writable: { write: (v: string) => void },
   options?: {
-    eventNames?: string[];
     nonce?: string;
-    noScript?: boolean;
-    onReady?: (r: PipeToWritableResults) => void;
-    onComplete?: (r: PipeToWritableResults) => void | Promise<void>;
+    renderId?: string;
+    onCompleteShell?: () => void;
+    onCompleteAll?: () => void;
   }
-): void;
+): {
+  pipe: (writable: { write: (v: string) => void }) => void;
+  pipeTo: (writable: WritableStream) => void;
+};
 ```
 
 This method renders to a Node stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data from any async resource as it completes.
 
 ```js
-pipeToNodeWritable(App, res);
-```
+// node
+renderToStream(App).pipe(res);
 
-The `onReady` option is useful for writing into the stream around the the core app rendering. Remember if you use `onReady` to manually call `startWriting`.
-
-## `pipeToWritable`
-
-```ts
-export type PipeToWritableResults = {
-  write: (v: string) => void;
-  abort: () => void;
-  script: string;
-};
-export function pipeToWritable<T>(
-  fn: () => T,
-  writable: WritableStream,
-  options?: {
-    eventNames?: string[];
-    nonce?: string;
-    noScript?: boolean;
-    onReady?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-    onComplete?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-  }
-): void;
-```
-
-This method renders to a web stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data from any async resource as it completes.
-
-```js
+// web stream
 const { readable, writable } = new TransformStream();
-pipeToWritable(App, writable);
+renderToStream(App).pipeTo(writable);
 ```
 
-The `onReady` option is useful for writing into the stream around the the core app rendering. Remember if you use `onReady` to manually call `startWriting`.
+`onCompleteShell` fires when synchronous rendering is complete before writing the first flush to the stream out to the browser. `onCompleteAll` is called when all server Suspense boundaries have settled. `renderId` is used to namespace renders when having multiple top level roots.
+
+> Note this API replaces the previous `pipeToWritable` and `pipeToNodeWritable` APIs.
 
 ## `isServer`
 
@@ -953,10 +1028,28 @@ if (isServer) {
 }
 ```
 
+## `generateHydrationScript`/`<HydrationScript>`
+
+```ts
+export function generateHydrationScript(options: {
+  nonce?: string;
+  eventNames?: string[];
+}): string;
+
+export function HydrationScript(props: {
+  nonce?: string;
+  eventNames?: string[];
+}): JSX.Element;
+```
+
+Hydration Script is a special script that should be placed once on the page to bootstrap hydration before Solid's runtime has loaded. It comes both as a function that can be called and inserted in an your HTML string, or as a Component if you are rendering JSX from the `<html>` tag.
+
+The options are for the `nonce` to be put on the script tag and any event names for that Solid should capture before scripts have loaded and replay during hydration. These events are limited to those that Solid delegates which include most UI Events that are composed and bubble. By default it is only `click` and `input` events.
+
 # Control Flow
 
- For reactive contriol flow to be performant, we have to control how elements are created. For example, with lists, a simple `map` is inefficient as it always maps the entire array. 
- 
+For reactive contriol flow to be performant, we have to control how elements are created. For example, with lists, a simple `map` is inefficient as it always maps the entire array.
+
 This means helper functions. Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flow components.
 
 These built-in control flow components will be automatically imported. All except `Portal` and `Dynamic` are exported from `solid-js`. Those two, which are DOM-specific, are exported by `solid-js/web`.
@@ -1286,7 +1379,7 @@ These work the same as their property equivalent. Set a string and they will be 
 
 ## `on___`
 
-Event handlers in Solid typically take the form of `onclick` or `onClick` depending on style. 
+Event handlers in Solid typically take the form of `onclick` or `onClick` depending on style.
 
 Solid uses semi-synthetic event delegation for common UI events that are composed and bubble. This improves performance for these common events.
 
@@ -1306,7 +1399,7 @@ function handler(itemId, e) {
 </ul>;
 ```
 
-Events are never rebound and the bindings are not reactive, as it is expensive to attach and detach listeners. 
+Events are never rebound and the bindings are not reactive, as it is expensive to attach and detach listeners.
 Since event handlers are called like any other function each time an event fires, there is no need for reactivity; simply shortcut your handler if desired.
 
 ```jsx
@@ -1315,6 +1408,7 @@ Since event handlers are called like any other function each time an event fires
 ```
 
 Note that `onChange` and `onInput` work according to their native behavior. `onInput` will fire immediately after the value has changed; for `<input>` fields, `onChange` will only fire after the field loses focus.
+
 ## `on:___`/`oncapture:___`
 
 For any other events, perhaps ones with unusual names, or ones you wish not to be delegated there are the `on` namespace events. This simply adds an event listener verbatim.
