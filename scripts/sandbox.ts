@@ -2,5 +2,5 @@
 import { getSupported, getTutorialDirectory } from "../src";
 
 (async () => {
-  console.log(await getTutorialDirectory("ja"))
+  console.log(getSupported("guides", "he"))
 })()

@@ -10,9 +10,12 @@
   "license": "MIT",
   "types": "dist/src/index.d.ts",
   "devDependencies": {
+    "@mdx-js/rollup": "^2.0.0-rc.2",
+    "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-dynamic-import-vars": "^1.4.1",
     "@rollup/plugin-json": "^4.1.0",
     "@types/node": "^16.11.3",
+    "babel-preset-solid": "^1.2.6",
     "front-matter": "^4.0.2",
     "gitlog": "^4.0.4",
     "htmlnano": "^1.1.1",
@@ -24,6 +27,7 @@
     "rollup": "^2.58.3",
     "rollup-plugin-typescript2": "^0.30.0",
     "shiki": "^0.9.12",
+    "solid-mdx": "^0.0.5",
     "tablemark": "^3.0.0",
     "tslib": "^2.3.1",
     "typescript": "^4.4.4"
@@ -37,6 +41,7 @@
     "publish": "npm publish --access public"
   },
   "dependencies": {
+    "@babel/core": "^7.16.7",
     "@types/markdown-it": "^12.2.3",
     "node-watch": "^0.7.2"
   }
