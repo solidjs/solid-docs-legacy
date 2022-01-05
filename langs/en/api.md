@@ -338,7 +338,7 @@ start(() => setSignal(newValue), () => /* transition is done */)
 
 ## `startTransition`
 
-_New in v1.1_
+_New in v1.1.0_
 
 ```ts
 export function startTransition: (fn: () => void) => Promise<void>;
@@ -366,7 +366,7 @@ obsv$.subscribe((v) => console.log(v));
 
 ## `from`
 
-_New in v1.1_
+_New in v1.1.0_
 
 ```ts
 export function from<T>(
@@ -863,6 +863,8 @@ Creates a new computation that automatically tracks dependencies and runs during
 
 ## `createReaction`
 
+_New in v1.3.0_
+
 ```ts
 export function createReaction(
   onInvalidate: () => void
@@ -980,7 +982,7 @@ const html = await renderToStringAsync(App);
 
 ## `renderToStream`
 
-_New in v1.3_
+_New in v1.3.0_
 
 ```ts
 export function renderToStream<T>(
@@ -997,7 +999,7 @@ export function renderToStream<T>(
 };
 ```
 
-This method renders to a Node stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data from any async resource as it completes.
+This method renders to a stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data and HTML from any async resource as it completes.
 
 ```js
 // node
