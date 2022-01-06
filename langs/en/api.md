@@ -147,24 +147,33 @@ export function createResource<T, U>(
 ```
 
 Creates a signal that reflects an async request. 
+
+
 `createResource` takes an asynchronous fetcher function and returns a signal that is updated with the resulting data when the fetcher completes.
 
-There are two ways to use `createResource`: one with a source signal as the first argument, and one with the fetcher function as the sole argument.
+There are two ways to use `createResource`:  you can pass the fetcher function as the sole argument, or you can additionally pass a source signal as the first argument. The source signal will retrigger the fetcher whenever it changes, and its value will be passed to the fetcher.
 ```js
 const [data, { mutate, refetch }] = createResource(fetchData)
+```
+```js
 const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData)
 ```
-In this example, the fetcher is the function `fetchData`. In both cases, `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately; in the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`. It will be called again whenever `sourceSignal` changes, and the value of `sourceSignal` will always be passed to `fetchData` as its first argument.
+In these snippets, the fetcher is the function `fetchData`. In both cases, `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately. 
+In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`. 
+It will be called again whenever `sourceSignal` changes, and the value of `sourceSignal` will always be passed to `fetchData` as its first argument.
 
-Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher (`refetch(info)`).
+Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
 `data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`. 
 But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary.](http://localhost:3000/docs/latest/api#%3Cerrorboundary%3E))
 
 `loading` and `error` are reactive getters and can be tracked. 
 
-The `fetcher` is the async function that you provide to `createResource`. 
-It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: `value` and `refetching`. `value` tells you the previously fetched value.  `refetching` is `true` if the fetcher was triggered using the `refetch` function and `false` otherwise. If the `refetch` function was called with an argument, `refetching` is set to that argument.
+The `fetcher` is the async function that you provide to `createResource` to actually fetch the data.
+It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: 
+`value` and `refetching`. `value` tells you the previously fetched value.
+`refetching` is `true` if the fetcher was triggered using the `refetch` function and `false` otherwise. 
+If the `refetch` function was called with an argument (`refetch(info)`), `refetching` is set to that argument.
 
 ```js
 async function fetchData(source, { value, refetching }) {
