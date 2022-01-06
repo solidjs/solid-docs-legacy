@@ -100,7 +100,7 @@ const App = () => {
 };
 ```
 
-When hydrating from the document inserting assets that aren't available in the client run also can mess things up when not under the `<head>` tag. Solid provides a `<NoHydration>` component whose children will work as normal on the server, but not hydrate in the browser.
+When hydrating from the document, inserting assets that aren't available in the client run can also mess things up when not under the `<head>` tag. Solid provides a `<NoHydration>` component whose children will work as normal on the server, but not hydrate in the browser.
 
 ```jsx
 <NoHydration>
@@ -110,15 +110,23 @@ When hydrating from the document inserting assets that aren't available in the c
 
 ## Async and Streaming SSR
 
-These mechanisms are built on Solid's knowledge of how your application works. It does so by using Suspense and the Resource API on the server, instead of fetching ahead and then rendering. Solid fetches as it renders on the server just like it does on the client. Your code and execution patterns is written exactly the same way.
+These mechanisms are built on Solid's knowledge of how your application works. 
+It uses Suspense and the Resource API on the server, 
+instead of fetching ahead and then rendering. 
+Solid fetches as it renders on the server just like it does on the client.
+Your code is written exactly the same way.
 
-Async rendering waits until all Suspense boundaries resolve and then sends the results (or writes them to a file in the case of Static Site Generation).
+Async rendering waits until all Suspense boundaries resolve and then sends 
+the results (or writes them to a file in the case of Static Site Generation).
 
-Streaming starts flushing synchronous content to the browser immediately rendering your Suspense Fallbacks on the server. Then as the async data finishes on the server it sends the data and HTML over the same stream to the client to resolve Suspense where the browser finishes the job and replaces the fallback with real content.
+Streaming starts flushing synchronous content to the browser immediately. Initially, it renders your Suspense fallbacks on the server and sends them to the client.
+Then, as the async data finishes loading on the server, we send the data and HTML over the same stream to the client. 
+The browser finishes the job, resolves the Suspense, and replaces the fallback with real content.
+
 
 The advantage of this approach:
 
-- Server doesn't have to wait for Async data to respond. Assets can start loading sooner in the browser, and the user can start seeing content sooner.
+- Server doesn't have to wait for async data to respond. Assets can start loading sooner in the browser, and the user can start seeing content sooner.
 - Compared to client fetching like JAMStack, data loading starts on the server immediately and doesn't have to wait for client JavaScript to load.
 - All data is serialized and transported from server to client automatically.
 

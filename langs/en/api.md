@@ -146,7 +146,16 @@ export function createResource<T, U>(
 
 Creates a signal that can manage async requests. The `fetcher` is an async function that accepts return value of the `source` if provided and returns a Promise whose resolved value is set in the resource. The fetcher is not reactive so use the optional first argument if you want it to run more than once. If the source resolves to false, null, or undefined will not to fetch.
 
+
 ```js
+function fetchData(source, { value, refetching }) {
+  // Fetch the data and return a value.
+  //`source` tells you the current value of the source signal; 
+  //`value` tells you the last returned value of the fetcher;
+  //`refetching` is true when the fetcher is triggered by calling `refetch()`,
+  // or equal to the optional data passed: `refetch(info)`
+}
+
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
 
 // read value
@@ -161,10 +170,9 @@ data.error;
 // directly set value without creating promise
 mutate(optimisticValue);
 
-// refetch last request just because
+// refetch the last request explicitly
 refetch();
 ```
-
 `loading` and `error` are reactive getters and can be tracked.
 
 # Lifecycles
@@ -338,7 +346,7 @@ start(() => setSignal(newValue), () => /* transition is done */)
 
 ## `startTransition`
 
-_New in v1.1.0_
+**New in v1.1.0**
 
 ```ts
 export function startTransition: (fn: () => void) => Promise<void>;
@@ -366,7 +374,7 @@ obsv$.subscribe((v) => console.log(v));
 
 ## `from`
 
-_New in v1.1.0_
+**New in v1.1.0**
 
 ```ts
 export function from<T>(
@@ -863,7 +871,7 @@ Creates a new computation that automatically tracks dependencies and runs during
 
 ## `createReaction`
 
-_New in v1.3.0_
+**New in v1.3.0**
 
 ```ts
 export function createReaction(
@@ -982,7 +990,7 @@ const html = await renderToStringAsync(App);
 
 ## `renderToStream`
 
-_New in v1.3.0_
+**New in v1.3.0**
 
 ```ts
 export function renderToStream<T>(
