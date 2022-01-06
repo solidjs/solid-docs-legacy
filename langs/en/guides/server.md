@@ -26,8 +26,7 @@ The server entry can use one of the four rendering options offered by Solid. Eac
 import {
   renderToString,
   renderToStringAsync,
-  renderToNodeStream,
-  renderToWebStream,
+  renderToStream
 } from "solid-js/web";
 
 // Synchronous string rendering
@@ -36,12 +35,15 @@ const html = renderToString(() => <App />);
 // Asynchronous string rendering
 const html = await renderToStringAsync(() => <App />);
 
-// Node Stream API
-pipeToNodeWritable(App, res);
+// Stream rendering
+const stream = renderToStream(() => <App />);
 
-// Web Stream API (for like Cloudflare Workers)
+// Node
+stream.pipe(res);
+
+// Web streams (for like Cloudflare Workers)
 const { readable, writable } = new TransformStream();
-pipeToWritable(() => <App />, writable);
+stream.pipeTo(writable);
 ```
 
 For your convenience `solid-js/web` exports an `isServer` flag. This is useful as most bundlers will be able to treeshake anything under this flag or imports only used by code under this flag out of your client bundle.
@@ -98,13 +100,11 @@ const App = () => {
 };
 ```
 
-When hydrating from the document inserting assets that aren't available in the client run also can mess things up. Solid provides a `<NoHydration>` component whose children will work as normal on the server, but not hydrate in the browser.
+When hydrating from the document inserting assets that aren't available in the client run also can mess things up when not under the `<head>` tag. Solid provides a `<NoHydration>` component whose children will work as normal on the server, but not hydrate in the browser.
 
 ```jsx
 <NoHydration>
-  {manifest.map((m) => (
-    <link rel="modulepreload" href={m.href} />
-  ))}
+  <ImNotHydrated />
 </NoHydration>
 ```
 
@@ -114,7 +114,7 @@ These mechanisms are built on Solid's knowledge of how your application works. I
 
 Async rendering waits until all Suspense boundaries resolve and then sends the results (or writes them to a file in the case of Static Site Generation).
 
-Streaming starts flushing synchronous content to the browser immediately rendering your Suspense Fallbacks on the server. Then as the async data finishes on the server it sends the data over the same stream to the client to resolve Suspense where the browser finishes the job and replaces the fallback with real content.
+Streaming starts flushing synchronous content to the browser immediately rendering your Suspense Fallbacks on the server. Then as the async data finishes on the server it sends the data and HTML over the same stream to the client to resolve Suspense where the browser finishes the job and replaces the fallback with real content.
 
 The advantage of this approach:
 
@@ -128,7 +128,7 @@ Solid's Isomorphic SSR solution is very powerful in that you can write your code
 
 We use markers rendered in the server to match elements and resource locations on server. For this reason the Client and Server should have the same components. This is not typically a problem given that Solid renders the same way on client and server. But currently there is no means to render something on the server that does not get hydrated on the client. Currently, there is no way to partially hydrate a whole page, and not generate hydration markers for it. It is all or nothing. Partial Hydration is something we want to explore in the future.
 
-Finally, all resources need to be defined under the `render` tree. They are automatically serialized and picked up in the browser, but that works because the `render` or `pipeTo` methods keep track of the progress of the render. Something we cannot do if they are created in isolated context. Similarly there is no reactivity on the server so do not update signals on initial render and expect them to reflect higher up the tree. While we have Suspense boundaries Solid's SSR is basically top down.
+Finally, all resources need to be defined under the `render` tree. They are automatically serialized and picked up in the browser, but that works because the `render` methods keep track of the progress of the render. Something we cannot do if they are created in isolated context. Similarly there is no reactivity on the server so do not update signals on initial render and expect them to reflect higher up the tree. While we have Suspense boundaries Solid's SSR is basically top down.
 
 ## Getting Started with SSR
 
