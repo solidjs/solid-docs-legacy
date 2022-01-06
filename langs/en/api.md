@@ -1040,7 +1040,7 @@ if (isServer) {
 }
 ```
 
-## `generateHydrationScript`/`<HydrationScript>`
+## `HydrationScript`
 
 ```ts
 export function generateHydrationScript(options: {
