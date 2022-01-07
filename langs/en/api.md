@@ -146,8 +146,7 @@ export function createResource<T, U>(
 ): ResourceReturn<T>;
 ```
 
-Creates a signal that reflects an async request. 
-
+Creates a signal that reflects the result of an async request. 
 
 `createResource` takes an asynchronous fetcher function and returns a signal that is updated with the resulting data when the fetcher completes.
 
@@ -160,7 +159,7 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData)
 ```
 In these snippets, the fetcher is the function `fetchData`. In both cases, `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately. 
 In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`. 
-It will be called again whenever `sourceSignal` changes, and the value of `sourceSignal` will always be passed to `fetchData` as its first argument.
+It will be called again whenever the value of `sourceSignal` changes, it will always be passed to `fetchData` as its first argument.
 
 Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
