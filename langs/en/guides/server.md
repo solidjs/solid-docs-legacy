@@ -111,18 +111,15 @@ When hydrating from the document, inserting assets that aren't available in the 
 ## Async and Streaming SSR
 
 These mechanisms are built on Solid's knowledge of how your application works. 
-It uses Suspense and the Resource API on the server, 
-instead of fetching ahead and then rendering. 
+It uses Suspense and the Resource API on the server, instead of fetching ahead and then rendering.
 Solid fetches as it renders on the server just like it does on the client.
 Your code is written exactly the same way.
 
-Async rendering waits until all Suspense boundaries resolve and then sends 
-the results (or writes them to a file in the case of Static Site Generation).
+Async rendering waits until all Suspense boundaries resolve and then sends the results (or writes them to a file in the case of Static Site Generation).
 
 Streaming starts flushing synchronous content to the browser immediately. Initially, it renders your Suspense fallbacks on the server and sends them to the client.
 Then, as the async data finishes loading on the server, we send the data and HTML over the same stream to the client. 
 The browser finishes the job, resolves the Suspense, and replaces the fallback with real content.
-
 
 The advantage of this approach:
 
