@@ -146,11 +146,36 @@ export function createResource<T, U>(
 ): ResourceReturn<T>;
 ```
 
-Creates a signal that can manage async requests. The `fetcher` is an async function that accepts return value of the `source` if provided and returns a Promise whose resolved value is set in the resource. The fetcher is not reactive so use the optional first argument if you want it to run more than once. If the source resolves to false, null, or undefined will not to fetch.
+Creates a signal that reflects the result of an async request. 
 
+`createResource` takes an asynchronous fetcher function and returns a signal that is updated with the resulting data when the fetcher completes.
+
+There are two ways to use `createResource`:  you can pass the fetcher function as the sole argument, or you can additionally pass a source signal as the first argument. The source signal will retrigger the fetcher whenever it changes, and its value will be passed to the fetcher.
+```js
+const [data, { mutate, refetch }] = createResource(fetchData)
+```
+```js
+const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData)
+```
+In these snippets, the fetcher is the function `fetchData`. In both cases, `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately. 
+In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`. 
+It will be called again whenever the value of `sourceSignal` changes, it will always be passed to `fetchData` as its first argument.
+
+Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
+
+`data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`. 
+But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary.](http://localhost:3000/docs/latest/api#%3Cerrorboundary%3E))
+
+`loading` and `error` are reactive getters and can be tracked. 
+
+The `fetcher` is the async function that you provide to `createResource` to actually fetch the data.
+It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: 
+`value` and `refetching`. `value` tells you the previously fetched value.
+`refetching` is `true` if the fetcher was triggered using the `refetch` function and `false` otherwise. 
+If the `refetch` function was called with an argument (`refetch(info)`), `refetching` is set to that argument.
 
 ```js
-function fetchData(source, { value, refetching }) {
+async function fetchData(source, { value, refetching }) {
   // Fetch the data and return a value.
   //`source` tells you the current value of the source signal; 
   //`value` tells you the last returned value of the fetcher;
@@ -175,7 +200,6 @@ mutate(optimisticValue);
 // refetch the last request explicitly
 refetch();
 ```
-`loading` and `error` are reactive getters and can be tracked.
 
 # Lifecycles
 
