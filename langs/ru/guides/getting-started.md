@@ -97,7 +97,7 @@ Solid предлагает решение для динамического ре
 
 Поскольку Solid поддерживает асинхронный и рендеринг с помощью [стримов](https://developer.mozilla.org/ru/docs/Web/API/Streams_API) на сервере, вам не нужно думать об особенностях работы вашего кода на сервере - он будет отлично работать из коробки. Современная архитектура Solid и поддержка стримов означает, что такие фичи, как [render-as-you-fetch](https://ru.reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) и [разделение кода](https://ru.reactjs.org/docs/code-splitting.html) будут работать без проблем.
 
-Для получения дополнительной информации прочтите [Рендеринг на стороне сервера](#server-side-rendering).
+Для получения дополнительной информации прочтите [Рендеринг на стороне сервера](/guides/server#server-side-rendering).
 
 ## Нет компиляции?
 

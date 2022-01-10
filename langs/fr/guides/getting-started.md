@@ -88,7 +88,7 @@ Solid propose une solution dynamique de rendu côté serveur qui permet une vrai
 
 Comme Solid supporte le fonctionnement asynchrone et le stream rendering côté serveur, vous pouvez écrire votre code d'une seule manière et l'exécuter côté serveur. Ce qui veut dire que des fonctionnalités comme [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) et le fractionnement de code vont fonctionner sans effort avec Solid.
 
-Pour plus d'information, n'hésitez pas à lire le [guide serveur](https://www.solidjs.com/docs/latest#server-side-rendering).
+Pour plus d'information, n'hésitez pas à lire le [guide serveur](https://www.solidjs.com/docs/latest/guides/server#server-side-rendering).
 
 ## Pas de Compilation ?
 
