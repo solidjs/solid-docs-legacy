@@ -1,6 +1,43 @@
 
 ## Translator Notes
 
+原文 | 訳 | NG
+-|-|-
+caching | キャッシュ
+clone | 複製
+design | 設計
+fire | （イベントの）発生
+first argument | 第一引数 | 第1引数
+handler | ハンドラー
+helper | ヘルパー
+interface | インターフェイス | インターフェース、インタフェイス
+leaf | 葉ノード
+load | ロード | 読み込み
+loading | ローディング、ロード
+mutable/immutable | 可変/不変、ミュータブルな/イミュータブルな
+nested | ネストした | 入れ子になった、ネストされた
+note | 注意
+prerender | 事前レンダリング
+production | 本番環境
+prop | プロパティ | プロップ
+props | props
+reactivity | リアクティビティ | リアクティブ性
+read value | 値の読み取り
+set value | 値の設定
+state | 状態
+testing | テスト
+tracking | 追跡 | トラッキング
+update | 更新 | アップデート
+virtual DOM, VDOM | 仮想 DOM
+||
+Fragment|Fragment
+Context | コンテキスト
+Context API | Context API
+Signals, Memos, Effects, Resources | Signal, Memo, Effect, Resource | シグナル、メモ、エフェクト、リソース
+Stores | ストア
+Store object | Store オブジェクト
+Store proxy | ストアプロキシ
+
 ## Todo
 
 ### Updates  
