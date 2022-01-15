@@ -85,7 +85,7 @@ Solid는 진정한 동형<sub>Isomorphic</sub> 개발 경험을 가능하게 하
 
 Solid는 서버에서 비동기 렌더링과 스트림 렌더링을 지원하기 하므로, 한 방향으로 코드를 작성해서 서버에서 실행할 수 있습니다. 즉, [render-as-you-fetch](https://ko.reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) 및 코드 분할과 같은 기능이 Solid에서도 작동합니다.
 
-자세한 내용은 [서버 가이드](#server-side-rendering)를 읽어보시기 바랍니다.
+자세한 내용은 [서버 가이드](/guides/server#server-side-rendering)를 읽어보시기 바랍니다.
 
 ## 컴파일 미사용?
 
