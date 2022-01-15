@@ -87,7 +87,7 @@ O Solid tem uma solução de renderização dinâmica do lado do servidor que pe
 
 Como o Solid oferece suporte à renderização assíncrona e de fluxo no servidor, você pode escrever seu código de uma maneira e executá-lo no servidor. Isso significa que recursos como [render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) e a divisão de código funciona apenas em Solid.
 
-Para obter mais informações, leia o [Server guide](#server-side-rendering).
+Para obter mais informações, leia o [Server guide](/guides/server#server-side-rendering).
 
 ## Sem Compilação?
 
