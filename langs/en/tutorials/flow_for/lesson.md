@@ -16,5 +16,4 @@ Then, instead of writing nodes directly between `<For>` and `</For>`, you a pass
 
 Note that the index is a _signal_, not a constant number. This is because `<For>` is "keyed by reference": each node that it renders is coupled to an element in the array. In other words, if an element changes placement in the array, rather than being destroyed and recreated, the corresponding node will move too and its index will change.
 
-
-The `each` prop expects an array, but you can turn other iterable objects into arrays with utilities like [`Array.from`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from), [`Object.keys`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys), or [spread syntax](`https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax`).
+The `each` prop expects an array, but you can turn other iterable objects into arrays with utilities like [`Array.from`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from), [`Object.keys`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys), or [`spread syntax`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax).

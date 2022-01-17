@@ -6,7 +6,7 @@ sort: 2
 
 # レンダリング
 
-Solid は、JSX、タグ付きテンプレートリテラル、および Solid の HyperScript バリアントの 3 つの形式でテンプレートをサポートしていますが、JSX が主流となっています。その理由は？ JSX は、コンパイルのために作られた優れた DSL です。明確な構文を持ち、TypeScript をサポートし、Babel と連携し、Code Syntax Highlighting や Prettier などのツールをサポートしています。基本的にすべてを無料で提供してくれるツールを使うのは現実的なことでした。コンパイルされたソリューションとして、素晴らしい DX を提供します。こんなに広くサポートされているものを使えるのに、なぜカスタム構文 DSL で苦労しているのですか？
+Solid は、JSX、タグ付きテンプレートリテラル、および Solid の HyperScript バリアントの 3 つの形式でテンプレートをサポートしていますが、JSX が主流となっています。その理由は？　JSX は、コンパイルのために作られた優れた DSL です。明確な構文を持ち、TypeScript をサポートし、Babel と連携し、Code Syntax Highlighting や Prettier などのツールをサポートしています。基本的にすべてを無料で提供してくれるツールを使うのは現実的なことでした。コンパイルされたソリューションとして、素晴らしい DX を提供します。こんなに広くサポートされているものを使えるのに、なぜカスタム構文 DSL で苦労しているのですか？
 
 ## JSX コンパイル
 
@@ -206,7 +206,7 @@ const BasicComponent = (props) => {
 
 // だめ
 const BasicComponent = (props) => {
-  const valueProp = prop.value;
+  const valueProp = props.value;
   const value = createMemo(() => valueProp || "default");
   return <div>{value()}</div>;
 };

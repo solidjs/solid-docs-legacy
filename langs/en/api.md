@@ -164,13 +164,12 @@ It will be called again whenever the value of `sourceSignal` changes, it will al
 Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
 `data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`. 
-But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary.](http://localhost:3000/docs/latest/api#%3Cerrorboundary%3E))
+But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](http://localhost:3000/docs/latest/api#%3Cerrorboundary%3E).)
 
 `loading` and `error` are reactive getters and can be tracked. 
 
 The `fetcher` is the async function that you provide to `createResource` to actually fetch the data.
-It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: 
-`value` and `refetching`. `value` tells you the previously fetched value.
+It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: `value` and `refetching`. `value` tells you the previously fetched value.
 `refetching` is `true` if the fetcher was triggered using the `refetch` function and `false` otherwise. 
 If the `refetch` function was called with an argument (`refetch(info)`), `refetching` is set to that argument.
 
@@ -1084,7 +1083,7 @@ The options are for the `nonce` to be put on the script tag and any event names 
 
 # Control Flow
 
-For reactive contriol flow to be performant, we have to control how elements are created. For example, with lists, a simple `map` is inefficient as it always maps the entire array.
+For reactive control flow to be performant, we have to control how elements are created. For example, with lists, a simple `map` is inefficient as it always maps the entire array.
 
 This means helper functions. Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flow components.
 

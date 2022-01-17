@@ -12,10 +12,14 @@ sort: 0
 export function createSignal<T>(
   value: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
-): [get: () => T, set:(v: T) => T];
+): [get: () => T, set: (v: T) => T];
 ```
 
-これは時間の経過とともに変化する単一の値を追跡するために使用される、最も基本的なリアクティブプリミティブです。create 関数は Signal にアクセスしたり更新するための get と set のペアの関数を返します。
+これは時間の経過とともに変化する単一の値を追跡するために使用される、最も基本的なリアクティブプリミティブです。`createSignal` 関数は、ゲッター (またはアクセサー) とセッターの 2 つの関数を配列として返します。
+
+ゲッターは Signal の現在の値を返します。追跡スコープ内（`createEffect` に渡される関数や、JSX 式で使用される関数など）で呼び出された場合、Signal が更新されると呼び出し側のコンテキストが再実行されます。
+
+セッターは Signal を更新します。唯一の引数として、Signal の新しい値か、Signal の前回の値を新しい値にマップする関数を受け取ります。セッターは更新された値を返します。
 
 ```js
 const [getValue, setValue] = createSignal(initialValue);
@@ -30,21 +34,35 @@ setValue(nextValue);
 setValue((prev) => prev + next);
 ```
 
-Signal を更新に反応させたい場合は、追跡スコープの下でアクセスすることを忘れないでください。追跡スコープは、`createEffect` や JSX 式などの計算に渡される関数です。
-
 > Signal に関数を格納したい場合は、関数の形式を使用する必要があります:
 >
 > ```js
 > setValue(() => myFunction);
 > ```
 
+##### Options
+
+Solid のいくつかのプリミティブは、省略可能な最後の引数として "options" オブジェクトを取ります。`createSignal` の options オブジェクトには `equals` オプションを指定できます。
+
+```js
+const [getValue, setValue] = createSignal(initialValue, { equals: false });
+```
+
+デフォルトでは、シグナルのセッターが呼び出されたとき、新しい値が古い値と実際に異なる場合にのみ依存関係が再実行されます。`equals` を `false` に設定することで、セッターが呼ばれた後に依存関係を常に再実行できます。また、独自の等価関数を渡すこともできます。
+
+```js
+const [myString, setMyString] = createSignal("string", {
+  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+});
+
+setMyString("strung"); // 最後の値と等しいと見なされ、更新は発生しません
+setMyString("stranger"); // 異なると見なされ、更新が発生します
+```
+
 ## `createEffect`
 
 ```ts
-export function createEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-): void;
+export function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 依存関係を自動的に追跡し、それらが変更された各レンダリングの後に実行される新しい計算を作成します。`ref` を使用したり、他の副作用を管理するのに理想的です。
@@ -65,6 +83,8 @@ createEffect((prev) => {
   return sum;
 }, 0);
 ```
+
+Effect バッチ内の Signal の変更: Effect の実行が終了するまで、Signal の更新は行われません。
 
 ## `createMemo`
 
@@ -91,6 +111,8 @@ memo 関数は、その memo 関数の前回実行時に返された値で呼び
 const sum = createMemo((prev) => input() + prev, 0);
 ```
 
+memo 関数は、セッターを呼び出すことによって他の Signal を変更してはいけません（それは "純粋" でなければなりません）。これにより、読み込まれた依存関係に応じて Memo の実行順序を最適化できます。
+
 ## `createResource`
 
 ```ts
@@ -102,25 +124,64 @@ type ResourceReturn<T> = [
   },
   {
     mutate: (v: T | undefined) => T | undefined;
-    refetch: () => void;
+    refetch: (info: unknown) => Promise<T> | T;
   }
 ];
 
 export function createResource<T, U = true>(
-  fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; }
+  fetcher: (
+    k: U,
+    info: { value: T | undefined; refetching: boolean | unknown }
+  ) => T | Promise<T>,
+  options?: { initialValue?: T }
 ): ResourceReturn<T>;
 
 export function createResource<T, U>(
   source: U | false | null | (() => U | false | null),
-  fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; }
+  fetcher: (
+    k: U,
+    info: { value: T | undefined; refetching: boolean | unknown }
+  ) => T | Promise<T>,
+  options?: { initialValue?: T }
 ): ResourceReturn<T>;
 ```
 
-非同期のリクエストを管理できる Signal を作成します。`fetcher` は非同期関数で、`source` が提供されていればその戻り値を受け取り、Resource に設定された解決値を持つ Promise を返します。fetcher はリアクティブではないので、複数回実行させたい場合はオプションの第一引数を使用してください。source の解決値が false, null, undefined の場合はフェッチしません。
+非同期リクエストの結果を Signal するシグナルを作成します。
+
+`createResource` は非同期のフェッチャー関数を受け取り、フェッチャーが完了したときに結果のデータで更新される Signal を返します。
+
+`createResource` を使用するには、2 つの方法があります。フェッチャー関数を唯一の引数として渡すか、または、最初の引数としてソース Signal を渡すことができます。ソース Signal は、それが変更されるたびにフェッチャーを再トリガーし、その値がフェッチャーに渡されます。
+```js
+const [data, { mutate, refetch }] = createResource(fetchData)
+```
+```js
+const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData)
+```
+これらのスニペットでは、フェッチャーは関数 `fetchData` です。どちらの場合も、`fetchData` が解決を終えるまで `data()` は undefined です。最初のケースでは、`fetchData` はすぐに呼び出されます。
+2 番目のケースでは、`sourceSignal` が `false`, `null`, `undefined` 以外の値を持つとすぐに `fetchData` が呼び出されます。
+また、`sourceSignal` の値が変更されるたびに再度呼び出され、常に `fetchData` に第一引数として渡されます。
+
+どちらの方法でも、`mutate` を呼び出すことで、`data` Signal を直接更新できます（他の Signal セッターと同じように動作します）。また、`refetch` を呼び出すことでフェッチャーを直接再実行でき、`refetch(info)` のように追加の引数を渡すことで、フェッチャーに追加情報を提供できます。
+
+`data` は通常の Signal のゲッターのように動作します。 `fetchData` の最後の戻り値を読み取るには `data()` を使用します。
+しかし、これには 2 つの追加プロパティがあり、`data.loading` はフェッチャーが呼び出されたが返されていないかどうかを示します。そして、`data.error` はリクエストがエラーになったかどうかを示します（注意: もしエラーが予想される場合は `createResource` を [ErrorBoundary](http://localhost:3000/docs/latest/api#%3Cerrorboundary%3E) でラップするとよいでしょう）。
+
+`loading` と `error` はリアクティブゲッターで、追跡が可能です。
+
+`fetcher` は `createResource` に提供する非同期関数で、実際にデータを取得するために使用します。
+2 つの引数が渡されます。ソースシグナルの値（提供されている場合）と、`value` と `refetching` の 2 つのプロパティを持つ info オブジェクトです。`value` は以前にフェッチした値を示します。
+`refetching` は、フェッチャーが `refetch` 関数を使用してトリガーされた場合は `true` で、そうでない場合は `false` です。
+もし、`refetch` 関数が引数付きで呼ばれた場合 (`refetch(info)`) には、`refetching` にその引数がセットされます。
 
 ```js
+async function fetchData(source, { value, refetching }) {
+  // データをフェッチして値を返します。
+  //`source` は、ソース Signal の現在の値を示します。
+  //`value` は、フェッチャーの最後の戻り値を示します。
+  //`refetching` は、`refetch()` を呼び出してフェッチャーがトリガーされたときに true になります。
+  // または渡されたオプションのデータと等しい: `refetch(info)`
+}
+
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
 
 // 値の読み取り
@@ -135,11 +196,9 @@ data.error;
 // プロミスを作成せずに直接値を設定
 mutate(optimisticValue);
 
-// ただ前回のリクエストを再取得
+// 最後のリクエストを明示的に再フェッチ
 refetch();
 ```
-
-`loading` や `error` はリアクティブなゲッターなので追跡できます。
 
 # ライフサイクル
 
@@ -224,9 +283,25 @@ setA("new"); // ここで実行される
 export function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-自動廃棄されない新しい非追跡型コンテキストを作成します。これは、親の再評価時に解放したくない、ネストされたリアクティブコンテキストなどに便利です。これは、キャッシュのための強力なパターンです。
+自動廃棄されない新しい非追跡の所有者スコープを作成します。これは、親の再評価時に解放したくない、ネストされたリアクティブスコープなどに便利です。
 
 すべての Solid のコードは、すべてのメモリ/計算が解放されることを保証するため、これらのいずれかのトップレベルでラップされる必要があります。通常は、すべての `render` エントリー関数に `createRoot` が組み込まれているので、これを気にする必要はありません。
+
+## `getOwner`
+
+```ts
+export function getOwner(): Owner;
+```
+
+実行中のリアクティブスコープの現在の所有している計算を取得します。このスコープは必ずしも追跡しているわけではなく、現在の実行ブロックの廃棄を担当するスコープです。
+
+## `runWithOwner`
+
+```ts
+export function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
+```
+
+提供された所有者の下でコードを実行してから、外側のスコープの所有者に復元します。
 
 ## `mergeProps`
 
@@ -277,8 +352,8 @@ const [local, others] = splitProps(props, ["children"]);
 
 ```ts
 export function useTransition(): [
-  () => boolean,
-  (fn: () => void, cb?: () => void) => void
+  pending: () => boolean,
+  startTransition: (fn: () => void) => Promise<void>
 ];
 ```
 
@@ -293,6 +368,16 @@ isPending();
 // トランジションでラップ
 start(() => setSignal(newValue), () => /* トランジションが完了 */)
 ```
+
+## `startTransition`
+
+**v1.1.0 の新機能**
+
+```ts
+export function startTransition: (fn: () => void) => Promise<void>;
+```
+
+`useTransition` と似ていますが、関連する保留状態はありません。これは単にトランジションを開始するために直接使用できます。
 
 ## `observable`
 
@@ -311,6 +396,39 @@ const obsv$ = from(observable(s));
 
 obsv$.subscribe((v) => console.log(v));
 ```
+
+## `from`
+
+**v1.1.0 の新機能**
+
+```ts
+export function from<T>(
+  producer:
+    | ((setter: (v: T) => T) => () => void)
+    | {
+        subscribe: (
+          fn: (v: T) => void
+        ) => (() => void) | { unsubscribe: () => void };
+      }
+): () => T;
+```
+
+RxJS observables や Svelte Stores のような外部プロデューサーとの相互運用を容易にするためのシンプルなヘルパーです。これは基本的に、任意の購読可能なもの（`subscribe` メソッドを持つオブジェクト）を Signal に変え、購読と廃棄を管理します。
+
+```js
+const signal = from(obsv$);
+```
+
+また、カスタムプロデューサー関数を使用することもでき、セッター関数に渡された関数はアンサブスクライブ関数を返します:
+
+```js
+const clock = from((set) => {
+  const t = setInterval(() => set(1), 1000);
+  return () => clearInterval(t);
+});
+```
+
+> 注意: `from` によって生成された Signal は、外部ストリームやソースとのインターフェイスを良くするために、等値性チェックがオフになっています。
 
 ## `mapArray`
 
@@ -383,7 +501,7 @@ const mapped = indexArray(source, (model) => {
 
 ```ts
 export function createStore<T extends StoreNode>(
-  state: T | Store<T>,
+  state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
@@ -407,6 +525,7 @@ setState("path", "to", "value", newValue);
 ネストしたオブジェクトがアクセスされると、ストアはネストしたストアオブジェクトを生成し、これはツリーの下まで適用されます。ただし、これは配列とプレーンオブジェクトにのみ適用されます。クラスはラップされないので、`Date`, `HTMLElement`, `RegExp`, `Map`, `Set` といったオブジェクトは、ストアのプロパティとしてきめ細かく反応しません。
 
 トップレベルの状態オブジェクトは追跡できないので、状態オブジェクト自体を使用するのではなく、状態のキーにリストを置くようにしてください。
+
 ```js
 // list を状態オブジェクトのキーにする
 const [state, setState] = createStore({ list: [] });
@@ -541,6 +660,7 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ```
 
 ## ストアユーティリティ
+
 ### `produce`
 
 ```ts
@@ -587,6 +707,14 @@ const unsubscribe = store.subscribe(({ todos }) => (
 );
 onCleanup(() => unsubscribe());
 ```
+
+### `unwrap`
+
+```ts
+export function unwrap(store: Store<T>): T;
+```
+
+ストアの基となるデータをプロキシなしで返します。
 
 ### `createMutable`
 
@@ -718,6 +846,20 @@ const ComponentA = lazy(() => import("./ComponentA"));
 <ComponentA title={props.title} />;
 ```
 
+## `createUniqueId`
+
+```ts
+export function createUniqueId(): string;
+```
+
+サーバ/ブラウザにまたがって変動のない汎用 ID ジェネレータです。
+
+```js
+const id = createUniqueId();
+```
+
+> **注意** サーバ上では、ハイドレート可能なコンポーネントでのみ動作します。
+
 # 副次的なプリミティブ
 
 おそらく初めてのアプリには必要ないでしょうが、あると便利なツールです。
@@ -739,10 +881,7 @@ export function createDeferred<T>(
 ## `createComputed`
 
 ```ts
-export function createComputed<T>(
-  fn: (v: T) => T,
-  value?: T,
-): void;
+export function createComputed<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 依存関係を自動的に追跡し、レンダリングの直前に実行する新しい計算を作成します。これは他のリアクティブプリミティブに書き込むために使用します。更新の途中で Signal に書き込むと、他の計算で再計算が必要になることがあるので、可能であれば代わりに `createMemo` を使用してください。
@@ -750,20 +889,42 @@ export function createComputed<T>(
 ## `createRenderEffect`
 
 ```ts
-export function createRenderEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-): void;
+export function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 依存関係を自動的に追跡する新しい計算を作成し、DOM 要素が作成および更新されるが必ずしも結合されていないレンダリングフェーズで実行します。すべての内部 DOM の更新はこの時点で行われます。
+
+## `createReaction`
+
+**New in v1.3.0**
+
+```ts
+export function createReaction(
+  onInvalidate: () => void
+): (fn: () => void) => void;
+```
+
+追跡と再実行を分離することが便利な場合があります。このプリミティブは、返された追跡関数によってラップされた式が初めて変更を通知されたときに実行される副作用を登録します。
+
+```js
+const [s, set] = createSignal("start");
+
+const track = createReaction(() => console.log("something"));
+
+// 次に s が変化したときにリアクションを実行する
+track(() => s());
+
+set("end"); // "something"
+
+set("final"); // 最初の更新時のみ反応するため、何もしません。再度 track を呼び出す必要があります。
+```
 
 ## `createSelector`
 
 ```ts
 export function createSelector<T, U>(
   source: () => T,
-  fn?: (a: U, b: T) => boolean,
+  fn?: (a: U, b: T) => boolean
 ): (k: U) => boolean;
 ```
 
@@ -817,13 +978,15 @@ const dispose = hydrate(App, document.getElementById("app"));
 export function renderToString<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
     nonce?: string;
+    renderId?: string;
   }
 ): string;
 ```
 
 文字列に同期的にレンダリングします。この関数は、プログレッシブハイドレーション用のスクリプトタグも生成します。オプションには、ページがロードされてハイドレーションの再生前に購読する eventNames と、スクリプトタグに付ける nonce があります。
+
+`renderId` は、複数のトップレベルルートがある場合に、レンダリングの名前空間を作成するために使用されます。
 
 ```js
 const html = renderToString(App);
@@ -835,8 +998,8 @@ const html = renderToString(App);
 export function renderToStringAsync<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
     timeoutMs?: number;
+    renderId?: string;
     nonce?: string;
   }
 ): Promise<string>;
@@ -844,74 +1007,45 @@ export function renderToStringAsync<T>(
 
 結果を返す前に、すべての `<Suspense>` 境界が解決するのを待つという点を除いて、`renderToString` と同じです。リソースデータは自動的にスクリプトタグにシリアライズされ、クライアントのロード時にハイドレーションされます。
 
+`renderId` は、複数のトップレベルルートがある場合に、レンダリングの名前空間を作成するために使用されます。
+
 ```js
 const html = await renderToStringAsync(App);
 ```
 
-## `pipeToNodeWritable`
+## `renderToStream`
+
+**v1.3.0 の新機能**
 
 ```ts
-export type PipeToWritableResults = {
-  startWriting: () => void;
-  write: (v: string) => void;
-  abort: () => void;
-};
-export function pipeToNodeWritable<T>(
+export function renderToStream<T>(
   fn: () => T,
-  writable: { write: (v: string) => void },
   options?: {
-    eventNames?: string[];
     nonce?: string;
-    noScript?: boolean;
-    onReady?: (r: PipeToWritableResults) => void;
-    onComplete?: (r: PipeToWritableResults) => void | Promise<void>;
+    renderId?: string;
+    onCompleteShell?: () => void;
+    onCompleteAll?: () => void;
   }
-): void;
+): {
+  pipe: (writable: { write: (v: string) => void }) => void;
+  pipeTo: (writable: WritableStream) => void;
+};
 ```
 
-このメソッドは、Node のストリームにレンダリングします。Suspense のフォールバックプレースホルダーを含むコンテンツを同期的にレンダリングし、完了すると任意の非同期リソースからデータをストリームし続けます。
+このメソッドは、ストリームにレンダリングします。Suspense のフォールバックプレースホルダーを含むコンテンツを同期的にレンダリングし、完了すると任意の非同期リソースからデータと HTML をストリームし続けます。
 
 ```js
-pipeToNodeWritable(App, res);
-```
+// node
+renderToStream(App).pipe(res);
 
-`onReady` オプションは、コアアプリのレンダリング前後にストリームに書き込む際に便利です。`onReady` を使用する場合は、手動で `startWriting` を呼び出すことを忘れないでください。
-
-## `pipeToWritable`
-
-```ts
-export type PipeToWritableResults = {
-  write: (v: string) => void;
-  abort: () => void;
-  script: string;
-};
-export function pipeToWritable<T>(
-  fn: () => T,
-  writable: WritableStream,
-  options?: {
-    eventNames?: string[];
-    nonce?: string;
-    noScript?: boolean;
-    onReady?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-    onComplete?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-  }
-): void;
-```
-
-このメソッドは、Web ストリームにレンダリングします。Suspense のフォールバックプレースホルダーを含むコンテンツを同期的にレンダリングし、完了すると任意の非同期リソースからデータをストリームし続けます。
-
-```js
+// web stream
 const { readable, writable } = new TransformStream();
-pipeToWritable(App, writable);
+renderToStream(App).pipeTo(writable);
 ```
 
-`onReady` オプションは、コアアプリのレンダリング前後にストリームに書き込む際に便利です。`onReady` を使用する場合は、手動で `startWriting` を呼び出すことを忘れないでください。
+`onCompleteShell` は、同期レンダリングが完了してから、最初のフラッシュをストリームに書き出し、ブラウザに出力するときに発生します。`onCompleteAll` は、すべてのサーバーの Suspense 境界が確定したときに呼び出されます。`renderId` は、複数のトップレベルルートがある場合に、レンダリングの名前空間を作成するために使用されます。
+
+> この API は、以前の `pipeToWritable` と `pipeToNodeWritable` API を置き換えるものであることに注意してください。
 
 ## `isServer`
 
@@ -929,13 +1063,31 @@ if (isServer) {
 }
 ```
 
+## `HydrationScript`
+
+```ts
+export function generateHydrationScript(options: {
+  nonce?: string;
+  eventNames?: string[];
+}): string;
+
+export function HydrationScript(props: {
+  nonce?: string;
+  eventNames?: string[];
+}): JSX.Element;
+```
+
+Hydration Script は、Solid のランタイムがロードされる前に Hydration を起動するために、ページ上に一度配置される特別なスクリプトです。HTML 文字列に挿入して呼び出す関数として、または `<html>` タグから JSX をレンダリングする場合はコンポーネントとして提供されます。
+
+オプションは、スクリプトscript タグに付けられる `nonce` と、スクリプトがロードされる前に Solid が取得し、ハイドレーション中に再生されるイベント名です。これらのイベントは Solid が委譲するものに限定され、合成やバブルなどの UI イベントが含まれます。デフォルトでは、`click` および `input` イベントのみです。
+
 # 制御フロー
 
-Solid では制御フローにコンポーネントを使用しています。その理由は、リアクティビティのパフォーマンスを向上させるためには、要素の生成方法を制御する必要があるからです。例えばリストの場合、単純な `map` では、常にすべてをマッピングしてしまい、非効率です。これはヘルパー関数を意味します。
+リアクティブな制御フローがパフォーマンスを発揮するためには、要素がどのように作成されるかを制御する必要があります。例えば、リストの場合、単純な `map` は常に配列全体をマップしてしまうので、非効率的です。
 
-これらをコンポーネントでラップすることで、簡潔なテンプレートを作成するのに便利ですし、ユーザーが独自の制御フローを構成・構築することもできます。
+これはヘルパー関数を意味します。これらをコンポーネントでラップすることによって、簡潔なテンプレートを作成するのに便利ですし、ユーザーが独自の制御フローを構成・構築することもできます。
 
-これらの組み込み制御フローは自動的にインポートされます。`Portal` と `Dynamic` 以外のすべては `solid-js` からエクスポートされます。DOM に特化したこれらの 2 つは、`solid-js/web` からエクスポートされます。
+これらの組み込み制御フローコンポーネントは自動的にインポートされます。`Portal` と `Dynamic` 以外のすべては `solid-js` からエクスポートされます。DOM に特化したこれらの 2 つは、`solid-js/web` からエクスポートされます。
 
 > 注意: 制御フローのコールバック/レンダー関数の子はすべて追跡されません。これにより、状態をネストして作成でき、反応をよりよく分離できます。
 
@@ -949,7 +1101,7 @@ export function For<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-シンプルな参照キー付きループ制御フローです。
+単純な参照キー付きループ。コールバックは第一引数として現在のアイテムを受け取ります。
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -1035,7 +1187,7 @@ export function Index<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-キーを持たないリストの反復（インデックスをキーとする行）。これは、データがプリミティブで構成されていて、値ではなくインデックスが固定されている場合など、概念的なキーが存在しない場合に便利です。
+キーを持たないリストの反復（レンダリングされたノードは配列のインデックスがキーとなります）。これは、データがプリミティブで構成されていて、値ではなくインデックスが固定されている場合など、概念的なキーが存在しない場合に便利です。
 
 item は Signal です:
 
@@ -1291,6 +1443,7 @@ function handler(itemId, e) {
 ```
 
 `onChange` と `onInput` はそれぞれのネイティブな動作に基づいて動作することに注意してください。`onInput` は、値が変更された直後に発生します。`<input>` フィールドの場合、`onChange` はフィールドがフォーカスを失った後にのみ発生します。
+
 ## `on:___`/`oncapture:___`
 
 その他のイベント、例えば変わった名前のイベントや、委譲したくないイベントには、`on` 名前空間イベントがあります。これは単に、イベントリスナーをそのまま追加するだけです。
