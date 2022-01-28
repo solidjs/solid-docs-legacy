@@ -164,7 +164,7 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData)
 どちらの方法でも、`mutate` を呼び出すことで、`data` Signal を直接更新できます（他の Signal セッターと同じように動作します）。また、`refetch` を呼び出すことでフェッチャーを直接再実行でき、`refetch(info)` のように追加の引数を渡すことで、フェッチャーに追加情報を提供できます。
 
 `data` は通常の Signal のゲッターのように動作します。 `fetchData` の最後の戻り値を読み取るには `data()` を使用します。
-しかし、これには 2 つの追加プロパティがあり、`data.loading` はフェッチャーが呼び出されたが返されていないかどうかを示します。そして、`data.error` はリクエストがエラーになったかどうかを示します（注意: もしエラーが予想される場合は `createResource` を [ErrorBoundary](http://localhost:3000/docs/latest/api#%3Cerrorboundary%3E) でラップするとよいでしょう）。
+しかし、これには 2 つの追加プロパティがあり、`data.loading` はフェッチャーが呼び出されたが返されていないかどうかを示します。そして、`data.error` はリクエストがエラーになったかどうかを示します（注意: もしエラーが予想される場合は `createResource` を [ErrorBoundary](#%3Cerrorboundary%3E) でラップするとよいでしょう）。
 
 `loading` と `error` はリアクティブゲッターで、追跡が可能です。
 
