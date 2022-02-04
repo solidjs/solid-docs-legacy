@@ -164,7 +164,7 @@ It will be called again whenever the value of `sourceSignal` changes, it will al
 Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
 `data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`. 
-But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#%3Cerrorboundary%3E).)
+But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#<errorboundary>).)
 
 `loading` and `error` are reactive getters and can be tracked. 
 
