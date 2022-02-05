@@ -1,43 +1,96 @@
 ---
 title: API
-description: Outline of all Solid APIs.
+description: Description of all of Solid's API
 sort: 0
 ---
 
 # Basic Reactivity
 
+Solid's overall approach to reactivity is to wrap any reactive computation in
+a function, and rerun that function when its dependencies update.
+The Solid JSX compiler also wraps every JSX expression (code in braces) with a
+function, so they automatically update (and trigger corresponding DOM updates)
+when their dependencies change.
+More precisely, automatic rerunning of a function happens whenever the function
+gets called in a *tracking scope*, such as a JSX expression
+or most `create...` API calls (`createEffect`, `createMemo`, etc.).
+By default, the dependencies of a function get tracked automatically
+when they're called in a tracking scope, by detecting when the function reads
+reactive state (e.g., via a Signal getter or Store attribute).
+As a result, you generally don't need to worry about dependencies yourselves.
+(But if automatic dependency tracking ever doesn't produce the results you
+want, you can also [override dependency tracking](#reactive-utilities).)
+This approach makes reactivity composable: calling one function within another
+function generally causes the calling function to inherit the dependencies of
+the called function.
+
 ## `createSignal`
 
 ```ts
 export function createSignal<T>(
-  value: T,
+  initialValue: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): [get: () => T, set: (v: T) => T];
 ```
 
-This is the most basic reactive primitive used to track a single value that changes over time. The `createSignal` function returns a pair of functions as an array: a getter (or _accessor_) and a setter.
-
-The getter returns the current value of the signal. When called within a tracking scope (like functions passed to `createEffect` or used in JSX expressions), the calling context will rerun when the signal is updated.
-
-The setter updates the signal. As its only argument, it takes either the new value for the signal, or a function that maps the last value of the signal to a new value. The setter returns the updated value.
+Signals are the most basic reactive primitive.  They track a single value
+(which can be any JavaScript object) that changes over time.
+The Signal's value starts out equal to the passed first argument
+`initialValue` (or `undefined` if there are no arguments).
+The `createSignal` function returns a pair of functions as a two-element array:
+a *getter* (or *accessor*) and a *setter*.  In typical use, you would
+destructure this array into a named Signal like so:
 
 ```js
-const [getValue, setValue] = createSignal(initialValue);
-
-// read value
-getValue();
-
-// set value
-setValue(nextValue);
-
-// set value with a function setter
-setValue((prev) => prev + next);
+const [count, setCount] = createSignal(0);
+const [ready, setReady] = createSignal(false);
 ```
 
-> If you wish to store a function in a Signal you must use the function form:
+Calling the getter (e.g., `count()` or `ready()`)
+returns the current value of the Signal.
+Crucial to automatic dependency tracking, calling the getter
+within a tracking scope causes the calling function to depends on this Signal,
+so that function will rerun if the Signal gets updated.
+
+Calling the setter (e.g., `setCount(nextCount) or `setReady(nextReady)`)
+sets the Signal's value and *updates* the Signal
+(triggering dependents to rerun)
+if the value actually changed (see details below).
+As its only argument, the setter takes either the new value for the signal,
+or a function that maps the last value of the signal to a new value.
+The setter also returns the updated value.  For example:
+
+```js
+// read signal's current value, and
+// depend on signal if in a tracking scope
+// (but nonreactive outside of a tracking scope):
+const currentCount = count();
+
+// or wrap any computation with a function,
+// and this function can be used in a tracking scope:
+const doubledCount = () => 2 * count();
+
+// or build a tracking scope and depend on signal:
+const countDisplay = <div>{count()}</div>;
+
+// write signal by providing a value:
+setValue(ready, true);
+
+// write signal by providing a function setter:
+const newCount = setValue((prev) => prev + 1);
+```
+
+> If you want to store a function in a Signal you must use the function form:
 >
 > ```js
 > setValue(() => myFunction);
+> ```
+>
+> However, functions are not treated specially as the `initialValue` argument
+> to `createSignal`, so you should pass a function initial value as is:
+>
+> ```js
+> const [func, setFunc] = createSignal(myFunction);
 > ```
 
 ##### Options
@@ -48,15 +101,28 @@ Several primitives in Solid take an "options" object as an optional last argumen
 const [getValue, setValue] = createSignal(initialValue, { equals: false });
 ```
 
-By default, when a signal's setter is called, dependencies are only rerun if the new value is actually different than the old value. You can set `equals` to `false` to always rerun dependencies after the setter is called, or you can pass your own equality function.
+By default, when calling a signal's setter, the signal only updates (and causes
+dependents to rerun) if the new value is actually different than the old value,
+according to JavaScript's `===` operator.
+
+Alternatively, you can set `equals` to `false` to always rerun dependents after
+the setter is called, or you can pass your own function for testing equality:
 
 ```js
+// use { equals: false } signal as trigger without value:
+const [depend, rerun] = createSignal(undefined, {
+  equals: false
+});
+// now calling depend() in a tracking context
+// makes that context rerun whenever rerun() gets called
+
+// define equality based on string length:
 const [myString, setMyString] = createSignal("string", {
   equals: (newVal, oldVal) => newVal.length === oldVal.length,
 });
 
-setMyString("strung"); //is considered equal to the last value and won't cause updates
-setMyString("stranger"); //is considered different and will cause updates
+setMyString("strung"); // considered equal to the last value and won't cause updates
+setMyString("stranger"); // considered different and will cause updates
 ```
 
 ## `createEffect`
