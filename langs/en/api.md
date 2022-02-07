@@ -296,15 +296,25 @@ export function getOwner(): Owner;
 Gets the reactive scope that owns the currently running code, e.g.,
 for passing into a later call to `runWithOwner` outside of the current scope.
 
-Internally, computations (effects, memos, components, etc.) create owners
-which are children of their owner, all the way up to the root owner created by
+Internally, computations (effects, memos, etc.) create owners which are
+children of their owner, all the way up to the root owner created by
 `createRoot` or `render`.  In particular, this ownership tree lets Solid
-clean up a disposed computation (e.g., an unmounted component) by traversing
-its subtree and calling `onCleanup`.  Calling `getOwner` returns the current
-owner node that is responsible for disposal of the current execution block.
+automatically clean up a disposed computation by traversing its subtree
+and calling all [`onCleanup`](#oncleanup) callbacks.
+For example, when a `createEffect`'s dependencies change, the effect calls
+all descendant `onCleanup` callbacks before running the effect function again.
+Calling `getOwner` returns the current owner node that is responsible
+for disposal of the current execution block.
 
-Note that the owning reactive scope isn't necessarily a *tracking* reactive
-scope.  For example, `untrack` creates a nontracking reactive scope, as do
+Components are not computations, so do not create an owner node, but they are
+typically rendered from a `createEffect` which does, so the result is similar:
+when a component gets unmounted, all descendant `onCleanup` callbacks get
+called.  Calling `getOwner` from a component scope returns the owner that is
+responsible for rendering and unmounting that component.
+
+Note that the owning reactive scope isn't necessarily *tracking*.
+For example, [`untrack`](#untrack) turns off tracking for the duration
+of a function (without creating a new reactive scope), as do
 components created via JSX (`<Component ...>`).
 
 ## `runWithOwner`
@@ -346,7 +356,7 @@ Having an owner is important for two reasons:
 * Computations without an owner cannot be cleaned up.  For example, if you call
   `createEffect` without an owner (e.g., in the global scope), the effect will
   continue running forever, instead of being disposed when its owner gets
-  disposed (e.g., when the containing component gets unmounted).
+  disposed.
 * [`useContext`](#usecontext) obtains context by walking up the owner tree
   to find the nearest ancestor providing the desired context.
   So without an owner you cannot look up any provided context
