@@ -76,7 +76,7 @@ Esta biblioteca tuvo la mayor influencia en el diseño reactivo de Solid. Solid 
 
 ## RxJS
 
-RxJS es una biblioteca reactiva. Si bien Solid tiene una idea similar de los datos observables, utiliza una aplicación muy diferente del patrón del observador. Si bien las señales son como una versión simple de un Observable (solo el siguiente), el patrón de detección de dependencia automática reemplaza a los cien o más operadores de RxJS. Solid podría haber adoptado este enfoque y, de hecho, las versiones anteriores de la biblioteca incluían operadores similares, pero en la mayoría de los casos es más sencillo escribir su propia lógica de transformación en un cálculo. Mientras que los Observables son de arranque en frío, unidifusión y basados en push, muchos problemas en el cliente se prestan a un arranque en caliente y multidifusión, que es el comportamiento predeterminado de Solid.
+RxJS es una biblioteca reactiva. Si bien Solid tiene una idea similar de los datos observables, utiliza una aplicación muy diferente del patrón del observador. Si bien las señales son como una versión simple de un Observable (solo el siguiente), el patrón de detección de dependencia automática reemplaza a los cien o más operadores de RxJS. Solid podría haber adoptado este enfoque y, de hecho, las versiones anteriores de la biblioteca incluían operadores similares, pero en la mayoría de los casos es más sencillo escribir su propia lógica de transformación en una computación. Mientras que los Observables son de arranque en frío, unidifusión y basados en push, muchos problemas en el cliente se prestan a un arranque en caliente y multidifusión, que es el comportamiento predeterminado de Solid.
 
 ## Otros
 
