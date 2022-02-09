@@ -8,21 +8,21 @@ sort: 0
 
 Solid's overall approach to reactivity is to wrap any reactive computation in
 a function, and rerun that function when its dependencies update.
-The Solid JSX compiler also wraps every JSX expression (code in braces) with a
+The Solid JSX compiler also wraps most JSX expressions (code in braces) with a
 function, so they automatically update (and trigger corresponding DOM updates)
 when their dependencies change.
 More precisely, automatic rerunning of a function happens whenever the function
 gets called in a *tracking scope*, such as a JSX expression
-or most `create...` API calls (`createEffect`, `createMemo`, etc.).
+or API calls that build "computations" (`createEffect`, `createMemo`, etc.).
 By default, the dependencies of a function get tracked automatically
 when they're called in a tracking scope, by detecting when the function reads
 reactive state (e.g., via a Signal getter or Store attribute).
 As a result, you generally don't need to worry about dependencies yourselves.
 (But if automatic dependency tracking ever doesn't produce the results you
 want, you can also [override dependency tracking](#reactive-utilities).)
-This approach makes reactivity composable: calling one function within another
-function generally causes the calling function to inherit the dependencies of
-the called function.
+This approach makes reactivity *composable*: calling one function
+within another function generally causes the calling function
+to inherit the dependencies of the called function.
 
 ## `createSignal`
 
@@ -52,7 +52,7 @@ Crucial to automatic dependency tracking, calling the getter
 within a tracking scope causes the calling function to depends on this Signal,
 so that function will rerun if the Signal gets updated.
 
-Calling the setter (e.g., `setCount(nextCount) or `setReady(nextReady)`)
+Calling the setter (e.g., `setCount(nextCount)` or `setReady(nextReady)`)
 sets the Signal's value and *updates* the Signal
 (triggering dependents to rerun)
 if the value actually changed (see details below).
@@ -74,10 +74,10 @@ const doubledCount = () => 2 * count();
 const countDisplay = <div>{count()}</div>;
 
 // write signal by providing a value:
-setValue(ready, true);
+setReady(true);
 
 // write signal by providing a function setter:
-const newCount = setValue((prev) => prev + 1);
+const newCount = setCount((prev) => prev + 1);
 ```
 
 > If you want to store a function in a Signal you must use the function form:
@@ -93,12 +93,29 @@ const newCount = setValue((prev) => prev + 1);
 > const [func, setFunc] = createSignal(myFunction);
 > ```
 
-##### Options
-
-Several primitives in Solid take an "options" object as an optional last argument. `createSignal`'s options object allows you to provide an `equals` option.
+Unless you're in a [batch](#batch) or [transition](#use-transition) context,
+signals update immediately when you set them.  For example:
 
 ```js
-const [getValue, setValue] = createSignal(initialValue, { equals: false });
+setReady(false);
+console.assert(ready() === false);
+setReady(true);
+console.assert(ready() === true);
+```
+
+If you're not sure whether your code will be run in a batch or transition
+context (e.g., library code), you should avoid making this assumption.
+
+##### Options
+
+Several primitives in Solid take an "options" object
+as an optional last argument.
+`createSignal`'s options object allows you to provide an
+`equals` option.  For example:
+
+```js
+const [getValue, setValue] = createSignal(initialValue,
+  { equals: false });
 ```
 
 By default, when calling a signal's setter, the signal only updates (and causes
@@ -106,13 +123,24 @@ dependents to rerun) if the new value is actually different than the old value,
 according to JavaScript's `===` operator.
 
 Alternatively, you can set `equals` to `false` to always rerun dependents after
-the setter is called, or you can pass your own function for testing equality:
+the setter is called, or you can pass your own function for testing equality.
+Some examples:
 
 ```js
-// use { equals: false } signal as trigger without value:
-const [depend, rerun] = createSignal(undefined, {
-  equals: false
+// use { equals: false } to allow modifying object in-place;
+// normally this wouldn't be seen as an update because the
+// object has the same identity before and after change
+const [object, setObject] = createSignal(
+  { count: 0 }, { equals: false });
+setObject((current) => {
+  current.count += 1;
+  current.updated = new Date;
+  return current;
 });
+
+// use { equals: false } signal as trigger without value:
+const [depend, rerun] = createSignal(undefined,
+  { equals: false });
 // now calling depend() in a tracking context
 // makes that context rerun whenever rerun() gets called
 
