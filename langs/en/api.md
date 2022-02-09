@@ -93,8 +93,9 @@ const newCount = setCount((prev) => prev + 1);
 > const [func, setFunc] = createSignal(myFunction);
 > ```
 
-Unless you're in a [batch](#batch) or [transition](#use-transition) context,
-signals update immediately when you set them.  For example:
+Unless you're in a [batch](#batch), [effect](#createEffect), or
+[transition](#use-transition), signals update immediately when you set them.
+For example:
 
 ```js
 setReady(false);
@@ -104,7 +105,7 @@ console.assert(ready() === true);
 ```
 
 If you're not sure whether your code will be run in a batch or transition
-context (e.g., library code), you should avoid making this assumption.
+(e.g., library code), you should avoid making this assumption.
 
 ##### Options
 
@@ -141,8 +142,8 @@ setObject((current) => {
 // use { equals: false } signal as trigger without value:
 const [depend, rerun] = createSignal(undefined,
   { equals: false });
-// now calling depend() in a tracking context
-// makes that context rerun whenever rerun() gets called
+// now calling depend() in a tracking scope
+// makes that scope rerun whenever rerun() gets called
 
 // define equality based on string length:
 const [myString, setMyString] = createSignal("string", {
@@ -159,7 +160,11 @@ setMyString("stranger"); // considered different and will cause updates
 export function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs after each render in which a dependency has changed. Ideal for using `ref`s and managing other side effects.
+Effects are a general way to make arbitrary code run whenever dependencies
+change.  `createEffect` creates a new computation that runs the given function
+in a tracking scope, thus automatically tracking its dependencies,
+and automatically reruns the function whenever the dependencies update.
+For example:
 
 ```js
 const [a, setA] = createSignal(initialValue);
@@ -168,17 +173,92 @@ const [a, setA] = createSignal(initialValue);
 createEffect(() => doSideEffect(a()));
 ```
 
-The effect function is called with the value returned from the effect function's last execution. This value can be initialized as an optional 2nd argument. This can be useful for diffing without creating an additional closure.
+The effect function gets called with an argument equal to the value returned
+from the effect function's last execution, or on the first call,
+equal to the optional second argument to `createEffect`.
+This allows you to compute diffs without creating an additional closure
+to remember the last computed value.  For example:
 
 ```js
 createEffect((prev) => {
   const sum = a() + b();
-  if (sum !== prev) console.log(sum);
+  if (sum !== prev)
+    console.log('sum changed to', sum);
   return sum;
 }, 0);
 ```
 
-Signal changes inside effects _batch_: no update to a signal will propogate until the effect finishes executing.
+The effect function is automatically wrapped in [`batch`](#batch),
+meaning that all signal changes inside the effect propagate only after the
+effect finishes.  This lets you update several signals while triggering only
+one update, and avoids unwanted side-effects from happening in the middle
+of your side effects.
+
+The *first* execution of the effect function is not immediate;
+it's scheduled to run after the current synchronous task via
+[`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask).
+If you want to wait for the first execution to occur,
+use `queueMicrotask` (which run before render) or
+`await Promise.resolve()` or `setTimeout(..., 0)` (which run after render).
+After this first execution, effects generally run immediately when
+their dependencies update (unless you're in a [batch](#batch) or
+[transition](#use-transition)).  For example:
+
+```js
+const [count, setCount] = createSignal(0);
+
+// this effect prints count at the beginning and when it changes
+createEffect(() => console.log('count =', count()));
+// effect won't run yet
+console.log('hello');
+setCount(1);  // effect still won't run yet
+setCount(2);  // effect still won't run yet
+
+queueMicrotask(() => {
+  // now `count = 2` will print
+  console.log('microtask');
+  setCount(3);  // immediately prints `count = 3`
+  console.log('goodbye');
+});
+
+// --- overall output: ---
+// hello
+// count = 2
+// microtask
+// count = 3
+// goodbye
+```
+
+This delay in first execution is useful because it means
+an effect defined in a component scope runs after
+the JSX returned by the component gets added the DOM.
+In particular, [`ref`s](#ref) will already be set.
+Thus you can use an effect to manipulate the DOM manually,
+call vanilla JS libraries, or other side effects.
+
+Note that the first run of the effect still runs before the browser renders
+the DOM to the screen (similar to React's `createLayoutEffect`).
+If you need to wait until after rendering, you can use
+`await Promise.resolve()` (or `Promise.resolve().then(...)`),
+but note that subsequent use of reactive state (such as signals)
+will not trigger the effect to rerun, as tracking is not
+possible after an `async` function uses `await`.
+
+You can clean up your side effects in between executions of the effect function
+by calling [`onCleanup`](#oncleanup) *inside* the effect function.
+Such a cleanup function gets called both in between effect executions and
+when the effect gets disposed (e.g., the containing component unmounts).
+For example:
+
+```js
+// listen to event dynamically given by eventName signal
+createEffect(() => {
+  const event = eventName();
+  const callback = (e) => console.log(e);
+  ref.addEventListener(event, callback);
+  onCleanup(() => ref.removeEventListener(event, callback));
+});
+```
 
 ## `createMemo`
 
@@ -457,6 +537,11 @@ setTimeout(() => {
   });
 }, 1000)
 ```
+
+Note that owners are not what determines dependency tracking,
+so `runWithOwner` does not help with tracking in asynchronous functions;
+use of reactive state in the asynchronous part (e.g. after the first `await`)
+will not be tracked as a dependency.
 
 ## `mergeProps`
 
