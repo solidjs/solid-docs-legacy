@@ -238,11 +238,12 @@ call vanilla JS libraries, or other side effects.
 
 Note that the first run of the effect still runs before the browser renders
 the DOM to the screen (similar to React's `createLayoutEffect`).
-If you need to wait until after rendering, you can use
-`await Promise.resolve()` (or `Promise.resolve().then(...)`),
+If you need to wait until after rendering (e.g., to measure the rendering),
+you can use `await Promise.resolve()` (or `Promise.resolve().then(...)`),
 but note that subsequent use of reactive state (such as signals)
 will not trigger the effect to rerun, as tracking is not
 possible after an `async` function uses `await`.
+Thus you should use all dependencies before the promise.
 
 If you'd rather an effect run immediately even for its first run,
 use [`createComputed`](#createcomputed).
