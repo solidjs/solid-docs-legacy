@@ -244,6 +244,9 @@ but note that subsequent use of reactive state (such as signals)
 will not trigger the effect to rerun, as tracking is not
 possible after an `async` function uses `await`.
 
+If you'd rather an effect run immediately even for its first run,
+use [`createComputed`](#createcomputed).
+
 You can clean up your side effects in between executions of the effect function
 by calling [`onCleanup`](#oncleanup) *inside* the effect function.
 Such a cleanup function gets called both in between effect executions and
