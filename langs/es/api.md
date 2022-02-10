@@ -1,62 +1,62 @@
 ---
 title: API
-description: Outline of all Solid APIs.
+description: Resumen de todas las APIs de Solid.
 sort: 0
 ---
 
-# Basic Reactivity
+# Reactividad Básica
 
 ## `createSignal`
 
 ```ts
 export function createSignal<T>(
-  value: T,
-  options?: { equals?: false | ((prev: T, next: T) => boolean) }
+	value: T,
+	options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): [get: () => T, set: (v: T) => T];
 ```
 
-This is the most basic reactive primitive used to track a single value that changes over time. The `createSignal` function returns a pair of functions as an array: a getter (or _accessor_) and a setter.
+Esta es la primitiva reactiva más básica que se usa para dar seguimiento a un solo valor que cambia con el tiempo. La función `createSignal` devuelve un par de funciones en array: un getter (u _obtenedor_) y un setter (o _asignador_).
 
-The getter returns the current value of the signal. When called within a tracking scope (like functions passed to `createEffect` or used in JSX expressions), the calling context will rerun when the signal is updated.
+El getter devuelve el valor actual de la señal. Cuando se llama dentro de un scope de seguimiento (como funciones pasadas a `createEffect` o usadas en expresiones JSX), el contexto de llamada se re-ejecutará cuando se actualice la señal.
 
-The setter updates the signal. As its only argument, it takes either the new value for the signal, or a function that maps the last value of the signal to a new value. The setter returns the updated value.
+El setter actualiza la señal. Como único argumento, toma el nuevo valor de la señal o una función que asigna el último valor de la señal a un nuevo valor. El setter devuelve el valor actualizado. Son usualmente utilizados como `valor`, `setValor`.
 
 ```js
-const [getValue, setValue] = createSignal(initialValue);
+const [getValor, setValor] = createSignal(valorInicial);
 
-// read value
-getValue();
+// leet el valor
+getValor();
 
-// set value
-setValue(nextValue);
+// asignar el valor
+setValor(valorSiguiente);
 
-// set value with a function setter
-setValue((prev) => prev + next);
+// asignar un valor con un setter/asignador
+setValor((prev) => prev + siguiente);
 ```
 
-> If you wish to store a function in a Signal you must use the function form:
+> Si deseas almacenar una función en una Signal debes emplear la siguiente forma:
 >
 > ```js
-> setValue(() => myFunction);
+> setValor(() => miFuncion);
 > ```
 
 ##### Options
 
-Several primitives in Solid take an "options" object as an optional last argument. `createSignal`'s options object allows you to provide an `equals` option.
+Varias primitivas en Solid toman un objeto de "opciones" como último argumento opcional. El objeto de opciones de `createSignal` le permite proporcionar una opción `equals`.
 
 ```js
-const [getValue, setValue] = createSignal(initialValue, { equals: false });
+const [getValor, setValor] = createSignal(valorInicial, { equals: false });
 ```
 
-By default, when a signal's setter is called, dependencies are only rerun if the new value is actually different than the old value. You can set `equals` to `false` to always rerun dependencies after the setter is called, or you can pass your own equality function.
+De forma predeterminada, cuando se llama al setter de una señal, las dependencias solo se vuelven a ejecutar si el nuevo valor es realmente diferente al valor anterior. Puede establecer `equals` `false` para ejecutar siempre las dependencias después de llamar al setter, o puede pasar su propia función de igualdad.
 
 ```js
-const [myString, setMyString] = createSignal("string", {
-  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+const [miString, setMiString] = createSignal("string", {
+	equals: (newVal, oldVal) => newVal.length === oldVal.length,
 });
 
-setMyString("strung"); //is considered equal to the last value and won't cause updates
-setMyString("stranger"); //is considered different and will cause updates
+setMyString("strung"); //es considerado igual al ultimo valor y no generará actualizaciones
+setMyString("stranger"); //es considerado diferente y generará actualizaciones
 ```
 
 ## `createEffect`
@@ -65,142 +65,141 @@ setMyString("stranger"); //is considered different and will cause updates
 export function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs after each render in which a dependency has changed. Ideal for using `ref`s and managing other side effects.
+Crea un nuevo cálculo que realiza un seguimiento automático de las dependencias y se ejecuta después de cada procesamiento en el que haya cambiado una dependencia. Ideal para usar `ref`s y manejar otros efectos secundarios.
 
 ```js
-const [a, setA] = createSignal(initialValue);
+const [a, setA] = createSignal(valorInicial);
 
-// effect that depends on signal `a`
+// effect que depende de la señal `a`
 createEffect(() => doSideEffect(a()));
 ```
 
-The effect function is called with the value returned from the effect function's last execution. This value can be initialized as an optional 2nd argument. This can be useful for diffing without creating an additional closure.
+La función effect se llama con el valor devuelto desde la última ejecución de la función effect. Este valor se puede inicializar como un segundo argumento opcional. Esto puede ser útil para diferenciar sin crear un closure adicional.
 
 ```js
 createEffect((prev) => {
-  const sum = a() + b();
-  if (sum !== prev) console.log(sum);
-  return sum;
+	const suma = a() + b();
+	if (suma !== prev) console.log(suma);
+	return suma;
 }, 0);
 ```
 
-Signal changes inside effects _batch_: no update to a signal will propogate until the effect finishes executing.
+Cambios de señal dentro del _batch_ de los efectos: no se propagará ninguna actualización de una señal hasta que el efecto termine de ejecutarse.
 
 ## `createMemo`
 
 ```ts
 export function createMemo<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { equals?: false | ((prev: T, next: T) => boolean) }
+	fn: (v: T) => T,
+	value?: T,
+	options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): () => T;
 ```
 
-Creates a readonly derived signal that recalculates its value whenever the executed code's dependencies update.
+Crea una señal derivada de solo lectura que vuelve a calcular su valor cada vez que se actualizan las dependencias del código ejecutado.
 
 ```js
-const getValue = createMemo(() => computeExpensiveValue(a(), b()));
+const getValor = createMemo(() => computeExpensiveValue(a(), b()));
 
-// read value
-getValue();
+// leer el valor
+getValor();
 ```
 
-The memo function is called with the value returned from the memo function's last execution. This value can be initialized as an optional 2nd argument. This is useful for reducing computations.
+La función memo se llama con el valor devuelto por la última ejecución de la función memo. Este valor se puede inicializar como un segundo argumento opcional. Esto es útil para reducir los cálculos.
 
 ```js
-const sum = createMemo((prev) => input() + prev, 0);
+const suma = createMemo((prev) => input() + prev, 0);
 ```
 
-The memo function should not change other signals by calling setters (it should be "pure"). This enables the execution order of memos to be optimized according to read dependencies.
+La función de memo no debe cambiar otras señales al llamar a los setters (debe ser "puro"). Esto permite que el orden de ejecución de los memos sea optimizado de acuerdo con las dependencias de lectura.
 
 ## `createResource`
 
 ```ts
-type ResourceReturn<T> = [
-  {
-    (): T | undefined;
-    loading: boolean;
-    error: any;
-  },
-  {
-    mutate: (v: T | undefined) => T | undefined;
-    refetch: (info: unknown) => Promise<T> | T;
-  }
+type RecursoRetornado<T> = [
+	{
+		(): T | undefined;
+		loading: boolean;
+		error: any;
+	},
+	{
+		mutate: (v: T | undefined) => T | undefined;
+		refetch: (info: unknown) => Promise<T> | T;
+	}
 ];
 
 export function createResource<T, U = true>(
-  fetcher: (
-    k: U,
-    info: { value: T | undefined; refetching: boolean | unknown }
-  ) => T | Promise<T>,
-  options?: { initialValue?: T }
-): ResourceReturn<T>;
+	fetcher: (k: U, info: { valor: T | undefined; refetching: boolean | unknown }) => T | Promise<T>,
+	options?: { valorInicial?: T }
+): RecursoRetornado<T>;
 
 export function createResource<T, U>(
-  source: U | false | null | (() => U | false | null),
-  fetcher: (
-    k: U,
-    info: { value: T | undefined; refetching: boolean | unknown }
-  ) => T | Promise<T>,
-  options?: { initialValue?: T }
-): ResourceReturn<T>;
+	source: U | false | null | (() => U | false | null),
+	fetcher: (k: U, info: { valor: T | undefined; refetching: boolean | unknown }) => T | Promise<T>,
+	options?: { valorInicial?: T }
+): RecursoRetornado<T>;
 ```
 
-Creates a signal that reflects the result of an async request. 
+Crea una señal que refleja el resultado de una solicitud asíncrona.
 
-`createResource` takes an asynchronous fetcher function and returns a signal that is updated with the resulting data when the fetcher completes.
+`createResource` toma una función fetcher asíncrona y devuelve una señal que se actualiza con los datos resultantes cuando se completa el fetch.
 
-There are two ways to use `createResource`:  you can pass the fetcher function as the sole argument, or you can additionally pass a source signal as the first argument. The source signal will retrigger the fetcher whenever it changes, and its value will be passed to the fetcher.
+Hay dos formas de usar `createResource`: puede pasar la función de búsqueda de recursos como único argumento, o también puede pasar una signal de origen como primer argumento. La signal de fuente volverá a activar el fetcher cada vez que cambie, y su valor se pasará al fetcher.
+
 ```js
-const [data, { mutate, refetch }] = createResource(fetchData)
+// const [datos, { mutar, buscarDeNuevo}] = createResource(buscarDatos)
+const [data, { mutate, refetch }] = createResource(fetchData);
 ```
+
 ```js
-const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData)
+// const [datos, { mutar, buscarDeNuevo}] = createResource(signalDeOrigen, buscarDatos)
+const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 ```
-In these snippets, the fetcher is the function `fetchData`. In both cases, `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately. 
-In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`. 
-It will be called again whenever the value of `sourceSignal` changes, it will always be passed to `fetchData` as its first argument.
 
-Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
+En estos fragmentos, el buscador es la función `fetchData`. En ambos casos, `data()` no está definido hasta que `fetchData` termina de resolverse. En el primer caso, `fetchData` será llamado inmediatamente.
+En el segundo, se llamará a `fetchData` tan pronto como `sourceSignal` tenga cualquier valor que no sea `false`, `null` o `undefined`. Se volverá a llamar cada vez que cambie el valor de `sourceSignal`, siempre se pasará a `fetchData` como su primer argumento.
 
-`data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`. 
-But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#<errorboundary>).)
+De cualquier manera, puede llamar a `mutate` para actualizar directamente la signal `data` (funciona como cualquier otro emisor de signals). También puede llamar a `refetch` para volver a ejecutar el buscador directamente y pasar un argumento opcional para proporcionar información adicional al buscador: `refetch(info)`.
 
-`loading` and `error` are reactive getters and can be tracked. 
+`data` funciona como un receptor de señal normal: usa `data()` para leer el último valor devuelto de `fetchData`.
+Pero también tiene dos propiedades extra: `data.loading` te dice si el buscador ha sido llamado pero no devuelto, y `data.error` te dice si la solicitud ha fallado; si es así, contiene el error arrojado por el buscador. (Nota: si prevé errores, es posible que desee incluir `createResource` en un [ErrorBoundary](#<errorboundary>).)
 
-The `fetcher` is the async function that you provide to `createResource` to actually fetch the data.
-It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: `value` and `refetching`. `value` tells you the previously fetched value.
-`refetching` is `true` if the fetcher was triggered using the `refetch` function and `false` otherwise. 
-If the `refetch` function was called with an argument (`refetch(info)`), `refetching` is set to that argument.
+`loading` y `error` son getters reactivos y pueden recibir seguimiento.
+
+El `fetcher` es la función asíncrona que proporcionas a `createResource` para obtener los datos.
+Se pasan dos argumentos: el valor de la señal de origen (si se proporciona) y un objeto de información con dos propiedades: "value" y "refetching". `value` te dice el valor obtenido previamente.
+`refetching` es `true` si el buscador se activó mediante la función `refetch` y `false` en caso contrario.
+Si se llamó a la función `refetch` con un argumento (`refetch(info)`), `refetch` se establece en ese argumento.
 
 ```js
 async function fetchData(source, { value, refetching }) {
-  // Fetch the data and return a value.
-  //`source` tells you the current value of the source signal; 
-  //`value` tells you the last returned value of the fetcher;
-  //`refetching` is true when the fetcher is triggered by calling `refetch()`,
-  // or equal to the optional data passed: `refetch(info)`
+	//
+	// Obtener los datos y devolver un valor.
+	//`source` te dice el valor actual de la señal fuente;
+	//`valor` te dice el último valor devuelto por el fetcher;
+	//`refetching` es verdadero cuando el buscador se activa al llamar `refetch()`,
+	// o igual a la información opcional pasada: `refetch(info)`
 }
 
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
 
-// read value
+// leer valor
 data();
 
-// check if loading
+// checa si esta cargando
 data.loading;
 
-// check if errored
+// checa si hubo error
 data.error;
 
-// directly set value without creating promise
+// establece el valor directamente sin devolver una prom
 mutate(optimisticValue);
 
-// refetch the last request explicitly
+// volver a recuperar la última solicitud explícitamente
 refetch();
 ```
 
-# Lifecycles
+# Ciclos de vida
 
 ## `onMount`
 
@@ -208,7 +207,7 @@ refetch();
 export function onMount(fn: () => void): void;
 ```
 
-Registers a method that runs after initial render and elements have been mounted. Ideal for using `ref`s and managing other one time side effects. It is equivalent to a `createEffect` which does not have any dependencies.
+Registra un método que se ejecuta después de que se hayan montado la representación inicial y los elementos. Ideal para usar `ref`s y manejar otros efectos secundarios de una sola vez. Es equivalente a un `createEffect` que no tiene dependencias.
 
 ## `onCleanup`
 
@@ -216,7 +215,7 @@ Registers a method that runs after initial render and elements have been mounted
 export function onCleanup(fn: () => void): void;
 ```
 
-Registers a cleanup method that executes on disposal or recalculation of the current reactive scope. Can be used in any Component or Effect.
+Registra un método de limpieza que se ejecuta al desechar o volver a calcular el scope reactivo actual. Se puede utilizar en cualquier Component o Effect.
 
 ## `onError`
 
@@ -224,11 +223,11 @@ Registers a cleanup method that executes on disposal or recalculation of the cur
 export function onError(fn: (err: any) => void): void;
 ```
 
-Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
+Registra un método de manejo de errores que se ejecuta cuando se producen errores en el scope secundario. Solo se ejecutan los controladores de error de scope más cercano. Vuelve a lanzar para disparar la línea.
 
-# Reactive Utilities
+# Utilidades Reactivas
 
-These helpers provide the ability to better schedule updates and control how reactivity is tracked.
+Estos asistentes brindan la capacidad de programar mejor las actualizaciones y controlar cómo se realiza el seguimiento de la reactividad.
 
 ## `untrack`
 
@@ -236,7 +235,7 @@ These helpers provide the ability to better schedule updates and control how rea
 export function untrack<T>(fn: () => T): T;
 ```
 
-Ignores tracking any of the dependencies in the executing code block and returns the value.
+Ignora el seguimiento de cualquiera de las dependencias en el bloque de código de ejecución y devuelve el valor.
 
 ## `batch`
 
@@ -244,37 +243,37 @@ Ignores tracking any of the dependencies in the executing code block and returns
 export function batch<T>(fn: () => T): T;
 ```
 
-Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method and Effects automatically wrap their code in a batch.
+Retiene la confirmación de actualizaciones dentro del bloque hasta el final para evitar un nuevo calculo innecesario. Esto significa que los valores de lectura en la siguiente línea aún no se habrán actualizado. El método set y los efectos de [Solid Store](#createstore) envuelven automáticamente su código en un lote.
 
 ## `on`
 
 ```ts
 export function on<T extends Array<() => any> | (() => any), U>(
-  deps: T,
-  fn: (input: T, prevInput: T, prevValue?: U) => U,
-  options: { defer?: boolean } = {}
+	deps: T,
+	fn: (input: T, prevInput: T, prevValue?: U) => U,
+	options: { defer?: boolean } = {}
 ): (prevValue?: U) => U | undefined;
 ```
 
-`on` is designed to be passed into a computation to make its dependencies explicit. If an array of dependencies is passed, `input` and `prevInput` are arrays.
+`on` está diseñado para pasar a un cálculo para hacer explícitas sus dependencias. Si se pasa un array de dependencias, `input` y `prevInput` son arrays.
 
 ```js
 createEffect(on(a, (v) => console.log(v, b())));
 
-// is equivalent to:
+// es equivalente a:
 createEffect(() => {
-  const v = a();
-  untrack(() => console.log(v, b()));
+	const v = a();
+	untrack(() => console.log(v, b()));
 });
 ```
 
-You can also not run the computation immediately and instead opt in for it to only run on change by setting the defer option to true.
+También puedes no ejecutar el calculo de inmediato y en su lugar, optar porque se ejecute cuando cambie configurando la opción defer a true.
 
 ```js
-// doesn't run immediately
+// no se ejecuta de inmediato
 createEffect(on(a, (v) => console.log(v), { defer: true }));
 
-setA("new"); // now it runs
+setA("new"); // ahora si se ejecuta
 ```
 
 ## `createRoot`
@@ -283,9 +282,9 @@ setA("new"); // now it runs
 export function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-Creates a new non-tracked owner scope that doesn't auto-dispose. This is useful for nested reactive scopes that you do not wish to release when the parent re-evaluates.
+Crea un nuevo scope de propietario sin seguimiento que no se auto-desecha. Esto es útil para los scopes reactivos anidados que no desee liberar cuando el padre vuelve ser calculado.
 
-All Solid code should be wrapped in one of these top level as they ensure that all memory/computations are freed up. Normally you do not need to worry about this as `createRoot` is embedded into all `render` entry functions.
+Todo el código de Solid debe incluirse en uno de estos niveles superiores, ya que aseguran que toda la memoria/cálculos se liberen. Normalmente no necesita preocuparse por esto ya que `createRoot` está incrustado en todas las funciones de entrada `render`.
 
 ## `getOwner`
 
@@ -293,29 +292,13 @@ All Solid code should be wrapped in one of these top level as they ensure that a
 export function getOwner(): Owner;
 ```
 
-Gets the reactive scope that owns the currently running code, e.g.,
-for passing into a later call to `runWithOwner` outside of the current scope.
+Obtiene el scope reactivo que posee el código que se está ejecutando, por ejemplo, para pasar a una llamada posterior a `runWithOwner` fuera del scope actual.
 
-Internally, computations (effects, memos, etc.) create owners which are
-children of their owner, all the way up to the root owner created by
-`createRoot` or `render`.  In particular, this ownership tree lets Solid
-automatically clean up a disposed computation by traversing its subtree
-and calling all [`onCleanup`](#oncleanup) callbacks.
-For example, when a `createEffect`'s dependencies change, the effect calls
-all descendant `onCleanup` callbacks before running the effect function again.
-Calling `getOwner` returns the current owner node that is responsible
-for disposal of the current execution block.
+Internamente, los cálculos (effects, memos, etc.) crean owners que son hijos de su owner, hasta llegar al owner raíz creado por `createRoot` o `render`. En particular, este árbol posesiones permite que Solid limpie automáticamente un cómputo descartado atravesando su sub-árbol y llamando a todas las devoluciones de llamada [`onCleanup`](#oncleanup). Por ejemplo, cuando las dependencias de `createEffect` cambian, el efecto llama a todas las devoluciones de llamada descendientes de `onCleanup` antes de volver a ejecutar la función de efecto. Llamar a `getOwner` devuelve el nodo propietario actual que es responsable de la eliminación del bloque de ejecución actual.
 
-Components are not computations, so do not create an owner node, but they are
-typically rendered from a `createEffect` which does, so the result is similar:
-when a component gets unmounted, all descendant `onCleanup` callbacks get
-called.  Calling `getOwner` from a component scope returns the owner that is
-responsible for rendering and unmounting that component.
+Los componentes no son cálculos, por lo tanto, no cree un nodo propietario ahí, generalmente se procesan desde un `createEffect` que sí lo hace, por lo que el resultado es similar: cuando un componente se desmonta, se llaman todas las devoluciones de llamada `onCleanup` descendientes. Llamar a `getOwner` desde el scope de un componente devuelve el propietario responsable de renderizar y desmontar ese componente.
 
-Note that the owning reactive scope isn't necessarily *tracking*.
-For example, [`untrack`](#untrack) turns off tracking for the duration
-of a function (without creating a new reactive scope), as do
-components created via JSX (`<Component ...>`).
+Tenga en cuenta que el scope reactivo propietario no es necesariamente _seguimiento_. Por ejemplo, [`untrack`](#untrack) desactiva el seguimiento durante la duración de una función (sin crear un nuevo scope reactivo), al igual que los componentes creados a través de JSX (`<Componente ...>`).
 
 ## `runWithOwner`
 
@@ -334,17 +317,17 @@ specified owner (typically, the return value from a previous call to
 
 Having a (correct) owner is important for two reasons:
 
-* Computations without an owner cannot be cleaned up.  For example, if you call
+- Computations without an owner cannot be cleaned up. For example, if you call
   `createEffect` without an owner (e.g., in the global scope), the effect will
   continue running forever, instead of being disposed when its owner gets
   disposed.
-* [`useContext`](#usecontext) obtains context by walking up the owner tree
+- [`useContext`](#usecontext) obtains context by walking up the owner tree
   to find the nearest ancestor providing the desired context.
   So without an owner you cannot look up any provided context
   (and with the wrong owner, you might obtain the wrong context).
 
 Manually setting the owner is especially helpful when doing reactivity outside
-of any owner scope.  In particular, asynchronous computation
+of any owner scope. In particular, asynchronous computation
 (via either `async` functions or callbacks like `setTimeout`)
 lose the automatically set owner, so remembering the original owner via
 `getOwner` and restoring it via `runWithOwner` is necessary in these cases.
@@ -353,15 +336,15 @@ For example:
 ```js
 const owner = getOwner();
 setTimeout(() => {
-  // This callback gets run without owner.
-  // Restore owner via runWithOwner:
-  runWithOwner(owner, () => {
-    const foo = useContext(FooContext);
-    createEffect(() => {
-      console.log(foo);
-    });
-  });
-}, 1000)
+	// This callback gets run without owner.
+	// Restore owner via runWithOwner:
+	runWithOwner(owner, () => {
+		const foo = useContext(FooContext);
+		createEffect(() => {
+			console.log(foo);
+		});
+	});
+}, 1000);
 ```
 
 ## `mergeProps`
@@ -388,10 +371,7 @@ props = mergeProps(props, otherProps);
 ## `splitProps`
 
 ```ts
-export function splitProps<T>(
-  props: T,
-  ...keys: Array<(keyof T)[]>
-): [...parts: Partial<T>];
+export function splitProps<T>(props: T, ...keys: Array<(keyof T)[]>): [...parts: Partial<T>];
 ```
 
 Splits a reactive object by keys.
@@ -413,8 +393,8 @@ const [local, others] = splitProps(props, ["children"]);
 
 ```ts
 export function useTransition(): [
-  pending: () => boolean,
-  startTransition: (fn: () => void) => Promise<void>
+	pending: () => boolean,
+	startTransition: (fn: () => void) => Promise<void>
 ];
 ```
 
@@ -464,13 +444,11 @@ obsv$.subscribe((v) => console.log(v));
 
 ```ts
 export function from<T>(
-  producer:
-    | ((setter: (v: T) => T) => () => void)
-    | {
-        subscribe: (
-          fn: (v: T) => void
-        ) => (() => void) | { unsubscribe: () => void };
-      }
+	producer:
+		| ((setter: (v: T) => T) => () => void)
+		| {
+				subscribe: (fn: (v: T) => void) => (() => void) | { unsubscribe: () => void };
+		  }
 ): () => T;
 ```
 
@@ -484,8 +462,8 @@ It can also take a custom producer function where the function is passed a sette
 
 ```js
 const clock = from((set) => {
-  const t = setInterval(() => set(1), 1000);
-  return () => clearInterval(t);
+	const t = setInterval(() => set(1), 1000);
+	return () => clearInterval(t);
 });
 ```
 
@@ -495,8 +473,8 @@ const clock = from((set) => {
 
 ```ts
 export function mapArray<T, U>(
-  list: () => readonly T[],
-  mapFn: (v: T, i: () => number) => U
+	list: () => readonly T[],
+	mapFn: (v: T, i: () => number) => U
 ): () => U[];
 ```
 
@@ -527,8 +505,8 @@ const mapped = mapArray(source, (model) => {
 
 ```ts
 export function indexArray<T, U>(
-  list: () => readonly T[],
-  mapFn: (v: () => T, i: number) => U
+	list: () => readonly T[],
+	mapFn: (v: () => T, i: number) => U
 ): () => U[];
 ```
 
@@ -562,7 +540,7 @@ These APIs are available at `solid-js/store`. They allow the creation of stores:
 
 ```ts
 export function createStore<T extends StoreNode>(
-  state: T | Store<T>
+	state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
@@ -570,7 +548,7 @@ The create function takes an initial state, wraps it in a store, and returns a r
 
 ```js
 import { createStore } from "solid-js/store";
-const [state, setState] = createStore(initialValue);
+const [state, setState] = createStore(valorInicial);
 
 // read value
 state.someValue;
@@ -602,13 +580,13 @@ Store objects support the use of getters to store calculated values.
 ```js
 import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
-  user: {
-    firstName: "John",
-    lastName: "Smith",
-    get fullName() {
-      return `${this.firstName} ${this.lastName}`;
-    },
-  },
+	user: {
+		firstName: "John",
+		lastName: "Smith",
+		get fullName() {
+			return `${this.firstName} ${this.lastName}`;
+		},
+	},
 });
 ```
 
@@ -617,13 +595,13 @@ These are simple getters, so you still need to use a memo if you want to cache a
 ```js
 let fullName;
 const [state, setState] = createStore({
-  user: {
-    firstName: "John",
-    lastName: "Smith",
-    get fullName() {
-      return fullName();
-    },
-  },
+	user: {
+		firstName: "John",
+		lastName: "Smith",
+		get fullName() {
+			return fullName();
+		},
+	},
 });
 fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 ```
@@ -635,8 +613,8 @@ Changes can take the form of function that passes previous state and returns new
 ```js
 import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
-  firstName: "John",
-  lastName: "Miller",
+	firstName: "John",
+	lastName: "Miller",
 });
 
 setState({ firstName: "Johnny", middleName: "Lee" });
@@ -726,20 +704,18 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 
 ```ts
 export function produce<T>(
-  fn: (state: T) => void
-): (
-  state: T extends NotWrappable ? T : Store<T>
-) => T extends NotWrappable ? T : Store<T>;
+	fn: (state: T) => void
+): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>;
 ```
 
 Immer inspired API for Solid's Store objects that allows for localized mutation.
 
 ```js
 setState(
-  produce((s) => {
-    s.user.name = "Frank";
-    s.list.push("Pencil Crayon");
-  })
+	produce((s) => {
+		s.user.name = "Frank";
+		s.list.push("Pencil Crayon");
+	})
 );
 ```
 
@@ -747,14 +723,12 @@ setState(
 
 ```ts
 export function reconcile<T>(
-  value: T | Store<T>,
-  options?: {
-    key?: string | null;
-    merge?: boolean;
-  } = { key: "id" }
-): (
-  state: T extends NotWrappable ? T : Store<T>
-) => T extends NotWrappable ? T : Store<T>;
+	value: T | Store<T>,
+	options?: {
+		key?: string | null;
+		merge?: boolean;
+	} = { key: "id" }
+): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>;
 ```
 
 Diffs data changes when we can't apply granular updates. Useful for when dealing with immutable data from stores or large API responses.
@@ -792,7 +766,7 @@ Useful for integrating external systems or as a compatibility layer with MobX/Vu
 > **Note:** A mutable state can be passed around and mutated anywhere, which can make it harder to follow and easier to break unidirectional flow. It is generally recommended to use `createStore` instead. The `produce` modifier can give many of the same benefits without any of the downsides.
 
 ```js
-const state = createMutable(initialValue);
+const state = createMutable(valorInicial);
 
 // read value
 state.someValue;
@@ -807,14 +781,14 @@ Mutables support setters along with getters.
 
 ```js
 const user = createMutable({
-  firstName: "John",
-  lastName: "Smith",
-  get fullName() {
-    return `${this.firstName} ${this.lastName}`;
-  },
-  set fullName(value) {
-    [this.firstName, this.lastName] = value.split(" ");
-  },
+	firstName: "John",
+	lastName: "Smith",
+	get fullName() {
+		return `${this.firstName} ${this.lastName}`;
+	},
+	set fullName(value) {
+		[this.firstName, this.lastName] = value.split(" ");
+	},
 });
 ```
 
@@ -824,9 +798,9 @@ const user = createMutable({
 
 ```ts
 interface Context<T> {
-  id: symbol;
-  Provider: (props: { value: T; children: any }) => any;
-  defaultValue: T;
+	id: symbol;
+	Provider: (props: { value: T; children: any }) => any;
+	defaultValue: T;
 }
 export function createContext<T>(defaultValue?: T): Context<T | undefined>;
 ```
@@ -839,24 +813,20 @@ This function creates a new context object that can be used with `useContext` an
 export const CounterContext = createContext([{ count: 0 }, {}]);
 
 export function CounterProvider(props) {
-  const [state, setState] = createStore({ count: props.count || 0 });
-  const store = [
-    state,
-    {
-      increment() {
-        setState("count", (c) => c + 1);
-      },
-      decrement() {
-        setState("count", (c) => c - 1);
-      },
-    },
-  ];
+	const [state, setState] = createStore({ count: props.count || 0 });
+	const store = [
+		state,
+		{
+			increment() {
+				setState("count", (c) => c + 1);
+			},
+			decrement() {
+				setState("count", (c) => c - 1);
+			},
+		},
+	];
 
-  return (
-    <CounterContext.Provider value={store}>
-      {props.children}
-    </CounterContext.Provider>
-  );
+	return <CounterContext.Provider value={store}>{props.children}</CounterContext.Provider>;
 }
 ```
 
@@ -893,7 +863,7 @@ createEffect(() => list());
 
 ```ts
 export function lazy<T extends Component<any>>(
-  fn: () => Promise<{ default: T }>
+	fn: () => Promise<{ default: T }>
 ): T & { preload: () => Promise<T> };
 ```
 
@@ -929,11 +899,11 @@ You probably won't need them for your first app, but these are useful tools to h
 
 ```ts
 export function createDeferred<T>(
-  source: () => T,
-  options?: {
-    timeoutMs?: number;
-    equals?: false | ((prev: T, next: T) => boolean);
-  }
+	source: () => T,
+	options?: {
+		timeoutMs?: number;
+		equals?: false | ((prev: T, next: T) => boolean);
+	}
 ): () => T;
 ```
 
@@ -960,9 +930,7 @@ Creates a new computation that automatically tracks dependencies and runs during
 **New in v1.3.0**
 
 ```ts
-export function createReaction(
-  onInvalidate: () => void
-): (fn: () => void) => void;
+export function createReaction(onInvalidate: () => void): (fn: () => void) => void;
 ```
 
 Sometimes it is useful to separate tracking from re-execution. This primitive registers a side effect that is run the first time the expression wrapped by the returned tracking function is notified of a change.
@@ -984,8 +952,8 @@ set("final"); // no-op as reaction only runs on first update, need to call track
 
 ```ts
 export function createSelector<T, U>(
-  source: () => T,
-  fn?: (a: U, b: T) => boolean
+	source: () => T,
+	fn?: (a: U, b: T) => boolean
 ): (k: U) => boolean;
 ```
 
@@ -995,7 +963,7 @@ Creates a conditional signal that only notifies subscribers when entering or exi
 const isSelected = createSelector(selectedId);
 
 <For each={list()}>
-  {(item) => <li classList={{ active: isSelected(item.id) }}>{item.name}</li>}
+	{(item) => <li classList={{ active: isSelected(item.id) }}>{item.name}</li>}
 </For>;
 ```
 
@@ -1006,10 +974,7 @@ These imports are exposed from `solid-js/web`.
 ## `render`
 
 ```ts
-export function render(
-  code: () => JSX.Element,
-  element: MountableElement
-): () => void;
+export function render(code: () => JSX.Element, element: MountableElement): () => void;
 ```
 
 This is the browser app entry point. Provide a top level component definition or function and an element to mount to. It is recommended this element be empty as the returned dispose function will wipe all children.
@@ -1021,10 +986,7 @@ const dispose = render(App, document.getElementById("app"));
 ## `hydrate`
 
 ```ts
-export function hydrate(
-  fn: () => JSX.Element,
-  node: MountableElement
-): () => void;
+export function hydrate(fn: () => JSX.Element, node: MountableElement): () => void;
 ```
 
 This method is similar to `render` except it attempts to rehydrate what is already rendered to the DOM. When initializing in the browser a page has already been server rendered.
@@ -1037,11 +999,11 @@ const dispose = hydrate(App, document.getElementById("app"));
 
 ```ts
 export function renderToString<T>(
-  fn: () => T,
-  options?: {
-    nonce?: string;
-    renderId?: string;
-  }
+	fn: () => T,
+	options?: {
+		nonce?: string;
+		renderId?: string;
+	}
 ): string;
 ```
 
@@ -1057,12 +1019,12 @@ const html = renderToString(App);
 
 ```ts
 export function renderToStringAsync<T>(
-  fn: () => T,
-  options?: {
-    timeoutMs?: number;
-    renderId?: string;
-    nonce?: string;
-  }
+	fn: () => T,
+	options?: {
+		timeoutMs?: number;
+		renderId?: string;
+		nonce?: string;
+	}
 ): Promise<string>;
 ```
 
@@ -1080,16 +1042,16 @@ const html = await renderToStringAsync(App);
 
 ```ts
 export function renderToStream<T>(
-  fn: () => T,
-  options?: {
-    nonce?: string;
-    renderId?: string;
-    onCompleteShell?: () => void;
-    onCompleteAll?: () => void;
-  }
+	fn: () => T,
+	options?: {
+		nonce?: string;
+		renderId?: string;
+		onCompleteShell?: () => void;
+		onCompleteAll?: () => void;
+	}
 ): {
-  pipe: (writable: { write: (v: string) => void }) => void;
-  pipeTo: (writable: WritableStream) => void;
+	pipe: (writable: { write: (v: string) => void }) => void;
+	pipeTo: (writable: WritableStream) => void;
 };
 ```
 
@@ -1118,24 +1080,18 @@ This indicates that the code is being run as the server or browser bundle. As th
 
 ```js
 if (isServer) {
-  // I will never make it to the browser bundle
+	// I will never make it to the browser bundle
 } else {
-  // won't be run on the server;
+	// won't be run on the server;
 }
 ```
 
 ## `HydrationScript`
 
 ```ts
-export function generateHydrationScript(options: {
-  nonce?: string;
-  eventNames?: string[];
-}): string;
+export function generateHydrationScript(options: { nonce?: string; eventNames?: string[] }): string;
 
-export function HydrationScript(props: {
-  nonce?: string;
-  eventNames?: string[];
-}): JSX.Element;
+export function HydrationScript(props: { nonce?: string; eventNames?: string[] }): JSX.Element;
 ```
 
 Hydration Script is a special script that should be placed once on the page to bootstrap hydration before Solid's runtime has loaded. It comes both as a function that can be called and inserted in an your HTML string, or as a Component if you are rendering JSX from the `<html>` tag.
@@ -1156,9 +1112,9 @@ These built-in control flow components will be automatically imported. All excep
 
 ```ts
 export function For<T, U extends JSX.Element>(props: {
-  each: readonly T[];
-  fallback?: JSX.Element;
-  children: (item: T, index: () => number) => U;
+	each: readonly T[];
+	fallback?: JSX.Element;
+	children: (item: T, index: () => number) => U;
 }): () => U[];
 ```
 
@@ -1166,7 +1122,7 @@ Simple referentially keyed loop. The callback takes the current item as the firs
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
-  {(item) => <div>{item}</div>}
+	{(item) => <div>{item}</div>}
 </For>
 ```
 
@@ -1174,11 +1130,11 @@ The optional second argument is an index signal:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
-  {(item, index) => (
-    <div>
-      #{index()} {item}
-    </div>
-  )}
+	{(item, index) => (
+		<div>
+			#{index()} {item}
+		</div>
+	)}
 </For>
 ```
 
@@ -1186,9 +1142,9 @@ The optional second argument is an index signal:
 
 ```ts
 function Show<T>(props: {
-  when: T | undefined | null | false;
-  fallback?: JSX.Element;
-  children: JSX.Element | ((item: T) => JSX.Element);
+	when: T | undefined | null | false;
+	fallback?: JSX.Element;
+	children: JSX.Element | ((item: T) => JSX.Element);
 }): () => JSX.Element;
 ```
 
@@ -1196,7 +1152,7 @@ The Show control flow is used to conditional render part of the view: it renders
 
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
-  <div>My Content</div>
+	<div>My Content</div>
 </Show>
 ```
 
@@ -1204,21 +1160,18 @@ Show can also be used as a way of keying blocks to a specific data model. Ex the
 
 ```jsx
 <Show when={state.user} fallback={<div>Loading...</div>}>
-  {(user) => <div>{user.firstName}</div>}
+	{(user) => <div>{user.firstName}</div>}
 </Show>
 ```
 
 ## `<Switch>`/`<Match>`
 
 ```ts
-export function Switch(props: {
-  fallback?: JSX.Element;
-  children: JSX.Element;
-}): () => JSX.Element;
+export function Switch(props: { fallback?: JSX.Element; children: JSX.Element }): () => JSX.Element;
 
 type MatchProps<T> = {
-  when: T | undefined | null | false;
-  children: JSX.Element | ((item: T) => JSX.Element);
+	when: T | undefined | null | false;
+	children: JSX.Element | ((item: T) => JSX.Element);
 };
 export function Match<T>(props: MatchProps<T>);
 ```
@@ -1227,12 +1180,12 @@ Useful for when there are more than 2 mutual exclusive conditions. Can be used t
 
 ```jsx
 <Switch fallback={<div>Not Found</div>}>
-  <Match when={state.route === "home"}>
-    <Home />
-  </Match>
-  <Match when={state.route === "settings"}>
-    <Settings />
-  </Match>
+	<Match when={state.route === "home"}>
+		<Home />
+	</Match>
+	<Match when={state.route === "settings"}>
+		<Settings />
+	</Match>
 </Switch>
 ```
 
@@ -1242,9 +1195,9 @@ Match also supports function children to serve as keyed flow.
 
 ```ts
 export function Index<T, U extends JSX.Element>(props: {
-  each: readonly T[];
-  fallback?: JSX.Element;
-  children: (item: () => T, index: number) => U;
+	each: readonly T[];
+	fallback?: JSX.Element;
+	children: (item: () => T, index: number) => U;
 }): () => U[];
 ```
 
@@ -1254,7 +1207,7 @@ The item is a signal:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
-  {(item) => <div>{item()}</div>}
+	{(item) => <div>{item()}</div>}
 </Index>
 ```
 
@@ -1262,11 +1215,11 @@ Optional second argument is an index number:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
-  {(item, index) => (
-    <div>
-      #{index} {item()}
-    </div>
-  )}
+	{(item, index) => (
+		<div>
+			#{index} {item()}
+		</div>
+	)}
 </Index>
 ```
 
@@ -1274,8 +1227,8 @@ Optional second argument is an index number:
 
 ```ts
 function ErrorBoundary(props: {
-  fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element);
-  children: JSX.Element;
+	fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element);
+	children: JSX.Element;
 }): () => JSX.Element;
 ```
 
@@ -1283,34 +1236,29 @@ Catches uncaught errors and renders fallback content.
 
 ```jsx
 <ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
-  <MyComp />
+	<MyComp />
 </ErrorBoundary>
 ```
 
 Also supports callback form which passes in error and a reset function.
 
 ```jsx
-<ErrorBoundary
-  fallback={(err, reset) => <div onClick={reset}>Error: {err.toString()}</div>}
->
-  <MyComp />
+<ErrorBoundary fallback={(err, reset) => <div onClick={reset}>Error: {err.toString()}</div>}>
+	<MyComp />
 </ErrorBoundary>
 ```
 
 ## `<Suspense>`
 
 ```ts
-export function Suspense(props: {
-  fallback?: JSX.Element;
-  children: JSX.Element;
-}): JSX.Element;
+export function Suspense(props: { fallback?: JSX.Element; children: JSX.Element }): JSX.Element;
 ```
 
 A component that tracks all resources read under it and shows a fallback placeholder state until they are resolved. What makes `Suspense` different than `Show` is it is non-blocking in that both branches exist at the same time even if not currently in the DOM.
 
 ```jsx
 <Suspense fallback={<div>Loading...</div>}>
-  <AsyncComponent />
+	<AsyncComponent />
 </Suspense>
 ```
 
@@ -1318,23 +1266,23 @@ A component that tracks all resources read under it and shows a fallback placeho
 
 ```ts
 function SuspenseList(props: {
-  children: JSX.Element;
-  revealOrder: "forwards" | "backwards" | "together";
-  tail?: "collapsed" | "hidden";
+	children: JSX.Element;
+	revealOrder: "forwards" | "backwards" | "together";
+	tail?: "collapsed" | "hidden";
 }): JSX.Element;
 ```
 
 `SuspenseList` allows for coordinating multiple parallel `Suspense` and `SuspenseList` components. It controls the order in which content is revealed to reduce layout thrashing and has an option to collapse or hide fallback states.
 
 ```jsx
-<SuspenseList revealOrder="forwards" tail="collapsed">
-  <ProfileDetails user={resource.user} />
-  <Suspense fallback={<h2>Loading posts...</h2>}>
-    <ProfileTimeline posts={resource.posts} />
-  </Suspense>
-  <Suspense fallback={<h2>Loading fun facts...</h2>}>
-    <ProfileTrivia trivia={resource.trivia} />
-  </Suspense>
+<SuspenseList revealOrder='forwards' tail='collapsed'>
+	<ProfileDetails user={resource.user} />
+	<Suspense fallback={<h2>Loading posts...</h2>}>
+		<ProfileTimeline posts={resource.posts} />
+	</Suspense>
+	<Suspense fallback={<h2>Loading fun facts...</h2>}>
+		<ProfileTrivia trivia={resource.trivia} />
+	</Suspense>
 </SuspenseList>
 ```
 
@@ -1344,10 +1292,10 @@ SuspenseList is still experimental and does not have full SSR support.
 
 ```ts
 function Dynamic<T>(
-  props: T & {
-    children?: any;
-    component?: Component<T> | string | keyof JSX.IntrinsicElements;
-  }
+	props: T & {
+		children?: any;
+		component?: Component<T> | string | keyof JSX.IntrinsicElements;
+	}
 ): () => JSX.Element;
 ```
 
@@ -1361,10 +1309,10 @@ This component lets you insert an arbitrary Component or tag and passes the prop
 
 ```ts
 export function Portal(props: {
-  mount?: Node;
-  useShadow?: boolean;
-  isSVG?: boolean;
-  children: JSX.Element;
+	mount?: Node;
+	useShadow?: boolean;
+	isSVG?: boolean;
+	children: JSX.Element;
 }): Text;
 ```
 
@@ -1374,7 +1322,7 @@ The portal is mounted in a `<div>` unless the target is the document head. `useS
 
 ```jsx
 <Portal mount={document.getElementById("modal")}>
-  <div>My Content</div>
+	<div>My Content</div>
 </Portal>
 ```
 
@@ -1386,23 +1334,23 @@ For custom namespaced attributes with TypeScript you need to extend Solid's JSX 
 
 ```ts
 declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      // use:____
-    }
-    interface ExplicitProperties {
-      // prop:____
-    }
-    interface ExplicitAttributes {
-      // attr:____
-    }
-    interface CustomEvents {
-      // on:____
-    }
-    interface CustomCaptureEvents {
-      // oncapture:____
-    }
-  }
+	namespace JSX {
+		interface Directives {
+			// use:____
+		}
+		interface ExplicitProperties {
+			// prop:____
+		}
+		interface ExplicitAttributes {
+			// attr:____
+		}
+		interface CustomEvents {
+			// on:____
+		}
+		interface CustomCaptureEvents {
+			// oncapture:____
+		}
+	}
 }
 ```
 
@@ -1426,13 +1374,13 @@ Refs can also be used on Components. They still need to be attached on the other
 
 ```jsx
 function MyComp(props) {
-  return <div ref={props.ref} />;
+	return <div ref={props.ref} />;
 }
 
 function App() {
-  let myDiv;
-  onMount(() => console.log(myDiv.clientWidth));
-  return <MyComp ref={myDiv} />;
+	let myDiv;
+	onMount(() => console.log(myDiv.clientWidth));
+	return <MyComp ref={myDiv} />;
 }
 ```
 
@@ -1441,9 +1389,7 @@ function App() {
 A helper that leverages `element.classList.toggle`. It takes an object whose keys are class names and assigns them when the resolved value is true.
 
 ```jsx
-<div
-  classList={{ active: state.active, editing: state.currentId === row.id }}
-/>
+<div classList={{ active: state.active, editing: state.currentId === row.id }} />
 ```
 
 ## `style`
@@ -1487,11 +1433,11 @@ Solid also supports passing an array to the event handler to bind a value to the
 
 ```jsx
 function handler(itemId, e) {
-  /*...*/
+	/*...*/
 }
 
 <ul>
-  <For each={state.list}>{(item) => <li onClick={[handler, item.id]} />}</For>
+	<For each={state.list}>{(item) => <li onClick={[handler, item.id]} />}</For>
 </ul>;
 ```
 
@@ -1527,23 +1473,23 @@ Directive functions are called at render time but before being added to the DOM.
 const [name, setName] = createSignal("");
 
 function model(el, value) {
-  const [field, setField] = value();
-  createRenderEffect(() => (el.value = field()));
-  el.addEventListener("input", (e) => setField(e.target.value));
+	const [field, setField] = value();
+	createRenderEffect(() => (el.value = field()));
+	el.addEventListener("input", (e) => setField(e.target.value));
 }
 
-<input type="text" use:model={[name, setName]} />;
+<input type='text' use:model={[name, setName]} />;
 ```
 
 To register with TypeScript extend the JSX namespace.
 
 ```ts
 declare module "solid-js" {
-  namespace JSX {
-    interface Directives {
-      model: [() => any, (v: any) => any];
-    }
-  }
+	namespace JSX {
+		interface Directives {
+			model: [() => any, (v: any) => any];
+		}
+	}
 }
 ```
 
