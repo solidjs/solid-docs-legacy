@@ -446,7 +446,7 @@ Similar to `useTransition` except there is no associated pending state. This one
 export function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable. Consume it from the Observable library of your choice with typically with the `from` operator.
+This method takes a signal and produces a simple Observable. Consume it from the Observable library of your choice typically with the `from` operator.
 
 ```js
 import { from } from "rxjs";
