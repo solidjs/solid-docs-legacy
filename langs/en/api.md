@@ -274,22 +274,69 @@ export function createMemo<T>(
 ): () => T;
 ```
 
-Creates a readonly derived signal that recalculates its value whenever the executed code's dependencies update.
+Memos let you efficiently re-use a derived value as a dependency in multiple
+other reactive computations.
+`createMemo` creates a readonly derived signal equal to the return value of
+the given function, which gets called immediately and whenever the
+executed code's dependencies update.  It returns a getter for this signal.
 
 ```js
-const getValue = createMemo(() => computeExpensiveValue(a(), b()));
+const value = createMemo(() => computeExpensiveValue(a(), b()));
 
 // read value
-getValue();
+value();
 ```
 
-The memo function is called with the value returned from the memo function's last execution. This value can be initialized as an optional 2nd argument. This is useful for reducing computations.
+In Solid, you often don't need to wrap functions in memos;
+you can alternatively just define and call a regular function
+to get similar reactive behavior.
+The main difference is when you call the function in multiple reactive settings.
+In this case, when the function's dependencies update, the function will get
+called multiple times unless it is wrapped in `createMemo`.  For example:
 
 ```js
+const user = createMemo(() => searchForUser(username()));
+// compare with: const user = () => searchForUser(username());
+return (
+  <ul>
+  <li>Your name is "{user()?.name}"</li>
+  <li>Your email is <code>{user()?.email}</code></li>
+  </div>
+);
+```
+
+When the `username` signal updates, `searchForUser` will get called just once
+to update the `user` memo, and then both list items will update automatically
+(if the returned user actually changed).
+If we had instead defined `user` as a plain function
+`() => searchForUser(username())`, then `searchForUser` would have been
+called twice, once when updating each list item.
+
+Another key difference is that a memo can shield dependents from updating
+when the memo's dependencies change but the resulting memo value doesn't.
+Like `createSignal`, the derived signal made by `createMemo` *updates*
+(and triggers dependents to rerun) only when the value returned by the
+memo function actually changes from the previous value,
+according to JavaScript's `===` operator.
+Alternatively, you can pass an options object with `equals` set to `false`
+to always update the memo when its dependencies change,
+or you can pass your own `equals` function for testing equality.
+
+The memo function gets called with an argument equal to the value returned
+from the memo function's last execution, or on the first call,
+equal to the optional second argument to `createMemo`.
+This is useful for reducing computations, for example:
+
+```js
+// track the sum of all values taken on by input() as it updates
 const sum = createMemo((prev) => input() + prev, 0);
 ```
 
-The memo function should not change other signals by calling setters (it should be "pure"). This enables the execution order of memos to be optimized according to read dependencies.
+The memo function should not change other signals by calling setters
+(it should be "pure").
+This enables Solid to optimize the execution order of memo updates
+according to their dependency graph, so that all memos can update
+at most once in response to a dependency change.
 
 ## `createResource`
 
