@@ -198,7 +198,7 @@ The *first* execution of the effect function is not immediate;
 it's scheduled to run after the current synchronous task via
 [`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask).
 If you want to wait for the first execution to occur,
-use `queueMicrotask` (which run before render) or
+use `queueMicrotask` (which runs before render) or
 `await Promise.resolve()` or `setTimeout(..., 0)` (which run after render).
 After this first execution, effects generally run immediately when
 their dependencies update (unless you're in a [batch](#batch) or
