@@ -314,9 +314,9 @@ called twice, once when updating each list item.
 
 Another key difference is that a memo can shield dependents from updating
 when the memo's dependencies change but the resulting memo value doesn't.
-Like `createSignal`, the derived signal made by `createMemo` *updates*
-(and triggers dependents to rerun) only when the value returned by the
-memo function actually changes from the previous value,
+Like [`createSignal`](#createsignal), the derived signal made by `createMemo`
+*updates* (and triggers dependents to rerun) only when the value returned by
+the memo function actually changes from the previous value,
 according to JavaScript's `===` operator.
 Alternatively, you can pass an options object with `equals` set to `false`
 to always update the memo when its dependencies change,
