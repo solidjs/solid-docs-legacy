@@ -31,7 +31,7 @@
 		"dropdown.border": "#e1e4e8",
 		"dropdown.foreground": "#24292e",
 		"dropdown.listBackground": "#ffffff",
-		"editor.background": "#ffffff",
+		"editor.background": "transparent",
 		"editor.findMatchBackground": "#ffdf5d",
 		"editor.findMatchHighlightBackground": "#ffdf5d66",
 		"editor.focusedStackFrameHighlightBackground": "#28a74525",
