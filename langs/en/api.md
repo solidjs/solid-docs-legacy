@@ -1,62 +1,157 @@
 ---
 title: API
-description: Outline of all Solid APIs.
+description: Description of all of Solid's API
 sort: 0
 ---
 
 # Basic Reactivity
 
+Solid's overall approach to reactivity is to wrap any reactive computation in
+a function, and rerun that function when its dependencies update.
+The Solid JSX compiler also wraps most JSX expressions (code in braces) with a
+function, so they automatically update (and trigger corresponding DOM updates)
+when their dependencies change.
+More precisely, automatic rerunning of a function happens whenever the function
+gets called in a *tracking scope*, such as a JSX expression
+or API calls that build "computations" (`createEffect`, `createMemo`, etc.).
+By default, the dependencies of a function get tracked automatically
+when they're called in a tracking scope, by detecting when the function reads
+reactive state (e.g., via a Signal getter or Store attribute).
+As a result, you generally don't need to worry about dependencies yourselves.
+(But if automatic dependency tracking ever doesn't produce the results you
+want, you can also [override dependency tracking](#reactive-utilities).)
+This approach makes reactivity *composable*: calling one function
+within another function generally causes the calling function
+to inherit the dependencies of the called function.
+
 ## `createSignal`
 
 ```ts
 export function createSignal<T>(
-  value: T,
+  initialValue: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): [get: () => T, set: (v: T) => T];
 ```
 
-This is the most basic reactive primitive used to track a single value that changes over time. The `createSignal` function returns a pair of functions as an array: a getter (or _accessor_) and a setter.
-
-The getter returns the current value of the signal. When called within a tracking scope (like functions passed to `createEffect` or used in JSX expressions), the calling context will rerun when the signal is updated.
-
-The setter updates the signal. As its only argument, it takes either the new value for the signal, or a function that maps the last value of the signal to a new value. The setter returns the updated value.
+Signals are the most basic reactive primitive.  They track a single value
+(which can be any JavaScript object) that changes over time.
+The Signal's value starts out equal to the passed first argument
+`initialValue` (or `undefined` if there are no arguments).
+The `createSignal` function returns a pair of functions as a two-element array:
+a *getter* (or *accessor*) and a *setter*.  In typical use, you would
+destructure this array into a named Signal like so:
 
 ```js
-const [getValue, setValue] = createSignal(initialValue);
-
-// read value
-getValue();
-
-// set value
-setValue(nextValue);
-
-// set value with a function setter
-setValue((prev) => prev + next);
+const [count, setCount] = createSignal(0);
+const [ready, setReady] = createSignal(false);
 ```
 
-> If you wish to store a function in a Signal you must use the function form:
+Calling the getter (e.g., `count()` or `ready()`)
+returns the current value of the Signal.
+Crucial to automatic dependency tracking, calling the getter
+within a tracking scope causes the calling function to depends on this Signal,
+so that function will rerun if the Signal gets updated.
+
+Calling the setter (e.g., `setCount(nextCount)` or `setReady(nextReady)`)
+sets the Signal's value and *updates* the Signal
+(triggering dependents to rerun)
+if the value actually changed (see details below).
+As its only argument, the setter takes either the new value for the signal,
+or a function that maps the last value of the signal to a new value.
+The setter also returns the updated value.  For example:
+
+```js
+// read signal's current value, and
+// depend on signal if in a tracking scope
+// (but nonreactive outside of a tracking scope):
+const currentCount = count();
+
+// or wrap any computation with a function,
+// and this function can be used in a tracking scope:
+const doubledCount = () => 2 * count();
+
+// or build a tracking scope and depend on signal:
+const countDisplay = <div>{count()}</div>;
+
+// write signal by providing a value:
+setReady(true);
+
+// write signal by providing a function setter:
+const newCount = setCount((prev) => prev + 1);
+```
+
+> If you want to store a function in a Signal you must use the function form:
 >
 > ```js
 > setValue(() => myFunction);
 > ```
+>
+> However, functions are not treated specially as the `initialValue` argument
+> to `createSignal`, so you should pass a function initial value as is:
+>
+> ```js
+> const [func, setFunc] = createSignal(myFunction);
+> ```
+
+Unless you're in a [batch](#batch), [effect](#createEffect), or
+[transition](#use-transition), signals update immediately when you set them.
+For example:
+
+```js
+setReady(false);
+console.assert(ready() === false);
+setReady(true);
+console.assert(ready() === true);
+```
+
+If you're not sure whether your code will be run in a batch or transition
+(e.g., library code), you should avoid making this assumption.
 
 ##### Options
 
-Several primitives in Solid take an "options" object as an optional last argument. `createSignal`'s options object allows you to provide an `equals` option.
+Several primitives in Solid take an "options" object
+as an optional last argument.
+`createSignal`'s options object allows you to provide an
+`equals` option.  For example:
 
 ```js
-const [getValue, setValue] = createSignal(initialValue, { equals: false });
+const [getValue, setValue] = createSignal(initialValue,
+  { equals: false });
 ```
 
-By default, when a signal's setter is called, dependencies are only rerun if the new value is actually different than the old value. You can set `equals` to `false` to always rerun dependencies after the setter is called, or you can pass your own equality function.
+By default, when calling a signal's setter, the signal only updates (and causes
+dependents to rerun) if the new value is actually different than the old value,
+according to JavaScript's `===` operator.
+
+Alternatively, you can set `equals` to `false` to always rerun dependents after
+the setter is called, or you can pass your own function for testing equality.
+Some examples:
 
 ```js
+// use { equals: false } to allow modifying object in-place;
+// normally this wouldn't be seen as an update because the
+// object has the same identity before and after change
+const [object, setObject] = createSignal(
+  { count: 0 }, { equals: false });
+setObject((current) => {
+  current.count += 1;
+  current.updated = new Date;
+  return current;
+});
+
+// use { equals: false } signal as trigger without value:
+const [depend, rerun] = createSignal(undefined,
+  { equals: false });
+// now calling depend() in a tracking scope
+// makes that scope rerun whenever rerun() gets called
+
+// define equality based on string length:
 const [myString, setMyString] = createSignal("string", {
   equals: (newVal, oldVal) => newVal.length === oldVal.length,
 });
 
-setMyString("strung"); //is considered equal to the last value and won't cause updates
-setMyString("stranger"); //is considered different and will cause updates
+setMyString("strung"); // considered equal to the last value and won't cause updates
+setMyString("stranger"); // considered different and will cause updates
 ```
 
 ## `createEffect`
@@ -65,7 +160,11 @@ setMyString("stranger"); //is considered different and will cause updates
 export function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs after each render in which a dependency has changed. Ideal for using `ref`s and managing other side effects.
+Effects are a general way to make arbitrary code run whenever dependencies
+change.  `createEffect` creates a new computation that runs the given function
+in a tracking scope, thus automatically tracking its dependencies,
+and automatically reruns the function whenever the dependencies update.
+For example:
 
 ```js
 const [a, setA] = createSignal(initialValue);
@@ -74,17 +173,96 @@ const [a, setA] = createSignal(initialValue);
 createEffect(() => doSideEffect(a()));
 ```
 
-The effect function is called with the value returned from the effect function's last execution. This value can be initialized as an optional 2nd argument. This can be useful for diffing without creating an additional closure.
+The effect function gets called with an argument equal to the value returned
+from the effect function's last execution, or on the first call,
+equal to the optional second argument to `createEffect`.
+This allows you to compute diffs without creating an additional closure
+to remember the last computed value.  For example:
 
 ```js
 createEffect((prev) => {
   const sum = a() + b();
-  if (sum !== prev) console.log(sum);
+  if (sum !== prev)
+    console.log('sum changed to', sum);
   return sum;
 }, 0);
 ```
 
-Signal changes inside effects _batch_: no update to a signal will propogate until the effect finishes executing.
+The effect function is automatically wrapped in [`batch`](#batch),
+meaning that all signal changes inside the effect propagate only after the
+effect finishes.  This lets you update several signals while triggering only
+one update, and avoids unwanted side-effects from happening in the middle
+of your side effects.
+
+The *first* execution of the effect function is not immediate;
+it's scheduled to run after the current synchronous task via
+[`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask).
+If you want to wait for the first execution to occur,
+use `queueMicrotask` (which runs before render) or
+`await Promise.resolve()` or `setTimeout(..., 0)` (which run after render).
+After this first execution, effects generally run immediately when
+their dependencies update (unless you're in a [batch](#batch) or
+[transition](#use-transition)).  For example:
+
+```js
+const [count, setCount] = createSignal(0);
+
+// this effect prints count at the beginning and when it changes
+createEffect(() => console.log('count =', count()));
+// effect won't run yet
+console.log('hello');
+setCount(1);  // effect still won't run yet
+setCount(2);  // effect still won't run yet
+
+queueMicrotask(() => {
+  // now `count = 2` will print
+  console.log('microtask');
+  setCount(3);  // immediately prints `count = 3`
+  console.log('goodbye');
+});
+
+// --- overall output: ---
+// hello
+// count = 2
+// microtask
+// count = 3
+// goodbye
+```
+
+This delay in first execution is useful because it means
+an effect defined in a component scope runs after
+the JSX returned by the component gets added the DOM.
+In particular, [`ref`s](#ref) will already be set.
+Thus you can use an effect to manipulate the DOM manually,
+call vanilla JS libraries, or other side effects.
+
+Note that the first run of the effect still runs before the browser renders
+the DOM to the screen (similar to React's `createLayoutEffect`).
+If you need to wait until after rendering (e.g., to measure the rendering),
+you can use `await Promise.resolve()` (or `Promise.resolve().then(...)`),
+but note that subsequent use of reactive state (such as signals)
+will not trigger the effect to rerun, as tracking is not
+possible after an `async` function uses `await`.
+Thus you should use all dependencies before the promise.
+
+If you'd rather an effect run immediately even for its first run,
+use [`createComputed`](#createcomputed).
+
+You can clean up your side effects in between executions of the effect function
+by calling [`onCleanup`](#oncleanup) *inside* the effect function.
+Such a cleanup function gets called both in between effect executions and
+when the effect gets disposed (e.g., the containing component unmounts).
+For example:
+
+```js
+// listen to event dynamically given by eventName signal
+createEffect(() => {
+  const event = eventName();
+  const callback = (e) => console.log(e);
+  ref.addEventListener(event, callback);
+  onCleanup(() => ref.removeEventListener(event, callback));
+});
+```
 
 ## `createMemo`
 
@@ -96,22 +274,69 @@ export function createMemo<T>(
 ): () => T;
 ```
 
-Creates a readonly derived signal that recalculates its value whenever the executed code's dependencies update.
+Memos let you efficiently re-use a derived value as a dependency in multiple
+other reactive computations.
+`createMemo` creates a readonly derived signal equal to the return value of
+the given function, which gets called immediately and whenever the
+executed code's dependencies update.  It returns a getter for this signal.
 
 ```js
-const getValue = createMemo(() => computeExpensiveValue(a(), b()));
+const value = createMemo(() => computeExpensiveValue(a(), b()));
 
 // read value
-getValue();
+value();
 ```
 
-The memo function is called with the value returned from the memo function's last execution. This value can be initialized as an optional 2nd argument. This is useful for reducing computations.
+In Solid, you often don't need to wrap functions in memos;
+you can alternatively just define and call a regular function
+to get similar reactive behavior.
+The main difference is when you call the function in multiple reactive settings.
+In this case, when the function's dependencies update, the function will get
+called multiple times unless it is wrapped in `createMemo`.  For example:
 
 ```js
+const user = createMemo(() => searchForUser(username()));
+// compare with: const user = () => searchForUser(username());
+return (
+  <ul>
+  <li>Your name is "{user()?.name}"</li>
+  <li>Your email is <code>{user()?.email}</code></li>
+  </div>
+);
+```
+
+When the `username` signal updates, `searchForUser` will get called just once
+to update the `user` memo, and then both list items will update automatically
+(if the returned user actually changed).
+If we had instead defined `user` as a plain function
+`() => searchForUser(username())`, then `searchForUser` would have been
+called twice, once when updating each list item.
+
+Another key difference is that a memo can shield dependents from updating
+when the memo's dependencies change but the resulting memo value doesn't.
+Like [`createSignal`](#createsignal), the derived signal made by `createMemo`
+*updates* (and triggers dependents to rerun) only when the value returned by
+the memo function actually changes from the previous value,
+according to JavaScript's `===` operator.
+Alternatively, you can pass an options object with `equals` set to `false`
+to always update the memo when its dependencies change,
+or you can pass your own `equals` function for testing equality.
+
+The memo function gets called with an argument equal to the value returned
+from the memo function's last execution, or on the first call,
+equal to the optional second argument to `createMemo`.
+This is useful for reducing computations, for example:
+
+```js
+// track the sum of all values taken on by input() as it updates
 const sum = createMemo((prev) => input() + prev, 0);
 ```
 
-The memo function should not change other signals by calling setters (it should be "pure"). This enables the execution order of memos to be optimized according to read dependencies.
+The memo function should not change other signals by calling setters
+(it should be "pure").
+This enables Solid to optimize the execution order of memo updates
+according to their dependency graph, so that all memos can update
+at most once in response to a dependency change.
 
 ## `createResource`
 
@@ -363,6 +588,11 @@ setTimeout(() => {
   });
 }, 1000)
 ```
+
+Note that owners are not what determines dependency tracking,
+so `runWithOwner` does not help with tracking in asynchronous functions;
+use of reactive state in the asynchronous part (e.g. after the first `await`)
+will not be tracked as a dependency.
 
 ## `mergeProps`
 
