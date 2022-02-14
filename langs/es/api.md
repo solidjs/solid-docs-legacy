@@ -306,38 +306,21 @@ Tenga en cuenta que el scope reactivo propietario no es necesariamente _seguimie
 export function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
 ```
 
-Executes the given function under the provided owner,
-instead of (and without affecting) the owner of the outer scope.
-By default, computations created by `createEffect`, `createMemo`, etc.
-are owned by the owner of the currently executing code (the return value of
-`getOwner`), so in particular will get disposed when their owner does.
-Calling `runWithOwner` provides a way to override this default to a manually
-specified owner (typically, the return value from a previous call to
-`getOwner`), enabling more precise control of when computations get disposed.
+Ejecuta la función dada bajo el propietario proporcionado, en lugar de (y sin afectar) al propietario del scope externo. De forma predeterminada, los cálculos creados por `createEffect`, `createMemo`, etc. pertenecen al propietario del código que se está ejecutando actualmente (el valor de retorno de `getOwner`), por lo que, en particular, se eliminarán cuando lo haga su propietario. Llamar a `runWithOwner` proporciona una forma de anular este valor predeterminado a un propietario especificado manualmente (normalmente, el valor de retorno de una llamada anterior a `getOwner`), lo que permite un control más preciso de cuándo se eliminan los cálculos.
 
-Having a (correct) owner is important for two reasons:
+Tener un propietario (correcto) es importante por dos razones:
 
-- Computations without an owner cannot be cleaned up. For example, if you call
-  `createEffect` without an owner (e.g., in the global scope), the effect will
-  continue running forever, instead of being disposed when its owner gets
-  disposed.
-- [`useContext`](#usecontext) obtains context by walking up the owner tree
-  to find the nearest ancestor providing the desired context.
-  So without an owner you cannot look up any provided context
-  (and with the wrong owner, you might obtain the wrong context).
+- Los cálculos sin propietario no se pueden limpiar. Por ejemplo, si llama a `createEffect` sin un propietario (por ejemplo, en el ámbito global), el efecto continuará ejecutándose para siempre, en lugar de eliminarse cuando su propietario se elimine.
 
-Manually setting the owner is especially helpful when doing reactivity outside
-of any owner scope. In particular, asynchronous computation
-(via either `async` functions or callbacks like `setTimeout`)
-lose the automatically set owner, so remembering the original owner via
-`getOwner` and restoring it via `runWithOwner` is necessary in these cases.
-For example:
+- [`useContext`](#usecontext) obtiene el contexto recorriendo el árbol de propietarios para encontrar el ancestro más cercano que proporcione el contexto deseado. Entonces, sin un propietario, no puede buscar ningún contexto proporcionado (y con el propietario incorrecto, puede obtener el contexto incorrecto).
+
+La configuración manual del propietario es especialmente útil cuando se realiza una reactividad fuera del scope de cualquier propietario. En particular, la computación asíncrona (a través de funciones `async` o devoluciones de llamada como `setTimeout`) automáticamente pierde el propietario establecido, por lo que es necesario recordar el propietario original a través de `getOwner` y restaurarlo a través de `runWithOwner` en estos casos. Por ejemplo:
 
 ```js
 const owner = getOwner();
 setTimeout(() => {
-	// This callback gets run without owner.
-	// Restore owner via runWithOwner:
+	// Este callback se ejecuta sin propietario/dueño.
+	// Restaura el propietario/dueño via runWithOwner:
 	runWithOwner(owner, () => {
 		const foo = useContext(FooContext);
 		createEffect(() => {
@@ -353,19 +336,19 @@ setTimeout(() => {
 export function mergeProps(...sources: any): any;
 ```
 
-A reactive object `merge` method. Useful for setting default props for components in case caller doesn't provide them. Or cloning the props object including reactive properties.
+`merge` Es un método de objeto reactivo. Útil para configurar props predeterminados para componentes en caso de que en el llamado se proporcionen. O clonando el objeto props incluyendo propiedades reactivas.
 
-This method works by using a proxy and resolving properties in reverse order. This allows for dynamic tracking of properties that aren't present when the prop object is first merged.
+Este método funciona utilizando un proxy y resolviendo las propiedades en orden inverso. Esto permite el seguimiento dinámico de propiedades que no están presentes cuando el objeto prop se fusiona por primera vez.
 
 ```js
-// default props
-props = mergeProps({ name: "Smith" }, props);
+// props por default
+props = mergeProps({ nombre: "Smith" }, props);
 
-// clone props
+// clonar props
 newProps = mergeProps(props);
 
-// merge props
-props = mergeProps(props, otherProps);
+// merge props / fusionar props
+props = mergeProps(props, otrasProps);
 ```
 
 ## `splitProps`
@@ -374,18 +357,18 @@ props = mergeProps(props, otherProps);
 export function splitProps<T>(props: T, ...keys: Array<(keyof T)[]>): [...parts: Partial<T>];
 ```
 
-Splits a reactive object by keys.
+Divide un objeto reactivo por claves.
 
-It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
+Toma un objeto reactivo y cualquier número de arrays de claves; para cada array de claves, devolverá un objeto reactivo con solo esas propiedades del objeto original. El último objeto reactivo en el array devuelto tendrá las propiedades sobrantes del objeto original.
 
-This can be useful if you want to consume a subset of props and pass the rest to a child.
+Esto puede ser útil si desea consumir un subconjunto de props y pasar el resto a un hijo.
 
 ```js
-const [local, others] = splitProps(props, ["children"]);
+const [local, otros] = splitProps(props, ["hijo"]);
 
 <>
-  <Child {...others} />
-  <div>{local.children}<div>
+  <Child {...otros} />
+  <div>{local.hijo}<div>
 </>
 ```
 
@@ -398,27 +381,27 @@ export function useTransition(): [
 ];
 ```
 
-Used to batch async updates in a transaction deferring commit until all async processes are complete. This is tied into Suspense and only tracks resources read under Suspense boundaries.
+Se utiliza para procesar por lotes actualizaciones asíncronas dentro de una transacción aplazada hasta que se completen todos los procesos asíncronos. Esto está vinculado a Suspense y solo rastrea los recursos leídos dentro de los límites de Suspense.
 
 ```js
 const [isPending, start] = useTransition();
 
-// check if transitioning
+// checkar si está en transición
 isPending();
 
-// wrap in transition
-start(() => setSignal(newValue), () => /* transition is done */)
+// envuelto en transición
+start(() => setSignal(nuevoValor), () => /* se hace la transicion */)
 ```
 
 ## `startTransition`
 
-**New in v1.1.0**
+**Nuevo en la v1.1.0**
 
 ```ts
 export function startTransition: (fn: () => void) => Promise<void>;
 ```
 
-Similar to `useTransition` except there is no associated pending state. This one can just be used directly to start the Transition.
+Similar a `useTransition` excepto que no hay un estado pendiente asociado. Este solo puede usarse directamente para iniciar la transición.
 
 ## `observable`
 
@@ -426,7 +409,7 @@ Similar to `useTransition` except there is no associated pending state. This one
 export function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable. Consume it from the Observable library of your choice with typically with the `from` operator.
+Este método toma una señal y produce un Observable simple. Consúmalo de la librería Observable de su elección, normalmente con el operador `from`.
 
 ```js
 import { from } from "rxjs";
@@ -440,7 +423,7 @@ obsv$.subscribe((v) => console.log(v));
 
 ## `from`
 
-**New in v1.1.0**
+**Nuevo en la v1.1.0**
 
 ```ts
 export function from<T>(
@@ -452,13 +435,13 @@ export function from<T>(
 ): () => T;
 ```
 
-A simple helper to make it easier to interopt with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
+Un ayudante simple para facilitar la interoperabilidad con productores externos como observables RxJS o con Svelte Stores. Básicamente, esto convierte cualquier suscribible (objeto con un método de suscripción) en una señal y gestiona la suscripción y la eliminación.
 
 ```js
 const signal = from(obsv$);
 ```
 
-It can also take a custom producer function where the function is passed a setter function returns a unsubscribe function:
+Tambien puede tener una funcion productora personalizada donde la función es pasada una funcion setter, retorna una funcion que cancela la suscripción.
 
 ```js
 const clock = from((set) => {
@@ -467,7 +450,7 @@ const clock = from((set) => {
 });
 ```
 
-> Note: Signals created by `from` have equality checks turned off to interface better with external streams and sources.
+> Nota: Las señales creadas por `from` tienen controles de igualdad desactivados para interactuar mejor con flujos y fuentes externos.
 
 ## `mapArray`
 
@@ -478,25 +461,25 @@ export function mapArray<T, U>(
 ): () => U[];
 ```
 
-Reactive map helper that caches each item by reference to reduce unnecessary mapping on updates. It only runs the mapping function once per value and then moves or removes it as needed. The index argument is a signal. The map function itself is not tracking.
+Asistente de mapa reactivo que almacena en caché cada elemento por referencia para reducir el mapeo innecesario en las actualizaciones. Solo ejecuta la función de mapeo una vez por valor y luego la mueve o elimina según sea necesario. El argumento index es una señal. La función de mapa en sí no está rastreando.
 
-Underlying helper for the `<For>` control flow.
+Ayudante subyacente para el control de flujo `<For>`.
 
 ```js
-const mapped = mapArray(source, (model) => {
-  const [name, setName] = createSignal(model.name);
-  const [description, setDescription] = createSignal(model.description);
+const mapeado = mapArray(fuente, (modelo) => {
+  const [nombre, setNombre] = createSignal(modelo.nombre);
+  const [descripcion, setDescripcion] = createSignal(modelo.descripcion);
 
   return {
-    id: model.id,
-    get name() {
-      return name();
+    id: modelo.id,
+    get Nombre() {
+      return Nombre();
     },
-    get description() {
-      return description();
+    get descripcion() {
+      return descripcion();
     }
-    setName,
-    setDescription
+    setNombre,
+    setDescripcion
   }
 });
 ```
@@ -510,21 +493,21 @@ export function indexArray<T, U>(
 ): () => U[];
 ```
 
-Similar to `mapArray` except it maps by index. The item is a signal and the index is now the constant.
+Similar a `mapArray` excepto que mapea por índice. El elemento es una señal y el índice es ahora la constante.
 
-Underlying helper for the `<Index>` control flow.
+Ayudante subyacente para el control de flujo `<Index>`.
 
 ```js
-const mapped = indexArray(source, (model) => {
+const mapeado = indexArray(fuente, (modelo) => {
   return {
     get id() {
-      return model().id
+      return modelo().id
     }
-    get firstInitial() {
-      return model().firstName[0];
+    get inicialNombre() {
+      return modelo().nombre[0];
     },
-    get fullName() {
-      return `${model().firstName} ${model().lastName}`;
+    get nombreCompleto() {
+      return `${modelo().nombre} ${modelo().apellido}`;
     },
   }
 });
@@ -532,9 +515,9 @@ const mapped = indexArray(source, (model) => {
 
 # Stores
 
-These APIs are available at `solid-js/store`. They allow the creation of stores: [proxy objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) that allow a tree of signals to be independently tracked and modified.
+Estas API están disponibles en `solid-js/store`. Permiten la creación de almacenes: [objetos proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) que permiten rastrear y modificar un árbol de señales de forma independiente .
 
-## Using Stores
+## Usando Stores
 
 ### `createStore`
 
@@ -544,161 +527,165 @@ export function createStore<T extends StoreNode>(
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
-The create function takes an initial state, wraps it in a store, and returns a readonly proxy object and a setter function.
+La función de creación toma un estado inicial, lo envuelve en un almacén y devuelve un objeto de proxy de solo lectura y una función de establecimiento.
 
 ```js
 import { createStore } from "solid-js/store";
-const [state, setState] = createStore(valorInicial);
+const [estado, setEstado] = createStore(valorInicial);
 
-// read value
-state.someValue;
+// get/leer valor
+estado.algunValor;
 
-// set value
-setState({ merge: "thisValue" });
+// set/establecer valor
+setEstado({ merge: "esteValor" });
 
-setState("path", "to", "value", newValue);
+setEstado("ruta", "al", "valor", nuevoValor);
 ```
 
-As proxies, store objects only track when a property is accessed.
+Como proxies, los objetos del almacén solo se rastrean cuando se accede a una propiedad.
 
-When nested objects are accessed, stores will produce nested store objects, and this applies all the way down the tree. However, this only applies to arrays and plain objects. Classes are not wrapped, so objects like `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` won't be granularly reactive as properties on a store.
+Cuando se accede a los objetos anidados, los almacenes producirán objetos de almacén anidados, y esto se aplica a todo el árbol. Sin embargo, esto solo se aplica a arrays y objetos simples. Las clases no están envueltas, por lo que objetos como `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` no serán granularmente reactivos como propiedades en un almacén.
 
-The top level state object cannot be tracked, so put any lists on a key of state rather than using the state object itself.
+El objeto de estado de nivel superior no se puede rastrear, por lo tanto, coloque las listas en una clave de estado en lugar de usar el objeto de estado en sí.
 
 ```js
 // put the list as a key on the state object
-const [state, setState] = createStore({ list: [] });
+// pon la lista como una clave en objeto del estado
+const [estado, setEstado] = createStore({ lista: [] });
 
 // access the `list` property on the state object
-<For each={state.list}>{item => /*...*/}</For>
+// accede a la propiedad 'lista' en el objeto del estado
+<For each={estado.lista}>{item => /*...*/}</For>
 ```
 
 ### Getters
 
-Store objects support the use of getters to store calculated values.
+Los objetos Store admiten el uso de getters para almacenar valores calculados.
 
 ```js
 import { createStore } from "solid-js/store";
-const [state, setState] = createStore({
-	user: {
-		firstName: "John",
-		lastName: "Smith",
-		get fullName() {
-			return `${this.firstName} ${this.lastName}`;
+const [estado, setEstado] = createStore({
+	usuario: {
+		nombre: "John",
+		apellido: "Smith",
+		get nombreCompleto() {
+			return `${this.nombre} ${this.apellido}`;
 		},
 	},
 });
 ```
 
-These are simple getters, so you still need to use a memo if you want to cache a value:
+Estos son getters simples, por lo que aún necesita usar un memo si desea almacenar un valor en caché:
 
 ```js
-let fullName;
-const [state, setState] = createStore({
-	user: {
-		firstName: "John",
-		lastName: "Smith",
-		get fullName() {
-			return fullName();
+let nombreCompleto;
+const [estado, setEstado] = createStore({
+	usuario: {
+		nombre: "John",
+		apellido: "Smith",
+		get nombreCompleto() {
+			return nombreCompleto();
 		},
 	},
 });
-fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
+nombreCompleto = createMemo(() => `${estado.usuario.nombre} ${estado.usuario.apellido}`);
 ```
 
-### Updating Stores
+### Actualizando Stores
 
-Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store.
+Los cambios pueden tomar la forma de una función que pasa el estado anterior y devuelve un estado o valor nuevo. Los objetos siempre se fusionan superficialmente. Establezca los valores en `undefined` para eliminarlos de la Tienda.
 
 ```js
 import { createStore } from "solid-js/store";
-const [state, setState] = createStore({
-	firstName: "John",
-	lastName: "Miller",
+const [estado, setEstado] = createStore({
+	nombre: "John",
+	apellido: "Miller",
 });
 
-setState({ firstName: "Johnny", middleName: "Lee" });
-// ({ firstName: 'Johnny', middleName: 'Lee', lastName: 'Miller' })
+setEstado({ nombre: "Johnny", segundoNombre: "Lee" });
+// ({ nombre: 'Johnny', segundoNombre: 'Lee', apellido: 'Miller' })
 
-setState((state) => ({ preferredName: state.firstName, lastName: "Milner" }));
-// ({ firstName: 'Johnny', preferredName: 'Johnny', middleName: 'Lee', lastName: 'Milner' })
+setEstado((estado) => ({ nombrePreferido: estado.nombre, apellido: "Milner" }));
+// ({ nombre: 'Johnny', nombrePreferido: 'Johnny', segundoNombre: 'Lee', apellido: 'Milner' })
 ```
 
-It supports paths including key arrays, object ranges, and filter functions.
+Admite rutas que incluyen arrays de claves, rangos de objetos y funciones de filtro.
 
-setState also supports nested setting where you can indicate the path to the change. When nested the state you are updating may be other non Object values. Objects are still merged but other values (including Arrays) are replaced.
+setState también admite la configuración anidada donde puede indicar la ruta al cambio. Cuando está anidado, el estado que está actualizando puede ser otros valores que no sean Objeto. Los objetos aún se fusionan, pero se reemplazan otros valores (arrays incluidos).
 
 ```js
-const [state, setState] = createStore({
-  counter: 2,
-  list: [
-    { id: 23, title: 'Birds' }
-    { id: 27, title: 'Fish' }
+const [estado, setEstado] = createStore({
+  contador: 2,
+  lista: [
+    { id: 23, titulo: 'Aves' }
+    { id: 27, titulo: 'Peses' }
   ]
 });
 
-setState('counter', c => c + 1);
-setState('list', l => [...l, {id: 43, title: 'Marsupials'}]);
-setState('list', 2, 'read', true);
+setEstado('contador', c => c + 1);
+setEstado('lista', l => [...l, {id: 43, titulo: 'Marsupiales'}]);
+setEstado('lista', 2, 'leer', true);
 // {
-//   counter: 3,
-//   list: [
-//     { id: 23, title: 'Birds' }
-//     { id: 27, title: 'Fish' }
-//     { id: 43, title: 'Marsupials', read: true }
+//   contador: 3,
+//   lista: [
+//     { id: 23, titulo: 'Aves' }
+//     { id: 27, titulo: 'Peses' }
+//     { id: 43, titulo: 'Marsupiales', leer: true }
 //   ]
 // }
 ```
 
-Path can be string keys, array of keys, iterating objects ({from, to, by}), or filter functions. This gives incredible expressive power to describe state changes.
+La ruta puede ser claves en string, un array de claves, objetos iterativos ({from, to, by}) o funciones de filtro. Esto le da un poder expresivo increíble para describir cambios de estado.
 
 ```js
-const [state, setState] = createStore({
-  todos: [
-    { task: 'Finish work', completed: false }
-    { task: 'Go grocery shopping', completed: false }
-    { task: 'Make dinner', completed: false }
+const [estado, setEstado] = createStore({
+  tareas: [
+    { tarea: 'Terminar trabajo', completado: false }
+    { tarea: 'Surtir la despensa', completado: false }
+    { tarea: 'Preparar la cena', completado: false }
   ]
 });
 
-setState('todos', [0, 2], 'completed', true);
+setEstado('tareas', [0, 2], 'completado', true);
 // {
-//   todos: [
-//     { task: 'Finish work', completed: true }
-//     { task: 'Go grocery shopping', completed: false }
-//     { task: 'Make dinner', completed: true }
+//   tareas: [
+//     { tarea: 'Terminar trabajo', completado: true }
+//     { tarea: 'Surtir la despensa', completado: false }
+//     { tarea: 'Preparar la cena', completado: true }
 //   ]
 // }
 
-setState('todos', { from: 0, to: 1 }, 'completed', c => !c);
+setEstado('tareas', { from: 0, to: 1 }, 'completado', c => !c);
 // {
-//   todos: [
-//     { task: 'Finish work', completed: false }
-//     { task: 'Go grocery shopping', completed: true }
-//     { task: 'Make dinner', completed: true }
+//   tareas: [
+//     { tarea: 'Terminar trabajo', completado: false }
+//     { tarea: 'Surtir la despensa', completado: true }
+//     { tarea: 'Preparar la cena', completado: true }
 //   ]
 // }
 
-setState('todos', todo => todo.completed, 'task', t => t + '!')
+setEstado('tareas', tarea => tarea.completado, 'tarea', t => t + '!')
 // {
-//   todos: [
-//     { task: 'Finish work', completed: false }
-//     { task: 'Go grocery shopping!', completed: true }
-//     { task: 'Make dinner!', completed: true }
+//   tareas: [
+//     { tarea: 'Terminar trabajo', completado: false }
+//     { tarea: 'Surtir la despensa!', completado: true }
+//     { tarea: 'Preparar la cena!', completado: true }
 //   ]
 // }
 
-setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
+setEstado('tareas', {}, tarea => ({ marcado: true, completado: !tarea.completado }))
 // {
-//   todos: [
-//     { task: 'Finish work', completed: true, marked: true }
-//     { task: 'Go grocery shopping!', completed: false, marked: true }
-//     { task: 'Make dinner!', completed: false, marked: true }
+//   tareas: [
+//     { tarea: 'Terminar trabajo', completado: true, marcado: true }
+//     { tarea: 'Surtir la despensa!', completado: false, marcado: true }
+//     { tarea: 'Preparar la cena!', completado: false, marcado: true }
 //   ]
 // }
 ```
 
-## Store Utilities
+## Utilidades Store
+
+<!-- 14/02/22 -->
 
 ### `produce`
 
