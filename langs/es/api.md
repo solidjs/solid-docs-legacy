@@ -435,7 +435,7 @@ export function from<T>(
 ): () => T;
 ```
 
-Un ayudante simple para facilitar la interoperabilidad con productores externos como observables RxJS o con Svelte Stores. Básicamente, esto convierte cualquier suscribible (objeto con un método de suscripción) en una señal y gestiona la suscripción y la eliminación.
+Un auxiliar simple para facilitar la interoperabilidad con productores externos como observables RxJS o con Svelte Stores. Básicamente, esto convierte cualquier suscribible (objeto con un método de suscripción) en una señal y gestiona la suscripción y la eliminación.
 
 ```js
 const signal = from(obsv$);
@@ -463,7 +463,7 @@ export function mapArray<T, U>(
 
 Asistente de mapa reactivo que almacena en caché cada elemento por referencia para reducir el mapeo innecesario en las actualizaciones. Solo ejecuta la función de mapeo una vez por valor y luego la mueve o elimina según sea necesario. El argumento index es una señal. La función de mapa en sí no está rastreando.
 
-Ayudante subyacente para el control de flujo `<For>`.
+Auxiliar subyacente para el control de flujo `<For>`.
 
 ```js
 const mapeado = mapArray(fuente, (modelo) => {
@@ -495,7 +495,7 @@ export function indexArray<T, U>(
 
 Similar a `mapArray` excepto que mapea por índice. El elemento es una señal y el índice es ahora la constante.
 
-Ayudante subyacente para el control de flujo `<Index>`.
+Auxiliar subyacente para el control de flujo `<Index>`.
 
 ```js
 const mapeado = indexArray(fuente, (modelo) => {
@@ -683,9 +683,7 @@ setEstado('tareas', {}, tarea => ({ marcado: true, completado: !tarea.completado
 // }
 ```
 
-## Utilidades Store
-
-<!-- 14/02/22 -->
+## Utilidades Store/Almacén
 
 ### `produce`
 
@@ -695,13 +693,13 @@ export function produce<T>(
 ): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>;
 ```
 
-Immer inspired API for Solid's Store objects that allows for localized mutation.
+API inspirada en Immer para objetos del almacén de Solid que permite la mutación localizada.
 
 ```js
 setState(
 	produce((s) => {
-		s.user.name = "Frank";
-		s.list.push("Pencil Crayon");
+		s.usuario.nombre = "Frank";
+		s.lista.push("Pluma Crayola");
 	})
 );
 ```
@@ -718,14 +716,14 @@ export function reconcile<T>(
 ): (state: T extends NotWrappable ? T : Store<T>) => T extends NotWrappable ? T : Store<T>;
 ```
 
-Diffs data changes when we can't apply granular updates. Useful for when dealing with immutable data from stores or large API responses.
+Diferencia los cambios de datos cuando no podemos aplicar actualizaciones granulares. Útil para cuando se trata de datos inmutables de tiendas o respuestas de API grandes.
 
-The key is used when available to match items. By default `merge` false does referential checks where possible to determine equality and replaces where items are not referentially equal. `merge` true pushes all diffing to the leaves and effectively morphs the previous data to the new value.
+La clave se usa cuando está disponible para hacer coincidir los elementos. Por defecto, `merge` false realiza comprobaciones referenciales cuando es posible para determinar la igualdad y reemplaza los elementos donde los elementos no son referencialmente iguales. `merge` true empuja todas las diferencias a las hojas y efectivamente transforma los datos anteriores al nuevo valor.
 
 ```js
-// subscribing to an observable
-const unsubscribe = store.subscribe(({ todos }) => (
-  setState('todos', reconcile(todos)));
+// subscribiendo a un observable
+const unsubscribe = store.subscribe(({ tareas }) => (
+  setState('tareas', reconcile(tareas)));
 );
 onCleanup(() => unsubscribe());
 ```
@@ -736,7 +734,7 @@ onCleanup(() => unsubscribe());
 export function unwrap(store: Store<T>): T;
 ```
 
-Returns the underlying data in the store without a proxy.
+Devuelve los datos subyacentes en el almacén sin un proxy.
 
 ### `createMutable`
 
@@ -746,35 +744,37 @@ export function createMutable<T extends StoreNode>(
 ): Store<T> {
 ```
 
-Creates a new mutable Store proxy object. Stores only trigger updates on values changing. Tracking is done by intercepting property access and automatically tracks deep nesting via proxy.
+Crea un nuevo objeto proxy de Store mutable. Las tiendas solo activan actualizaciones cuando los valores cambian. El seguimiento se realiza interceptando el acceso a la propiedad y rastrea automáticamente la anidación profunda a través de un proxy.
 
-Useful for integrating external systems or as a compatibility layer with MobX/Vue.
+Útil para integrar sistemas externos o como capa de compatibilidad con MobX/Vue.
 
-> **Note:** A mutable state can be passed around and mutated anywhere, which can make it harder to follow and easier to break unidirectional flow. It is generally recommended to use `createStore` instead. The `produce` modifier can give many of the same benefits without any of the downsides.
+> **Nota:** Un estado mutable se puede pasar y mutar en cualquier lugar, lo que puede hacer que sea más difícil de seguir y más fácil romper el flujo unidireccional. En general, se recomienda usar `createStore` en su lugar. El modificador `produce` puede brindar muchos de los mismos beneficios sin ninguna de las desventajas.
 
 ```js
 const state = createMutable(valorInicial);
 
 // read value
-state.someValue;
+// leer valor
+state.algunValor;
 
 // set value
-state.someValue = 5;
+// establecer valor
+state.algunValor = 5;
 
-state.list.push(anotherValue);
+state.list.push(otroValor);
 ```
 
-Mutables support setters along with getters.
+Los mutables admiten setters junto con getters.
 
 ```js
-const user = createMutable({
-	firstName: "John",
-	lastName: "Smith",
-	get fullName() {
-		return `${this.firstName} ${this.lastName}`;
+const usuario = createMutable({
+	nombre: "John",
+	apellido: "Smith",
+	get nombreCompleto() {
+		return `${this.nombre} ${this.apellido}`;
 	},
-	set fullName(value) {
-		[this.firstName, this.lastName] = value.split(" ");
+	set nombreCompleto(valor) {
+		[this.nombre, this.apellido] = valor.split(" ");
 	},
 });
 ```
@@ -792,32 +792,32 @@ interface Context<T> {
 export function createContext<T>(defaultValue?: T): Context<T | undefined>;
 ```
 
-Context provides a form of dependency injection in Solid. It is used to save from needing to pass data as props through intermediate components.
+Context proporciona una forma de inyección de dependencias en Solid. Se utiliza para evitar la necesidad de pasar datos via props a través de componentes intermedios.
 
-This function creates a new context object that can be used with `useContext` and provides the `Provider` control flow. Default Context is used when no `Provider` is found above in the hierarchy.
+Esta función crea un nuevo objeto de contexto que se puede usar con `useContext` y proporciona el control de flujo `Provider`. El contexto predeterminado se utiliza cuando no se encuentra ningún 'Provider' en la jerarquía.
 
 ```js
-export const CounterContext = createContext([{ count: 0 }, {}]);
+export const ContextoContador = createContext([{ cuenta: 0 }, {}]);
 
-export function CounterProvider(props) {
-	const [state, setState] = createStore({ count: props.count || 0 });
+export function ProveedorContador(props) {
+	const [estado, setEstado] = createStore({ cuenta: props.count || 0 });
 	const store = [
-		state,
+		estado,
 		{
-			increment() {
-				setState("count", (c) => c + 1);
+			incrementar() {
+				setEstado("cuenta", (c) => c + 1);
 			},
-			decrement() {
-				setState("count", (c) => c - 1);
+			disminuir() {
+				setEstado("cuenta", (c) => c - 1);
 			},
 		},
 	];
 
-	return <CounterContext.Provider value={store}>{props.children}</CounterContext.Provider>;
+	return <ContextoContador.Provider value={store}>{props.children}</ContextoContador.Provider>;
 }
 ```
 
-The value passed to provider is passed to `useContext` as is. That means wrapping as a reactive expression will not work. You should pass in Signals and Stores directly instead of accessing them in the JSX.
+El valor pasado al proveedor se pasa a `useContext` tal cual. Eso significa que envolver como una expresión reactiva no funcionará. Debe pasar Signals y Stores directamente en lugar de acceder a ellos en el JSX.
 
 ## `useContext`
 
@@ -825,10 +825,10 @@ The value passed to provider is passed to `useContext` as is. That means wrappin
 export function useContext<T>(context: Context<T>): T;
 ```
 
-Used to grab context to allow for deep passing of props without having to pass them through each Component function.
+Se usa para tomar contexto para permitir el paso profundo de props sin tener que pasarlos a través de cada función de Componente.
 
 ```js
-const [state, { increment, decrement }] = useContext(CounterContext);
+const [estado, { incrementar, disminuir }] = useContext(ContextoContador);
 ```
 
 ## `children`
@@ -837,13 +837,14 @@ const [state, { increment, decrement }] = useContext(CounterContext);
 export function children(fn: () => any): () => any;
 ```
 
-Used to make it easier to interact with `props.children`. This helper resolves any nested reactivity and returns a memo. Recommended approach to using `props.children` in anything other than passing directly through to JSX.
+Usado para facilitar la interacción con `props.children`. Este auxiliar resuelve cualquier reactividad anidada y retorna un memo. Es el enfoque recomendado para usar `props.children` en cualquier otra cosa que no sea pasarlos directamente mediante JSX.
 
 ```js
-const list = children(() => props.children);
+const lista = children(() => props.children);
 
 // do something with them
-createEffect(() => list());
+// haz algo con ellos
+createEffect(() => lista());
 ```
 
 ## `lazy`
@@ -854,14 +855,16 @@ export function lazy<T extends Component<any>>(
 ): T & { preload: () => Promise<T> };
 ```
 
-Used to lazy load components to allow for code splitting. Components are not loaded until rendered. Lazy loaded components can be used the same as its statically imported counterpart, receiving props etc... Lazy components trigger `<Suspense>`
+Se utiliza para cargar componentes de forma diferida para permitir la división de código. Los componentes no se cargan hasta que se renderizan. Los componentes cargados de forma diferida se pueden usar de la misma manera que su contraparte importada estáticamente, recibiendo props, etc. Los componentes perezosos o lazy activan `<Suspense>`
 
 ```js
 // wrap import
-const ComponentA = lazy(() => import("./ComponentA"));
+// envuelve import
+const ComponenteA = lazy(() => import("./ComponenteA"));
 
 // use in JSX
-<ComponentA title={props.title} />;
+// usalo en JSX
+<ComponenteA title={props.title} />;
 ```
 
 ## `createUniqueId`
@@ -870,17 +873,17 @@ const ComponentA = lazy(() => import("./ComponentA"));
 export function createUniqueId(): string;
 ```
 
-A universal id generator that is stable across server/browser.
+Un generador de ID universal que es estable a lo largo del servidor/navegador.
 
 ```js
 const id = createUniqueId();
 ```
 
-> **Note** on the server this only works under hydratable components
+> **Nota** en el servidor esto solo funciona bajo componentes hidratables
 
-# Secondary Primitives
+# Primitives Secundarios
 
-You probably won't need them for your first app, but these are useful tools to have.
+Probablemente no los necesitará para su primera aplicación, pero estas son herramientas útiles para tener.
 
 ## `createDeferred`
 
@@ -894,7 +897,7 @@ export function createDeferred<T>(
 ): () => T;
 ```
 
-Creates a readonly that only notifies downstream changes when the browser is idle. `timeoutMs` is the maximum time to wait before forcing the update.
+Crea un readonly que solo notifica los cambios posteriores cuando el navegador está inactivo. `timeoutMs` es el tiempo máximo de espera antes de forzar la actualización.
 
 ## `createComputed`
 
@@ -902,7 +905,7 @@ Creates a readonly that only notifies downstream changes when the browser is idl
 export function createComputed<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs immediately before render. Use this to write to other reactive primitives. When possible use `createMemo` instead as writing to a signal mid update can cause other computations to need to re-calculate.
+Crea un nuevo cálculo que rastrea automáticamente las dependencias y se ejecuta inmediatamente antes del procesamiento. Use esto para escribir en otras primitivas reactivas. Cuando sea posible, use `createMemo` en su lugar, ya que escribir en una señal a mitad de la actualización puede hacer que otros cálculos necesiten volver a calcularse.
 
 ## `createRenderEffect`
 
@@ -910,29 +913,30 @@ Creates a new computation that automatically tracks dependencies and runs immedi
 export function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs during the render phase as DOM elements are created and updated but not necessarily connected. All internal DOM updates happen at this time.
+Crea un nuevo cálculo que realiza un seguimiento automático de las dependencias y se ejecuta durante la fase de renderizado a medida que se crean y actualizan los elementos DOM, pero no están necesariamente conectados. Todas las actualizaciones internas de DOM ocurren en este momento.
 
 ## `createReaction`
 
-**New in v1.3.0**
+**Nuevo en la v1.3.0**
 
 ```ts
 export function createReaction(onInvalidate: () => void): (fn: () => void) => void;
 ```
 
-Sometimes it is useful to separate tracking from re-execution. This primitive registers a side effect that is run the first time the expression wrapped by the returned tracking function is notified of a change.
+En ocasiones es util separar el seguimiento de la re-ejecución. Esta primitiva registra un efecto secundario que es ejecutado la primera vez que la función envuelta por la funcion de seguimiento es notificada de un cambio.
 
 ```js
-const [s, set] = createSignal("start");
+const [s, set] = createSignal("inicio");
 
-const track = createReaction(() => console.log("something"));
+const track = createReaction(() => console.log("algo"));
 
 // next time s changes run the reaction
+// la próxima ocasión que s cambia ejecuta la reacción
 track(() => s());
 
-set("end"); // "something"
+set("fin"); // "algo"
 
-set("final"); // no-op as reaction only runs on first update, need to call track again.
+set("final"); // sin operar ya que la reaccion solo se ejecuta al primer update, necesitas volver a llamar "track"
 ```
 
 ## `createSelector`
@@ -944,7 +948,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Creates a conditional signal that only notifies subscribers when entering or exiting their key matching the value. Useful for delegated selection state. As it makes the operation O(2) instead of O(n).
+Crea una signal condicional que unicamente notifica a los subscriptores cuando ingresan o salen al valor de dicha clave. Útil para selección de estado delegada. Ya que hace la operación O(2) en lugar de O(n).
 
 ```js
 const isSelected = createSelector(selectedId);
@@ -954,9 +958,9 @@ const isSelected = createSelector(selectedId);
 </For>;
 ```
 
-# Rendering
+# Renderizado
 
-These imports are exposed from `solid-js/web`.
+Estas importaciones se exponen desde `solid-js/web`.
 
 ## `render`
 
@@ -964,7 +968,7 @@ These imports are exposed from `solid-js/web`.
 export function render(code: () => JSX.Element, element: MountableElement): () => void;
 ```
 
-This is the browser app entry point. Provide a top level component definition or function and an element to mount to. It is recommended this element be empty as the returned dispose function will wipe all children.
+Este es el punto de entrada de la aplicación del navegador. Proporciona una definición o función de componente de nivel superior y un elemento para montar. Se recomienda que este elemento esté vacío ya que la función dispose devuelta borrará a todos los elementos secundarios.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
@@ -976,7 +980,7 @@ const dispose = render(App, document.getElementById("app"));
 export function hydrate(fn: () => JSX.Element, node: MountableElement): () => void;
 ```
 
-This method is similar to `render` except it attempts to rehydrate what is already rendered to the DOM. When initializing in the browser a page has already been server rendered.
+Este metodo es similar a `render`excepto que intenta rehidratar lo que ya ha sido renderizado en el DOM. Cuando se está inicializando el el navegador una página ya ha sido renderizada en el servidor.
 
 ```js
 const dispose = hydrate(App, document.getElementById("app"));
@@ -994,7 +998,7 @@ export function renderToString<T>(
 ): string;
 ```
 
-Renders to a string synchronously. The function also generates a script tag for progressive hydration. Options include eventNames to listen to before the page loads and play back on hydration, and nonce to put on the script tag.
+Renderiza en forma de string sincrónicamente. La función además genera una equieta script para hidratación progresiva. Las opciones incluyen eventNames que pueden ser escuchados antes de que la pagina cargue y reproducirse al hidratarse, y una vez para poner en la etiqueta script.
 
 `renderId` is used to namespace renders when having multiple top level roots.
 
@@ -1015,9 +1019,9 @@ export function renderToStringAsync<T>(
 ): Promise<string>;
 ```
 
-Same as `renderToString` except it will wait for all `<Suspense>` boundaries to resolve before returning the results. Resource data is automatically serialized into the script tag and will be hydrated on client load.
+Igual que `renderToString` excepto que esta esperará a que todos los limites de `<Suspense>` sean resueltos antes de retornar los resultados. Los datos de los recursos serán automáticamente serializados dentro de la etiqueta script y será hidratado una vez el cliente cargue.
 
-`renderId` is used to namespace renders when having multiple top level roots.
+`renderId` se usa para renderizar espacios de nombres cuando se tienen varias raíces de nivel superior
 
 ```js
 const html = await renderToStringAsync(App);
@@ -1025,7 +1029,7 @@ const html = await renderToStringAsync(App);
 
 ## `renderToStream`
 
-**New in v1.3.0**
+**Nuevo en la v1.3.0**
 
 ```ts
 export function renderToStream<T>(
@@ -1042,7 +1046,7 @@ export function renderToStream<T>(
 };
 ```
 
-This method renders to a stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data and HTML from any async resource as it completes.
+Este metodo renderiza una transmisión. Renderiza el contenido sincrónicamente incluyendo cualquier placeholder de respaldo en los Suspense, despúes continua transmitiendo los datos y el HTML de cualquier recurso asincrono conforme estos estén completos.
 
 ```js
 // node
@@ -1053,9 +1057,9 @@ const { readable, writable } = new TransformStream();
 renderToStream(App).pipeTo(writable);
 ```
 
-`onCompleteShell` fires when synchronous rendering is complete before writing the first flush to the stream out to the browser. `onCompleteAll` is called when all server Suspense boundaries have settled. `renderId` is used to namespace renders when having multiple top level roots.
+`onCompleteShell` se dispara cuando se completa la renderización síncrona antes de escribir el primer vaciado de la transmisión al navegador. Se llama a `onCompleteAll` cuando todos los límites de suspenso del servidor se han establecido. `renderId` se usa para renderizar espacios de nombres cuando se tienen varias raíces de nivel superior.
 
-> Note this API replaces the previous `pipeToWritable` and `pipeToNodeWritable` APIs.
+> Tenga en cuenta que esta API reemplaza las API anteriores `pipeToWritable` y `pipeToNodeWritable`.
 
 ## `isServer`
 
@@ -1063,13 +1067,15 @@ renderToStream(App).pipeTo(writable);
 export const isServer: boolean;
 ```
 
-This indicates that the code is being run as the server or browser bundle. As the underlying runtimes export this as a constant boolean it allows bundlers to eliminate the code and their used imports from the respective bundles.
+Esto indica que el código se ejecuta como paquete de servidor o navegador. Como los tiempos de ejecución subyacentes exportan esto como un booleano constante, permite a los empaquetadores eliminar el código y sus importaciones usadas de los paquetes respectivos.
 
 ```js
 if (isServer) {
 	// I will never make it to the browser bundle
+	// Nunca llegaré al paquete del navegador
 } else {
 	// won't be run on the server;
+	// no será ejecutado en el servidor;
 }
 ```
 
@@ -1081,19 +1087,20 @@ export function generateHydrationScript(options: { nonce?: string; eventNames?: 
 export function HydrationScript(props: { nonce?: string; eventNames?: string[] }): JSX.Element;
 ```
 
-Hydration Script is a special script that should be placed once on the page to bootstrap hydration before Solid's runtime has loaded. It comes both as a function that can be called and inserted in an your HTML string, or as a Component if you are rendering JSX from the `<html>` tag.
+Hydration Script es un script especial que debe colocarse una vez en la página para iniciar la hidratación antes de que se cargue el tiempo de ejecución de Solid. Viene como una función que se puede llamar e insertar en su cadena HTML, o como un componente si está representando JSX desde la etiqueta `<html>`.
 
-The options are for the `nonce` to be put on the script tag and any event names for that Solid should capture before scripts have loaded and replay during hydration. These events are limited to those that Solid delegates which include most UI Events that are composed and bubble. By default it is only `click` and `input` events.
+Las opciones son para que `nonce` se coloque en la etiqueta del script y cualquier nombre de evento para que Solid
+los capture antes de que los scripts se hayan cargado y reproducirse durante la hidratación. Estos eventos están limitados a aquellos que delega Solid, que incluyen la mayoría de los eventos de interfaz de usuario que están compuestos y burbujean. De forma predeterminada, solo son eventos `click` e `input`.
 
-# Control Flow
+# Control de Flujo
 
-For reactive control flow to be performant, we have to control how elements are created. For example, with lists, a simple `map` is inefficient as it always maps the entire array.
+Para que el flujo de control reactivo tenga un buen rendimiento, tenemos que controlar cómo se crean los elementos. Por ejemplo, con las listas, un 'mapa' simple es ineficiente ya que siempre mapea el array completo.
 
-This means helper functions. Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flow components.
+Esto significan funciones auxiliares. Envolviendo estas en componentes es una manera conveniente para crear templates concisas y permite a los usuarios componer y construir sus propios componentes de control de flujo.
 
-These built-in control flow components will be automatically imported. All except `Portal` and `Dynamic` are exported from `solid-js`. Those two, which are DOM-specific, are exported by `solid-js/web`.
+Estos componentes de control de flujo incorporados se importarán automáticamente. Todos excepto `Portal` y `Dynamic` se exportan desde `solid-js`. Esos dos, que son específicos de DOM, son exportados por `solid-js/web`.
 
-> Note: All callback/render function children of control flow are non-tracking. This allows for nesting state creation, and better isolates reactions.
+> Nota: Todas las funciones callbacks/render hijas del flujo de control no son de seguimiento. Esto permite anidar la creación del estado y aisla las reacciones de mejor forma.
 
 ## `<For>`
 
@@ -1105,21 +1112,21 @@ export function For<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Simple referentially keyed loop. The callback takes the current item as the first argument:
+Bucle simple con llave referencial. El callback toma el elemento actual como primer argumento:
 
 ```jsx
-<For each={state.list} fallback={<div>Loading...</div>}>
-	{(item) => <div>{item}</div>}
+<For each={state.lista} fallback={<div>Cargando...</div>}>
+	{(elemento) => <div>{elemento}</div>}
 </For>
 ```
 
-The optional second argument is an index signal:
+El segundo argumento opcional es una señal index:
 
 ```jsx
-<For each={state.list} fallback={<div>Loading...</div>}>
-	{(item, index) => (
+<For each={state.lista} fallback={<div>Cargando...</div>}>
+	{(elemento, index) => (
 		<div>
-			#{index()} {item}
+			#{index()} {elemento}
 		</div>
 	)}
 </For>
@@ -1135,19 +1142,19 @@ function Show<T>(props: {
 }): () => JSX.Element;
 ```
 
-The Show control flow is used to conditional render part of the view: it renders `children` when the `when` is truthy, an `fallback` otherwise. It is similar to the ternary operator (`when ? children : fallback`) but is ideal for templating JSX.
+El control de flujo Show se usa para renderizar condicionalmente parte de la vista: renderiza `children` cuando el `when` es verdadero, de lo contrario renderiza el `fallback`. Es similar al operador ternario (`when ? children : fallback`) pero es ideal para crear plantillas JSX.
 
 ```jsx
-<Show when={state.count > 0} fallback={<div>Loading...</div>}>
-	<div>My Content</div>
+<Show when={state.cuenta > 0} fallback={<div>Cargando...</div>}>
+	<div>Mi Contenidio</div>
 </Show>
 ```
 
-Show can also be used as a way of keying blocks to a specific data model. Ex the function is re-executed whenever the user model is replaced.
+Show también se puede utilizar como una forma de introducir bloques en un modelo de datos específico. Por ejemplo, la función se vuelve a ejecutar cada vez que se reemplaza el modelo de usuario.
 
 ```jsx
-<Show when={state.user} fallback={<div>Loading...</div>}>
-	{(user) => <div>{user.firstName}</div>}
+<Show when={state.usuario} fallback={<div>Cargando...</div>}>
+	{(usuario) => <div>{usuario.nombre}</div>}
 </Show>
 ```
 
@@ -1163,20 +1170,20 @@ type MatchProps<T> = {
 export function Match<T>(props: MatchProps<T>);
 ```
 
-Useful for when there are more than 2 mutual exclusive conditions. Can be used to do things like simple routing.
+Útil para cuando hay más de 2 condiciones de exclusión mutua. Se puede usar para hacer cosas como enrutamiento simple.
 
 ```jsx
-<Switch fallback={<div>Not Found</div>}>
+<Switch fallback={<div>No Encontrado</div>}>
 	<Match when={state.route === "home"}>
 		<Home />
 	</Match>
-	<Match when={state.route === "settings"}>
-		<Settings />
+	<Match when={state.route === "configuracion"}>
+		<Configuracion />
 	</Match>
 </Switch>
 ```
 
-Match also supports function children to serve as keyed flow.
+Match tambien soporta la función children para servir como flujo codificado.
 
 ## `<Index>`
 
@@ -1188,23 +1195,23 @@ export function Index<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Non-keyed list iteration (rendered nodes are keyed to an array index). This is useful when there is no conceptual key, like if the data consists of primitives and it is the index that is fixed rather than the value.
+Iteración de listas sin codificar (los nodos representados se codifican en un índice de array). Esto es útil cuando no hay una clave conceptual, como si los datos consisten en primitivas y es el índice el que está fijo en lugar del valor.
 
-The item is a signal:
+El elemento es una signal:
 
 ```jsx
-<Index each={state.list} fallback={<div>Loading...</div>}>
-	{(item) => <div>{item()}</div>}
+<Index each={state.lista} fallback={<div>Cargando...</div>}>
+	{(elemento) => <div>{elemento()}</div>}
 </Index>
 ```
 
-Optional second argument is an index number:
+El segundo argumento opcional es un número de índice:
 
 ```jsx
-<Index each={state.list} fallback={<div>Loading...</div>}>
-	{(item, index) => (
+<Index each={state.lista} fallback={<div>Cargando...</div>}>
+	{(elemento, index) => (
 		<div>
-			#{index} {item()}
+			#{index} {elemento()}
 		</div>
 	)}
 </Index>
@@ -1219,19 +1226,19 @@ function ErrorBoundary(props: {
 }): () => JSX.Element;
 ```
 
-Catches uncaught errors and renders fallback content.
+Captura errores no detectados y presenta contenido alternativo.
 
 ```jsx
-<ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
-	<MyComp />
+<ErrorBoundary fallback={<div>Algo salió terriblemente mal</div>}>
+	<MiComponente />
 </ErrorBoundary>
 ```
 
-Also supports callback form which passes in error and a reset function.
+Tambien soporta la forma de callback que pasa un error y una función reset.
 
 ```jsx
 <ErrorBoundary fallback={(err, reset) => <div onClick={reset}>Error: {err.toString()}</div>}>
-	<MyComp />
+	<MiComponente />
 </ErrorBoundary>
 ```
 
@@ -1241,11 +1248,11 @@ Also supports callback form which passes in error and a reset function.
 export function Suspense(props: { fallback?: JSX.Element; children: JSX.Element }): JSX.Element;
 ```
 
-A component that tracks all resources read under it and shows a fallback placeholder state until they are resolved. What makes `Suspense` different than `Show` is it is non-blocking in that both branches exist at the same time even if not currently in the DOM.
+Un componente que rastrea todos los recursos leídos dentro de él y muestra un estado alternativo hasta que se resuelven. Lo que hace que 'Suspense' sea diferente de 'Show' es que no bloquea, ya que ambas ramas existen al mismo tiempo, incluso si no están actualmente en el DOM.
 
 ```jsx
-<Suspense fallback={<div>Loading...</div>}>
-	<AsyncComponent />
+<Suspense fallback={<div>Cargando...</div>}>
+	<ComponenteAsincrono />
 </Suspense>
 ```
 
@@ -1259,21 +1266,21 @@ function SuspenseList(props: {
 }): JSX.Element;
 ```
 
-`SuspenseList` allows for coordinating multiple parallel `Suspense` and `SuspenseList` components. It controls the order in which content is revealed to reduce layout thrashing and has an option to collapse or hide fallback states.
+`SuspenseList` permite coordinar múltiples componentes paralelos `Suspense` y `SuspenseList`. Controla el orden en el que se revela el contenido para reducir la hiperpaginación del diseño y tiene una opción para colapsar u ocultar estados alternativos.
 
 ```jsx
 <SuspenseList revealOrder='forwards' tail='collapsed'>
-	<ProfileDetails user={resource.user} />
-	<Suspense fallback={<h2>Loading posts...</h2>}>
-		<ProfileTimeline posts={resource.posts} />
+	<PerfilDetalles usuario={recurso.usuario} />
+	<Suspense fallback={<h2>Cargando posts...</h2>}>
+		<PerfilTimeline posts={recurso.posts} />
 	</Suspense>
-	<Suspense fallback={<h2>Loading fun facts...</h2>}>
-		<ProfileTrivia trivia={resource.trivia} />
+	<Suspense fallback={<h2>Cargando hechos divertidos...</h2>}>
+		<PerfilTrivia trivia={recurso.trivia} />
 	</Suspense>
 </SuspenseList>
 ```
 
-SuspenseList is still experimental and does not have full SSR support.
+SuspenseList aún es experimental y no tiene soporte SSR completo.
 
 ## `<Dynamic>`
 
@@ -1286,7 +1293,7 @@ function Dynamic<T>(
 ): () => JSX.Element;
 ```
 
-This component lets you insert an arbitrary Component or tag and passes the props through to it.
+Este componente le permite insertar un componente o etiqueta arbitraria y pasa los props a través de él.
 
 ```jsx
 <Dynamic component={state.component} someProp={state.something} />
@@ -1303,21 +1310,21 @@ export function Portal(props: {
 }): Text;
 ```
 
-This inserts the element in the mount node. Useful for inserting Modals outside of the page layout. Events still propagate through the Component Hierarchy.
+Esto inserta el elemento en el nodo de montaje. Útil para insertar modales fuera del diseño de la página. Los eventos aún se propagan a través de la jerarquía de componentes.
 
-The portal is mounted in a `<div>` unless the target is the document head. `useShadow` places the element in a Shadow Root for style isolation, and `isSVG` is required if inserting into an SVG element so that the `<div>` is not inserted.
+El portal se monta en un `<div>` a menos que el objetivo sea el encabezado del documento. `useShadow` coloca el elemento en Shadow Root para el aislamiento de estilo, `isSVG` es necesario si se inserta en un elemento SVG para que `<div>` no sea insertado.
 
 ```jsx
 <Portal mount={document.getElementById("modal")}>
-	<div>My Content</div>
+	<div>Mi Contenido</div>
 </Portal>
 ```
 
 # Special JSX Attributes
 
-In general Solid attempts to stick to DOM conventions. Most props are treated as attributes on native elements and properties on Web Components, but a few of them have special behavior.
+En general, Solid intenta apegarse a las convenciones DOM. La mayoría de los accesorios se tratan como atributos en elementos nativos y propiedades en componentes web, pero algunos de ellos tienen un comportamiento especial.
 
-For custom namespaced attributes with TypeScript you need to extend Solid's JSX namespace:
+Para los atributos de espacio de nombres personalizados con TypeScript, debe ampliar el espacio de nombres JSX de Solid:
 
 ```ts
 declare module "solid-js" {
@@ -1343,37 +1350,40 @@ declare module "solid-js" {
 
 ## `ref`
 
-Refs are a way of getting access to underlying DOM elements in our JSX. While it is true one could just assign an element to a variable, it is more optimal to leave components in the flow of JSX. Refs are assigned at render time but before the elements are connected to the DOM. They come in 2 flavors.
+Las refs son una forma de obtener acceso a los elementos DOM subyacentes en nuestro JSX. Si bien es cierto que uno podría simplemente asignar un elemento a una variable, es más óptimo dejar los componentes en el flujo de JSX. Las refs se asignan en el momento del renderizado, pero antes de que los elementos se conecten al DOM. Vienen en 2 sabores.
 
 ```js
 // simple assignment
-let myDiv;
+// asignación simple
+let miDiv;
 
 // use onMount or createEffect to read after connected to DOM
-onMount(() => console.log(myDiv));
-<div ref={myDiv} />
+// use onMount o createEffect para leer después de conectarse al DOM
+onMount(() => console.log(miDiv));
+<div ref={miDiv} />
 
 // Or, callback function (called before connected to DOM)
+// O función de devolución de llamada (llamada antes de conectarse al DOM)
 <div ref={el => console.log(el)} />
 ```
 
-Refs can also be used on Components. They still need to be attached on the otherside.
+Las referencias también se pueden usar en componentes. Todavía tienen que estar conectados en el otro lado.
 
 ```jsx
-function MyComp(props) {
+function MiComp(props) {
 	return <div ref={props.ref} />;
 }
 
 function App() {
-	let myDiv;
-	onMount(() => console.log(myDiv.clientWidth));
-	return <MyComp ref={myDiv} />;
+	let miDiv;
+	onMount(() => console.log(miDiv.anchoDelCliente));
+	return <MiComp ref={miDiv} />;
 }
 ```
 
 ## `classList`
 
-A helper that leverages `element.classList.toggle`. It takes an object whose keys are class names and assigns them when the resolved value is true.
+Un auxiliar que aprovecha `element.classList.toggle`. Toma un objeto cuyas claves son nombres de clases y las asigna cuando el valor resuelto es verdadero.
 
 ```jsx
 <div classList={{ active: state.active, editing: state.currentId === row.id }} />
@@ -1381,42 +1391,45 @@ A helper that leverages `element.classList.toggle`. It takes an object whose key
 
 ## `style`
 
-Solid's style helper works with either a string or with an object. Unlike React's version Solid uses `element.style.setProperty` under the hood. This means support for CSS vars, but it also means we use the lower, dash-case version of properties. This actually leads to better performance and consistency with SSR output.
+El asistente de estilo de Solid funciona con una cadena o con un objeto. A diferencia de la versión de React, Solid usa `element.style.setProperty` bajo el capó. Esto significa soporte para CSS vars, pero también significa que usamos la versión de propiedades en minúsculas y con guión. En realidad, esto conduce a un mejor rendimiento y consistencia con la salida del SSR.
 
 ```jsx
 // string
-<div style={`color: green; background-color: ${state.color}; height: ${state.height}px`} />
+// cadena
+<div style={`color: green; background-color: ${state.color}; height: ${state.altura}px`} />
 
 // object
+// objeto
 <div style={{
   color: "green",
   "background-color": state.color,
-  height: state.height + "px" }}
+  height: state.altura + "px" }}
 />
 
-// css variable
-<div style={{ "--my-custom-color": state.themeColor }} />
+// css vars
+// variables css
+<div style={{ "--mi-color-personalizado": state.temaColor }} />
 ```
 
 ## `innerHTML`/`textContent`
 
-These work the same as their property equivalent. Set a string and they will be set. **Be careful!!** Setting `innerHTML` with any data that could be exposed to an end user as it could be a vector for malicious attack. `textContent` while generally not needed is actually a performance optimization when you know the children will only be text as it bypasses the generic diffing routine.
+Estos funcionan igual que su propiedad equivalente. Establezca una cadena y se configurarán. **¡¡Cuidado!!** Establecer `innerHTML` con cualquier dato que pueda estar expuesto a un usuario final, ya que podría ser un vector de ataque malicioso. `textContent`, aunque generalmente no es necesario, en realidad es una optimización del rendimiento cuando sabe que los elementos secundarios solo serán texto, ya que omite la rutina de diferenciación genérica.
 
 ```jsx
-<div textContent={state.text} />
+<div textContent={state.texto} />
 ```
 
 ## `on___`
 
-Event handlers in Solid typically take the form of `onclick` or `onClick` depending on style.
+Los controladores de eventos en Solid normalmente toman la forma de `onclick` u `onClick` dependiendo del estilo.
 
-Solid uses semi-synthetic event delegation for common UI events that are composed and bubble. This improves performance for these common events.
+Solid utiliza la delegación de eventos semisintéticos para eventos de interfaz de usuario comunes que están compuestos y burbujeados. Esto mejora el rendimiento para estos eventos comunes.
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
-Solid also supports passing an array to the event handler to bind a value to the first argument of the event handler. This doesn't use `bind` or create an additional closure, so it is a highly optimized way of delegating events.
+Solid también admite pasar un array al controlador de eventos para enlazar un valor al primer argumento del controlador de eventos. Esto no usa `bind` ni crea un cierre adicional, por lo que es una forma altamente optimizada de delegar eventos.
 
 ```jsx
 function handler(itemId, e) {
@@ -1424,57 +1437,58 @@ function handler(itemId, e) {
 }
 
 <ul>
-	<For each={state.list}>{(item) => <li onClick={[handler, item.id]} />}</For>
+	<For each={state.lista}>{(item) => <li onClick={[handler, item.id]} />}</For>
 </ul>;
 ```
 
-Events are never rebound and the bindings are not reactive, as it is expensive to attach and detach listeners.
-Since event handlers are called like any other function each time an event fires, there is no need for reactivity; simply shortcut your handler if desired.
+Los eventos nunca se vuelven a vincular y los enlaces no son reactivos, ya que es costoso conectar y desconectar listeners.
+Dado que los controladores de eventos se llaman como cualquier otra función cada vez que se activa un evento, no hay necesidad de reactividad; simplemente abre un atajo a tu controlador si lo deseas.
 
 ```jsx
 // if defined call it, otherwised don't.
+// si está definido, llámelo, de lo contrario, no lo haga.
 <div onClick={() => props.handleClick?.()} />
 ```
 
-Note that `onChange` and `onInput` work according to their native behavior. `onInput` will fire immediately after the value has changed; for `<input>` fields, `onChange` will only fire after the field loses focus.
+Tenga en cuenta que `onChange` y `onInput` funcionan de acuerdo con su comportamiento nativo. `onInput` se activará inmediatamente después de que el valor haya cambiado; para los campos `<input>`, `onChange` solo se activará después de que el campo pierda el foco.
 
 ## `on:___`/`oncapture:___`
 
-For any other events, perhaps ones with unusual names, or ones you wish not to be delegated there are the `on` namespace events. This simply adds an event listener verbatim.
+Para cualquier otro evento, tal vez aquellos con nombres inusuales, o aquellos que no desea que se deleguen, están los eventos de espacio de nombres `on`. Esto simplemente agrega un detector de eventos literal.
 
 ```jsx
-<div on:Weird-Event={(e) => alert(e.detail)} />
+<div on:Evento-Raro={(e) => alert(e.detail)} />
 ```
 
 ## `use:___`
 
-These are custom directives. In a sense this is just syntax sugar over ref but allows us to easily attach multiple directives to a single element. A directive is simply a function with the following signature:
+Estas son directivas personalizadas. En cierto sentido, esto es solo syntax sugar sobre ref, pero nos permite adjuntar fácilmente varias directivas a un solo elemento. Una directiva es simplemente una función con la siguiente firma:
 
 ```ts
-function directive(element: Element, accessor: () => any): void;
+function directive(elemento: Elemento, accessor: () => any): void;
 ```
 
-Directive functions are called at render time but before being added to the DOM. You can do whatever you'd like in them including create signals, effects, register clean-up etc.
+Las funciones directivas se llaman en el momento del procesamiento, pero antes de agregarse al DOM. Puede hacer lo que quiera en ellos, incluida la creación de señales, efectos, limpieza de registros, etc.
 
 ```js
-const [name, setName] = createSignal("");
+const [nombre, setNombre] = createSignal("");
 
-function model(el, value) {
-	const [field, setField] = value();
-	createRenderEffect(() => (el.value = field()));
-	el.addEventListener("input", (e) => setField(e.target.value));
+function modelo(el, valor) {
+	const [campo, setCampo] = valor();
+	createRenderEffect(() => (el.valor = campo()));
+	el.addEventListener("input", (e) => setCampo(e.target.value));
 }
 
-<input type='text' use:model={[name, setName]} />;
+<input type='text' use:modelo={[nombre, setNombre]} />;
 ```
 
-To register with TypeScript extend the JSX namespace.
+Para registrar con TypeScript, extienda el espacio de nombres JSX.
 
 ```ts
 declare module "solid-js" {
 	namespace JSX {
 		interface Directives {
-			model: [() => any, (v: any) => any];
+			modelo: [() => any, (v: any) => any];
 		}
 	}
 }
@@ -1482,7 +1496,7 @@ declare module "solid-js" {
 
 ## `prop:___`
 
-Forces the prop to be treated as a property instead of an attribute.
+Obliga a que el prop se trate como una propiedad en lugar de como un atributo.
 
 ```jsx
 <div prop:scrollTop={props.scrollPos + "px"} />
@@ -1490,24 +1504,24 @@ Forces the prop to be treated as a property instead of an attribute.
 
 ## `attr:___`
 
-Forces the prop to be treated as a attribute instead of an property. Useful for Web Components where you want to set attributes.
+Obliga a que la propiedad se trate como un atributo en lugar de una propiedad. Útil para componentes web en los que desea establecer atributos.
 
 ```jsx
-<my-element attr:status={props.status} />
+<mi-elemento attr:status={props.status} />
 ```
 
 ## `/* @once */`
 
-Solid's compiler uses a simple heuristic for reactive wrapping and lazy evaluation of JSX expressions. Does it contain a function call, a property access, or JSX? If yes we wrap it in a getter when passed to components or in an effect if passed to native elements.
+El compilador de Solid utiliza una heurística simple para la envoltura reactiva y la evaluación diferida de expresiones JSX. ¿Contiene una llamada de función, un acceso de propiedad o JSX? En caso afirmativo, lo envolvemos en un getter cuando se pasa a componentes o en un efecto si se pasa a elementos nativos.
 
-Knowing this we can reduce overhead of things we know will never change simply by accessing them outside of the JSX. A simple variable will never be wrapped. We can also tell the compiler not to wrap them by starting the expression with a comment decorator `/_ @once _/`.
+Sabiendo esto, podemos reducir la sobrecarga de cosas que sabemos que nunca cambiarán simplemente accediendo a ellas fuera de JSX. Una variable simple nunca se envolverá. También podemos decirle al compilador que no los envuelva al comenzar la expresión con un decorador de comentarios `/_ @once _/`.
 
 ```jsx
-<MyComponent static={/*@once*/ state.wontUpdate} />
+<MyComponent static={/*@once*/ state.noSeActualizara} />
 ```
 
-This also works on children.
+Tambien funciona en los hijos.
 
 ```jsx
-<MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
+<MyComponent>{/*@once*/ state.noSeActualizara}</MyComponent>
 ```
