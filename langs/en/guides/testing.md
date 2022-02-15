@@ -135,6 +135,8 @@ Additional setup files can be added via `-r setup.ts`, ignore non-tests with `-i
 
 ### Coverage Reports
 
+> Unfortunately, due to a [limitation of babel](https://github.com/babel/babel/issues/4289), we cannot get source maps output for transpiled JSX, which will result in components to show zero coverage. It will work for non-JSX code, though.
+
 If you want to check code coverage of your tests, the favorite tool for uvu is c8. To install and set it up, run:
 
 ```sh
@@ -144,7 +146,7 @@ If you want to check code coverage of your tests, the favorite tool for uvu is c
 
 Now if you `npm run test:coverage`, you'll see the test coverage.
 
-If you want nice HTML coverage reports, you 
+If you want nice HTML coverage reports, you can use `c8 -r html` instead of `c8` to enable the html reporter.
 
 ### Watch Mode
 
@@ -212,6 +214,12 @@ If you are using another test runner, e.g. uvu or tape, there are a few assertio
 ```
 
 There's no setup required, you can just import and use the helpers in your tests as you see fit.
+
+## vitest
+
+There's a new kid on the block of unit testing called [vitest](https://vitest.dev/) and it aims to replace jest with something faster, yet providing almost the same feature set.
+
+Unfortunately, at the time of writing, there is an issue in the module resolution that causes solid's server and client version loaded at the same time, which causes the reactive system to fail. Hopefully, this issue will be resolved at some point in the near future.
 
 ## Testing Patterns and Best Practices
 
