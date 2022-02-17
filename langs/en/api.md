@@ -1176,14 +1176,6 @@ export function createDeferred<T>(
 
 Creates a readonly that only notifies downstream changes when the browser is idle. `timeoutMs` is the maximum time to wait before forcing the update.
 
-## `createComputed`
-
-```ts
-export function createComputed<T>(fn: (v: T) => T, value?: T): void;
-```
-
-Creates a new computation that automatically tracks dependencies and runs immediately before render. Use this to write to other reactive primitives. When possible use `createMemo` instead as writing to a signal mid update can cause other computations to need to re-calculate.
-
 ## `createRenderEffect`
 
 ```ts
@@ -1242,6 +1234,52 @@ Just like `createEffect`, the effect function gets called with an argument
 equal to the value returned from the effect function's last execution,
 or on the first call, equal to the optional second argument to
 `createRenderEffect`.
+
+## `createComputed`
+
+```ts
+export function createComputed<T>(fn: (v: T) => T, value?: T): void;
+```
+
+`createComputed` creates a new computation that immediately runs the given
+function in a tracking scope, thus automatically tracking its dependencies,
+and automatically reruns the function whenever the dependencies changes.
+The function gets called with an argument equal to the value returned
+from the function's last execution, or on the first call,
+equal to the optional second argument to `createComputed`.
+Note that the return value of the function is not otherwise exposed;
+in particular, `createComputed` has no return value.
+
+`createComputed` is the most immediate form of reactivity in Solid, and is
+most useful for building other reactive primitives.
+(For example, some other Solid primitives are built from `createComputed`.)
+But it should be used with care, as `createComputed` can easily cause more
+unnecessary updates than other reactive primitives.
+Before using it, consider the closely related primitives
+[`createMemo`](#creatememo) and [`createRenderEffect`](#createrendereffect).
+
+Like `createMemo`, `createComputed` calls its function immediately on updates
+(unless you're in a [batch](#batch), [effect](#createEffect), or
+[transition](#use-transition)).
+However, while `createMemo` functions should be pure (not set any signals),
+`createComputed` functions can set signals.
+Related, `createMemo` offers a readonly signal for the return value of the
+function, whereas to do the same with `createComputed` you would need to
+set a signal within the function.
+If it is possible to use pure functions and `createMemo`, this is likely
+more efficient, as Solid optimizes the execution order of memo updates,
+whereas updating a signal within `createComputed` will immediately trigger
+reactive updates some of which may turn out to be unnecessary
+(unless you take care by wrapping in
+[`batch`](#batch), [`untrack`](#untrack), etc.).
+
+Like `createRenderEffect`, `createComputed` calls its function for the first
+time immediately.  But they differ in how updates are performed.
+While `createComputed` generally updates immediately, `createRenderEffect`
+updates queue to run in a single `batch` (along with `createEffect`s)
+after the current render phase.
+Thus `createRenderEffect` can perform fewer overall updates,
+but is slightly less immediate.
 
 ## `createReaction`
 
