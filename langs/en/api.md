@@ -193,13 +193,18 @@ meaning that all signal changes inside the effect propagate only after the
 effect finishes.  This lets you update several signals while triggering only
 one update, and avoids unwanted side-effects from happening in the middle
 of your side effects.
+In fact, if multiple effects all trigger at once, they collectively
+get wrapped into a single `batch`.
 
 The *first* execution of the effect function is not immediate;
-it's scheduled to run after the current synchronous task via
+it's scheduled to run after the current rendering phase
+(e.g., after calling the function passed to [`render`](#render),
+[`createRoot`](#createroot), or [`runWithOwner`](#runwithowner)).
+If you want to wait for the first execution to occur, use
 [`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask).
-If you want to wait for the first execution to occur,
-use `queueMicrotask` (which runs before render) or
-`await Promise.resolve()` or `setTimeout(..., 0)` (which run after render).
+(which runs before the browser renders the DOM) or
+`await Promise.resolve()` or `setTimeout(..., 0)`
+(which run after browser rendering).
 After this first execution, effects generally run immediately when
 their dependencies update (unless you're in a [batch](#batch) or
 [transition](#use-transition)).  For example:
@@ -232,7 +237,7 @@ queueMicrotask(() => {
 This delay in first execution is useful because it means
 an effect defined in a component scope runs after
 the JSX returned by the component gets added the DOM.
-In particular, [`ref`s](#ref) will already be set.
+In particular, [`ref`](#ref)s will already be set.
 Thus you can use an effect to manipulate the DOM manually,
 call vanilla JS libraries, or other side effects.
 
@@ -246,7 +251,8 @@ possible after an `async` function uses `await`.
 Thus you should use all dependencies before the promise.
 
 If you'd rather an effect run immediately even for its first run,
-use [`createComputed`](#createcomputed).
+use [`createRenderEffect`](#createrendereffect) or
+[`createComputed`](#createcomputed).
 
 You can clean up your side effects in between executions of the effect function
 by calling [`onCleanup`](#oncleanup) *inside* the effect function.
