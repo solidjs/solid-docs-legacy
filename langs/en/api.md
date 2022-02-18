@@ -19,7 +19,7 @@ when they're called in a tracking scope, by detecting when the function reads
 reactive state (e.g., via a Signal getter or Store attribute).
 As a result, you generally don't need to worry about dependencies yourselves.
 (But if automatic dependency tracking ever doesn't produce the results you
-want, you can also [override dependency tracking](#reactive-utilities).)
+want, you can [override dependency tracking](#reactive-utilities).)
 This approach makes reactivity *composable*: calling one function
 within another function generally causes the calling function
 to inherit the dependencies of the called function.
