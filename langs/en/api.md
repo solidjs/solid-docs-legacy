@@ -49,7 +49,7 @@ const [ready, setReady] = createSignal(false);
 Calling the getter (e.g., `count()` or `ready()`)
 returns the current value of the Signal.
 Crucial to automatic dependency tracking, calling the getter
-within a tracking scope causes the calling function to depends on this Signal,
+within a tracking scope causes the calling function to depend on this Signal,
 so that function will rerun if the Signal gets updated.
 
 Calling the setter (e.g., `setCount(nextCount)` or `setReady(nextReady)`)
