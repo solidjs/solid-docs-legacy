@@ -746,7 +746,7 @@ const mapped = mapArray(source, (model) => {
     },
     get description() {
       return description();
-    }
+    },
     setName,
     setDescription
   }
