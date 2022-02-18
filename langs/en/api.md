@@ -676,9 +676,13 @@ Similar to `useTransition` except there is no associated pending state. This one
 export function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable. Consume it from the Observable library of your choice with typically with the `from` operator.
+This method takes a signal and produces a simple Observable.
+You can consume it from another Observable library of your choice, typically
+with the `from` operator.
 
 ```js
+// How to integrate rxjs with a solid.js signal
+import { observable } from "rxjs";
 import { from } from "rxjs";
 
 const [s, set] = createSignal(0);
@@ -687,6 +691,8 @@ const obsv$ = from(observable(s));
 
 obsv$.subscribe((v) => console.log(v));
 ```
+
+You can also use `from` without `rxjs`, see below.
 
 ## `from`
 
@@ -707,12 +713,16 @@ export function from<T>(
 A simple helper to make it easier to interopt with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
 
 ```js
+import { from } from "solid-js/store";
+
 const signal = from(obsv$);
 ```
 
 It can also take a custom producer function where the function is passed a setter function returns a unsubscribe function:
 
 ```js
+import { from } from "solid-js/store";
+
 const clock = from((set) => {
   const t = setInterval(() => set(1), 1000);
   return () => clearInterval(t);
