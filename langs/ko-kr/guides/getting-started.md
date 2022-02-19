@@ -8,7 +8,7 @@ sort: 0
 
 Solid를 사용하기 위한 가장 쉬운 방법은 온라인으로 시도해 보는 것입니다. https://playground.solidjs.com 의 REPL은 이를 위한 완벽한 방법을 제공합니다. 또한 [샘플](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md)을 편집해 볼 수 있는 https://codesandbox.io/ 도 있습니다.
 
-또한, 터미널에서 다음 명령을 실행해서 [Vite](https://vitejs.dev/) 템플릿을 사용할 수 있습니다:
+또한, 터미널에서 다음 명령을 실행해서 [Vite 템플릿](https://github.com/solidjs/templates)을 사용할 수 있습니다:
 
 ```sh
 > npx degit solidjs/templates/js my-app
