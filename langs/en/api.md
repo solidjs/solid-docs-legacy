@@ -301,7 +301,7 @@ return (
   <ul>
   <li>Your name is "{user()?.name}"</li>
   <li>Your email is <code>{user()?.email}</code></li>
-  </div>
+  </ul>
 );
 ```
 
