@@ -324,6 +324,7 @@
   "api": [
     "de",
     "en",
+    "es",
     "fr",
     "id",
     "it",
@@ -337,6 +338,7 @@
     "comparison": [
       "de",
       "en",
+      "es",
       "fr",
       "id",
       "it",
@@ -349,6 +351,7 @@
     "faq": [
       "de",
       "en",
+      "es",
       "fr",
       "id",
       "it",
@@ -361,6 +364,7 @@
     "getting-started": [
       "de",
       "en",
+      "es",
       "fr",
       "id",
       "it",
@@ -373,6 +377,7 @@
     "reactivity": [
       "de",
       "en",
+      "es",
       "fr",
       "id",
       "it",
@@ -385,6 +390,7 @@
     "rendering": [
       "de",
       "en",
+      "es",
       "fr",
       "id",
       "it",
@@ -397,6 +403,7 @@
     "server": [
       "de",
       "en",
+      "es",
       "fr",
       "id",
       "it",
@@ -408,6 +415,7 @@
     ],
     "testing": [
       "en",
+      "es",
       "ja",
       "ko-kr"
     ]
