@@ -1662,7 +1662,7 @@ onMount(() => console.log(myDiv));
 <div ref={el => console.log(el)} />
 ```
 
-Refs can also be used on Components. They still need to be attached on the otherside.
+Refs can also be used on Components. They still need to be attached on the other side.
 
 ```jsx
 function MyComp(props) {
