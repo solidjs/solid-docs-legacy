@@ -6,7 +6,7 @@ In the example, we would like to show only the appropriate button that reflects 
 ```jsx
 <Show
   when={loggedIn()}
-  fallback={() => <button onClick={toggle}>Log in</button>}
+  fallback={<button onClick={toggle}>Log in</button>}
 >
   <button onClick={toggle}>Log out</button>
 </Show>
