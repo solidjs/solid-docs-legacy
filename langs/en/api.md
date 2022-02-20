@@ -19,7 +19,7 @@ when they're called in a tracking scope, by detecting when the function reads
 reactive state (e.g., via a Signal getter or Store attribute).
 As a result, you generally don't need to worry about dependencies yourselves.
 (But if automatic dependency tracking ever doesn't produce the results you
-want, you can also [override dependency tracking](#reactive-utilities).)
+want, you can [override dependency tracking](#reactive-utilities).)
 This approach makes reactivity *composable*: calling one function
 within another function generally causes the calling function
 to inherit the dependencies of the called function.
@@ -49,7 +49,7 @@ const [ready, setReady] = createSignal(false);
 Calling the getter (e.g., `count()` or `ready()`)
 returns the current value of the Signal.
 Crucial to automatic dependency tracking, calling the getter
-within a tracking scope causes the calling function to depends on this Signal,
+within a tracking scope causes the calling function to depend on this Signal,
 so that function will rerun if the Signal gets updated.
 
 Calling the setter (e.g., `setCount(nextCount)` or `setReady(nextReady)`)
@@ -193,18 +193,24 @@ meaning that all signal changes inside the effect propagate only after the
 effect finishes.  This lets you update several signals while triggering only
 one update, and avoids unwanted side-effects from happening in the middle
 of your side effects.
+In fact, if multiple effects all trigger at once, they collectively
+get wrapped into a single `batch`.
 
 The *first* execution of the effect function is not immediate;
-it's scheduled to run after the current synchronous task via
+it's scheduled to run after the current rendering phase
+(e.g., after calling the function passed to [`render`](#render),
+[`createRoot`](#createroot), or [`runWithOwner`](#runwithowner)).
+If you want to wait for the first execution to occur, use
 [`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask).
-If you want to wait for the first execution to occur,
-use `queueMicrotask` (which runs before render) or
-`await Promise.resolve()` or `setTimeout(..., 0)` (which run after render).
+(which runs before the browser renders the DOM) or
+`await Promise.resolve()` or `setTimeout(..., 0)`
+(which run after browser rendering).
 After this first execution, effects generally run immediately when
 their dependencies update (unless you're in a [batch](#batch) or
 [transition](#use-transition)).  For example:
 
 ```js
+// assume this code is in a component function, so is part of a rendering phase
 const [count, setCount] = createSignal(0);
 
 // this effect prints count at the beginning and when it changes
@@ -232,7 +238,7 @@ queueMicrotask(() => {
 This delay in first execution is useful because it means
 an effect defined in a component scope runs after
 the JSX returned by the component gets added the DOM.
-In particular, [`ref`s](#ref) will already be set.
+In particular, [`ref`](#ref)s will already be set.
 Thus you can use an effect to manipulate the DOM manually,
 call vanilla JS libraries, or other side effects.
 
@@ -246,7 +252,8 @@ possible after an `async` function uses `await`.
 Thus you should use all dependencies before the promise.
 
 If you'd rather an effect run immediately even for its first run,
-use [`createComputed`](#createcomputed).
+use [`createRenderEffect`](#createrendereffect) or
+[`createComputed`](#createcomputed).
 
 You can clean up your side effects in between executions of the effect function
 by calling [`onCleanup`](#oncleanup) *inside* the effect function.
@@ -299,9 +306,9 @@ const user = createMemo(() => searchForUser(username()));
 // compare with: const user = () => searchForUser(username());
 return (
   <ul>
-  <li>Your name is "{user()?.name}"</li>
-  <li>Your email is <code>{user()?.email}</code></li>
-  </div>
+    <li>Your name is "{user()?.name}"</li>
+    <li>Your email is <code>{user()?.email}</code></li>
+  </ul>
 );
 ```
 
@@ -676,9 +683,13 @@ Similar to `useTransition` except there is no associated pending state. This one
 export function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable. Consume it from the Observable library of your choice with typically with the `from` operator.
+This method takes a signal and produces a simple Observable.
+You can consume it from another Observable library of your choice, typically
+with the `from` operator.
 
 ```js
+// How to integrate rxjs with a solid.js signal
+import { observable } from "rxjs";
 import { from } from "rxjs";
 
 const [s, set] = createSignal(0);
@@ -687,6 +698,8 @@ const obsv$ = from(observable(s));
 
 obsv$.subscribe((v) => console.log(v));
 ```
+
+You can also use `from` without `rxjs`, see below.
 
 ## `from`
 
@@ -707,12 +720,16 @@ export function from<T>(
 A simple helper to make it easier to interopt with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
 
 ```js
+import { from } from "solid-js/store";
+
 const signal = from(obsv$);
 ```
 
 It can also take a custom producer function where the function is passed a setter function returns a unsubscribe function:
 
 ```js
+import { from } from "solid-js/store";
+
 const clock = from((set) => {
   const t = setInterval(() => set(1), 1000);
   return () => clearInterval(t);
@@ -746,7 +763,7 @@ const mapped = mapArray(source, (model) => {
     },
     get description() {
       return description();
-    }
+    },
     setName,
     setDescription
   }
@@ -1169,21 +1186,110 @@ export function createDeferred<T>(
 
 Creates a readonly that only notifies downstream changes when the browser is idle. `timeoutMs` is the maximum time to wait before forcing the update.
 
-## `createComputed`
-
-```ts
-export function createComputed<T>(fn: (v: T) => T, value?: T): void;
-```
-
-Creates a new computation that automatically tracks dependencies and runs immediately before render. Use this to write to other reactive primitives. When possible use `createMemo` instead as writing to a signal mid update can cause other computations to need to re-calculate.
-
 ## `createRenderEffect`
 
 ```ts
 export function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs during the render phase as DOM elements are created and updated but not necessarily connected. All internal DOM updates happen at this time.
+A render effect is a computation similar to a regular effect
+(as created by [`createEffect`](#createeffect)),
+but differs in when Solid schedules the first execution of the effect function.
+While `createEffect` waits for the current rendering phase to be complete,
+`createRenderEffect` immediately calls the function.
+Thus the effect runs as DOM elements are being created and updated,
+but possibly before specific elements of interest have been created,
+and probably before those elements have been connected to the document.
+In particular, [`ref`](#ref)s will not be set before the initial effect call.
+Indeed, Solid uses `createRenderEffect` to implement the rendering phase
+itself, including setting of `ref`s.
+
+Reactive updates to render effects are identical to effects: they queue up in
+response to a reactive change (e.g., a single signal update, or a `batch` of
+changes, or collective changes during an entire render phase) and run in a
+single [`batch`](#batch) afterward (together with effects).
+In particular, all signal updates within a render effect are batched.
+
+Here is an example of the behavior.
+(Compare with the example in [`createEffect`](#createeffect).)
+
+```js
+// assume this code is in a component function, so is part of a rendering phase
+const [count, setCount] = createSignal(0);
+
+// this effect prints count at the beginning and when it changes
+createRenderEffect(() => console.log('count =', count()));
+// render effect runs immediately, printing `count = 0`
+console.log('hello');
+setCount(1);  // effect won't run yet
+setCount(2);  // effect won't run yet
+
+queueMicrotask(() => {
+  // now `count = 2` will print
+  console.log('microtask');
+  setCount(3);  // immediately prints `count = 3`
+  console.log('goodbye');
+});
+
+// --- overall output: ---
+// count = 0   [this is the only added line compared to createEffect]
+// hello
+// count = 2
+// microtask
+// count = 3
+// goodbye
+```
+
+Just like `createEffect`, the effect function gets called with an argument
+equal to the value returned from the effect function's last execution,
+or on the first call, equal to the optional second argument to
+`createRenderEffect`.
+
+## `createComputed`
+
+```ts
+export function createComputed<T>(fn: (v: T) => T, value?: T): void;
+```
+
+`createComputed` creates a new computation that immediately runs the given
+function in a tracking scope, thus automatically tracking its dependencies,
+and automatically reruns the function whenever the dependencies changes.
+The function gets called with an argument equal to the value returned
+from the function's last execution, or on the first call,
+equal to the optional second argument to `createComputed`.
+Note that the return value of the function is not otherwise exposed;
+in particular, `createComputed` has no return value.
+
+`createComputed` is the most immediate form of reactivity in Solid, and is
+most useful for building other reactive primitives.
+(For example, some other Solid primitives are built from `createComputed`.)
+But it should be used with care, as `createComputed` can easily cause more
+unnecessary updates than other reactive primitives.
+Before using it, consider the closely related primitives
+[`createMemo`](#creatememo) and [`createRenderEffect`](#createrendereffect).
+
+Like `createMemo`, `createComputed` calls its function immediately on updates
+(unless you're in a [batch](#batch), [effect](#createEffect), or
+[transition](#use-transition)).
+However, while `createMemo` functions should be pure (not set any signals),
+`createComputed` functions can set signals.
+Related, `createMemo` offers a readonly signal for the return value of the
+function, whereas to do the same with `createComputed` you would need to
+set a signal within the function.
+If it is possible to use pure functions and `createMemo`, this is likely
+more efficient, as Solid optimizes the execution order of memo updates,
+whereas updating a signal within `createComputed` will immediately trigger
+reactive updates some of which may turn out to be unnecessary
+(unless you take care by wrapping in
+[`batch`](#batch), [`untrack`](#untrack), etc.).
+
+Like `createRenderEffect`, `createComputed` calls its function for the first
+time immediately.  But they differ in how updates are performed.
+While `createComputed` generally updates immediately, `createRenderEffect`
+updates queue to run in a single `batch` (along with `createEffect`s)
+after the current render phase.
+Thus `createRenderEffect` can perform fewer overall updates,
+but is slightly less immediate.
 
 ## `createReaction`
 
@@ -1652,7 +1758,7 @@ onMount(() => console.log(myDiv));
 <div ref={el => console.log(el)} />
 ```
 
-Refs can also be used on Components. They still need to be attached on the otherside.
+Refs can also be used on Components. They still need to be attached on the other side.
 
 ```jsx
 function MyComp(props) {

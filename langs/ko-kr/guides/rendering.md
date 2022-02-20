@@ -98,7 +98,7 @@ const Parent = () => {
 };
 ```
 
-컴포넌트는 `props` 인자를 통해 전달된 property에 액세스할 수 있습니다.
+컴포넌트는 `props` 인자를 통해 전달된 property에 접근할 수 있습니다.
 
 ```jsx
 const Label = (props) => (
@@ -111,14 +111,14 @@ const Label = (props) => (
 
 다른 프레임워크와 달리, 컴포넌트의 `props`에 대해서 디스트럭쳐링을 사용할 수 없습니다. `props` 객체는 내부적으로 Object의 getter를 사용해 값을 지연 취득하기 때문입니다. 디스트럭쳐링을 사용하게 되면 `props`의 반응성을 손상시키게 됩니다.
 
-다음 예제는 Solid에서 props에 액세스하는 "올바른" 방법을 보여줍니다:
+다음 예제는 Solid에서 props에 접근하는 "올바른" 방법을 보여줍니다:
 
 ```jsx
 // `props.name` 은 예상한대로 업데이트됩니다.
 const MyComponent = (props) => <div>{props.name}</div>;
 ```
 
-다음 예제는 Solid에서 props에 액세스하는 "잘못된" 방법을 보여줍니다:
+다음 예제는 Solid에서 props에 접근하는 "잘못된" 방법을 보여줍니다:
 
 ```jsx
 // 잘못된 방법
@@ -151,11 +151,11 @@ export default function Form() {
 }
 ```
 
-이 예제에서는 아마 `BasicComponent`가 `input`에 입력된 현재 값을 표시하고 싶었을 것입니다. 하지만, `BasicComponent` 함수는 컴포넌트 생성시 한 번만 실행된다는 점을 기억해야 합니다. 처음 생성시, `props.value` 는 `''`입니다. 이는 `BasicComponent`에 있는 `const value`는 `'default'`가 되며 절대로 업데이트되지 않음을 의미합니다. `props` 객체는 리액티브하지만, `const value = props.value || 'default';` 에서 props에 액세스하는 것은 Solid의 관찰 범위를 벗어나므로, props가 변경되더라도 자동으로 재평가되지 않습니다.
+이 예제에서는 아마 `BasicComponent`가 `input`에 입력된 현재 값을 표시하고 싶었을 것입니다. 하지만, `BasicComponent` 함수는 컴포넌트 생성시 한 번만 실행된다는 점을 기억해야 합니다. 처음 생성시, `props.value` 는 `''`입니다. 이는 `BasicComponent`에 있는 `const value`는 `'default'`가 되며 절대로 업데이트되지 않음을 의미합니다. `props` 객체는 리액티브하지만, `const value = props.value || 'default';` 에서 props에 접근하는 것은 Solid의 관찰 범위를 벗어나므로, props가 변경되더라도 자동으로 재평가되지 않습니다.
 
 그렇다면 이 문제를 어떻게 해결해야 할까요?
 
-`props`를 Solid가 관찰할 수 있는 곳에서 액세스해야 합니다. 일반적으로 JSX 내부 혹은 `createMemo`, `createEffect` 또는 thunk(`() => ...`)의 내부를 의미합니다. 여기서는 예상한대로 작동하는 솔루션 중 하나를 소개합니다:
+`props`를 Solid가 관찰할 수 있는 곳에서 접근해야 합니다. 일반적으로 JSX 내부 혹은 `createMemo`, `createEffect` 또는 thunk(`() => ...`)의 내부를 의미합니다. 여기서는 예상한대로 작동하는 솔루션 중 하나를 소개합니다:
 
 ```jsx
 const BasicComponent = (props) => {
@@ -211,7 +211,7 @@ const BasicComponent = (props) => {
 };
 ```
 
-Solid의 컴포넌트는 성능의 중요한 부분입니다. Solid의 "사라지는<sub>disappearing</sub>" 컴포넌트 접근 방식은 지연된 props 평가를 통해 이루어집니다. props 표현식을 즉시 평가하고 값을 전달하는 대신, 자식 컴포넌트에서 props에 액세스할 때까지 실행을 연기합니다. 이렇게 실행을 마지막 순간(일반적으로 DOM 바인딩 시점)까지 연기함으로써 성능을 극대화합니다.
+Solid의 컴포넌트는 성능의 중요한 부분입니다. Solid의 "사라지는<sub>disappearing</sub>" 컴포넌트 접근 방식은 지연된 props 평가를 통해 이루어집니다. props 표현식을 즉시 평가하고 값을 전달하는 대신, 자식 컴포넌트에서 props에 접근할 때까지 실행을 연기합니다. 이렇게 실행을 마지막 순간(일반적으로 DOM 바인딩 시점)까지 연기함으로써 성능을 극대화합니다.
 
 ```jsx
 <Component prop1="static" prop2={state.dynamic} />;
@@ -284,4 +284,4 @@ const List = (props) => {
   </ul>;
 ```
 
-**중요함:** Solid는 자식 태그들을 비싼 표현식으로 취급하고, 동적 리액티브 표현식과 같은 방식으로 래핑합니다. 즉, `props` 액세스에 대해 지연 평가한다는 것을 의미합니다. 뷰에서 사용하기 전에 여러 번 액세스하거나 디스트럭쳐링할 때 주의해야 합니다. 이는 Solid가 미리 가상 DOM 노드를 만들어 비교할 수 있는 사치를 누릴 수 없기 때문에, `props`의 값에 대한 접근은 지연시키고 신중하게 해야합니다. 이를 위해서는 메모아이즈를 사용하는 `children` 헬퍼를 사용하세요.
+**중요함:** Solid는 자식 태그들을 비싼 표현식으로 취급하고, 동적 리액티브 표현식과 같은 방식으로 래핑합니다. 즉, `props` 접근에 대해 지연 평가한다는 것을 의미합니다. 뷰에서 사용하기 전에 여러 번 접근하거나 디스트럭쳐링할 때 주의해야 합니다. 이는 Solid가 미리 가상 DOM 노드를 만들어 비교할 수 있는 사치를 누릴 수 없기 때문에, `props`의 값에 대한 접근은 지연시키고 신중하게 해야합니다. 이를 위해서는 메모아이즈를 사용하는 `children` 헬퍼를 사용하세요.
