@@ -55,8 +55,7 @@ const [apellido, setApellido] = createSignal("Bourne");
 createEffect(() => console.log(`${nombre()} ${apellido()}`));
 ```
 
-Puedes aprender mas sobre [Reactividad Solid](#reactivity) y [Renderizado Solid](#rendering).
-Puedes aprender mas sobre [Reactividad Solid](#reactivity) y [Renderizado Solid](#rendering).
+Puedes aprender mas sobre [Reactividad Solid](/guides/reactivity) y [Renderizado Solid](/guides/rendering).
 
 ## Piensa Solid
 

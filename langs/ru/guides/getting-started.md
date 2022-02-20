@@ -61,7 +61,7 @@ createEffect(() => {
 });
 ```
 
-Вы можете узнать больше о [Реактивности Solid](#reactivity) и [Solid Рендеринг](#rendering).
+Вы можете узнать больше о [Реактивности Solid](/guides/reactivity) и [Solid Рендеринг](/guides/rendering).
 
 ## Философия Solid
 
