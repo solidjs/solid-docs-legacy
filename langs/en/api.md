@@ -306,9 +306,9 @@ const user = createMemo(() => searchForUser(username()));
 // compare with: const user = () => searchForUser(username());
 return (
   <ul>
-  <li>Your name is "{user()?.name}"</li>
-  <li>Your email is <code>{user()?.email}</code></li>
-  </div>
+    <li>Your name is "{user()?.name}"</li>
+    <li>Your email is <code>{user()?.email}</code></li>
+  </ul>
 );
 ```
 
