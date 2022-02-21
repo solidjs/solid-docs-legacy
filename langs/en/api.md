@@ -131,8 +131,7 @@ Some examples:
 // use { equals: false } to allow modifying object in-place;
 // normally this wouldn't be seen as an update because the
 // object has the same identity before and after change
-const [object, setObject] = createSignal(
-  { count: 0 }, { equals: false });
+const [object, setObject] = createSignal({ count: 0 }, { equals: false });
 setObject((current) => {
   current.count += 1;
   current.updated = new Date;
@@ -140,8 +139,7 @@ setObject((current) => {
 });
 
 // use { equals: false } signal as trigger without value:
-const [depend, rerun] = createSignal(undefined,
-  { equals: false });
+const [depend, rerun] = createSignal(undefined, { equals: false });
 // now calling depend() in a tracking scope
 // makes that scope rerun whenever rerun() gets called
 
