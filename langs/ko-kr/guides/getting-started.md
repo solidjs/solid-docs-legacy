@@ -53,7 +53,7 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-[Solid의 반응성](#reactivity)과 [Solid의 렌더링](#rendering)에 대해서 자세히 알아보세요.
+[Solid의 반응성](/guides/reactivity)과 [Solid의 렌더링](/guides/rendering)에 대해서 자세히 알아보세요.
 
 ## Solid의 철학
 

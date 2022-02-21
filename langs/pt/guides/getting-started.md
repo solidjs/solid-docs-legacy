@@ -55,7 +55,7 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-Você pode aprender mais sobre [Solid's Reactivity](#reactivity) e [Solid's Rendering](#rendering).
+Você pode aprender mais sobre [Solid's Reactivity](/guides/reactivity) e [Solid's Rendering](/guides/rendering).
 
 ## Pense como Solid
 
