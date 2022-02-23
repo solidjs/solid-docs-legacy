@@ -26,7 +26,9 @@ These are currently unique techniques in a combination that gives Solid an edge 
 
 No. And there likely never will be. While the APIs are similar and components often can be moved across with minor edits, the update model is fundamentally different. React Components render over and over so code outside of Hooks works very differently. The closures and hook rules are not only unnecessary in Solid: they can prescribe code that does not work here.
 
-Vue-compat on the other hand, that'd be doable; although there are no plans to implement it currently.
+Vue-Compat, on the other hand, would be doable, although there are no plans to implement it currently.
+
+On the other hand, it is possible to run Solid *within* React. [React Solid State](https://github.com/solidjs/react-solid-state) makes the Solid API accessible in React function components. [reactjs-solidjs-bridge](https://github.com/Sawtaytoes/reactjs-solidjs-bridge) lets you render React components within Solid components and vice versa, which is useful when gradually porting an app.
 
 ### Why shouldn't I use `map` in my template, and what's the difference between `<For>` and `<Index>`?
 
@@ -39,13 +41,16 @@ If your array is static, there's nothing wrong with using map. But if you're loo
 For example, if two elements in the array are swapped, `<For>` will reposition the two corresponding DOM nodes and update their `index()` signals along the way. `<Index>` won't reposition any DOM nodes, but will update the `item()` signals for the two DOM nodes and cause them to rerender. 
 
 For an in-depth demonstration of the difference, see [this segment](https://www.youtube.com/watch?v=YxroH_MXuhw&t=2164s) of Ryan's stream.
+
 ### Why doesn't destructuring work with props or stores?
 
 With props and store objects, reactivity is tracked on property access: when you call `props.whatever` within a reactive context, it tells Solid to keep track of that context and update it when the prop changes. By destructuring, you separate the value from the object, giving you the value at that point in time and losing reactivity.
 
+If you prefer the style of destructuring, though, there are two different Babel transforms you can use to make (certain styles of) destructuring reactive again: [babel-plugin-solid-undestructure](https://github.com/orenelbaum/babel-plugin-solid-undestructure) and [Solid Labels](https://github.com/LXSMNSYC/solid-labels/)'s [object features](https://github.com/LXSMNSYC/solid-labels/blob/main/docs/ctf.md#objects).
+
 ### Why isn't my `onChange` event handler firing on time?
 
-In some frameworks, the `onChange` event for inputs is modified so that it fires on every key press. But this isn't how the `onChange` event [works natively](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange): it is meant to reflect a _commited_ change to the input and will usually fire when the input loses focus. To handle all changes to the value of an input, use `onInput`.
+In some frameworks, the `onChange` event for inputs is modified so that it fires on every key press. But this isn't how the `onChange` event [works natively](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange): it is meant to reflect a _committed_ change to the input and will usually fire when the input loses focus. To handle all changes to the value of an input, use `onInput`.
 
 ### Can you add support for class components? I find the lifecycles are easier to reason about.
 
@@ -67,7 +72,7 @@ Stores automatically wrap nested values making it ideal for deep data structures
 
 As much we would love to wrap these together as a single thing, you can't proxy primitives. Functions are the simplest interface and any reactive expression (including state access) can be wrapped in one on transport so this provides a universal API. You can name your signals and state as you choose and it stays minimal. Last thing we'd want to do is force typing `.get()` `.set()` on the end-user or even worse `.value`. At least the former can be aliased for brevity, whereas the latter is just the least terse way to call a function.
 
-### Why can I not just assign a value to Solid's Store as I can in Vue. Svelte, or MobX? Where is the 2-way binding?
+### Why can I not just assign a value to Solid's Store as I can in Vue, Svelte, or MobX? Where is the 2-way binding?
 
 Reactivity is a powerful tool but also a dangerous one. MobX knows this and introduced Strict mode and Actions to limit where/when updates occur. In Solid, which deals with whole Component trees of data, it became apparent that we can learn something from React here. You don't need to be actually immutable as long as you provide the means to have the same contract.
 
@@ -79,6 +84,6 @@ Of course. While we haven't exported a standalone package it is easy to install 
 
 To list a few to try: [Solid](https://github.com/solidjs/solid), [MobX](https://github.com/mobxjs/mobx), [Knockout](https://github.com/knockout/knockout), [Svelte](https://github.com/sveltejs/svelte), [S.js](https://github.com/adamhaile/S), [CellX](https://github.com/Riim/cellx), [Derivable](https://github.com/ds300/derivablejs), [Sinuous](https://github.com/luwes/sinuous), and even recently [Vue](https://github.com/vuejs/vue). Much more goes into making a reactive library than tagging it onto a renderer like, [lit-html](https://github.com/Polymer/lit-html) for example, but it's a good way to get a feel.
 
-###  Does Solid have a Next.js or Material Components like library I can use?
+### Does Solid have a Next.js or Material Components like library I can use?
 
- They're in the works! If you are interested in building one, we are readily available on our [Discord](https://discord.com/invite/solidjs), where you can join existing ecosystem efforts or start your own. 
+They're in the works! Solid has a [rapidly growing ecosystem of libraries and tools](https://www.solidjs.com/resources). If you are interested in building one, we are readily available on our [Discord](https://discord.com/invite/solidjs), where you can join existing ecosystem efforts or start your own. 
