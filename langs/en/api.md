@@ -647,8 +647,11 @@ function MyComponent(props) {
 }
 ```
 
-Because `splitProps` takes any number of arrays, we can split a props object as much as we wish. 
-Let's say our component was passed six props:
+Because `splitProps` takes any number of arrays, we can split a props object 
+as much as we wish (if, for example, we had multiple child components that 
+each required a subset of the props).
+
+Let's say a component was passed six props:
 ```js
 <MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar"/>
 function MyComponent(props) {
