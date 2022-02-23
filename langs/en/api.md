@@ -635,12 +635,16 @@ It takes a reactive object and any number of arrays of keys; for each array of k
 
 This can be useful if you want to consume a subset of props and pass the rest to a child.
 ```js
-const [local, others] = splitProps(props, ["children"]);
+function MyComponent(props) {
+  const [local, others] = splitProps(props, ["children"]);
 
-<>
-  <Child {...others} />
-  <div>{local.children}<div>
-</>
+  return (
+    <>
+      <div>{local.children}</div>
+      <Child {...others} />
+    </>
+  )
+}
 ```
 
 Because `splitProps` takes any number of arrays, we can split a props object as much as we wish. 
