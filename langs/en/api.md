@@ -634,7 +634,6 @@ Splits a reactive object by keys.
 It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
 
 This can be useful if you want to consume a subset of props and pass the rest to a child.
-
 ```js
 const [local, others] = splitProps(props, ["children"]);
 
@@ -644,6 +643,19 @@ const [local, others] = splitProps(props, ["children"]);
 </>
 ```
 
+Because `splitProps` takes any number of arrays, we can split a props object as much as we wish. 
+Let's say our component was passed six props:
+```js
+<MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar"/>
+function MyComponent(props) {
+  console.log(props) // {a: 1, b: 2, c: 3, d: 4, e: 5, foo: "bar"}
+  const [vowels, consonants, leftovers] = splitProps(props, 
+          ["a", "e"], ["b", "c", "d"]);
+  console.log(vowels) // {a: 1, e: 5}
+  console.log(consonants) // {b: 2, c: 3, d: 4}
+  console.log(leftovers.foo) // bar
+}
+```
 ## `useTransition`
 
 ```ts
