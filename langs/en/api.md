@@ -27,10 +27,18 @@ to inherit the dependencies of the called function.
 ## `createSignal`
 
 ```ts
-export function createSignal<T>(
+import { createSignal } from 'solid-js';
+
+function createSignal<T>(
   initialValue: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): [get: () => T, set: (v: T) => T];
+
+// available types for return value of createSignal:
+import type { Signal, Accessor, Setter } from 'solid-js';
+type Signal<T> = [get: Accessor<T>, set: Setter<T>];
+type Accessor<T> = () => T;
+type Setter<T> = (v: T) => T;  // simplified version of real type
 ```
 
 Signals are the most basic reactive primitive.  They track a single value
@@ -155,7 +163,9 @@ setMyString("stranger"); // considered different and will cause updates
 ## `createEffect`
 
 ```ts
-export function createEffect<T>(fn: (v: T) => T, value?: T): void;
+import { createEffect } from 'solid-js';
+
+function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 Effects are a general way to make arbitrary code run whenever dependencies
@@ -272,7 +282,9 @@ createEffect(() => {
 ## `createMemo`
 
 ```ts
-export function createMemo<T>(
+import { createMemo } from 'solid-js';
+
+function createMemo<T>(
   fn: (v: T) => T,
   value?: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
@@ -346,6 +358,9 @@ at most once in response to a dependency change.
 ## `createResource`
 
 ```ts
+import { createResource } from 'solid-js';
+import type { ResourceReturn } from 'solid-js';
+
 type ResourceReturn<T> = [
   {
     (): T | undefined;
@@ -358,7 +373,7 @@ type ResourceReturn<T> = [
   }
 ];
 
-export function createResource<T, U = true>(
+function createResource<T, U = true>(
   fetcher: (
     k: U,
     info: { value: T | undefined; refetching: boolean | unknown }
@@ -366,7 +381,7 @@ export function createResource<T, U = true>(
   options?: { initialValue?: T }
 ): ResourceReturn<T>;
 
-export function createResource<T, U>(
+function createResource<T, U>(
   source: U | false | null | (() => U | false | null),
   fetcher: (
     k: U,
@@ -435,7 +450,9 @@ refetch();
 ## `onMount`
 
 ```ts
-export function onMount(fn: () => void): void;
+import { onMount } from 'solid-js';
+
+function onMount(fn: () => void): void;
 ```
 
 Registers a method that runs after initial render and elements have been mounted. Ideal for using `ref`s and managing other one time side effects. It is equivalent to a `createEffect` which does not have any dependencies.
@@ -443,7 +460,9 @@ Registers a method that runs after initial render and elements have been mounted
 ## `onCleanup`
 
 ```ts
-export function onCleanup(fn: () => void): void;
+import { onCleanup } from 'solid-js';
+
+function onCleanup(fn: () => void): void;
 ```
 
 Registers a cleanup method that executes on disposal or recalculation of the current reactive scope. Can be used in any Component or Effect.
@@ -451,7 +470,9 @@ Registers a cleanup method that executes on disposal or recalculation of the cur
 ## `onError`
 
 ```ts
-export function onError(fn: (err: any) => void): void;
+import { onError } from 'solid-js';
+
+function onError(fn: (err: any) => void): void;
 ```
 
 Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
@@ -463,7 +484,9 @@ These helpers provide the ability to better schedule updates and control how rea
 ## `untrack`
 
 ```ts
-export function untrack<T>(fn: () => T): T;
+import { untrack } from 'solid-js';
+
+function untrack<T>(fn: () => T): T;
 ```
 
 Ignores tracking any of the dependencies in the executing code block and returns the value.
@@ -471,7 +494,9 @@ Ignores tracking any of the dependencies in the executing code block and returns
 ## `batch`
 
 ```ts
-export function batch<T>(fn: () => T): T;
+import { batch } from 'solid-js';
+
+function batch<T>(fn: () => T): T;
 ```
 
 Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method and Effects automatically wrap their code in a batch.
@@ -479,7 +504,9 @@ Holds committing updates within the block until the end to prevent unnecessary r
 ## `on`
 
 ```ts
-export function on<T extends Array<() => any> | (() => any), U>(
+import { on } from 'solid-js';
+
+function on<T extends Array<() => any> | (() => any), U>(
   deps: T,
   fn: (input: T, prevInput: T, prevValue?: U) => U,
   options: { defer?: boolean } = {}
@@ -510,7 +537,9 @@ setA("new"); // now it runs
 ## `createRoot`
 
 ```ts
-export function createRoot<T>(fn: (dispose: () => void) => T): T;
+import { createRoot } from 'solid-js';
+
+function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
 Creates a new non-tracked owner scope that doesn't auto-dispose. This is useful for nested reactive scopes that you do not wish to release when the parent re-evaluates.
@@ -520,7 +549,9 @@ All Solid code should be wrapped in one of these top level as they ensure that a
 ## `getOwner`
 
 ```ts
-export function getOwner(): Owner;
+import { getOwner } from 'solid-js';
+
+function getOwner(): Owner;
 ```
 
 Gets the reactive scope that owns the currently running code, e.g.,
@@ -550,7 +581,9 @@ components created via JSX (`<Component ...>`).
 ## `runWithOwner`
 
 ```ts
-export function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
+import { runWithOwner } from 'solid-js';
+
+function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
 ```
 
 Executes the given function under the provided owner,
@@ -602,7 +635,9 @@ will not be tracked as a dependency.
 ## `mergeProps`
 
 ```ts
-export function mergeProps(...sources: any): any;
+import { mergeProps } from 'solid-js';
+
+function mergeProps(...sources: any): any;
 ```
 
 A reactive object `merge` method. Useful for setting default props for components in case caller doesn't provide them. Or cloning the props object including reactive properties.
@@ -623,7 +658,9 @@ props = mergeProps(props, otherProps);
 ## `splitProps`
 
 ```ts
-export function splitProps<T>(
+import { splitProps } from 'solid-js';
+
+function splitProps<T>(
   props: T,
   ...keys: Array<(keyof T)[]>
 ): [...parts: Partial<T>];
@@ -666,7 +703,9 @@ function MyComponent(props) {
 ## `useTransition`
 
 ```ts
-export function useTransition(): [
+import { useTransition } from 'solid-js';
+
+function useTransition(): [
   pending: () => boolean,
   startTransition: (fn: () => void) => Promise<void>
 ];
@@ -689,7 +728,9 @@ start(() => setSignal(newValue), () => /* transition is done */)
 **New in v1.1.0**
 
 ```ts
-export function startTransition: (fn: () => void) => Promise<void>;
+import { startTransition } from 'solid-js';
+
+function startTransition: (fn: () => void) => Promise<void>;
 ```
 
 Similar to `useTransition` except there is no associated pending state. This one can just be used directly to start the Transition.
@@ -697,7 +738,9 @@ Similar to `useTransition` except there is no associated pending state. This one
 ## `observable`
 
 ```ts
-export function observable<T>(input: () => T): Observable<T>;
+import { observable } from 'solid-js';
+
+function observable<T>(input: () => T): Observable<T>;
 ```
 
 This method takes a signal and produces a simple Observable.
@@ -706,8 +749,8 @@ with the `from` operator.
 
 ```js
 // How to integrate rxjs with a solid.js signal
-import { observable } from "rxjs";
-import { from } from "rxjs";
+import { observable } from 'solid-js';
+import { from } from 'rxjs';
 
 const [s, set] = createSignal(0);
 
@@ -716,14 +759,16 @@ const obsv$ = from(observable(s));
 obsv$.subscribe((v) => console.log(v));
 ```
 
-You can also use `from` without `rxjs`, see below.
+You can also use `from` without `rxjs`; see below.
 
 ## `from`
 
 **New in v1.1.0**
 
 ```ts
-export function from<T>(
+import { from } from 'solid-js';
+
+function from<T>(
   producer:
     | ((setter: (v: T) => T) => () => void)
     | {
@@ -737,16 +782,12 @@ export function from<T>(
 A simple helper to make it easier to interopt with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
 
 ```js
-import { from } from "solid-js/store";
-
 const signal = from(obsv$);
 ```
 
 It can also take a custom producer function where the function is passed a setter function returns a unsubscribe function:
 
 ```js
-import { from } from "solid-js/store";
-
 const clock = from((set) => {
   const t = setInterval(() => set(1), 1000);
   return () => clearInterval(t);
@@ -758,7 +799,9 @@ const clock = from((set) => {
 ## `mapArray`
 
 ```ts
-export function mapArray<T, U>(
+import { mapArray } from 'solid-js';
+
+function mapArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: T, i: () => number) => U
 ): () => U[];
@@ -790,7 +833,9 @@ const mapped = mapArray(source, (model) => {
 ## `indexArray`
 
 ```ts
-export function indexArray<T, U>(
+import { indexArray } from 'solid-js';
+
+function indexArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: () => T, i: number) => U
 ): () => U[];
@@ -825,7 +870,10 @@ These APIs are available at `solid-js/store`. They allow the creation of stores:
 ### `createStore`
 
 ```ts
-export function createStore<T extends StoreNode>(
+import { createStore } from 'solid-js/store';
+import type { StoreNode, Store, SetStoreFunction } from 'solid-js/store';
+
+function createStore<T extends StoreNode>(
   state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
@@ -833,7 +881,6 @@ export function createStore<T extends StoreNode>(
 The create function takes an initial state, wraps it in a store, and returns a readonly proxy object and a setter function.
 
 ```js
-import { createStore } from "solid-js/store";
 const [state, setState] = createStore(initialValue);
 
 // read value
@@ -864,7 +911,6 @@ const [state, setState] = createStore({ list: [] });
 Store objects support the use of getters to store calculated values.
 
 ```js
-import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
   user: {
     firstName: "John",
@@ -897,7 +943,6 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store.
 
 ```js
-import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
   firstName: "John",
   lastName: "Miller",
@@ -989,7 +1034,9 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ### `produce`
 
 ```ts
-export function produce<T>(
+import { produce } from 'solid-js/store';
+
+function produce<T>(
   fn: (state: T) => void
 ): (
   state: T extends NotWrappable ? T : Store<T>
@@ -1010,7 +1057,9 @@ setState(
 ### `reconcile`
 
 ```ts
-export function reconcile<T>(
+import { reconcile } from 'solid-js/store';
+
+function reconcile<T>(
   value: T | Store<T>,
   options?: {
     key?: string | null;
@@ -1036,7 +1085,9 @@ onCleanup(() => unsubscribe());
 ### `unwrap`
 
 ```ts
-export function unwrap(store: Store<T>): T;
+import { unwrap } from 'solid-js/store';
+
+function unwrap(store: Store<T>): T;
 ```
 
 Returns the underlying data in the store without a proxy.
@@ -1044,7 +1095,9 @@ Returns the underlying data in the store without a proxy.
 ### `createMutable`
 
 ```ts
-export function createMutable<T extends StoreNode>(
+import { createMutable } from 'solid-js/store';
+
+function createMutable<T extends StoreNode>(
   state: T | Store<T>,
 ): Store<T> {
 ```
@@ -1087,12 +1140,16 @@ const user = createMutable({
 ## `createContext`
 
 ```ts
+import { createContext } from 'solid-js';
+import type { Context } from 'solid-js';
+
 interface Context<T> {
   id: symbol;
   Provider: (props: { value: T; children: any }) => any;
   defaultValue: T;
 }
-export function createContext<T>(defaultValue?: T): Context<T | undefined>;
+
+function createContext<T>(defaultValue?: T): Context<T | undefined>;
 ```
 
 Context provides a form of dependency injection in Solid. It is used to save from needing to pass data as props through intermediate components.
@@ -1129,7 +1186,9 @@ The value passed to provider is passed to `useContext` as is. That means wrappin
 ## `useContext`
 
 ```ts
-export function useContext<T>(context: Context<T>): T;
+import { useContext } from 'solid-js';
+
+function useContext<T>(context: Context<T>): T;
 ```
 
 Used to grab context to allow for deep passing of props without having to pass them through each Component function.
@@ -1141,7 +1200,9 @@ const [state, { increment, decrement }] = useContext(CounterContext);
 ## `children`
 
 ```ts
-export function children(fn: () => any): () => any;
+import { children } from 'solid-js';
+
+function children(fn: () => any): () => any;
 ```
 
 Used to make it easier to interact with `props.children`. This helper resolves any nested reactivity and returns a memo. Recommended approach to using `props.children` in anything other than passing directly through to JSX.
@@ -1156,7 +1217,9 @@ createEffect(() => list());
 ## `lazy`
 
 ```ts
-export function lazy<T extends Component<any>>(
+import { lazy } from 'solid-js';
+
+function lazy<T extends Component<any>>(
   fn: () => Promise<{ default: T }>
 ): T & { preload: () => Promise<T> };
 ```
@@ -1174,7 +1237,9 @@ const ComponentA = lazy(() => import("./ComponentA"));
 ## `createUniqueId`
 
 ```ts
-export function createUniqueId(): string;
+import { createUniqueId } from 'solid-js';
+
+function createUniqueId(): string;
 ```
 
 A universal id generator that is stable across server/browser.
@@ -1192,7 +1257,9 @@ You probably won't need them for your first app, but these are useful tools to h
 ## `createDeferred`
 
 ```ts
-export function createDeferred<T>(
+import { createDeferred } from 'solid-js';
+
+function createDeferred<T>(
   source: () => T,
   options?: {
     timeoutMs?: number;
@@ -1206,7 +1273,9 @@ Creates a readonly that only notifies downstream changes when the browser is idl
 ## `createRenderEffect`
 
 ```ts
-export function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
+import { createRenderEffect } from 'solid-js';
+
+function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 A render effect is a computation similar to a regular effect
@@ -1265,7 +1334,9 @@ or on the first call, equal to the optional second argument to
 ## `createComputed`
 
 ```ts
-export function createComputed<T>(fn: (v: T) => T, value?: T): void;
+import { createComputed } from 'solid-js';
+
+function createComputed<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 `createComputed` creates a new computation that immediately runs the given
@@ -1313,7 +1384,9 @@ but is slightly less immediate.
 **New in v1.3.0**
 
 ```ts
-export function createReaction(
+import { createReaction } from 'solid-js';
+
+function createReaction(
   onInvalidate: () => void
 ): (fn: () => void) => void;
 ```
@@ -1336,7 +1409,9 @@ set("final"); // no-op as reaction only runs on first update, need to call track
 ## `createSelector`
 
 ```ts
-export function createSelector<T, U>(
+import { createSelector } from 'solid-js';
+
+function createSelector<T, U>(
   source: () => T,
   fn?: (a: U, b: T) => boolean
 ): (k: U) => boolean;
@@ -1359,7 +1434,9 @@ These imports are exposed from `solid-js/web`.
 ## `render`
 
 ```ts
-export function render(
+import { render } from 'solid-js/web';
+
+function render(
   code: () => JSX.Element,
   element: MountableElement
 ): () => void;
@@ -1374,7 +1451,9 @@ const dispose = render(App, document.getElementById("app"));
 ## `hydrate`
 
 ```ts
-export function hydrate(
+import { hydrate } from 'solid-js/web';
+
+function hydrate(
   fn: () => JSX.Element,
   node: MountableElement
 ): () => void;
@@ -1389,7 +1468,9 @@ const dispose = hydrate(App, document.getElementById("app"));
 ## `renderToString`
 
 ```ts
-export function renderToString<T>(
+import { renderToString } from 'solid-js/web';
+
+function renderToString<T>(
   fn: () => T,
   options?: {
     nonce?: string;
@@ -1409,7 +1490,9 @@ const html = renderToString(App);
 ## `renderToStringAsync`
 
 ```ts
-export function renderToStringAsync<T>(
+import { renderToStringAsync } from 'solid-js/web';
+
+function renderToStringAsync<T>(
   fn: () => T,
   options?: {
     timeoutMs?: number;
@@ -1432,7 +1515,9 @@ const html = await renderToStringAsync(App);
 **New in v1.3.0**
 
 ```ts
-export function renderToStream<T>(
+import { renderToStream } from 'solid-js/web';
+
+function renderToStream<T>(
   fn: () => T,
   options?: {
     nonce?: string;
@@ -1464,7 +1549,9 @@ renderToStream(App).pipeTo(writable);
 ## `isServer`
 
 ```ts
-export const isServer: boolean;
+import { isServer } from 'solid-js/web';
+
+const isServer: boolean;
 ```
 
 This indicates that the code is being run as the server or browser bundle. As the underlying runtimes export this as a constant boolean it allows bundlers to eliminate the code and their used imports from the respective bundles.
@@ -1480,12 +1567,14 @@ if (isServer) {
 ## `HydrationScript`
 
 ```ts
-export function generateHydrationScript(options: {
+import { generateHydrationScript, HydrationScript } from 'solid-js/web';
+
+function generateHydrationScript(options: {
   nonce?: string;
   eventNames?: string[];
 }): string;
 
-export function HydrationScript(props: {
+function HydrationScript(props: {
   nonce?: string;
   eventNames?: string[];
 }): JSX.Element;
@@ -1501,14 +1590,16 @@ For reactive control flow to be performant, we have to control how elements are 
 
 This means helper functions. Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flow components.
 
-These built-in control flow components will be automatically imported. All except `Portal` and `Dynamic` are exported from `solid-js`. Those two, which are DOM-specific, are exported by `solid-js/web`.
+These built-in control flow components will be automatically imported. All except `Portal` and `Dynamic` are exported from both `solid-js` and `solid-js/web`. `Portal` and `Dynamic`, which are DOM-specific, are exported by `solid-js/web`.
 
 > Note: All callback/render function children of control flow are non-tracking. This allows for nesting state creation, and better isolates reactions.
 
 ## `<For>`
 
 ```ts
-export function For<T, U extends JSX.Element>(props: {
+import { For } from 'solid-js';
+
+function For<T, U extends JSX.Element>(props: {
   each: readonly T[];
   fallback?: JSX.Element;
   children: (item: T, index: () => number) => U;
@@ -1538,6 +1629,8 @@ The optional second argument is an index signal:
 ## `<Show>`
 
 ```ts
+import { Show } from 'solid-js';
+
 function Show<T>(props: {
   when: T | undefined | null | false;
   fallback?: JSX.Element;
@@ -1564,7 +1657,10 @@ Show can also be used as a way of keying blocks to a specific data model. Ex the
 ## `<Switch>`/`<Match>`
 
 ```ts
-export function Switch(props: {
+import { Switch, Match } from 'solid-js';
+import type { MatchProps } from 'solid-js';
+
+function Switch(props: {
   fallback?: JSX.Element;
   children: JSX.Element;
 }): () => JSX.Element;
@@ -1573,7 +1669,7 @@ type MatchProps<T> = {
   when: T | undefined | null | false;
   children: JSX.Element | ((item: T) => JSX.Element);
 };
-export function Match<T>(props: MatchProps<T>);
+function Match<T>(props: MatchProps<T>);
 ```
 
 Useful for when there are more than 2 mutual exclusive conditions. Can be used to do things like simple routing.
@@ -1594,7 +1690,9 @@ Match also supports function children to serve as keyed flow.
 ## `<Index>`
 
 ```ts
-export function Index<T, U extends JSX.Element>(props: {
+import { Index } from 'solid-js';
+
+function Index<T, U extends JSX.Element>(props: {
   each: readonly T[];
   fallback?: JSX.Element;
   children: (item: () => T, index: number) => U;
@@ -1626,6 +1724,8 @@ Optional second argument is an index number:
 ## `<ErrorBoundary>`
 
 ```ts
+import { ErrorBoundary } from 'solid-js';
+
 function ErrorBoundary(props: {
   fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element);
   children: JSX.Element;
@@ -1653,7 +1753,9 @@ Also supports callback form which passes in error and a reset function.
 ## `<Suspense>`
 
 ```ts
-export function Suspense(props: {
+import { Suspense } from 'solid-js';
+
+function Suspense(props: {
   fallback?: JSX.Element;
   children: JSX.Element;
 }): JSX.Element;
@@ -1670,6 +1772,8 @@ A component that tracks all resources read under it and shows a fallback placeho
 ## `<SuspenseList>` (Experimental)
 
 ```ts
+import { SuspenseList } from 'solid-js';
+
 function SuspenseList(props: {
   children: JSX.Element;
   revealOrder: "forwards" | "backwards" | "together";
@@ -1696,6 +1800,8 @@ SuspenseList is still experimental and does not have full SSR support.
 ## `<Dynamic>`
 
 ```ts
+import { Dynamic } from 'solid-js/web';
+
 function Dynamic<T>(
   props: T & {
     children?: any;
@@ -1713,7 +1819,9 @@ This component lets you insert an arbitrary Component or tag and passes the prop
 ## `<Portal>`
 
 ```ts
-export function Portal(props: {
+import { Portal } from 'solid-js/web';
+
+function Portal(props: {
   mount?: Node;
   useShadow?: boolean;
   isSVG?: boolean;
