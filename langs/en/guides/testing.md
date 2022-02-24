@@ -9,7 +9,7 @@ To use your Solid code in production, it needs to be tested. Since you don't wan
 
 ## Testing Setup
 
-Before you set up testing, you need to choose your test runner. There is an abundance of choices, but we'll focus on two very different projects that are opposite extremes, jest and uvu. Jest is heavily integrated, uvu only brings the bare necessities. If you want to use another test runner, the setup for uvu should work for most other test runners.
+Before you set up testing, you need to choose your test runner. There is an abundance of choices, but we'll focus on two very different projects that are opposite extremes, jest and uvu, and also show a newer alternative called vitest. Jest is heavily integrated, uvu only brings the bare necessities, vitest is full-featured yet frugal. If you want to use another test runner, the setup for uvu should work for most other test runners.
 
 ### Setting up Jest
 
@@ -219,7 +219,52 @@ There's no setup required, you can just import and use the helpers in your tests
 
 There's a new kid on the block of unit testing called [vitest](https://vitest.dev/) and it aims to replace jest with something faster, yet providing almost the same feature set.
 
-Unfortunately, at the time of writing, there is an issue in the module resolution that causes solid's server and client version loaded at the same time, which causes the reactive system to fail. Hopefully, this issue will be resolved at some point in the near future.
+Installation is straightforward:
+
+```sh
+> npm i --save-dev vitest jsdom # or yarn add -D or pnpm
+```
+
+If you are using the official starter or solid-start, you are already using vite, so you have a `vite.config.mjs`. Make sure it looks something like this:
+
+```js
+/// <reference types="vitest" />
+/// <reference types="vite/client" />
+
+import { defineConfig } from 'vite'
+import solid from 'solid-start' // or 'vite-plugin-solid'
+
+export default defineConfig({
+  test: {
+    // if you want to have `describe, test, it`
+    // globally, comment out:
+    // globals: true,
+    environment: 'jsdom',
+    transformMode: {
+      web: [/\.[jt]sx$/],
+    },
+    // solid needs to be inline to work around
+    // a resolution issue in vitest:
+    deps: {
+      inline: [/solid-js/],
+    },
+    // if you have few tests, try commenting one
+    // or both out to improve performance:
+    // threads: false,
+    // isolate: false,
+  },
+  plugins: [solid()],
+  resolve: {
+    conditions: ['development', 'browser'],
+  },
+})
+```
+
+Lastly, you can add the test script to `package.json` using:
+
+```sh
+> npm set-script "test" "vitest"
+```
 
 ## Testing Patterns and Best Practices
 
@@ -247,7 +292,7 @@ export function createLocalStore<T>(initState: T): [Store<T>, SetStoreFunction<T
 
 Instead of creating a TODO component, we can test this model in isolation; when we do that, we need to keep in mind that 1. reactive changes only work when they have a tracking context provided by `render` or `createRoot` and 2. are asynchronous, but we can use `createEffect` to catch them. Using `createRoot` has the advantage that we can trigger the disposal manually:
 
-#### Testing in Jest
+#### Testing in Jest / vitest
 
 ```ts
 import { createLocalStore } from "./main.tsx";
@@ -354,7 +399,7 @@ todoTest.run();
 
 We could now create a component and use the directive in there, but then we'd be testing the use of directives instead of directly testing the directive. It's simpler to test the surface of the directive by providing a mounted node and the accessor:
 
-#### Testing in Jest
+#### Testing in Jest / vitest
 
 ```ts
 // click-outside.test.ts
@@ -469,7 +514,7 @@ export const Counter: Component = () => {
 
 You should definitely install `solid-testing-library`, if you haven't already done that; it's most important helpers are `render` to render a component to the dom in a managed way, `fireEvent` to dispatch events in a way that resembles actual user events and `screen` to provide global selectors. If you use jest, you should also install `@testing-library/jest-dom` and set it up to have some helpful assertions, otherwise install `solid-dom-testing` as described above.
 
-#### Testing in Jest
+#### Testing in Jest / vitest
 
 ```ts
 // main.test.tsx
