@@ -1801,7 +1801,18 @@ A helper that leverages `element.classList.toggle`. It takes an object whose key
 
 ## `style`
 
-Solid's style helper works with either a string or with an object. Unlike React's version Solid uses `element.style.setProperty` under the hood. This means support for CSS vars, but it also means we use the lower, dash-case version of properties. This actually leads to better performance and consistency with SSR output.
+Solid's `style` helper works with either a string or with an object.
+
+```jsx
+// string
+<div style={`color: green;`} />
+
+// object
+<div style={{color: "green"}} />
+```
+Unlike React's `style` helper, Solid uses `element.style.setProperty` under the hood. This means you need to use
+the lower-case, dash-separated version of property names, like `"background-color"` rather than
+`backgroundColor`. This actually leads to better performance and consistency with SSR output.
 
 ```jsx
 // string
@@ -1813,7 +1824,11 @@ Solid's style helper works with either a string or with an object. Unlike React'
   "background-color": state.color,
   height: state.height + "px" }}
 />
+```
 
+It also means you can use CSS variables! This just works:
+
+```jsx
 // css variable
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
