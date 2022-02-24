@@ -1805,10 +1805,13 @@ Solid's `style` helper works with either a string or with an object.
 
 ```jsx
 // string
-<div style={`color: green;`} />
+<div style={`color: green; height: ${state.height}px`} />
 
 // object
-<div style={{color: "green"}} />
+<div style={{
+  color: "green", 
+  height: state.height + "px" }}
+/>
 ```
 Unlike React's `style` helper, Solid uses `element.style.setProperty` under the hood. This means you need to use
 the lower-case, dash-separated version of property names, like `"background-color"` rather than
