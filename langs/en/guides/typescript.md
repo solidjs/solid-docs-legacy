@@ -5,11 +5,35 @@ sort: 4
 ---
 # TypeScript
 
-Solid is written in TypeScript, so everything is typed out of the box.
-This guide covers some useful tips for working with types in your Solid code.
+Solid is designed to be easy to use with TypeScript:
+its use of standard JSX makes code largely understood by TypeScript,
+and it provides sophisticated built-in types for its API.
+This guide covers some useful tips for working with TypeScript and
+typing your Solid code.
+
+## Configuring TypeScript
+
+The [Solid starter templates](https://github.com/solidjs/templates/)
+offer good starting points for
+[`.tsconfig`](https://github.com/solidjs/templates/blob/master/ts/tsconfig.json).
+In particular, to use TypeScript with the Solid JSX compiler,
+you need to configure TypeScript to leave JSX constructs alone via
+`"jsx": "preserve"`, and tell TypeScript about where the JSX types come from
+via `"jsxImportSource": "solid-js"`.
+Thus a minimal `.tsconfig` would look like this:
+
+```json
+{
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  }
+}
+```
 
 ## API Types
 
+Solid is written in TypeScript, so everything is typed out of the box.
 The [API documentation](https://www.solidjs.com/docs/latest/api) details the
 types for all API calls, as well as several helpful type definitions to make it
 easier to refer to Solid notions when you need to specify explicit types.
