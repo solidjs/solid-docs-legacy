@@ -249,10 +249,10 @@ class NameEvent extends CustomEvent {
 declare module "solid-js" {
   namespace JSX {
     interface CustomEvents { // on:Name
-      "Name": NameEvent,
+      "Name": NameEvent;
     }
     interface CustomCaptureEvents { // oncapture:Name
-      "Name": NameEvent,
+      "Name": NameEvent;
     }
   }
 }
@@ -299,7 +299,7 @@ function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
 declare module "solid-js" {
   namespace JSX {
     interface Directives {  // use:model
-      model: Signal<string>,
+      model: Signal<string>;
     }
   }
 }
