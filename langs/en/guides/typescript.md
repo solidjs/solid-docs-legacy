@@ -18,8 +18,9 @@ offer good starting points for
 [`.tsconfig`](https://github.com/solidjs/templates/blob/master/ts/tsconfig.json).
 In particular, to use TypeScript with the Solid JSX compiler,
 you need to configure TypeScript to leave JSX constructs alone via
-`"jsx": "preserve"`, and tell TypeScript about where the JSX types come from
-via `"jsxImportSource": "solid-js"`.
+[`"jsx": "preserve"`](https://www.typescriptlang.org/tsconfig#jsx),
+and tell TypeScript about where the JSX types come from via
+[`"jsxImportSource": "solid-js"`](https://www.typescriptlang.org/tsconfig#jsxImportSource).
 Thus a minimal `.tsconfig` would look like this:
 
 ```json
@@ -29,6 +30,22 @@ Thus a minimal `.tsconfig` would look like this:
     "jsxImportSource": "solid-js"
   }
 }
+```
+
+If your code base uses a mix of JSX types (e.g., some files are React
+while other files are Solid), you can set the default `jsxImportSource`
+in `.tsconfig` for the majority of your code, and then
+[override the `jsxImportSource` option](https://www.typescriptlang.org/tsconfig#jsxImportSource)
+in specific `.tsx` files using the following pragma:
+
+```ts
+/** @jsxImportSource solid-js */
+```
+
+or
+
+```ts
+/** @jsxImportSource react */
 ```
 
 ## API Types
