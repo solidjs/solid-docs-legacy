@@ -136,15 +136,17 @@ type helper:
 export const makeCountNameContext = (initialCount = 0, initialName = '') => {
   const [count, setCount] = createSignal(initialCount);
   const [name, setName] = createSignal(initialName);
-  return [{count, name}, {setCount, setName}];
+  return [{count, name}, {setCount, setName}] as const;
+    // `as const` forces tuple type inference
 };
-type CountNameContextType = ReturnType<makeCountNameContext>;
-export const CountNameContext = createContext<CountNameContextType>;
+type CountNameContextType = ReturnType<typeof makeCountNameContext>;
+export const CountNameContext = createContext<CountNameContextType>();
 export const useCountNameContext = () => useContext(CountNameContext);
 ```
 
 In this case, `CountNameContextType` is automatically
-`[{count: Accessor<number>, name: Accessor<string>}, {setCount: Setter<number>, Setter<string>}]`,
+`[{readonly count: Accessor<number>, readonly name: Accessor<string>},
+{readonly setCount: Setter<number>, readonly setName: Setter<string>}]`,
 and `useCountNameContext` has type `() => CountNameContextType | undefined`.
 If you want to avoid the `undefined` possibility by asserting that the
 context is always provided when used (*this is dangerous!*), you could define
