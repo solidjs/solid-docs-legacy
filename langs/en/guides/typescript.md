@@ -80,7 +80,7 @@ In this case, TypeScript infers that the signal types are `number` and `string`
 respectively.  Thus, for example, `count` obtains type `Accessor<number>`
 and `name` obtains type `Accessor<string>` (without `| undefined`).
 
-## Context
+### Context
 
 Similar to signals,
 [`createContext<T>`](https://www.solidjs.com/docs/latest/api#createcontext)
@@ -109,6 +109,31 @@ const dataContext = createContext({count: 0, name: ''});
 In this case, TypeScript infers that `dataContext` has type
 `Context<{count: number, name: string}>`, which is equivalent to
 `Context<Data>` (without `| undefined`).
+
+Another common pattern is to define a factory function that produces the
+value for a context.  In this case, we can type the context using TypeScript's
+[`ReturnValue`](https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype)
+type helper:
+
+```ts
+export const makeCountNameContext = (initialCount = 0, initialName = '') => {
+  const [count, setCount] = createSignal(initialCount);
+  const [name, setName] = createSignal(initialName);
+  return [{count, name}, {setCount, setName}];
+};
+type CountNameContextType = ReturnType<makeCountNameContext>;
+export const CountNameContext = createContext<CountNameContextType>;
+export const useCountNameContext = () => useContext(CountNameContext);
+```
+
+In this case, `CountNameContextType` is automatically
+`[{count: Accessor<number>, name: Accessor<string>}, {setCount: Setter<number>, Setter<string>}]`,
+and `useCountNameContext` has type `() => CountNameContextType | undefined`.
+If you want to avoid the `undefined` possibility by asserting that the
+context is always provided when used (*this is dangerous!*), you could define
+`useCountNameContext` as `() => useContext(CountNameContext)!`.
+But it would be safer to actually provide a default argument to
+`createContext` so that the context is definitely always defined.
 
 ## Component Types
 
@@ -234,10 +259,10 @@ Here are two workarounds for this issue:
 
    ```ts
    return (
-    <Show when={name()}>
-      GREETINGS {name()!.toUpperCase()}!
-    </Show>
-  );
+     <Show when={name()}>
+       GREETINGS {name()!.toUpperCase()}!
+     </Show>
+   );
    ```
 
 2. You can use the callback form of `<Show>`, which passes in the value of the
@@ -245,12 +270,12 @@ Here are two workarounds for this issue:
 
    ```ts
    return (
-    <Show when={name()}>
-      {(n) =>
-        <>GREETINGS {n.toUpperCase()}!</>
-      }
-    </Show>
-  );
+     <Show when={name()}>
+       {(n) =>
+         <>GREETINGS {n.toUpperCase()}!</>
+       }
+     </Show>
+   );
    ```
 
    In this case, the typing of the `Show` component is clever enough to tell
