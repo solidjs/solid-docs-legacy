@@ -168,7 +168,7 @@ a function returning a `JSX.Element`, a boolean, or anything
 else the renderer can handle).
 
 The namespace `JSX` offers a suite of useful types for working with HTML DOM
-in particular.  See the 
+in particular.  See the
 [definition of JSX in dom-expressions](https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/jsx.d.ts)
 for all the types provided.
 
@@ -176,25 +176,119 @@ for all the types provided.
 
 One useful helper type provided by the `JSX` namespace is `JSX.EventHandler<T>`,
 which represents a single-argument event handler for a DOM element type `T`.
+You can use this to type any event handlers you define outside JSX.
 For example:
 
 ```ts
 const onInput: JSX.EventHandler<HTMLInputElement> = (event) => {
   console.log('input changed to', event.currentTarget.value);
 };
-//...
+
 <input onInput={onInput}/>
 ```
 
+Handlers defined inline within
+[`on___` JSX attributes](https://www.solidjs.com/docs/latest/api#on___)
+(with built-in event types) are automatically typed as the appropriate
+`JSX.EventHandler`:
+
+```ts
+<input onInput={(event) => {
+  console.log('input changed to', event.currentTarget.value);
+}}/>;
+```
+
 Note that `JSX.EventHandler<T>` constrains the event's
-[`currentTarget`](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget)
-attribute to be of type `T`, but its
-[`target`](https://developer.mozilla.org/en-US/docs/Web/API/Event/target)
-attribute could be any `DOMEvent`.
-This is the nature of DOM events: `currentTarget` gives the element that the
+[`currentTarget` attribute](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget)
+to be of type `T` (in the example, `event.currentTarget` is typed
+as `HTMLInputEvent`, so has attribute `value`).  However, the event's
+[`target` attribute](https://developer.mozilla.org/en-US/docs/Web/API/Event/target)
+could be any `DOMElement`.
+This is the nature of DOM events: `currentTarget` is the element that the
 event handler was attached to, so has a known type, whereas `target` is
 whatever the user interacted with that caused the event to bubble to or get
-captured by the event handler.
+captured by the event handler, which can be any DOM element.
+
+## Custom Events, Properties, Attributes, and Directives
+
+If you use custom event handlers via Solid's
+[`on:___`/`oncapture:___` attributes](https://www.solidjs.com/docs/latest/api#on%3A___%2Foncapture%3A___),
+you should define corresponding types for the resulting `Event` objects,
+by overriding the `CustomEvents` and `CustomCaptureEvents` interfaces
+within module `"solid-js"`'s `JSX` namespace, like so:
+
+```ts
+class NameEvent extends CustomEvent {
+  type: 'Name';
+  detail: {name: string};
+
+  constructor(name: string) {
+    super('Name', {detail: {name}});
+  }
+}
+
+declare module "solid-js" {
+  namespace JSX {
+    interface CustomEvents { // on:Name
+      "Name": NameEvent,
+    }
+    interface CustomCaptureEvents { // oncapture:Name
+      "Name": NameEvent,
+    }
+  }
+}
+
+<div on:Name={(event) => console.log('name is', event.detail.name)}/>
+```
+
+If you use forced properties via Solid's
+[`prop:___` attributes](https://www.solidjs.com/docs/latest/api#prop%3A___),
+or custom attributes via Solid's
+[`attr:___` attributes](https://www.solidjs.com/docs/latest/api#attr%3A___),
+you can define their types in the `ExplicitProperties` and
+`ExplicitAttributes` interfaces, respectively:
+
+```ts
+declare module "solid-js" {
+  namespace JSX {
+    interface ExplicitProperties { // prop:___
+      count: number;
+      name: string;
+    }
+    interface ExplicitAttributes { // attr:___
+      count: number;
+      name: string;
+    }
+  }
+}
+
+<Input prop:name={name()} prop:count={count()}/>
+<my-web-component attr:name={name()} attr:count={count()}/>
+```
+
+If you define custom directives for Solid's
+[`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
+you can type them in the `Directives` interface, like so:
+
+```ts
+function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
+  const [field, setField] = value();
+  createRenderEffect(() => (element.value = field()));
+  element.addEventListener("input", (e) => setField(e.target.value));
+}
+
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {  // use:model
+      model: Signal<string>,
+    }
+  }
+}
+
+let [name, setName] = createSignal('');
+
+<input type="text" use:model={[name, setName]} />;
+```
 
 ## ref
 
@@ -203,7 +297,7 @@ Here is the typical pattern for using `ref` with TypeScript:
 ```ts
 let divRef: HTMLDivElement;
 let buttonRef: HTMLButtonElement;
-//...
+
 return (
   <div ref={divRef!}>
     <button ref={buttonRef!}>...</button>
@@ -238,7 +332,7 @@ to display data only when that data is defined:
 
 ```ts
 const [name, setName] = createSignal<string>();
-//...
+
 return (
   <Show when={name()}>
     GREETINGS {name().toUpperCase()}!
