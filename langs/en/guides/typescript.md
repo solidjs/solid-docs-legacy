@@ -354,7 +354,7 @@ const [name, setName] = createSignal<string>();
 
 return (
   <Show when={name()}>
-    GREETINGS {name().toUpperCase()}!
+    Hello {name().replace(/\s+/g, '\xa0')}!
   </Show>
 );
 ```
@@ -362,7 +362,7 @@ return (
 In this case, TypeScript can't determine that the two calls to `name()` will
 return the same value, and that the second call will happen only if the first
 call returned a truthy value.  Thus it will complain that `name()` might be
-`undefined` when trying to call `.toUpperCase()`.
+`undefined` when trying to call `.replace()`.
 
 Here are two workarounds for this issue:
 
@@ -373,7 +373,7 @@ Here are two workarounds for this issue:
    ```ts
    return (
      <Show when={name()}>
-       GREETINGS {name()!.toUpperCase()}!
+       Hello {name().replace(/\s+/g, '\xa0')}!
      </Show>
    );
    ```
@@ -385,7 +385,7 @@ Here are two workarounds for this issue:
    return (
      <Show when={name()}>
        {(n) =>
-         <>GREETINGS {n.toUpperCase()}!</>
+         <>Hello {n.replace(/\s+/g, '\xa0')}!</>
        }
      </Show>
    );
