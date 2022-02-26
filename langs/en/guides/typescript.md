@@ -349,7 +349,7 @@ Here are two workarounds for this issue:
    ```ts
    return (
      <Show when={name()}>
-       Hello {name().replace(/\s+/g, '\xa0')}!
+       Hello {name()!.replace(/\s+/g, '\xa0')}!
      </Show>
    );
    ```
@@ -368,20 +368,20 @@ Here are two workarounds for this issue:
    ```
 
    In this case, the typing of the `Show` component is clever enough to tell
-   TypeScript that `n` is truthy, so can't be `undefined` (or `null` or
+   TypeScript that `n` is truthy, so it can't be `undefined` (or `null` or
    `false`).
 
-   Note, however, that this form of `<Show>` forces the children to render
-   from scratch every time `name()` changes, instead of just rendering from
-   scratch when `name()` changes from a falsey to a truthy value.
-   This prevents the children from the benefits of fine-grained
+   Note, however, that this form of `<Show>` forces the entirety of the 
+   children to render
+   from scratch every time `name()` changes, instead of doing this just when `name()` changes from a falsey to a truthy value.
+   This means that the children don't have the full benefits of fine-grained
    reactivity (re-using unchanged parts and updating just what changed).
 
 ## Special JSX Attributes and Directives
 
 If you use custom event handlers via Solid's
 [`on:___`/`oncapture:___` attributes](https://www.solidjs.com/docs/latest/api#on%3A___%2Foncapture%3A___),
-you should define corresponding types for the resulting `Event` objects,
+you should define corresponding types for the resulting `Event` objects
 by overriding the `CustomEvents` and `CustomCaptureEvents` interfaces
 within module `"solid-js"`'s `JSX` namespace, like so:
 
