@@ -251,34 +251,42 @@ captured by the event handler, which can be any DOM element.
 Here is the typical pattern for using `ref` with TypeScript:
 
 ```ts
-let divRef: HTMLDivElement;
-let buttonRef: HTMLButtonElement;
+let divRef!: HTMLDivElement;
+let buttonRef!: HTMLButtonElement;
 
 return (
-  <div ref={divRef!}>
-    <button ref={buttonRef!}>...</button>
+  <div ref={divRef}>
+    <button ref={buttonRef}>...</button>
   </div>
 );
 ```
 
-Note the explicit types on the declarations, and the
+Note the explicit types on the declarations and 
 [non-null assertions (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)
-when using the `ref`.  (Without the non-null assertion, TypeScript thinks
-that the `ref` attribute is being given the ref variable, when in fact it's
-setting the ref variable.  This is a workaround until TypeScript can understand
-assignments to variables through JSX attributes.)
-
-Alternatively, you can declare the ref variables as non-null from the get go:
-
-```ts
-let divRef!: HTMLDivElement;
-let buttonRef!: HTMLButtonElement;
-```
+on the declarations.  
 
 But be careful: these ref variables won't actually be set (and non-null)
 until after the rendering phase.  You can safely use them in a
 [`createEffect`](https://www.solidjs.com/docs/latest/api#createeffect),
 for example, but not in the body of the component function.
+
+When using the `ref` attribute in JSX, you might get a warning from 
+VSCode - this is because TypeScript thinks
+that the `ref` attribute is being set _to_ the variable, when the attribute 
+is actually used to
+_set_ the ref variable (later on). This is usually fine, but if you're 
+looking for a workaround, 
+you can also apply 
+non-null assertions in the JSX:
+
+```ts
+return (
+   <div ref={divRef!}>
+     <button ref={buttonRef!}>...</button>
+   </div>
+);
+```
+
 
 ## Control Flow Narrowing
 
