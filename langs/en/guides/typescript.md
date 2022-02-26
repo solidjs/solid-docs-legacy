@@ -68,8 +68,10 @@ const [count, setCount] = createSignal<number>();
 
 The first `createSignal` has return type `Signal<number>`, corresponding to 
 the type we passed to it. This is a tuple of the getter and 
-setter, which each have a generic type `Accessor<T>` and 
-`Setter<T>`.
+setter, which each have a generic type: 
+```ts 
+type Signal<T> = [get: Accessor<T>, set: Setter<T>];
+```
 
 In this case, the signal getter `count` has type
 `Accessor<number | undefined>`. `Accessor<T>` is a type definition
@@ -136,7 +138,7 @@ value for a context.  Then we can grab the return type of that function using
 TypeScript's
 [`ReturnType`](https://www.typescriptlang.org/docs/handbook/utility-types.
 html#returntypetype)
-type helper, and use that to type the context.
+type helper, and use that to type the context:
 
 ```ts
 export const makeCountNameContext = (initialCount = 0, initialName = '') => {
