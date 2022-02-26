@@ -113,7 +113,8 @@ const dataContext = createContext<Data>();
 ```
 
 In this case, `dataContext` has type `Context<Data | undefined>`,
-causing `useContext(dataContext)` to have return type `Data | undefined`.
+causing `useContext(dataContext)` to have matching return type `Data | 
+undefined`.
 The reason for `| undefined` is that the context might not be provided in the
 ancestors of the current component, in which case `useContext` returns
 `undefined`.
@@ -131,9 +132,11 @@ In this case, TypeScript infers that `dataContext` has type
 `Context<Data>` (without `| undefined`).
 
 Another common pattern is to define a factory function that produces the
-value for a context.  In this case, we can type the context using TypeScript's
-[`ReturnValue`](https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype)
-type helper:
+value for a context.  Then we can grab the return type of that function using 
+TypeScript's
+[`ReturnType`](https://www.typescriptlang.org/docs/handbook/utility-types.
+html#returntypetype)
+type helper, and use that to type the context.
 
 ```ts
 export const makeCountNameContext = (initialCount = 0, initialName = '') => {
@@ -147,15 +150,26 @@ export const CountNameContext = createContext<CountNameContextType>();
 export const useCountNameContext = () => useContext(CountNameContext);
 ```
 
-In this case, `CountNameContextType` is automatically
-`[{readonly count: Accessor<number>, readonly name: Accessor<string>},
-{readonly setCount: Setter<number>, readonly setName: Setter<string>}]`,
+In this example, `CountNameContextType` corresponds to the return value of 
+`makeCountNameContext`:
+```ts
+[
+  {readonly count: Accessor<number>, readonly name: Accessor<string>},
+  {readonly setCount: Setter<number>, readonly setName: Setter<string>}
+]
+```
+
 and `useCountNameContext` has type `() => CountNameContextType | undefined`.
-If you want to avoid the `undefined` possibility by asserting that the
-context is always provided when used (*this is dangerous!*), you could define
-`useCountNameContext` as `() => useContext(CountNameContext)!`.
-But it would be safer to actually provide a default argument to
-`createContext` so that the context is definitely always defined.
+
+If you want to avoid the `undefined` possibility, you could assert that the
+context is always provided when used:
+```ts
+export const useCountNameContext = () => useContext(CountNameContext)!;
+```
+
+This is a dangerous assumption; it would be safer to actually provide a 
+default argument to `createContext` so that the context is always 
+defined.
 
 ## Component Types
 
