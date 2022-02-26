@@ -182,8 +182,7 @@ type Component<P = {}> = (props: PropsWithChildren<P>) => JSX.Element
 ```
 
 To type a component function, use the `Component<P>` type,
-where `P` is the type of the `props` argument and should be an [object type]
-(https://www.typescriptlang.org/docs/handbook/2/objects.html).
+where `P` is the type of the `props` argument and should be an [object type](https://www.typescriptlang.org/docs/handbook/2/objects.html)
 `P` doesn't need to explicitly mention the `children` property;
 `{ children?: JSX.Element }` is automatically added to the type
 (via the `PropsWithChildren<P>` wrapper).  For example:
