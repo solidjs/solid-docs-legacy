@@ -1,7 +1,7 @@
 ---
 title: TypeScript
-description: Tips for typing Solid code
-sort: 4
+description: Tips for using Solid with TypeScript 
+sort: 3
 ---
 # TypeScript
 
@@ -16,12 +16,13 @@ typing your Solid code.
 The [Solid starter templates](https://github.com/solidjs/templates/)
 offer good starting points for
 [`tsconfig.json`](https://github.com/solidjs/templates/blob/master/ts/tsconfig.json).
-In particular, to use TypeScript with the Solid JSX compiler,
+
+Most importantly, to use TypeScript with the Solid JSX compiler,
 you need to configure TypeScript to leave JSX constructs alone via
 [`"jsx": "preserve"`](https://www.typescriptlang.org/tsconfig#jsx),
-and tell TypeScript about where the JSX types come from via
+and tell TypeScript where the JSX types come from via
 [`"jsxImportSource": "solid-js"`](https://www.typescriptlang.org/tsconfig#jsxImportSource).
-Thus a minimal `tsconfig.json` would look like this:
+So, a minimal `tsconfig.json` would look like this:
 
 ```json
 {
@@ -54,7 +55,7 @@ Solid is written in TypeScript, so everything is typed out of the box.
 The [API documentation](https://www.solidjs.com/docs/latest/api) details the
 types for all API calls, as well as several helpful type definitions to make it
 easier to refer to Solid notions when you need to specify explicit types.
-Here we walk through the usage of a few core primitives.
+Here, we explore the resulting types when using a few core primitives.
 
 ### Signals
 
@@ -63,24 +64,26 @@ signal.  For example:
 
 ```ts
 const [count, setCount] = createSignal<number>();
-const [name, setName] = createSignal<string>();
 ```
 
+The first `createSignal` has return type `Signal<number>`, corresponding to 
+the type we passed to it. This is a tuple of the getter and 
+setter, which each have a generic type `Accessor<T>` and 
+`Setter<T>`.
+
 In this case, the signal getter `count` has type
-`Accessor<number | undefined>`, where `Accessor<T>` is a type definition
+`Accessor<number | undefined>`. `Accessor<T>` is a type definition
 provided by Solid, in this case equivalent to `() => number | undefined`.
 The `| undefined` gets added in this example because we did not provide a
 default value to `createSignal`, so the signal value indeed starts out as
 `undefined`.
 
 The signal setter `setCount` has type `Setter<number>`, which is a more
-complicated type definition provided by Solid corresponding roughly to
+complicated type definition corresponding roughly to
 `(value?: number | ((prev?: number) => number)) => number`, representing the
-two possibilities for the passed argument to be either a simple `number` or a
+two possibilities for the passed argument: you can call `setCount` with 
+a simple `number`, or a
 function taking the previous value (if there was one) and returning a number.
-
-Collectively, `[count, setCount]` (the return value of `createSignal`)
-has type `Signal<number>`.
 
 #### Defaults
 
