@@ -250,7 +250,27 @@ captured by the event handler, which can be any DOM element.
 
 ## ref
 
-Here is the typical pattern for using `ref` with TypeScript:
+When we use the `ref` attribute with a variable, we tell Solid to assign the 
+DOM element to 
+the variable once the element is rendered. Without Typescript, this looks like:
+```jsx
+let divRef;
+
+console.log(divRef); //undefined
+
+onMount(() => {
+  console.log(divRef) //<div></div>
+})
+
+return (
+  <div ref={divRef}></div>
+)
+```
+
+This presents a challenge for typing that variable: should we type `divRef` 
+as an `HTMLDivElement`, even though it's only set as such after rendering?
+
+Here is one common pattern for using `ref` variables with TypeScript:
 
 ```ts
 let divRef!: HTMLDivElement;
@@ -263,32 +283,41 @@ return (
 );
 ```
 
-Note the explicit types on the declarations and 
-[non-null assertions (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)
-on the declarations.  
+The [non-null assertions (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)
+on the declarations effectively tell TypeScript to assume that the refs have 
+been set, allowing you to call `HTMLDivElement` properties (e.g. `divRef.offsetWidth`) without a type assertion.
 
-But be careful: these ref variables won't actually be set (and non-null)
-until after the rendering phase.  You can safely use them in a
-[`createEffect`](https://www.solidjs.com/docs/latest/api#createeffect),
+The downside to this approach is that it doesn't reflect the full picture: 
+these ref variables 
+won't actually be set (and will still be null)
+until after the rendering phase.  You can safely use them in [`onMount`](/docs/latest/api#onmount) or a
+[`createEffect`](/docs/latest/api#createeffect),
 for example, but not in the body of the component function.
 
-When using the `ref` attribute in JSX, you might get a warning from 
-VSCode - this is because TypeScript thinks
-that the `ref` attribute is being set _to_ the variable, when the attribute 
-is actually used to
-_set_ the ref variable (later on). This is usually fine, but if you're 
-looking for a workaround, 
-you can also apply 
-non-null assertions in the JSX:
+Instead, you can leave off the non-null assertion in the declaration, and 
+check for nullity when you access the variable later on.
+Additionally, due 
+to a quirk with 
+TypeScript and JSX, you'll need to add the assertion using the `ref` 
+attribute in JSX:
 
 ```ts
+let divRef: HTMLDivElement;
+let buttonRef: HTMLButtonElement;
+
 return (
-   <div ref={divRef!}>
-     <button ref={buttonRef!}>...</button>
-   </div>
+        <div ref={divRef!}>
+        <button ref={buttonRef!}>...</button>
+</div>
 );
 ```
 
+This is because TypeScript assumes 
+that the variable is being used to set the ref attribute (and thus 
+believes 
+that the variable must be defined), 
+when in fact the `ref` attribute tells Solid to 
+set _the variable_ later on. 
 
 ## Control Flow Narrowing
 
