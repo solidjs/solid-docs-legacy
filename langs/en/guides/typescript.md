@@ -179,11 +179,12 @@ type PropsWithChildren<P = {}> = P & { children?: JSX.Element };
 type Component<P = {}> = (props: PropsWithChildren<P>) => JSX.Element
 ```
 
-Solid provides the `Component<P>` type to represent a component function,
-where the `props` argument has type `P`.  Here `P` should be an object type,
-and doesn't need to explicitly mention the `children` property;
+To type a component function, use the `Component<P>` type,
+where `P` is the type of the `props` argument and should be an [object type]
+(https://www.typescriptlang.org/docs/handbook/2/objects.html).
+`P` doesn't need to explicitly mention the `children` property;
 `{ children?: JSX.Element }` is automatically added to the type
-(via the `PropsWithChildren<P>` type definition).  For example:
+(via the `PropsWithChildren<P>` wrapper).  For example:
 
 ```ts
 const Counter: Component<{initialValue: number}> = (props) => {
@@ -198,7 +199,7 @@ const Counter: Component<{initialValue: number}> = (props) => {
 
 This code automatically types `props` to
 `{initialValue: number, children?: JSX.Element}`
-and forces a return value of `JSX.Element`
+and forces the return value of `Counter` to be `JSX.Element`
 (which can be a DOM node, an array of `JSX.Element`s,
 a function returning a `JSX.Element`, a boolean, or anything
 else the renderer can handle).
@@ -240,91 +241,10 @@ to be of type `T` (in the example, `event.currentTarget` is typed
 as `HTMLInputEvent`, so has attribute `value`).  However, the event's
 [`target` attribute](https://developer.mozilla.org/en-US/docs/Web/API/Event/target)
 could be any `DOMElement`.
-This is the nature of DOM events: `currentTarget` is the element that the
+This is because `currentTarget` is the element that the
 event handler was attached to, so has a known type, whereas `target` is
 whatever the user interacted with that caused the event to bubble to or get
 captured by the event handler, which can be any DOM element.
-
-## Custom Events, Properties, Attributes, and Directives
-
-If you use custom event handlers via Solid's
-[`on:___`/`oncapture:___` attributes](https://www.solidjs.com/docs/latest/api#on%3A___%2Foncapture%3A___),
-you should define corresponding types for the resulting `Event` objects,
-by overriding the `CustomEvents` and `CustomCaptureEvents` interfaces
-within module `"solid-js"`'s `JSX` namespace, like so:
-
-```ts
-class NameEvent extends CustomEvent {
-  type: 'Name';
-  detail: {name: string};
-
-  constructor(name: string) {
-    super('Name', {detail: {name}});
-  }
-}
-
-declare module "solid-js" {
-  namespace JSX {
-    interface CustomEvents { // on:Name
-      "Name": NameEvent;
-    }
-    interface CustomCaptureEvents { // oncapture:Name
-      "Name": NameEvent;
-    }
-  }
-}
-
-<div on:Name={(event) => console.log('name is', event.detail.name)}/>
-```
-
-If you use forced properties via Solid's
-[`prop:___` attributes](https://www.solidjs.com/docs/latest/api#prop%3A___),
-or custom attributes via Solid's
-[`attr:___` attributes](https://www.solidjs.com/docs/latest/api#attr%3A___),
-you can define their types in the `ExplicitProperties` and
-`ExplicitAttributes` interfaces, respectively:
-
-```ts
-declare module "solid-js" {
-  namespace JSX {
-    interface ExplicitProperties { // prop:___
-      count: number;
-      name: string;
-    }
-    interface ExplicitAttributes { // attr:___
-      count: number;
-      name: string;
-    }
-  }
-}
-
-<Input prop:name={name()} prop:count={count()}/>
-<my-web-component attr:name={name()} attr:count={count()}/>
-```
-
-If you define custom directives for Solid's
-[`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
-you can type them in the `Directives` interface, like so:
-
-```ts
-function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
-  const [field, setField] = value();
-  createRenderEffect(() => (element.value = field()));
-  element.addEventListener("input", (e) => setField(e.target.value));
-}
-
-declare module "solid-js" {
-  namespace JSX {
-    interface Directives {  // use:model
-      model: Signal<string>;
-    }
-  }
-}
-
-let [name, setName] = createSignal('');
-
-<input type="text" use:model={[name, setName]} />;
-```
 
 ## ref
 
@@ -417,3 +337,84 @@ Here are two workarounds for this issue:
    scratch when `name()` changes from a falsey to a truthy value.
    This prevents the children from the benefits of fine-grained
    reactivity (re-using unchanged parts and updating just what changed).
+
+## Special JSX Attributes and Directives
+
+If you use custom event handlers via Solid's
+[`on:___`/`oncapture:___` attributes](https://www.solidjs.com/docs/latest/api#on%3A___%2Foncapture%3A___),
+you should define corresponding types for the resulting `Event` objects,
+by overriding the `CustomEvents` and `CustomCaptureEvents` interfaces
+within module `"solid-js"`'s `JSX` namespace, like so:
+
+```ts
+class NameEvent extends CustomEvent {
+  type: 'Name';
+  detail: {name: string};
+
+  constructor(name: string) {
+    super('Name', {detail: {name}});
+  }
+}
+
+declare module "solid-js" {
+  namespace JSX {
+    interface CustomEvents { // on:Name
+      "Name": NameEvent;
+    }
+    interface CustomCaptureEvents { // oncapture:Name
+      "Name": NameEvent;
+    }
+  }
+}
+
+<div on:Name={(event) => console.log('name is', event.detail.name)}/>
+```
+
+If you use forced properties via Solid's
+[`prop:___` attributes](https://www.solidjs.com/docs/latest/api#prop%3A___),
+or custom attributes via Solid's
+[`attr:___` attributes](https://www.solidjs.com/docs/latest/api#attr%3A___),
+you can define their types in the `ExplicitProperties` and
+`ExplicitAttributes` interfaces, respectively:
+
+```ts
+declare module "solid-js" {
+  namespace JSX {
+    interface ExplicitProperties { // prop:___
+      count: number;
+      name: string;
+    }
+    interface ExplicitAttributes { // attr:___
+      count: number;
+      name: string;
+    }
+  }
+}
+
+<Input prop:name={name()} prop:count={count()}/>
+<my-web-component attr:name={name()} attr:count={count()}/>
+```
+
+If you define custom directives for Solid's
+[`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
+you can type them in the `Directives` interface, like so:
+
+```ts
+function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
+  const [field, setField] = value();
+  createRenderEffect(() => (element.value = field()));
+  element.addEventListener("input", (e) => setField(e.target.value));
+}
+
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {  // use:model
+      model: Signal<string>;
+    }
+  }
+}
+
+let [name, setName] = createSignal('');
+
+<input type="text" use:model={[name, setName]} />;
+```
