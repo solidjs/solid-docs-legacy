@@ -1163,7 +1163,7 @@ Das Portal wird automatisch in ein `<div>` eingehängt, es sei denn, das Ziel is
 
 Generell versucht Solid, sich an die DOM-Konventionen zu halten. Die meisten Props werden als Attribute für native Elemente gehandhabt und Eigenschaften von Web Components, aber ein paar von ihnen haben ein besonderes Verhalten.
 
-Für benutzerdefinierte Attribute innerhalb eines Namespaces in Typescript muss man Solid's JSX-Namespace erweitern:
+Für benutzerdefinierte Attribute innerhalb eines Namespaces in TypeScript muss man Solid's JSX-Namespace erweitern:
 
 ```ts
 declare module "solid-js" {

@@ -127,7 +127,7 @@ This example shows the wrong way of accessing props in Solid:
 const MyComponent = ({ name }) => <div>{name}</div>;
 ```
 
-While the props object looks like a normal object when you use it (and Typescript users will note that it is typed like a normal object), in reality it is reactive – somewhat similar to a Signal. This has a few implications.
+While the props object looks like a normal object when you use it (and TypeScript users will note that it is typed like a normal object), in reality it is reactive – somewhat similar to a Signal. This has a few implications.
 
 Because unlike most JSX frameworks, Solid's function components are only executed once (rather than every render cycle), the following example will not work as expected.
 
