@@ -126,7 +126,7 @@ Contoh dibawah ini menunjukkan cara yang tidak benar untuk mengakses props di So
 const MyComponent = ({ name }) => <div>{name}</div>;
 ```
 
-Meskipun objek `props` terlihat seperti objek biasa ketika kamu menggunakannya (dan pengguna Typescript mungkin akan mengatakan itu typed seperti objek normal pada umumnya), tapi nyatanya dia reaktif - sedikit mirip dengan Signal. Ini memiliki beberapa implikasi.
+Meskipun objek `props` terlihat seperti objek biasa ketika kamu menggunakannya (dan pengguna TypeScript mungkin akan mengatakan itu typed seperti objek normal pada umumnya), tapi nyatanya dia reaktif - sedikit mirip dengan Signal. Ini memiliki beberapa implikasi.
 
 Karena tidak seperti kebanyakan framework-framework JSX, fungsi komponen di Solid hanya untuk di eksekusi satu kali (bukan setiap siklus render), contoh berikut tidak akan bekerja seperti yang kita ekspektasikan.
 

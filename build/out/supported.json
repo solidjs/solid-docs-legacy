@@ -418,6 +418,9 @@
       "es",
       "ja",
       "ko-kr"
+    ],
+    "typescript": [
+      "en"
     ]
   }
 }

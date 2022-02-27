@@ -127,7 +127,7 @@ Cet exemple montre la mauvaise manière d'accéder aux props dans Solid :
 const MyComponent = ({ name }) => <div>{name}</div>;
 ```
 
-Même si l'objet `props` ressemble à un objet normal (et les utilisateurs de Typescript noteront que le typage est similaire à un objet normal), quand il est utilisé, il est en réalité réactif - en quelque sorte similaire aux Signaux. Cela a quelques implications.
+Même si l'objet `props` ressemble à un objet normal (et les utilisateurs de TypeScript noteront que le typage est similaire à un objet normal), quand il est utilisé, il est en réalité réactif - en quelque sorte similaire aux Signaux. Cela a quelques implications.
 
 Contrairement aux autres frameworks JSX, les fonctions Composants de Solid sont seulement exécutées une fois (plutôt qu'à chaque cycle de rendu), l'exemple ci-dessous ne va pas fonctionner comme prévu.
 

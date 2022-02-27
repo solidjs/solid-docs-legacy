@@ -55,8 +55,7 @@ const [apellido, setApellido] = createSignal("Bourne");
 createEffect(() => console.log(`${nombre()} ${apellido()}`));
 ```
 
-Puedes aprender mas sobre [Reactividad Solid](#reactivity) y [Renderizado Solid](#rendering).
-Puedes aprender mas sobre [Reactividad Solid](#reactivity) y [Renderizado Solid](#rendering).
+Puedes aprender mas sobre [Reactividad Solid](/guides/reactivity) y [Renderizado Solid](/guides/rendering).
 
 ## Piensa Solid
 
@@ -116,4 +115,4 @@ Puedes ejecutarlos directo en el navegador usando [Skypack](https://www.skypack.
 </html>
 ```
 
-Recuerda que aún necesitaras la correspondiente librería de expresiones DOM para que estos funciones con Typescript. Puedes usar Tagged Template Literals con [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) o HyperScript usando [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
+Recuerda que aún necesitaras la correspondiente librería de expresiones DOM para que estos funciones con TypeScript. Puedes usar Tagged Template Literals con [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) o HyperScript usando [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
