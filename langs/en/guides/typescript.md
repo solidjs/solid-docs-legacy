@@ -136,8 +136,7 @@ In this case, TypeScript infers that `dataContext` has type
 Another common pattern is to define a factory function that produces the
 value for a context.  Then we can grab the return type of that function using 
 TypeScript's
-[`ReturnType`](https://www.typescriptlang.org/docs/handbook/utility-types.
-html#returntypetype)
+[`ReturnType`](https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype)
 type helper, and use that to type the context:
 
 ```ts
