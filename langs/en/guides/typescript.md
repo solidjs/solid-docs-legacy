@@ -87,7 +87,7 @@ two possibilities for the passed argument: you can call `setCount` with
 a simple `number`, or a
 function taking the previous value (if there was one) and returning a number.
 
-#### Defaults
+##### Defaults
 
 We can avoid having to explicitly provide the type of the signal when calling
 `createSignal`, and avoid the `| undefined` part of the type, by providing
@@ -247,7 +247,7 @@ event handler was attached to, so has a known type, whereas `target` is
 whatever the user interacted with that caused the event to bubble to or get
 captured by the event handler, which can be any DOM element.
 
-## ref
+## The ref Attribute
 
 When we use the `ref` attribute with a variable, we tell Solid to assign the
 DOM element to 
