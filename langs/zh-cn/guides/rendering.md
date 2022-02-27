@@ -127,7 +127,7 @@ const MyComponent = props => <div>{props.name}</div>;
 const MyComponent = ({ name }) => <div>{name}</div>;
 ```
 
-虽然 props 对象在使用时看起来像一个普通对象（Typescript 用户会注意到它的类型像普通对象），但实际上它是响应式的 —— 有点类似于 Signal。这有几个含义。
+虽然 props 对象在使用时看起来像一个普通对象（TypeScript 用户会注意到它的类型像普通对象），但实际上它是响应式的 —— 有点类似于 Signal。这有几个含义。
 
 因为与大多数 JSX 框架不同，Solid 的函数组件只执行一次（而不是每个渲染周期都执行），所以下面的示例不会按预期工作。
 

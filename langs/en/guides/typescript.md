@@ -251,7 +251,7 @@ captured by the event handler, which can be any DOM element.
 
 When we use the `ref` attribute with a variable, we tell Solid to assign the 
 DOM element to 
-the variable once the element is rendered. Without Typescript, this looks like:
+the variable once the element is rendered. Without TypeScript, this looks like:
 ```jsx
 let divRef;
 
