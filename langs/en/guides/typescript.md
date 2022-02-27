@@ -249,7 +249,7 @@ captured by the event handler, which can be any DOM element.
 
 ## ref
 
-When we use the `ref` attribute with a variable, we tell Solid to assign the 
+When we use the `ref` attribute with a variable, we tell Solid to assign the
 DOM element to 
 the variable once the element is rendered. Without TypeScript, this looks like:
 ```jsx
@@ -288,7 +288,7 @@ been set, allowing you to call `HTMLDivElement` properties (e.g. `divRef.offsetW
 
 The downside to this approach is that it doesn't reflect the full picture: 
 these ref variables 
-won't actually be set (and will still be null)
+won't actually be set (and will still be undefined)
 until after the rendering phase.  You can safely use them in [`onMount`](/docs/latest/api#onmount) or a
 [`createEffect`](/docs/latest/api#createeffect),
 for example, but not in the body of the component function.
@@ -297,7 +297,7 @@ Instead, you can leave off the non-null assertion in the declaration, and
 check for nullity when you access the variable later on.
 Additionally, due 
 to a quirk with 
-TypeScript and JSX, you'll need to add the assertion using the `ref` 
+TypeScript and JSX, you'll need to add the non-null assertion using the `ref` 
 attribute in JSX:
 
 ```ts
@@ -305,9 +305,9 @@ let divRef: HTMLDivElement;
 let buttonRef: HTMLButtonElement;
 
 return (
-        <div ref={divRef!}>
-        <button ref={buttonRef!}>...</button>
-</div>
+  <div ref={divRef!}>
+    <button ref={buttonRef!}>...</button>
+  </div>
 );
 ```
 
@@ -317,6 +317,12 @@ believes
 that the variable must be defined), 
 when in fact the `ref` attribute tells Solid to 
 set _the variable_ later on. 
+
+With this pattern, TypeScript will correctly flag any accidental uses of the
+refs inside the body of the function (before the JSX block where they get
+defined).  However, TypeScript currently does not flag use of refs inside
+`createMemo` and `createRenderEffect`, even though they won't be defined there,
+so you still need to be careful.
 
 ## Control Flow Narrowing
 
