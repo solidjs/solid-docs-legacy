@@ -1,33 +1,36 @@
-Part of what makes Solid so performant is that our components are basically just function calls. The way we propagate updates is that the compiler wraps potentially reactive expressions in object getters. You can picture the compiler to output:
+Solid의 성능을 높이는 부분 중 하나는 컴포넌트가 기본적으로 함수 호출이기 때문입니다. 컴파일러가 객체의 getter 안에서 잠재적으로 리액티브한 표현식을 래핑하는 방식으로 업데이트를 전파합니다. 컴파일 결과를 다음과 같이 그려볼 수 있습니다:
 
 ```jsx
-// this JSX
+// 이 JSX 표현식이
 <MyComp dynamic={mySignal()}>
   <Child />
 </MyComp>
 
-// to become
+// 이렇게 컴파일됩니다.
 MyComp({
   get dynamic() { return mySignal() },
   get children() { return Child() }
 });
 ```
-This means that these props are evaluated lazily. Their access is deferred until where they are used. This retains reactivity without introducing extraneous wrappers or synchronization. However, it means that repeat access can lead to recreating child components or elements.
 
-The vast majority of the time you will just be inserting props into the JSX so there is no problem. However, when you work with children, you need to be careful to avoid creating the children multiple times.
+이는 props가 지연 평가됨을 의미합니다. props에 대한 액세스는 사용될 때까지 연기됩니다. 이로 인해 추가 래퍼나 동기화를 도입하지 않으면서도 반응성을 유지할 수 있습니다. 하지만, 반복적인 액세스로 인해 자식 컴포넌트나 엘리먼트가 다시 생성될 수 있음을 의미하기도 합니다.
 
-For that reason, Solid has the `children` helper. This method both creates a memo around the `children` prop and resolves any nested child reactive references so that you can interact with the children directly.
+대부분의 경우 JSX에 props를 삽입하기 때문에 문제가 없습니다만, 자식 컴포넌트 관련 작업에서는 자식들이 여러 번 생성되지 않도록 주의할 필요가 있습니다.
 
-In the example, we have a dynamic list and we want to set the items' `color` style property. If we interacted with `props.children` directly, not only would we create the nodes multiple times, but we'd find `props.children` to be a function, the Memo returned from `<For>`.
+이러한 이유로, Solid는 `children` 헬퍼를 제공합니다. 이 메서드는 `children` prop 에 대해 memo를 생성하고, 자식과 직접 인터랙션을 할 수 있도록 중첩된 자식들에 대해서도 리액티브한 참조를 제공합니다.
 
-Instead let's use the `children` helper inside `colored-list.tsx`:
+예제에서는, 동적 리스트에 있는 각 항목의 `color` 스타일 속성을 설정하려고 합니다. `props.children`와 직접 인터랙션을 하게 되면, 노드가 여러 번 생성될 뿐만 아니라 `props.children`이 `<For>`에서 반환된 Memo인 함수임을 알 수 있습니다.
+
+대신 `colored-list.tsx` 파일 내부에서 `children` 헬퍼를 사용해 보겠습니다:
+
 ```jsx
 export default function ColoredList(props) {
   const c = children(() => props.children);
   return <>{c()}</>
 }
 ```
-Now to update our elements, let's create an Effect:
+
+이제 엘리먼트를 업데이트하기 위해 Effect를 생성해 보겠습니다:
 ```jsx
 createEffect(() => c().forEach(item => item.style.color = props.color));
 ```

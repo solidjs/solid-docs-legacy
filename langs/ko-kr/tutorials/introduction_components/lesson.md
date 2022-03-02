@@ -1,14 +1,14 @@
-As you build your applications, you will want to break apart your code for better modularity and reusability. In Solid, the main way of doing that is by creating components.
+애플리케이션을 빌드할 때, 더 나은 모듈화와 재사용성을 위해 코드를 분리하고 싶을 것입니다. Solid에서는 이를 위해 컴포넌트를 만듭니다.
 
-Components are just functions like the `HelloWorld()` one we've been using so far. What makes them special is that they typically return JSX and can be called by JSX in other components.
+컴포넌트는 우리가 지금까지 사용해 온 `HelloWorld()`와 같은 함수일 뿐입니다. 함수의 특별한 점은 JSX를 반환하고 다른 컴포넌트의 JSX에 의해 호출될 수 있다는 점입니다. 
 
-In this example, let's add our `Nested` component to our app. We've defined it in another file, though you can put multiple components in the same file. First we must import it:
+이 예제에서는 `Nested` 컴포넌트를 앱에 추가해 보겠습니다. 같은 파일에 여러 개의 컴포넌트를 넣을 수 있지만, 여기서는 다른 파일에 정의했습니다. 먼저 이 파일을 임포트해야 합니다:
 
 ```js
 import Nested from "./nested";
 ```
 
-Then we need to add the component to our JSX. Like before, we now have multiple elements we want to return, so we wrap them in a Fragment:
+그런 다음 JSX에 컴포넌트를 추가해야 합니다. 이전과 마찬가지로 여러개의 엘리먼트를 반환해야 하므로 Fragment로 래핑합니다: 
 
 ```jsx
 function App() {
@@ -21,4 +21,4 @@ function App() {
 }
 ```
 
-When the parent component first renders, it will execute the `Nested()` function and won't call it ever again. All updates are applied by Solid’s reactivity system which we will cover in the next couple of lessons.
+부모 컴포넌트가 처음 렌더링될 때, `Nested()` 함수를 실행한 후 다시는 호출하지 않습니다. 모든 업데이트는 다음 장에서 다룰 Solid의 반응성 시스템에 의해 적용됩니다.

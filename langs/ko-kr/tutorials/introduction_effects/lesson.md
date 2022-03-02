@@ -1,8 +1,8 @@
-Signals are trackable values, but they are only one half of the equation. To complement those are observers that can be updated by those trackable values. An _effect_ is one such observer; it  runs a side effect that depends on signals.
+Signal은 추적 가능한 값이지만, 방정식의 절반에 불과합니다. 이를 보완하기 위해 추적 가능한 값으로 업데이트할 수 있는 옵저버가 있습니다. _Effect_ 는 옵저버 중 하나이며, Signal에 의존하는 사이드 이펙트를 실행합니다.
 
-An effect can be created by importing `createEffect` from `solid-js` and providing it a function. The effect automatically subscribes to any signal that is read during the function's execution and reruns when any of them change.
+`solid-js`에서 `createEffect`를 임포트해 Effect를 생성할 수 있습니다. Effect는 함수가 실행되는 동안 읽은 모든 Signal을 자동으로 구독하고, Signal이 변경되면 다시 실행됩니다.
 
-So let's create an Effect that reruns whenever `count` changes:
+`count`가 변경될 때마다 다시 실행되는 Effect를 만들어 보겠습니다:
 
 ```jsx
 createEffect(() => {
@@ -10,12 +10,12 @@ createEffect(() => {
 });
 ```
 
-To update our `count` Signal, we'll attach a click handler on our button:
+`count` Signal을 업데이트하기 위해, 버튼에 클릭 핸들러를 추가합니다:
 
 ```jsx
 <button onClick={() => setCount(count() + 1)}>Click Me</button>
 ```
 
-Now clicking the button writes to the console. This is a relatively simple example, but to understand how Solid works, you should imagine that every expression in JSX is its own effect that re-executes whenever its dependent signals change. This is how all rendering works in Solid: from Solid's perspective, *all rendering is just a side effect of the reactive system*.
+이제 버튼을 클릭하면 콘솔에 메시지를 출력합니다. 비교적 간단한 예이지만, Solid의 작동 방식을 이해하려면 JSX의 모든 표현식이 의존성을 가진 Signal이 변경될 때마다 다시 실행되는 자체 Effect라고 생각하면 됩니다. *Solid의 관점에서 모든 렌더링은 리액티브 시스템의 사이드 이펙트일 뿐입니다* : 이것이 Solid에서 렌더링이 작동하는 방식입니다.
 
-> Effects that developers create with `createEffect` run after rendering has completed and are mostly used for scheduling updates that interact with the DOM. If you want to modify the DOM earlier, use [`createRenderEffect`](https://www.solidjs.com/docs/latest/api#createrendereffect).
+> 개발자가 `createEffect`를 사용해 만드는 Effect는 렌더링이 완료된 후 실행되며, 주로 DOM과 상호 작용하는 업데이트를 스케줄링하는 데 사용됩니다. DOM을 좀 더 일찍 수정하려면, [`createRenderEffect`](https://www.solidjs.com/docs/latest/api#createrendereffect)를 사용하세요.

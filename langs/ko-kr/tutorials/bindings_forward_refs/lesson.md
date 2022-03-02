@@ -1,8 +1,10 @@
-On many occassions, you might want to expose a ref from inside a component to a parent. The way we do this is still by using the `ref` attribute. From the outside, using `ref` on a component works very similar to using `ref` on a native element. You can pass it a variable to be assigned or a callback function.
+컴포넌트 내부의 ref를 부모에게 노출하고 싶은 경우가 많이 있는데, Solid에서는 `ref` 속성을 사용합니다.
+외부에서 컴포넌트에 `ref`를 사용하는 것은 네이티브 엘리먼트에서 `ref`를 사용하는 것과 매우 유사하게 작동하는데, 할당할 변수나 콜백 함수를 전달할 수 있습니다.
 
-However, it is the component author's responsibility to connect that `ref` to an internal element to forward it back up. To do so, we leverage `props.ref`. This is a callback form of `ref` if either type of `ref` is given, but this detail is mostly hidden from you as you will more than likely just be assigning it directly to the `ref` attribute of one of the elements or components in this component's JSX.
+하지만, 컴포넌트 작성자는 해당 `ref`를 내부 엘리먼트에 연결하여 다시 전달해야 하며, ref 전달을 위해 `props.ref`를 활용할 수 있습니다. 
+`ref`의 타입이 제공되는 경우 콜백 형식이지만, 대부분의 경우 해당 컴포넌트의 JSX에 있는 엘리먼트나 컴포넌트의 `ref` 속성에 직접 할당할 가능성이 높기 떄문에, 이러한 세부 정보는 대부분 숨겨져 있습니다.
 
-To get the logo animating again, we need to forward the ref from `canvas.tsx`:
+로고에 애니메이션을 다시 적용하려면, ref를 `canvas.tsx`에 전달해야 합니다:
 
 ```jsx
 <canvas ref={props.ref} width="256" height="256" />

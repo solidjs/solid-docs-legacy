@@ -1,8 +1,9 @@
-Sometimes your components and elements accept a variable number of attributes and it makes sense to pass them down as an object instead of individually. This is especially true when wrapping a DOM element in a component, a common practice when making design systems.
+때로는 컴포넌트와 엘리먼트에서 다수의 속성을 받아서 아래쪽으로 전달할 때 하나씩 전달하기보다 객체로 전달하는 것이 합리적입니다.
+디자인 시스템을 만들 때 일반적인 관행인 컴포넌트 안에 DOM 엘리먼트를 래핑할 때 특히 그렇습니다. 
 
-For this we use the spread operator `...`.
+이런 경우 스프레드 연산자(`...`)를 사용합니다.
 
-We can pass an object with a variable number of properties:
+이렇게 하면 다수의 속성을 객체로 전달할 수 있습니다:
 
 ```jsx
 <Info {...pkg} />

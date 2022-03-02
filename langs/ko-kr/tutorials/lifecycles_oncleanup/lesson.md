@@ -1,8 +1,8 @@
-Some frameworks pair their cleanup methods as return values of their side effects or lifecycle methods. Since everything in a Solid render tree is living inside a (possibly inert) Effect and can be nested, we made `onCleanup` a first-class method. You can call it at any scope and it will run when that scope is triggered to re-evaluate and when it is finally disposed.
+일부 프레임워크는 사이드 이펙트나 라이프사이클 메서드의 반환값을 클린업 메서드로 사용합니다. Solid 렌더 트리의 모든 것이 (비활성일 수도 있음) Effect 안에 있고 중첩될 수 있기 때문에, `onCleanup` 함수를 일급 메서드로 만들었습니다. 모든 스코프에서 이 함수를 호출할 수 있으며, 해당 스코프가 재평가를 위해 트리거되고 최종적으로 폐기될 때 실행됩니다.
 
-Use it in your components or in your Effects. Use it in your custom directives. Use it pretty much anywhere that is part of the synchronous execution of the reactive system.
+이 함수는 Effect, 컴포넌트, 커스텀 디렉티브 뿐만 아니라 리액티브 시스템의 동기 실행이 일어나는 거의 모든 곳에서 사용하면 됩니다.
 
-The Signal example from the introduction never cleaned up after itself. Let's fix that by replacing the `setInterval` call with this:
+1장에 있었던 Signal 예제는 클린업 메서드를 사용해 정리하지 않았습니다. `setInterval` 호출을 다음과 같이 변경해 문제를 해결해 보겠습니다:
 
 ```js
 const timer = setInterval(() => setCount(count() + 1), 1000);

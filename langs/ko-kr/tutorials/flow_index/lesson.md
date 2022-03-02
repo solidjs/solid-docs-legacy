@@ -1,10 +1,10 @@
-You now know how to render lists in Solid with `<For>`, but Solid also provides the `<Index>` component, which will cause less rerenders in certain situations. 
+이제 `<For>`를 사용해 Solid에서 리스트를 렌더링하는 방법을 알게 되었지만, Solid는 특정 상황에서 렌더링 횟수를 줄일 수 있는 `<Index>` 컴포넌트도 제공합니다.
 
-When the array updates, the `<For>` component uses referential equality to compare elements to the last state of the array. But this isn't always desired. 
+배열이 업데이트 되었을 때, `<For>` 컴포넌트는 참조 동등성을 사용해 요소를 배열의 마지막 상태와 비교합니다. 하지만 이게 항상 원하는 방법은 아닙니다.
 
-In JavaScript, primitives (like strings and numbers) are always compared by value. When using `<For>` with primitive values or arrays of arrays, we could cause a lot of unnecessary rendering. If we used `<For>` to map a list of strings to `<input>` fields that could edit each, every change to that value would cause the `<input>` to be recreated. 
+자바스크립트에서 프리미티브(문자열이나 숫자와 같은)는 항상 값으로 비교됩니다. 프리미티브 값이나 배열의 배열에 대해 `<For>`를 사용하는 경우 불필요한 렌더링이 많이 발생할 수 있습니다. 문자열 리스트를 각각 편집 가능한 `<input>` 필드로 매핑하면, 값이 변경될 때마다 `<input>`이 다시 생성됩니다.
 
-The `<Index>` component is provided for these cases. As a rule of thumb, when working with primitives use `<Index>`. 
+이러한 경우를 위해 `<Index>` 컴포넌트가 제공됩니다. 일반적으로, 프리미티브를 사용하는 경우 `<Index>`를 사용합니다. 
 
 ```jsx
 <Index each={cats()}>{(cat, i) =>
@@ -16,6 +16,6 @@ The `<Index>` component is provided for these cases. As a rule of thumb, when wo
 }</Index>
 ```
 
- It has a similar signature to `<For>`, except this time the item is the signal and the index is fixed. Each rendered node corresponds to a spot in the array. Whenever the data in that spot changes, the signal will update.
+ 이번에는 항목이 Signal이고, 인덱스가 고정되어 있다는 점만 제외하면 `<For>`와 유사한 시그니처를 가집니다. 각 렌더링된 노드는 배열의 한 지점에 해당합니다. 해당 지점의 데이터가 변경될 때마다, Signal이 업데이트됩니다.
 
-`<For>` cares about each piece of data in your array, and the position of that data can change; `<Index>` cares about each index in your array, and the content at each index can change.
+`<For>`는 배열의 각 데이터 조각에 대해 관심을 가지며, 해당 데이터의 위치가 변경될 수 있습니다. `<Index>`는 배열의 각 인덱스에 관심을 가지며, 각 인덱스의 내용은 변경될 수 있습니다.
