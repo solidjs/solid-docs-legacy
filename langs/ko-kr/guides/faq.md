@@ -6,7 +6,7 @@ sort: 6
 
 # 자주하는 질문
 
-### 가상 DOM 을 사용하지 않는 JSX라구요? 베이퍼웨어인가요? 저명한 인사가 이건 불가능하다고 말하는 것을 들었습니다.
+### 가상 DOM 을 사용하지 않는 JSX라구요? 베이퍼웨어인가요? 저명한 발언들에서 이건 불가능하다고 말하는 것을 들었습니다.
 
 React의 업데이트 모델이 없으면 가능합니다. JSX는 Svelte나 Vue에 있는 것과 같은 템플릿 언어로, 어떤 면에서는 더 유연합니다. 임의의 자바스크립트를 삽입하는게 어려울 때도 있지만, 스프레드 연산자를 지원하는것과 별반 다르지 않습니다. 대답은 아니오: 이것은 베이퍼웨어가 아니라 가장 성능이 좋은것으로 입증된 접근 방식입니다.
 
@@ -26,7 +26,9 @@ React의 업데이트 모델이 없으면 가능합니다. JSX는 Svelte나 Vue�
 
 아니오. 그리고 앞으로도 불가능할 것입니다. API는 비슷하고, 컴포넌트는 약간의 편집으로 마이그레이션이 가능할 수 있지만, 업데이트 모델은 근본적으로 다릅니다. React 컴포넌트는 계속 렌더링되므로, Hook 외부의 코드는 아주 다르게 동작합니다. 클로저와 Hook 규칙은 Solid에서 불필요할 뿐만 아니라 여기에서는 작동하지 않는 코드를 규정할 수 있습니다.
 
-반면에 현재 구현 계획은 없지만 Vue 호환은 가능합니다.
+반면에 현재 구현 계획은 없지만 Vue 호환은 가능할 것 같습니다.
+
+반면에, Solid를 React내에서 실행하는 것은 가능합니다. [React Solid State](https://github.com/solidjs/react-solid-state)를 사용하면 React 함수형 컴포넌트에서 Solid API에 접근 가능합니다. [reactjs-solidjs-bridge](https://github.com/Sawtaytoes/reactjs-solidjs-bridge)를 사용하면 React 컴포넌트를 Solid 컴포넌트 내에서 렌더링할 수 있으며, 반대도 가능합니다. 이는 애플리케이션을 점진적으로 포팅하고자 하는 경우 유용합니다.
 
 ### 왜 템플릿에서 `map`을 사용할 수 없나요? `<For>`와 `<Index>`의 차이점은 뭔가요?
 
@@ -44,6 +46,8 @@ React의 업데이트 모델이 없으면 가능합니다. JSX는 Svelte나 Vue�
 
 props 및 store 객체를 사용하면 프로퍼티에 접근하는 경우 반응성이 추적됩니다: 리액티브 컨텍스트 내에서 `props.whatever`를 호출하면, Solid가 이 컨텍스트를 추적하고 props가 변경되면 업데이트하도록 합니다. 디스트럭쳐링을 사용하게 되면 객체에서 값을 분리하여 해당 시점의 값을 제공하게 되면서 반응성을 잃게 됩니다.
 
+디스트럭쳐링 스타일을 선호한다면, 특정 스타일의 디스트럭쳐링을 사용해 리액티브하게 사용 가능한 두 종류의 서로 다른 Babel transform 이 있습니다: [babel-plugin-solid-undestructure](https://github.com/orenelbaum/babel-plugin-solid-undestructure), [Solid Labels](https://github.com/LXSMNSYC/solid-labels/)의 [object features](https://github.com/LXSMNSYC/solid-labels/blob/main/docs/ctf.md#objects).
+
 ### 왜 `onChange` 이벤트 핸들러가 제 때 호출되지 않는건가요?
 
 일부 프레임워크에서는 입력에 대한 `onChange` 이벤트가 수정되어, 키를 누를 때마다 발생합니다. 하지만 이는 `onChange` 이벤트가 [네이티브하게 동작하는 방식](https://developer.mozilla.org/ko/docs/Web/API/GlobalEventHandlers/onchange)이 아닙니다: `onChange`는 입력창에 _커밋된_ 변경을 반영하기 위해서 사용되며, 일반적으로 입력창이 포커스를 잃으면 발생합니다. 입력 값에 대한 모든 변경 사항을 핸들링하려면 `onInput`을 사용하세요.
@@ -52,7 +56,7 @@ props 및 store 객체를 사용하면 프로퍼티에 접근하는 경우 반�
 
 클래스 컴포넌트는 지원할 생각이 없습니다. Solid의 컴포넌트 라이프사이클은 리액티브 시스템의 스케줄링과 관련되어 있으며 인위적입니다. 클래스를 만들 수는 있지만, 사실상 이벤트 핸들러 이외의 코드는 render 함수를 포함해 생성자에서 실행됩니다. 이는 데이터를 덜 세분화하기 위한 변명을 위한 구문일 뿐입니다.
 
-라이프사이클이 아니라 데이터와 동작을 함께 그룹화하세요. 이것은 수십년 동안 작동해온 리액비트의 모범 사례입니다.
+라이프사이클이 아니라 데이터와 동작을 함께 그룹화하세요. 이것은 수십년 동안 작동해온 리액티브의 모범 사례입니다.
 
 ### 나는 JSX를 아주 싫어합니다. 다른 템플릿 언어를 지원할 생각이 있나요? 아.. 태그가 지정된 템플릿 리터럴 / 하이퍼스크립트가 있군요. 이걸 사용해 볼까요?
 
@@ -82,4 +86,6 @@ Store는 중첩된 값을 자동으로 래핑므로 심층 데이터 구조와 �
 
 ### Solid에는 Next.js 나 Material Components 같은 라이브러리가 있나요?
 
- 현재 작업중입니다! 라이브러리 구축에 관심이 있다면, [Discord](https://discord.com/invite/solidjs)를 통해서 현재 에코시스템에 참여하거나 새로 만들 수도 있습니다.
+ 현재 작업중입니다! 
+ Solid의 [라이브러리와 도구 에코시스템은 빠르게 성장](https://www.solidjs.com/resources)하고 있습니다.
+ 라이브러리 구축에 관심이 있다면, [Discord](https://discord.com/invite/solidjs)를 통해서 현재 에코시스템에 참여하거나 새로 만들 수도 있습니다.

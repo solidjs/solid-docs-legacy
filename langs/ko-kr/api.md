@@ -19,7 +19,7 @@ when they're called in a tracking scope, by detecting when the function reads
 reactive state (e.g., via a Signal getter or Store attribute).
 As a result, you generally don't need to worry about dependencies yourselves.
 (But if automatic dependency tracking ever doesn't produce the results you
-want, you can also [override dependency tracking](#reactive-utilities).)
+want, you can [override dependency tracking](#reactive-utilities).)
 This approach makes reactivity *composable*: calling one function
 within another function generally causes the calling function
 to inherit the dependencies of the called function.
@@ -27,10 +27,18 @@ to inherit the dependencies of the called function.
 ## `createSignal`
 
 ```ts
-export function createSignal<T>(
+import { createSignal } from 'solid-js';
+
+function createSignal<T>(
   initialValue: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): [get: () => T, set: (v: T) => T];
+
+// available types for return value of createSignal:
+import type { Signal, Accessor, Setter } from 'solid-js';
+type Signal<T> = [get: Accessor<T>, set: Setter<T>];
+type Accessor<T> = () => T;
+type Setter<T> = (v: T) => T;  // simplified version of real type
 ```
 
 Signals are the most basic reactive primitive.  They track a single value
@@ -49,7 +57,7 @@ const [ready, setReady] = createSignal(false);
 Calling the getter (e.g., `count()` or `ready()`)
 returns the current value of the Signal.
 Crucial to automatic dependency tracking, calling the getter
-within a tracking scope causes the calling function to depends on this Signal,
+within a tracking scope causes the calling function to depend on this Signal,
 so that function will rerun if the Signal gets updated.
 
 Calling the setter (e.g., `setCount(nextCount)` or `setReady(nextReady)`)
@@ -131,8 +139,7 @@ Some examples:
 // use { equals: false } to allow modifying object in-place;
 // normally this wouldn't be seen as an update because the
 // object has the same identity before and after change
-const [object, setObject] = createSignal(
-  { count: 0 }, { equals: false });
+const [object, setObject] = createSignal({ count: 0 }, { equals: false });
 setObject((current) => {
   current.count += 1;
   current.updated = new Date;
@@ -140,8 +147,7 @@ setObject((current) => {
 });
 
 // use { equals: false } signal as trigger without value:
-const [depend, rerun] = createSignal(undefined,
-  { equals: false });
+const [depend, rerun] = createSignal(undefined, { equals: false });
 // now calling depend() in a tracking scope
 // makes that scope rerun whenever rerun() gets called
 
@@ -157,7 +163,9 @@ setMyString("stranger"); // considered different and will cause updates
 ## `createEffect`
 
 ```ts
-export function createEffect<T>(fn: (v: T) => T, value?: T): void;
+import { createEffect } from 'solid-js';
+
+function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 Effects are a general way to make arbitrary code run whenever dependencies
@@ -193,18 +201,24 @@ meaning that all signal changes inside the effect propagate only after the
 effect finishes.  This lets you update several signals while triggering only
 one update, and avoids unwanted side-effects from happening in the middle
 of your side effects.
+In fact, if multiple effects all trigger at once, they collectively
+get wrapped into a single `batch`.
 
 The *first* execution of the effect function is not immediate;
-it's scheduled to run after the current synchronous task via
+it's scheduled to run after the current rendering phase
+(e.g., after calling the function passed to [`render`](#render),
+[`createRoot`](#createroot), or [`runWithOwner`](#runwithowner)).
+If you want to wait for the first execution to occur, use
 [`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask).
-If you want to wait for the first execution to occur,
-use `queueMicrotask` (which runs before render) or
-`await Promise.resolve()` or `setTimeout(..., 0)` (which run after render).
+(which runs before the browser renders the DOM) or
+`await Promise.resolve()` or `setTimeout(..., 0)`
+(which run after browser rendering).
 After this first execution, effects generally run immediately when
 their dependencies update (unless you're in a [batch](#batch) or
 [transition](#use-transition)).  For example:
 
 ```js
+// assume this code is in a component function, so is part of a rendering phase
 const [count, setCount] = createSignal(0);
 
 // this effect prints count at the beginning and when it changes
@@ -232,7 +246,7 @@ queueMicrotask(() => {
 This delay in first execution is useful because it means
 an effect defined in a component scope runs after
 the JSX returned by the component gets added the DOM.
-In particular, [`ref`s](#ref) will already be set.
+In particular, [`ref`](#ref)s will already be set.
 Thus you can use an effect to manipulate the DOM manually,
 call vanilla JS libraries, or other side effects.
 
@@ -246,7 +260,8 @@ possible after an `async` function uses `await`.
 Thus you should use all dependencies before the promise.
 
 If you'd rather an effect run immediately even for its first run,
-use [`createComputed`](#createcomputed).
+use [`createRenderEffect`](#createrendereffect) or
+[`createComputed`](#createcomputed).
 
 You can clean up your side effects in between executions of the effect function
 by calling [`onCleanup`](#oncleanup) *inside* the effect function.
@@ -267,7 +282,9 @@ createEffect(() => {
 ## `createMemo`
 
 ```ts
-export function createMemo<T>(
+import { createMemo } from 'solid-js';
+
+function createMemo<T>(
   fn: (v: T) => T,
   value?: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
@@ -299,9 +316,9 @@ const user = createMemo(() => searchForUser(username()));
 // compare with: const user = () => searchForUser(username());
 return (
   <ul>
-  <li>Your name is "{user()?.name}"</li>
-  <li>Your email is <code>{user()?.email}</code></li>
-  </div>
+    <li>Your name is "{user()?.name}"</li>
+    <li>Your email is <code>{user()?.email}</code></li>
+  </ul>
 );
 ```
 
@@ -341,6 +358,9 @@ at most once in response to a dependency change.
 ## `createResource`
 
 ```ts
+import { createResource } from 'solid-js';
+import type { ResourceReturn } from 'solid-js';
+
 type ResourceReturn<T> = [
   {
     (): T | undefined;
@@ -353,7 +373,7 @@ type ResourceReturn<T> = [
   }
 ];
 
-export function createResource<T, U = true>(
+function createResource<T, U = true>(
   fetcher: (
     k: U,
     info: { value: T | undefined; refetching: boolean | unknown }
@@ -361,7 +381,7 @@ export function createResource<T, U = true>(
   options?: { initialValue?: T }
 ): ResourceReturn<T>;
 
-export function createResource<T, U>(
+function createResource<T, U>(
   source: U | false | null | (() => U | false | null),
   fetcher: (
     k: U,
@@ -430,7 +450,9 @@ refetch();
 ## `onMount`
 
 ```ts
-export function onMount(fn: () => void): void;
+import { onMount } from 'solid-js';
+
+function onMount(fn: () => void): void;
 ```
 
 Registers a method that runs after initial render and elements have been mounted. Ideal for using `ref`s and managing other one time side effects. It is equivalent to a `createEffect` which does not have any dependencies.
@@ -438,7 +460,9 @@ Registers a method that runs after initial render and elements have been mounted
 ## `onCleanup`
 
 ```ts
-export function onCleanup(fn: () => void): void;
+import { onCleanup } from 'solid-js';
+
+function onCleanup(fn: () => void): void;
 ```
 
 Registers a cleanup method that executes on disposal or recalculation of the current reactive scope. Can be used in any Component or Effect.
@@ -446,7 +470,9 @@ Registers a cleanup method that executes on disposal or recalculation of the cur
 ## `onError`
 
 ```ts
-export function onError(fn: (err: any) => void): void;
+import { onError } from 'solid-js';
+
+function onError(fn: (err: any) => void): void;
 ```
 
 Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
@@ -458,7 +484,9 @@ These helpers provide the ability to better schedule updates and control how rea
 ## `untrack`
 
 ```ts
-export function untrack<T>(fn: () => T): T;
+import { untrack } from 'solid-js';
+
+function untrack<T>(fn: () => T): T;
 ```
 
 Ignores tracking any of the dependencies in the executing code block and returns the value.
@@ -466,7 +494,9 @@ Ignores tracking any of the dependencies in the executing code block and returns
 ## `batch`
 
 ```ts
-export function batch<T>(fn: () => T): T;
+import { batch } from 'solid-js';
+
+function batch<T>(fn: () => T): T;
 ```
 
 Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method and Effects automatically wrap their code in a batch.
@@ -474,7 +504,9 @@ Holds committing updates within the block until the end to prevent unnecessary r
 ## `on`
 
 ```ts
-export function on<T extends Array<() => any> | (() => any), U>(
+import { on } from 'solid-js';
+
+function on<T extends Array<() => any> | (() => any), U>(
   deps: T,
   fn: (input: T, prevInput: T, prevValue?: U) => U,
   options: { defer?: boolean } = {}
@@ -505,7 +537,9 @@ setA("new"); // now it runs
 ## `createRoot`
 
 ```ts
-export function createRoot<T>(fn: (dispose: () => void) => T): T;
+import { createRoot } from 'solid-js';
+
+function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
 Creates a new non-tracked owner scope that doesn't auto-dispose. This is useful for nested reactive scopes that you do not wish to release when the parent re-evaluates.
@@ -515,7 +549,9 @@ All Solid code should be wrapped in one of these top level as they ensure that a
 ## `getOwner`
 
 ```ts
-export function getOwner(): Owner;
+import { getOwner } from 'solid-js';
+
+function getOwner(): Owner;
 ```
 
 Gets the reactive scope that owns the currently running code, e.g.,
@@ -545,7 +581,9 @@ components created via JSX (`<Component ...>`).
 ## `runWithOwner`
 
 ```ts
-export function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
+import { runWithOwner } from 'solid-js';
+
+function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
 ```
 
 Executes the given function under the provided owner,
@@ -597,7 +635,9 @@ will not be tracked as a dependency.
 ## `mergeProps`
 
 ```ts
-export function mergeProps(...sources: any): any;
+import { mergeProps } from 'solid-js';
+
+function mergeProps(...sources: any): any;
 ```
 
 A reactive object `merge` method. Useful for setting default props for components in case caller doesn't provide them. Or cloning the props object including reactive properties.
@@ -618,7 +658,9 @@ props = mergeProps(props, otherProps);
 ## `splitProps`
 
 ```ts
-export function splitProps<T>(
+import { splitProps } from 'solid-js';
+
+function splitProps<T>(
   props: T,
   ...keys: Array<(keyof T)[]>
 ): [...parts: Partial<T>];
@@ -629,20 +671,41 @@ Splits a reactive object by keys.
 It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
 
 This can be useful if you want to consume a subset of props and pass the rest to a child.
-
 ```js
-const [local, others] = splitProps(props, ["children"]);
+function MyComponent(props) {
+  const [local, others] = splitProps(props, ["children"]);
 
-<>
-  <Child {...others} />
-  <div>{local.children}<div>
-</>
+  return (
+    <>
+      <div>{local.children}</div>
+      <Child {...others} />
+    </>
+  )
+}
 ```
 
+Because `splitProps` takes any number of arrays, we can split a props object 
+as much as we wish (if, for example, we had multiple child components that 
+each required a subset of the props).
+
+Let's say a component was passed six props:
+```js
+<MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar"/>
+function MyComponent(props) {
+  console.log(props) // {a: 1, b: 2, c: 3, d: 4, e: 5, foo: "bar"}
+  const [vowels, consonants, leftovers] = splitProps(props, 
+          ["a", "e"], ["b", "c", "d"]);
+  console.log(vowels) // {a: 1, e: 5}
+  console.log(consonants) // {b: 2, c: 3, d: 4}
+  console.log(leftovers.foo) // bar
+}
+```
 ## `useTransition`
 
 ```ts
-export function useTransition(): [
+import { useTransition } from 'solid-js';
+
+function useTransition(): [
   pending: () => boolean,
   startTransition: (fn: () => void) => Promise<void>
 ];
@@ -665,7 +728,9 @@ start(() => setSignal(newValue), () => /* transition is done */)
 **New in v1.1.0**
 
 ```ts
-export function startTransition: (fn: () => void) => Promise<void>;
+import { startTransition } from 'solid-js';
+
+function startTransition: (fn: () => void) => Promise<void>;
 ```
 
 Similar to `useTransition` except there is no associated pending state. This one can just be used directly to start the Transition.
@@ -673,13 +738,19 @@ Similar to `useTransition` except there is no associated pending state. This one
 ## `observable`
 
 ```ts
-export function observable<T>(input: () => T): Observable<T>;
+import { observable } from 'solid-js';
+
+function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable. Consume it from the Observable library of your choice with typically with the `from` operator.
+This method takes a signal and produces a simple Observable.
+You can consume it from another Observable library of your choice, typically
+with the `from` operator.
 
 ```js
-import { from } from "rxjs";
+// How to integrate rxjs with a solid.js signal
+import { observable } from 'solid-js';
+import { from } from 'rxjs';
 
 const [s, set] = createSignal(0);
 
@@ -688,12 +759,16 @@ const obsv$ = from(observable(s));
 obsv$.subscribe((v) => console.log(v));
 ```
 
+You can also use `from` without `rxjs`; see below.
+
 ## `from`
 
 **New in v1.1.0**
 
 ```ts
-export function from<T>(
+import { from } from 'solid-js';
+
+function from<T>(
   producer:
     | ((setter: (v: T) => T) => () => void)
     | {
@@ -724,7 +799,9 @@ const clock = from((set) => {
 ## `mapArray`
 
 ```ts
-export function mapArray<T, U>(
+import { mapArray } from 'solid-js';
+
+function mapArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: T, i: () => number) => U
 ): () => U[];
@@ -746,7 +823,7 @@ const mapped = mapArray(source, (model) => {
     },
     get description() {
       return description();
-    }
+    },
     setName,
     setDescription
   }
@@ -756,7 +833,9 @@ const mapped = mapArray(source, (model) => {
 ## `indexArray`
 
 ```ts
-export function indexArray<T, U>(
+import { indexArray } from 'solid-js';
+
+function indexArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: () => T, i: number) => U
 ): () => U[];
@@ -791,7 +870,10 @@ These APIs are available at `solid-js/store`. They allow the creation of stores:
 ### `createStore`
 
 ```ts
-export function createStore<T extends StoreNode>(
+import { createStore } from 'solid-js/store';
+import type { StoreNode, Store, SetStoreFunction } from 'solid-js/store';
+
+function createStore<T extends StoreNode>(
   state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
@@ -799,7 +881,6 @@ export function createStore<T extends StoreNode>(
 The create function takes an initial state, wraps it in a store, and returns a readonly proxy object and a setter function.
 
 ```js
-import { createStore } from "solid-js/store";
 const [state, setState] = createStore(initialValue);
 
 // read value
@@ -830,7 +911,6 @@ const [state, setState] = createStore({ list: [] });
 Store objects support the use of getters to store calculated values.
 
 ```js
-import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
   user: {
     firstName: "John",
@@ -863,7 +943,6 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store.
 
 ```js
-import { createStore } from "solid-js/store";
 const [state, setState] = createStore({
   firstName: "John",
   lastName: "Miller",
@@ -955,7 +1034,9 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ### `produce`
 
 ```ts
-export function produce<T>(
+import { produce } from 'solid-js/store';
+
+function produce<T>(
   fn: (state: T) => void
 ): (
   state: T extends NotWrappable ? T : Store<T>
@@ -976,7 +1057,9 @@ setState(
 ### `reconcile`
 
 ```ts
-export function reconcile<T>(
+import { reconcile } from 'solid-js/store';
+
+function reconcile<T>(
   value: T | Store<T>,
   options?: {
     key?: string | null;
@@ -1002,7 +1085,9 @@ onCleanup(() => unsubscribe());
 ### `unwrap`
 
 ```ts
-export function unwrap(store: Store<T>): T;
+import { unwrap } from 'solid-js/store';
+
+function unwrap(store: Store<T>): T;
 ```
 
 Returns the underlying data in the store without a proxy.
@@ -1010,7 +1095,9 @@ Returns the underlying data in the store without a proxy.
 ### `createMutable`
 
 ```ts
-export function createMutable<T extends StoreNode>(
+import { createMutable } from 'solid-js/store';
+
+function createMutable<T extends StoreNode>(
   state: T | Store<T>,
 ): Store<T> {
 ```
@@ -1053,12 +1140,16 @@ const user = createMutable({
 ## `createContext`
 
 ```ts
+import { createContext } from 'solid-js';
+import type { Context } from 'solid-js';
+
 interface Context<T> {
   id: symbol;
   Provider: (props: { value: T; children: any }) => any;
   defaultValue: T;
 }
-export function createContext<T>(defaultValue?: T): Context<T | undefined>;
+
+function createContext<T>(defaultValue?: T): Context<T | undefined>;
 ```
 
 Context provides a form of dependency injection in Solid. It is used to save from needing to pass data as props through intermediate components.
@@ -1095,7 +1186,9 @@ The value passed to provider is passed to `useContext` as is. That means wrappin
 ## `useContext`
 
 ```ts
-export function useContext<T>(context: Context<T>): T;
+import { useContext } from 'solid-js';
+
+function useContext<T>(context: Context<T>): T;
 ```
 
 Used to grab context to allow for deep passing of props without having to pass them through each Component function.
@@ -1107,7 +1200,9 @@ const [state, { increment, decrement }] = useContext(CounterContext);
 ## `children`
 
 ```ts
-export function children(fn: () => any): () => any;
+import { children } from 'solid-js';
+
+function children(fn: () => any): () => any;
 ```
 
 Used to make it easier to interact with `props.children`. This helper resolves any nested reactivity and returns a memo. Recommended approach to using `props.children` in anything other than passing directly through to JSX.
@@ -1122,7 +1217,9 @@ createEffect(() => list());
 ## `lazy`
 
 ```ts
-export function lazy<T extends Component<any>>(
+import { lazy } from 'solid-js';
+
+function lazy<T extends Component<any>>(
   fn: () => Promise<{ default: T }>
 ): T & { preload: () => Promise<T> };
 ```
@@ -1140,7 +1237,9 @@ const ComponentA = lazy(() => import("./ComponentA"));
 ## `createUniqueId`
 
 ```ts
-export function createUniqueId(): string;
+import { createUniqueId } from 'solid-js';
+
+function createUniqueId(): string;
 ```
 
 A universal id generator that is stable across server/browser.
@@ -1158,7 +1257,9 @@ You probably won't need them for your first app, but these are useful tools to h
 ## `createDeferred`
 
 ```ts
-export function createDeferred<T>(
+import { createDeferred } from 'solid-js';
+
+function createDeferred<T>(
   source: () => T,
   options?: {
     timeoutMs?: number;
@@ -1169,28 +1270,123 @@ export function createDeferred<T>(
 
 Creates a readonly that only notifies downstream changes when the browser is idle. `timeoutMs` is the maximum time to wait before forcing the update.
 
-## `createComputed`
-
-```ts
-export function createComputed<T>(fn: (v: T) => T, value?: T): void;
-```
-
-Creates a new computation that automatically tracks dependencies and runs immediately before render. Use this to write to other reactive primitives. When possible use `createMemo` instead as writing to a signal mid update can cause other computations to need to re-calculate.
-
 ## `createRenderEffect`
 
 ```ts
-export function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
+import { createRenderEffect } from 'solid-js';
+
+function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Creates a new computation that automatically tracks dependencies and runs during the render phase as DOM elements are created and updated but not necessarily connected. All internal DOM updates happen at this time.
+A render effect is a computation similar to a regular effect
+(as created by [`createEffect`](#createeffect)),
+but differs in when Solid schedules the first execution of the effect function.
+While `createEffect` waits for the current rendering phase to be complete,
+`createRenderEffect` immediately calls the function.
+Thus the effect runs as DOM elements are being created and updated,
+but possibly before specific elements of interest have been created,
+and probably before those elements have been connected to the document.
+In particular, [`ref`](#ref)s will not be set before the initial effect call.
+Indeed, Solid uses `createRenderEffect` to implement the rendering phase
+itself, including setting of `ref`s.
+
+Reactive updates to render effects are identical to effects: they queue up in
+response to a reactive change (e.g., a single signal update, or a `batch` of
+changes, or collective changes during an entire render phase) and run in a
+single [`batch`](#batch) afterward (together with effects).
+In particular, all signal updates within a render effect are batched.
+
+Here is an example of the behavior.
+(Compare with the example in [`createEffect`](#createeffect).)
+
+```js
+// assume this code is in a component function, so is part of a rendering phase
+const [count, setCount] = createSignal(0);
+
+// this effect prints count at the beginning and when it changes
+createRenderEffect(() => console.log('count =', count()));
+// render effect runs immediately, printing `count = 0`
+console.log('hello');
+setCount(1);  // effect won't run yet
+setCount(2);  // effect won't run yet
+
+queueMicrotask(() => {
+  // now `count = 2` will print
+  console.log('microtask');
+  setCount(3);  // immediately prints `count = 3`
+  console.log('goodbye');
+});
+
+// --- overall output: ---
+// count = 0   [this is the only added line compared to createEffect]
+// hello
+// count = 2
+// microtask
+// count = 3
+// goodbye
+```
+
+Just like `createEffect`, the effect function gets called with an argument
+equal to the value returned from the effect function's last execution,
+or on the first call, equal to the optional second argument to
+`createRenderEffect`.
+
+## `createComputed`
+
+```ts
+import { createComputed } from 'solid-js';
+
+function createComputed<T>(fn: (v: T) => T, value?: T): void;
+```
+
+`createComputed` creates a new computation that immediately runs the given
+function in a tracking scope, thus automatically tracking its dependencies,
+and automatically reruns the function whenever the dependencies changes.
+The function gets called with an argument equal to the value returned
+from the function's last execution, or on the first call,
+equal to the optional second argument to `createComputed`.
+Note that the return value of the function is not otherwise exposed;
+in particular, `createComputed` has no return value.
+
+`createComputed` is the most immediate form of reactivity in Solid, and is
+most useful for building other reactive primitives.
+(For example, some other Solid primitives are built from `createComputed`.)
+But it should be used with care, as `createComputed` can easily cause more
+unnecessary updates than other reactive primitives.
+Before using it, consider the closely related primitives
+[`createMemo`](#creatememo) and [`createRenderEffect`](#createrendereffect).
+
+Like `createMemo`, `createComputed` calls its function immediately on updates
+(unless you're in a [batch](#batch), [effect](#createEffect), or
+[transition](#use-transition)).
+However, while `createMemo` functions should be pure (not set any signals),
+`createComputed` functions can set signals.
+Related, `createMemo` offers a readonly signal for the return value of the
+function, whereas to do the same with `createComputed` you would need to
+set a signal within the function.
+If it is possible to use pure functions and `createMemo`, this is likely
+more efficient, as Solid optimizes the execution order of memo updates,
+whereas updating a signal within `createComputed` will immediately trigger
+reactive updates some of which may turn out to be unnecessary
+(unless you take care by wrapping in
+[`batch`](#batch), [`untrack`](#untrack), etc.).
+
+Like `createRenderEffect`, `createComputed` calls its function for the first
+time immediately.  But they differ in how updates are performed.
+While `createComputed` generally updates immediately, `createRenderEffect`
+updates queue to run in a single `batch` (along with `createEffect`s)
+after the current render phase.
+Thus `createRenderEffect` can perform fewer overall updates,
+but is slightly less immediate.
 
 ## `createReaction`
 
 **New in v1.3.0**
 
 ```ts
-export function createReaction(
+import { createReaction } from 'solid-js';
+
+function createReaction(
   onInvalidate: () => void
 ): (fn: () => void) => void;
 ```
@@ -1213,7 +1409,9 @@ set("final"); // no-op as reaction only runs on first update, need to call track
 ## `createSelector`
 
 ```ts
-export function createSelector<T, U>(
+import { createSelector } from 'solid-js';
+
+function createSelector<T, U>(
   source: () => T,
   fn?: (a: U, b: T) => boolean
 ): (k: U) => boolean;
@@ -1236,7 +1434,9 @@ These imports are exposed from `solid-js/web`.
 ## `render`
 
 ```ts
-export function render(
+import { render } from 'solid-js/web';
+
+function render(
   code: () => JSX.Element,
   element: MountableElement
 ): () => void;
@@ -1251,7 +1451,9 @@ const dispose = render(App, document.getElementById("app"));
 ## `hydrate`
 
 ```ts
-export function hydrate(
+import { hydrate } from 'solid-js/web';
+
+function hydrate(
   fn: () => JSX.Element,
   node: MountableElement
 ): () => void;
@@ -1266,7 +1468,9 @@ const dispose = hydrate(App, document.getElementById("app"));
 ## `renderToString`
 
 ```ts
-export function renderToString<T>(
+import { renderToString } from 'solid-js/web';
+
+function renderToString<T>(
   fn: () => T,
   options?: {
     nonce?: string;
@@ -1286,7 +1490,9 @@ const html = renderToString(App);
 ## `renderToStringAsync`
 
 ```ts
-export function renderToStringAsync<T>(
+import { renderToStringAsync } from 'solid-js/web';
+
+function renderToStringAsync<T>(
   fn: () => T,
   options?: {
     timeoutMs?: number;
@@ -1309,7 +1515,9 @@ const html = await renderToStringAsync(App);
 **New in v1.3.0**
 
 ```ts
-export function renderToStream<T>(
+import { renderToStream } from 'solid-js/web';
+
+function renderToStream<T>(
   fn: () => T,
   options?: {
     nonce?: string;
@@ -1341,7 +1549,9 @@ renderToStream(App).pipeTo(writable);
 ## `isServer`
 
 ```ts
-export const isServer: boolean;
+import { isServer } from 'solid-js/web';
+
+const isServer: boolean;
 ```
 
 This indicates that the code is being run as the server or browser bundle. As the underlying runtimes export this as a constant boolean it allows bundlers to eliminate the code and their used imports from the respective bundles.
@@ -1357,12 +1567,14 @@ if (isServer) {
 ## `HydrationScript`
 
 ```ts
-export function generateHydrationScript(options: {
+import { generateHydrationScript, HydrationScript } from 'solid-js/web';
+
+function generateHydrationScript(options: {
   nonce?: string;
   eventNames?: string[];
 }): string;
 
-export function HydrationScript(props: {
+function HydrationScript(props: {
   nonce?: string;
   eventNames?: string[];
 }): JSX.Element;
@@ -1378,14 +1590,16 @@ For reactive control flow to be performant, we have to control how elements are 
 
 This means helper functions. Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flow components.
 
-These built-in control flow components will be automatically imported. All except `Portal` and `Dynamic` are exported from `solid-js`. Those two, which are DOM-specific, are exported by `solid-js/web`.
+These built-in control flow components will be automatically imported. All except `Portal` and `Dynamic` are exported from both `solid-js` and `solid-js/web`. `Portal` and `Dynamic`, which are DOM-specific, are exported by `solid-js/web`.
 
 > Note: All callback/render function children of control flow are non-tracking. This allows for nesting state creation, and better isolates reactions.
 
 ## `<For>`
 
 ```ts
-export function For<T, U extends JSX.Element>(props: {
+import { For } from 'solid-js';
+
+function For<T, U extends JSX.Element>(props: {
   each: readonly T[];
   fallback?: JSX.Element;
   children: (item: T, index: () => number) => U;
@@ -1415,6 +1629,8 @@ The optional second argument is an index signal:
 ## `<Show>`
 
 ```ts
+import { Show } from 'solid-js';
+
 function Show<T>(props: {
   when: T | undefined | null | false;
   fallback?: JSX.Element;
@@ -1441,7 +1657,10 @@ Show can also be used as a way of keying blocks to a specific data model. Ex the
 ## `<Switch>`/`<Match>`
 
 ```ts
-export function Switch(props: {
+import { Switch, Match } from 'solid-js';
+import type { MatchProps } from 'solid-js';
+
+function Switch(props: {
   fallback?: JSX.Element;
   children: JSX.Element;
 }): () => JSX.Element;
@@ -1450,7 +1669,7 @@ type MatchProps<T> = {
   when: T | undefined | null | false;
   children: JSX.Element | ((item: T) => JSX.Element);
 };
-export function Match<T>(props: MatchProps<T>);
+function Match<T>(props: MatchProps<T>);
 ```
 
 Useful for when there are more than 2 mutual exclusive conditions. Can be used to do things like simple routing.
@@ -1471,7 +1690,9 @@ Match also supports function children to serve as keyed flow.
 ## `<Index>`
 
 ```ts
-export function Index<T, U extends JSX.Element>(props: {
+import { Index } from 'solid-js';
+
+function Index<T, U extends JSX.Element>(props: {
   each: readonly T[];
   fallback?: JSX.Element;
   children: (item: () => T, index: number) => U;
@@ -1503,6 +1724,8 @@ Optional second argument is an index number:
 ## `<ErrorBoundary>`
 
 ```ts
+import { ErrorBoundary } from 'solid-js';
+
 function ErrorBoundary(props: {
   fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element);
   children: JSX.Element;
@@ -1530,7 +1753,9 @@ Also supports callback form which passes in error and a reset function.
 ## `<Suspense>`
 
 ```ts
-export function Suspense(props: {
+import { Suspense } from 'solid-js';
+
+function Suspense(props: {
   fallback?: JSX.Element;
   children: JSX.Element;
 }): JSX.Element;
@@ -1547,6 +1772,8 @@ A component that tracks all resources read under it and shows a fallback placeho
 ## `<SuspenseList>` (Experimental)
 
 ```ts
+import { SuspenseList } from 'solid-js';
+
 function SuspenseList(props: {
   children: JSX.Element;
   revealOrder: "forwards" | "backwards" | "together";
@@ -1573,6 +1800,8 @@ SuspenseList is still experimental and does not have full SSR support.
 ## `<Dynamic>`
 
 ```ts
+import { Dynamic } from 'solid-js/web';
+
 function Dynamic<T>(
   props: T & {
     children?: any;
@@ -1590,7 +1819,9 @@ This component lets you insert an arbitrary Component or tag and passes the prop
 ## `<Portal>`
 
 ```ts
-export function Portal(props: {
+import { Portal } from 'solid-js/web';
+
+function Portal(props: {
   mount?: Node;
   useShadow?: boolean;
   isSVG?: boolean;
@@ -1652,7 +1883,7 @@ onMount(() => console.log(myDiv));
 <div ref={el => console.log(el)} />
 ```
 
-Refs can also be used on Components. They still need to be attached on the otherside.
+Refs can also be used on Components. They still need to be attached on the other side.
 
 ```jsx
 function MyComp(props) {
@@ -1678,7 +1909,21 @@ A helper that leverages `element.classList.toggle`. It takes an object whose key
 
 ## `style`
 
-Solid's style helper works with either a string or with an object. Unlike React's version Solid uses `element.style.setProperty` under the hood. This means support for CSS vars, but it also means we use the lower, dash-case version of properties. This actually leads to better performance and consistency with SSR output.
+Solid's `style` helper works with either a string or with an object.
+
+```jsx
+// string
+<div style={`color: green; height: ${state.height}px`} />
+
+// object
+<div style={{
+  color: "green", 
+  height: state.height + "px" }}
+/>
+```
+Unlike React's `style` helper, Solid uses `element.style.setProperty` under the hood. This means you need to use
+the lower-case, dash-separated version of property names, like `"background-color"` rather than
+`backgroundColor`. This actually leads to better performance and consistency with SSR output.
 
 ```jsx
 // string
@@ -1690,7 +1935,11 @@ Solid's style helper works with either a string or with an object. Unlike React'
   "background-color": state.color,
   height: state.height + "px" }}
 />
+```
 
+It also means you can use CSS variables! This just works:
+
+```jsx
 // css variable
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```

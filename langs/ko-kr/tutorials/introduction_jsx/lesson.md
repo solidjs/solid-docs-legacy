@@ -1,12 +1,12 @@
-JSX is the HTML-like syntax we've seen inside these examples and is core to building components in Solid. 
-JSX adds dynamic expressions that allow you to reference variables and functions within your HTML by using the `{ } ` syntax.
-In this example, we include the string `name` in our HTML using `{name}` inside a div. In the same way, we include an HTML element that was directly assigned to the `svg` variable.
+JSX는 예제에서 보는 바와 같이 HTML과 구문이 유사하며, Solid에서 컴포넌트를 빌드하는데 핵심입니다.
+JSX는 `{ }` 구문을 사용하여 HTML 내에 변수와 함수를 참조할 수 있는 동적 표현식을 추가합니다.
+이 예제에서는 `div` 안에 `{name}`을 사용하여 HTML 내에 `name` 문자열을 포함합니다. 같은 방식으로 `svg` 변수에 할당된 HTML 엘리먼트를 포함합니다.
 
-Unlike some other frameworks that use JSX, Solid attempts to stay as close to HTML standards as possible, allowing simple copy and paste from answers on Stack Overflow or from template builders from your designers.
+JSX를 사용하는 다른 프레임워크와는 달리, Solid는 가능한 한 HTML 표준에 가깝게 유지하려고 노력합니다. 이 덕분에 스택오버플로우나 디자이너의 템플릿 빌더에 있는 코드를 단순히 복사/붙여넣기하는 방식이 가능합니다.
 
-There are 3 main differences between JSX and HTML that prevent JSX from being seen as a superset of HTML:
-1. JSX does not have void elements. This means that all elements must have a closing tag or self-close. Keep this in mind when copying over elements like `<input>` or `<br>`.
-2. JSX must return a single Element. To represent multiple top level elements, use a Fragment element:
+JSX와 HTML 사이에는 JSX가 HTML의 상위집합이 되지 못하는 3가지 주요 차이점이 있습니다:
+1. JSX는 void 엘리먼트가 없습니다. 즉, 모든 엘리먼트는 닫는 태그 또는 자체 닫기가 있어야 합니다. `<input>` 또는 `<br>` 엘리먼트를 복사할 때 이 점을 염두에 둬야 합니다.
+2. JSX는 단일 엘리먼트를 반환해야 합니다. 여러 최상위 엘리먼트를 반환하고자 한다면, 다음과 같이 Fragment 엘리먼트를 사용해야 합니다:
 
    ```jsx
    <>
@@ -14,9 +14,9 @@ There are 3 main differences between JSX and HTML that prevent JSX from being se
      <p>Some Text</p>
    </>
    ```
-3. JSX doesn't support HTML Comments `<!--...-->` or special tags like `<!DOCTYPE>`.
+3. JSX는 HTML 주석(`<!--...-->`) 이나 `<!DOCTYPE>` 같은 특별한 태그를 지원하지 않습니다.
 
-But JSX does support SVG. Let's try copying some SVG right into our component:
+하지만 JSX에서 SVG는 지원합니다. 아래와 같은 SVG를 컴포넌트에 추가해봅시다:
 ```jsx
 <svg height="300" width="400">
   <defs>

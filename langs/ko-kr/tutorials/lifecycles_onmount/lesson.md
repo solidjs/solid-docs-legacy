@@ -1,8 +1,8 @@
-There are only few Lifecycles in Solid as everything lives and dies by the reactive system. The reactive system is created and updates synchronously, so the only scheduling comes down to Effects which are pushed to the end of the update.
+Solid는 리액티브 시스템에 의해 생성, 소멸이 되기 때문에 라이프사이클이라고 할 만한 것이 거의 없습니다. 리액티브 시스템은 동기식으로 생성되고 업데이트되므로, 업데이트가 끝날 때까지 푸시되는 Effect만 스케줄링됩니다.
 
-We've found that developers doing simple tasks don't often think this way, so to make things a little easier we've aliased a non-tracking (never reruns) `createEffect` call with `onMount`. It is just an Effect call but you can use it with confidence that it will run only once for your component, once all initial rendering is done.
+우리는 간단한 작업을 하는 개발자들이 이런 식으로 생각하지 않는다는 것을 발견했습니다. 그래서 이해를 쉽게 하기 위해 트래킹하지 않는 (재실행하지 않는) `createEffect` 호출을 `onMount`라는 별칭으로 지정했습니다. 이것은 단지 Effect 호출일 뿐이지만, 모든 초기 렌더링이 완료되면 컴포넌트당 한 번만 실행된다는 확신을 가지고 사용할 수 있습니다.
 
-Let's use the `onMount` hook to fetch some photos:
+사진을 불러오기 위해 `onMount` 훅을 사용해 봅시다:
 ```js
 onMount(async () => {
   const res = await fetch(`https://jsonplaceholder.typicode.com/photos?_limit=20`);
@@ -10,4 +10,4 @@ onMount(async () => {
 });
 ```
 
-Lifecycles are only run in the browser, so putting code in `onMount` has the benefit of not running on the server during SSR. Even though we are doing data fetching in this example, usually we use Solid's resources for true server/browser coordination.
+라이프사이클은 브라우저에서만 실행되므로, `onMount`에 있는 코드는 SSR 동안 서버에서 실행되지 않는다는 장점이 있습니다. 이 예제에서는 데이터를 가져오고 있지만, 일반적으로는 서버/브라우저 코디네이션을 위해 Solid의 Resource를 사용합니다.

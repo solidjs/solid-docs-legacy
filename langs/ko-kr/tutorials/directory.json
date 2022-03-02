@@ -1,102 +1,102 @@
 [
   {
-    "lessonName": "Introduction/Basics",
+    "lessonName": "소개/기초",
     "internalName": "introduction_basics"
   },
   {
-    "lessonName": "Introduction/JSX",
+    "lessonName": "소개/JSX",
     "internalName": "introduction_jsx"
   },
   {
-    "lessonName": "Introduction/Components",
+    "lessonName": "소개/컴포넌트",
     "internalName": "introduction_components"
   },
   {
-    "lessonName": "Introduction/Signals",
+    "lessonName": "소개/Signal",
     "internalName": "introduction_signals"
   },
   {
-    "lessonName": "Introduction/Effects",
+    "lessonName": "소개/Effect",
     "internalName": "introduction_effects"
   },
   {
-    "lessonName": "Introduction/Derived Signals",
+    "lessonName": "소개/파생된 Signal",
     "internalName": "introduction_derived"
   },
   {
-    "lessonName": "Introduction/Memos",
+    "lessonName": "소개/Memo",
     "internalName": "introduction_memos"
   },
   {
-    "lessonName": "Control Flow/Show",
+    "lessonName": "제어 흐름/Show",
     "internalName": "flow_show"
   },
   {
-    "lessonName": "Control Flow/For",
+    "lessonName": "제어 흐름/For",
     "internalName": "flow_for"
   },
   {
-    "lessonName": "Control Flow/Index",
+    "lessonName": "제어 흐름/Index",
     "internalName": "flow_index"
   },
   {
-    "lessonName": "Control Flow/Switch",
+    "lessonName": "제어 흐름/Switch",
     "internalName": "flow_switch"
   },
   {
-    "lessonName": "Control Flow/Dynamic",
+    "lessonName": "제어 흐름/Dynamic",
     "internalName": "flow_dynamic"
   },
   {
-    "lessonName": "Control Flow/Portal",
+    "lessonName": "제어 흐름/Portal",
     "internalName": "flow_portal"
   },
   {
-    "lessonName": "Control Flow/Error Boundary",
+    "lessonName": "제어 흐름/에러 경계",
     "internalName": "flow_error_boundary"
   },
   {
-    "lessonName": "Lifecycles/onMount",
+    "lessonName": "라이프사이클/onMount",
     "internalName": "lifecycles_onmount"
   },
   {
-    "lessonName": "Lifecycles/onCleanup",
+    "lessonName": "라이프사이클/onCleanup",
     "internalName": "lifecycles_oncleanup"
   },
   {
-    "lessonName": "Bindings/Events",
+    "lessonName": "바인딩/이벤트",
     "internalName": "bindings_events"
   },
   {
-    "lessonName": "Bindings/Style",
+    "lessonName": "바인딩/스타일",
     "internalName": "bindings_style"
   },
   {
-    "lessonName": "Bindings/ClassList",
+    "lessonName": "바인딩/ClassList",
     "internalName": "bindings_classlist"
   },
   {
-    "lessonName": "Bindings/Refs",
+    "lessonName": "바인딩/Ref",
     "internalName": "bindings_refs"
   },
   {
-    "lessonName": "Bindings/Forwarding Refs",
+    "lessonName": "바인딩/Ref 전달",
     "internalName": "bindings_forward_refs"
   },
   {
-    "lessonName": "Bindings/Spreads",
+    "lessonName": "바인딩/스프레드",
     "internalName": "bindings_spreads"
   },
   {
-    "lessonName": "Bindings/Directives",
+    "lessonName": "바인딩/디렉티브",
     "internalName": "bindings_directives"
   },
   {
-    "lessonName": "Props/Default Props",
+    "lessonName": "Props/디폴트 Props",
     "internalName": "props_defaults"
   },
   {
-    "lessonName": "Props/Splitting Props",
+    "lessonName": "Props/Props 분리",
     "internalName": "props_split"
   },
   {
@@ -104,59 +104,59 @@
     "internalName": "props_children"
   },
   {
-    "lessonName": "Stores/Nested Reactivity",
+    "lessonName": "저장소/중첩된 반응성",
     "internalName": "stores_nested_reactivity"
   },
   {
-    "lessonName": "Stores/Create Store",
+    "lessonName": "저장소/저장소 생성",
     "internalName": "stores_createstore"
   },
   {
-    "lessonName": "Stores/Mutation",
+    "lessonName": "저장소/뮤테이션",
     "internalName": "stores_mutation"
   },
   {
-    "lessonName": "Stores/Context",
+    "lessonName": "저장소/컨텍스트",
     "internalName": "stores_context"
   },
   {
-    "lessonName": "Stores/Immutable Stores",
+    "lessonName": "저장소/불변 저장소",
     "internalName": "stores_immutable"
   },
   {
-    "lessonName": "Stores/Without Context",
+    "lessonName": "저장소/컨텍스트 미사용",
     "internalName": "stores_nocontext"
   },
   {
-    "lessonName": "Reactivity/Batching Updates",
+    "lessonName": "반응성/배치 업데이트",
     "internalName": "reactivity_batch"
   },
   {
-    "lessonName": "Reactivity/Untrack",
+    "lessonName": "반응성/Untrack",
     "internalName": "reactivity_untrack"
   },
   {
-    "lessonName": "Reactivity/On",
+    "lessonName": "반응성/On",
     "internalName": "reactivity_on"
   },
   {
-    "lessonName": "Async/Lazy Components",
+    "lessonName": "비동기/지연 컴포넌트",
     "internalName": "async_lazy"
   },
   {
-    "lessonName": "Async/Resources",
+    "lessonName": "비동기/Resource",
     "internalName": "async_resources"
   },
   {
-    "lessonName": "Async/Suspense",
+    "lessonName": "비동기/Suspense",
     "internalName": "async_suspense"
   },
   {
-    "lessonName": "Async/Suspense List",
+    "lessonName": "비동기/Suspense 리스트",
     "internalName": "async_suspense_list"
   },
   {
-    "lessonName": "Async/Transitions",
+    "lessonName": "비동기/트랜지션",
     "internalName": "async_transitions"
   }
 ]

@@ -1,6 +1,7 @@
-For convenience, Solid has an `on` helper that enables setting explicit dependencies for our computations. This is mostly used as a terse way to be even more explicit about which Signals are tracked (and not track any other Signals, even if they are read). In addition, `on` provides a `defer` option that allows the computation not to execute immediately and only run on first change.
+편의를 위해 Solid는 계산에 필요한 디펜던시를 명시적으로 설정할 수 있도록 `on` 헬퍼를 제공합니다.
+이는 주로 어떤 Signal이 추적되는지에 대한 명시적이고 간결한 방법으로 사용됩니다(다른 Signal들을 읽더라도 이들은 추적하지 않음). 추가로 `on`은 `defer` 옵션을 제공하는데, 이를 사용하면 계산이 즉시 실행되지 않고 첫번째 변경시에만 실행되도록 할 수 있습니다.
 
-Let's have our Effect run only when `a` updates, and defer execution until the value changes:
+Effect가 `a`가 변경된 경우만 실행되도록 하고, 값이 변경될 때까지 실행을 연기하도록 해 보겠습니다:
 
 ```js
 createEffect(on(a, (a) => {

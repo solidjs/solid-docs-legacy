@@ -9,7 +9,7 @@ sort: 4
 
 ## 테스트 설정
 
-테스트 환경을 설정하기 전에, 테스트 Runner를 먼저 선택해야 합니다. 많은 선택지가 있지만, 매우 극단적으로 반대되는 두 개의 프로젝트인 uvu와 Jest에 촛점을 맞출 것입니다. Jest 는 강력하게 통합되어 있으며, uvu는 필수적인 기능만 제공합니다. 다른 테스트 Runner를 사용하고 싶다면, uvu 설정 방법을 적용하면 다른 대부분의 테스트 Runner에서도 작동할 것입니다.
+테스트 환경을 설정하기 전에, 테스트 Runner를 먼저 선택해야 합니다. 많은 선택지가 있지만, 매우 극단적으로 반대되는 두 개의 프로젝트인 uvu와 Jest, 그리고 vitest라는 새로운 선택지에 촛점을 맞출 것입니다. Jest 는 강력하게 통합되어 있으며, uvu는 필수적인 기능만 제공하고, vitest는 모든 기능을 갖추고 있지만 단순합니다. 다른 테스트 Runner를 사용하고 싶다면, uvu 설정 방법을 적용하면 다른 대부분의 테스트 Runner에서도 작동할 것입니다.
 
 ### Jest 설정
 
@@ -219,7 +219,49 @@ uvu 혹은 tape 와 같은 테스트 Runner를 사용하는 경우, `solid-dom-t
 유닛 테스트 관련해 [vitest](https://vitest.dev/)라는 도구가 새로 나왔습니다.
 vitest는 jest와 동일한 기능들을 제공하면서 보다 빠른 속도를 제공해 jest를 대체하는 것을 목표로 합니다.
 
-안타깝게도 이 글을 쓰는 시점에 모듈 검색 이슈가 있어서 solid의 서버와 클라이언트 버전이 동시에 로드되는 문제가 있으며, 이로 인해 리액티브 시스템이 실패하게 됩니다. 하지만, 이 문제는 가까운 시일 내에 해결될 것으로 기대합니다.
+설치는 간단합니다:
+
+```sh
+> npm i --save-dev vitest jsdom # or yarn add -D 또는 pnpm
+```
+
+공식 starter 혹은 solid-start를 사용 중이라면, 이미 vite를 사용중이기 때문에`vite.config.mjs` 파일이 있을 것입니다. 파일을 다음과 같이 수정하세요:
+
+```js
+/// <reference types="vitest" />
+/// <reference types="vite/client" />
+
+import { defineConfig } from 'vite'
+import solid from 'solid-start' // 또는 'vite-plugin-solid'
+
+export default defineConfig({
+  test: {
+    // `describe, test, it`를 전역으로 사용하고 싶다면 아래의 주석을 해제하세요:
+    // globals: true,
+    environment: 'jsdom',
+    transformMode: {
+      web: [/\.[jt]sx$/],
+    },
+    // vitest에서의 모듈 검색 이슈를 해결하려면 solid를 인라인으로 설정해야 합니다.
+    deps: {
+      inline: [/solid-js/],
+    },
+    // 테스트가 별로 없다면, 퍼포먼스 향상을 위해 아래 주석을 하나 혹은 둘 다 해제하세요:
+    // threads: false,
+    // isolate: false,
+  },
+  plugins: [solid()],
+  resolve: {
+    conditions: ['development', 'browser'],
+  },
+})
+```
+
+마지막으로 `package.json` 파일에 test 스크립트를 추가하세요:
+
+```sh
+> npm set-script "test" "vitest"
+```
 
 ## 테스트 패턴 및 베스트 프랙티스
 
@@ -252,7 +294,7 @@ TODO 컴포넌트를 생성하는 대신, 이 모델을 독립적으로 테스�
 2. 리액티브 변경 사항은 비동기이지만, 이를 캐치하려면 `createEffect`를 사용해야 합니다.
 `createRoot`를 사용하면 수동 해제를 트리거할 수 있다는 장점이 있습니다.
 
-#### Jest 테스트
+#### Jest / vitest 테스트
 
 ```ts
 import { createLocalStore } from "./main.tsx";
@@ -359,7 +401,7 @@ todoTest.run();
 
 이제 컴포넌트를 만들고, 디렉티브를 사용할 수 있지만, 디렉티브를 직접 테스트하는 대신 디렉티브를 사용하는 것을 테스트합니다. 마운트된 노드와 접근자를 제공해서 디렉티브의 외부를 테스트하는 것이 더 간단합니다.
 
-#### Jest 테스트
+#### Jest / vitest 테스트
 
 ```ts
 // click-outside.test.ts
@@ -474,7 +516,7 @@ export const Counter: Component = () => {
 
 아직 `solid-testing-library`를 설치하지 않았다면 반드시 설치해야 합니다. 가장 중요한 헬퍼는 컴포넌트를 DOM에 렌더링하는 `render`, 실제 사용자 이벤트와 유사한 방식으로 이벤트 디스패칭을 하는 `fireEvent`, 전역 셀렉터를 제공하는 `screen` 입니다. jest를 사용하는 경우, `@testing-library/jest-dom`를 설치하고, 몇 가지 유용한 어설션을 설정하거나, 그렇지 않으면 위에서 설명한 `solid-dom-testing`을 설치해야 합니다.
 
-#### Jest 테스트
+#### Jest / vitest 테스트
 
 ```ts
 // main.test.tsx

@@ -1,8 +1,8 @@
-JSX allows you to use JavaScript to control the logic flow in the templates. However, without a Virtual DOM, naive use of things like `Array.prototype.map` would wastefully recreate all the DOM nodes on every update. Instead it is common for Reactive libraries to use template helpers. In Solid we wrap them in components.
+JSX에서는 자바스크립트를 사용해 템플릿의 논리 흐름을 제어할 수 있습니다. 그러나, 가상 DOM이 없는 경우, `Array.prototype.map`를 아무 생각없이 사용하면 업데이트할 때마다 모든 DOM 노드를 새로 생성하고 버리게 될 수 있습니다. 리액티브 라이브러리에서는 대신 템플릿 헬퍼를 사용하는 것이 일반적입니다. Solid에서는 헬퍼를 컴포넌트로 래핑합니다.
 
-The most basic control flow is the conditional. Solid's compiler is smart enough to optimally handle ternaries (`a ? b : c`) and boolean expressions (`a && b`). However, often it is more readable to use Solid's `<Show>` component.
+가장 기본적인 제어 흐름은 조건문입니다. Solid의 컴파일러는 똑똑하게도 삼항 연산자(`a ? b : c`)와 불 표현식(`a && b`)을 최적화해서 처리합니다. 하지만, Solid의 `<Show>` 컴포넌트를 사용하는 것이 가독성이 더 좋을 때도 있습니다.
 
-In the example, we would like to show only the appropriate button that reflects the current state (whether the user is logged in). Update the JSX to:
+이 예에서는, 현재 상태(사용자가 로그인했는지 여부)를 반영하는 적절한 버튼만 표시하고자 합니다. JSX를 다음과 같이 업데이트하세요:
 ```jsx
 <Show
   when={loggedIn()}
@@ -11,6 +11,6 @@ In the example, we would like to show only the appropriate button that reflects 
   <button onClick={toggle}>Log out</button>
 </Show>
 ```
-The `fallback` prop acts as the `else` and will show when the condition passed to `when` is not truthy.
+`fallback` prop은 `else`처럼 동작하며, `when`에 넘겨진 조건이 `false`인 경우에만 표시됩니다.
 
-Now clicking the button will change back and forth like you would expect.
+이제 버튼을 클릭하면 예상한 대로 버튼의 상태가 왔다 갔다하는 것을 볼 수 있습니다.

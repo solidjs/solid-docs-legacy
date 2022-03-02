@@ -1,12 +1,12 @@
-You can always get a reference to a DOM element in Solid through assignment, since JSX creates actual DOM elements. For example:
+JSX는 실제 DOM 엘리먼트를 생성하기 때문에, Solid에서는 항상 할당을 통해 DOM에 대한 레퍼런스를 얻을 수 있습니다. 예를 들어:
 
 ```jsx
 const myDiv = <div>My Element</div>;
 ```
 
-However, there is benefit to not breaking your elements out and instead putting them in a single contiguous JSX template, as it allows Solid to better optimize their creation.
+하지만, 엘리먼트를 분리하지 않고 하나의 연속된 JSX 템플릿에 넣는 경우 Solid가 생성시 최적화를 더 잘할 수 있다는 이점이 있습니다.
 
-Instead you can get a reference to an element in Solid using the `ref` attribute. Refs are basically assignments like the example above, which happen at creation time before they are attached to the document DOM. Simply declare a variable and it will be assigned to:
+Solid에서는 `ref` 속성을 사용해 엘리먼트에 대한 레퍼런스를 얻을 수 있습니다. 레퍼런스는 기본적으로 위의 예제와 같은 할당이며, document DOM에 첨부되기 전에 생성될 때 할당이 발생합니다. 변수를 선언하기만 하면 알아서 할당됩니다:
 
 ```jsx
 let myDiv;
@@ -14,13 +14,13 @@ let myDiv;
 <div ref={myDiv}>My Element</div>
 ```
 
-So let's get a reference to our canvas element and animate it:
+이제 canvan 엘리먼트에 대한 레퍼런스를 가져와 애니메이션을 적용해 보겠습니다:
 
 ```jsx
 <canvas ref={canvas} width="256" height="256" />
 ```
 
-Refs can also take the form of a callback function. This can be convenient for encapsulating logic, especially when you don't need to wait until the elements are attached. For example:
+레퍼런스는 콜백 함수의 형태로도 사용 가능합니다. 이는 엘리먼트가 첨부될 때까지 기다릴 필요가 없이 로직을 캡슐화할 때 편리합니다. 예를 들어:
 
 ```jsx
 <div ref={el => /* do something with el... */}>My Element</div>
