@@ -18,11 +18,11 @@ Rendering melibatkan prakompilasi template-template JSX kedalam kode native js y
 
 Pendekatan ini lebih berkinerja dan menghasilkan kode yang lebih sedikit daripada ketika kita membuat tiap elemen, satu per satu, dengan `document.createElement`.
 
-## Attributes dan Props
+## Atribut-Atribut dan Props
 
-Solid mencoba untuk mencerminkan konvensi HTML sebisa mungkin termasuk kasus insensitifitas dari attributes.
+Solid mencoba untuk mencerminkan konvensi HTML sebisa mungkin termasuk kasus insensitifitas dari atribut.
 
-Mayoritas dari semua attributes pada elemen asli dari JSX telah terset sebagai attributes dari DOM. Nilai-nilai statis dibangun langsung ke dalam template yang dikloning. Tapi ada beberapa pengecualian seperti `class`, `style`, `value`, `innerHTML` yang menyediakan fungsionalitas tambahan.
+Mayoritas dari semua attribut pada elemen asli dari JSX telah terset sebagai attribut DOM. Nilai-nilai statis dibangun langsung ke dalam template yang dikloning. Tapi ada beberapa pengecualian seperti `class`, `style`, `value`, `innerHTML` yang menyediakan fungsionalitas tambahan.
 
 Namun, elemen-elemen kustom (dengan pengecualian dari native built-in) default ke properti saat dinamis. Ini untuk menangani tipe-tipe data yang lebih kompleks. Ia melakukan konversi ini dengan mengubah nama-nama attribute snake case standar (seperti `some-attr`) menjadi camel case (seperti `someAttr`).
 
@@ -32,11 +32,11 @@ Namun, hal yang memungkinkan untuk mengontrol perilaku ini secara langsung denga
 <my-element prop:UniqACC={state.value} attr:title={state.title} />
 ```
 
-> **Note:** Attributes statis dibuat sebagai bagian dari template html yang telah dikloning. Ekspresi-ekspresi tetap dan dinamis akan diaplikasikan di urutan binding JSX. Walau ini mungkin baik-baik saja di sebagian besar elemen-elemen DOM, ada beberapa seperti elemen input dengan `type='range'`, dimana urutan sangatlah penting. Ingat hal ini ketika kamu mem-binding elemen-elemen.
+> **Catatan:** Atribut statis dibuat sebagai bagian dari template html yang telah dikloning. Ekspresi-ekspresi tetap dan dinamis akan diaplikasikan di urutan binding JSX. Walau ini mungkin baik-baik saja di sebagian besar elemen-elemen DOM, ada beberapa seperti elemen input dengan `type='range'`, dimana urutan sangatlah penting. Ingat hal ini ketika kamu mem-binding elemen-elemen.
 
 ## Entry
 
-Cara termudah untuk memasang Solid adalah dengan mengimpor `render` method dari `solid-js/web`. `render` membutuhkan fungsi sebagai argumen pertamanya dan mounting container sebagai argumen keduanya dan akan mengembalikan sebuah method disposal. `render` ini akan secara otomatis membuat root reaktif dan akan menangani rendering ke dalam container mountnya. Untuk performa yang terbaik gunakan elemen yang tidak memiliki turunan.
+Cara termudah untuk memasang Solid adalah dengan mengimpor `render` method dari `solid-js/web`. `render` membutuhkan fungsi sebagai argumen pertamanya dan mounting container sebagai argumen keduanya dan akan mengembalikan sebuah method disposal. `render` secara otomatis membuat root reaktif dan akan menangani rendering ke dalam container mountnya. Untuk performa yang terbaik gunakan elemen yang tidak memiliki turunan.
 
 ```jsx
 import { render } from "solid-js/web";
@@ -44,7 +44,7 @@ import { render } from "solid-js/web";
 render(() => <App />, document.getElementById("main"));
 ```
 
-> **Important** Argumen pertama haruslah sebuah fungsi. Jika tidak, Solid tidak akan bisa melacak dan meng-schedule sistem reaktifnya dengan baik. Kesalahan yang sederhana ini dapat menyebabkan Effect kamu tidak dapat bekerja. 
+> **Penting** Argumen pertama haruslah sebuah fungsi. Jika tidak, Solid tidak akan bisa melacak dan meng-schedule sistem reaktifnya dengan baik. Kesalahan yang sederhana ini dapat menyebabkan Effect kamu tidak dapat bekerja.
 
 ## Komponen-komponen
 
@@ -82,6 +82,7 @@ const Parent = () => (
   </section>
 );
 ```
+
 Pada contoh diatas, nilai yang terset di `greeting` adalah nilai statis, tapi kita juga bisa menset nilai yang dinamis. Sebagai contoh:
 
 ```jsx
@@ -151,7 +152,7 @@ export default function Form() {
 }
 ```
 
-Di contoh ini, apa yang kita mungkin ingin terjadai adalah agar `BasicComponent` bisa memunculkan nilai saat ini yang di ketikkan ke `input`. Namun, sebagai pengingat, fungsi `BasicComponent` hanya akan tereksekusi satu kali saja ketika componennya pertama kali dibuat. Di saat ini (saat pembuatan), `props.value` akan sama saja dengan `''`. Ini berarti `const value` di `BasicComponent` akan menjadi `'default'` dan tidak akan pernah ter-update. Walau mungkin objek `props` itu reaktif, mengakses props di `const value = props.value || 'default';` adalah diluar lingkup dari observable Solid, jadi dia tidak akan secara otomatis ter-evaluasi ulang ketika props terganti.
+Di contoh ini, apa yang kita mungkin ingin terjadai adalah agar `BasicComponent` bisa memunculkan nilai saat ini yang di ketikkan ke `input`. Namun, sebagai pengingat, fungsi `BasicComponent` hanya akan tereksekusi satu kali saja ketika komponennya pertama kali dibuat. Di saat ini (saat pembuatan), `props.value` akan sama saja dengan `''`. Ini berarti `const value` di `BasicComponent` akan menjadi `'default'` dan tidak akan pernah ter-update. Walau mungkin objek `props` itu reaktif, mengakses props di `const value = props.value || 'default';` adalah diluar lingkup dari observable Solid, jadi dia tidak akan secara otomatis ter-evaluasi ulang ketika props terganti.
 
 Terus bagiamana kita memperbaiki masalah ini?
 
@@ -205,7 +206,7 @@ const BasicComponent = (props) => {
 
 // buruk
 const BasicComponent = (props) => {
-  const valueProp = prop.value;
+  const valueProp = props.value;
   const value = createMemo(() => valueProp || "default");
   return <div>{value()}</div>;
 };
@@ -284,4 +285,4 @@ const List = (props) => {
   </ul>;
 ```
 
-**Important:** Solid memperlakukan child tags sebagai ekspresi yang expensive dan membungkus mereka sama seperti ekspresi-ekspresi reaktif dinamis. Ini berarti mereka ter-evaluasi secara malas ketika `props` diakses. Hati-hati ketika mengakses mereka berkali-kali atau men-destructure ditempat sebelum kamu menggunakan mereka di tampilannya. Ini karena Solid tidak mempunya kemewahan dari membuat node-node Virtual DOM sebelum waktunya lalu melakukan diffing ke mereka, jadi resolusi dari `props` ini adalah harus malas dan deliberate. Gunakan fungsi bantuan `children` jika kamu berharap untuk melakukan ini karenaia akan me-memoize mereka. 
+**Penting:** Solid memperlakukan child tags sebagai ekspresi yang expensive dan membungkus mereka sama seperti ekspresi-ekspresi reaktif dinamis. Ini berarti mereka ter-evaluasi secara malas ketika `props` diakses. Hati-hati ketika mengakses mereka berkali-kali atau men-destructure ditempat sebelum kamu menggunakan mereka di tampilannya. Ini karena Solid tidak mempunya kemewahan dari membuat node-node Virtual DOM sebelum waktunya lalu melakukan diffing ke mereka, jadi resolusi dari `props` ini adalah harus malas dan deliberate. Gunakan fungsi bantuan `children` jika kamu berharap untuk melakukan ini karenaia akan me-memoize mereka.

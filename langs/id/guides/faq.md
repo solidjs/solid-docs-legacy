@@ -1,12 +1,12 @@
 ---
 title: FAQ
 description: Pertanyaan-pertanyaan yang sering ditanyakan di komunitas.
-sort: 5
+sort: 6
 ---
 
 # FAQ
 
-### 1. JSX tanpa VDOM? Apa ini vaporware? Saya pernah mendengar penulis framewokr-framework lainnya mengatakan ini tidak mungkin bisa dilakukan.
+### 1. JSX tanpa VDOM? Apa ini vaporware? Saya pernah mendengar penulis framework-framework lainnya mengatakan ini tidak mungkin bisa dilakukan.
 
 Ini memungkinkan untuk dilakukan ketika kamu tidak memiliki model pembaruan seperti React. JSX adalah Template DSL seperti yang lainnya. Hanya satu yang lebih fleksibel dengan cara tertentu. Memasukkan JavaScript arbitrer terkadang sulit, tetapi tidak berbeda dengan mendukung spread operator. Jadi tidak, ini bukan vapourware tetapi pendekatan yang terbukti menjadi salah satu yang paling berkinerja.
 
@@ -28,9 +28,11 @@ Tidak. Dan kemungkinan besar tidak akan pernah ada. Meskipun API serupa dan komp
 
 Vue-compat di sisi lain, itu bisa dilakukan. Meskipun tidak ada rencana untuk diterapkan saat ini.
 
+Di samping itu, ini memungkinkan Solid berjalan didalam React. [React Solid State](https://github.com/solidjs/react-solid-state) membuat API Solid dapat di akses dari komponen-komponen fungsi React. [React Solid State](https://github.com/solidjs/react-solid-state) memungkinkan kamu merender komponen React didalam Solid dan sebaliknya, dimana berguna ketika memporting aplikasi secara bertahap.
+
 ### 4. Mengapa destrukturisasi tidak berhasil? Saya menyadari bahwa saya dapat memperbaikinya dengan membungkus seluruh komponen saya dalam suatu fungsi.
 
-Reaktivitas terjadi pada akses properti pada objek Prop dan Store. Merujuk (Referencing) mereka di luar komputasi yang mengikat atau reaktif tidak akan dilacak. Melakukan destrukturisasi boleh-boleh  saja di dalam mereka.
+Reaktivitas terjadi pada akses properti pada objek Prop dan Store. Merujuk (Referencing) mereka di luar komputasi yang mengikat atau reaktif tidak akan dilacak. Melakukan destrukturisasi boleh-boleh saja di dalam mereka.
 
 Namun, membungkus seluruh komponen kamu dalam suatu fungsi bukanlah hal yang ingin kamu lakukan secara tidak bertanggung jawab. Solid tidak memiliki VDOM. Jadi setiap perubahan yang dilacak akan menjalankan seluruh fungsi lagi menciptakan semuanya. Jangan lakukan itu.
 
