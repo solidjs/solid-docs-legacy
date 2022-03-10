@@ -88,9 +88,7 @@ With props and store objects, reactivity is tracked on property access: when you
 call `props.whatever` within a _tracking scope_ (like a JSX template or an
 effect), it tells Solid to keep track of that context and update it when the
 prop changes. Because of this, it's important to be mindful of when you're
-making that property access, because that will determine whether your code
-reruns:
-if you access the property within a template or an effect, the template will
+making that property access. If you access the property within a template or an effect, the template will
 rerender or the effect will rerun when that property changes.
 
 By destructuring, you're effectively accessing properties at that point in time.
