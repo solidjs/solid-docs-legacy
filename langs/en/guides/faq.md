@@ -42,17 +42,17 @@ For example, if two elements in the array are swapped, `<For>` will reposition t
 
 For an in-depth demonstration of the difference, see [this segment](https://www.youtube.com/watch?v=YxroH_MXuhw&t=2164s) of Ryan's stream.
 
-### Why doesn't destructuring work with props or stores?
+### Why do I lose reactivity when I destructure props?
 
 With props and store objects, reactivity is enabled by tracking on property access.
-If you access the property within a _tracking scope_ like a template or an effect, the template will
-rerender or the effect will rerun when that property changes.
+If you access the property within a _tracking scope_ 
+like a JSX expression or an effect, then the JSX expression will rerender or the effect will rerun when that property changes.
 
 When you destructure, you access the properties of the object. If this takes place outside of a tracking scope, Solid won't track and rerun
 your code.
 
 In this example, the property access happens within the JSX template, so it's
-tracked and the span rerenders when the signal changes:
+tracked and the span contents update when the signal changes:
 
 ```jsx
 function BlueText(props) {
@@ -64,7 +64,7 @@ function BlueText(props) {
 <BlueText text={mySignal()}/>
 ```
 
-But neither of these examples will rerender the span because the property access happens
+But neither of these examples will update the span text because the property access happens
 outside of the template:
 
 ```jsx
@@ -90,7 +90,7 @@ function BlueText({text}) {
 If you prefer the style of early destructuring, though, there are two different Babel
 transforms you can use to make (certain styles of) destructuring reactive
 again: [babel-plugin-solid-undestructure](https://github.com/orenelbaum/babel-plugin-solid-undestructure)
-and [Solid Labels](https://github.com/LXSMNSYC/solid-labels/)'s [object features](https://github.com/LXSMNSYC/solid-labels/blob/main/docs/ctf.md#objects).
+and [Solid Labels'](https://github.com/LXSMNSYC/solid-labels) [object features](https://github.com/LXSMNSYC/solid-labels/blob/main/docs/ctf.md#objects).
 
 ### Why isn't my `onChange` event handler firing on time?
 
