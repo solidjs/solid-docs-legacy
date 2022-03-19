@@ -44,7 +44,7 @@ For an in-depth demonstration of the difference, see [this segment](https://www.
 
 ### Why do I lose reactivity when I destructure props?
 
-With props and store objects, reactivity is enabled by tracking on property access.
+With a props object, reactivity is enabled by tracking on property access.
 If you access the property within a _tracking scope_ 
 like a JSX expression or an effect, then the JSX expression will rerender or the effect will rerun when that property changes.
 
