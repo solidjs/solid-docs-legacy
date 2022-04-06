@@ -402,11 +402,11 @@ const [data, { mutate, refetch }] = createResource(fetchData)
 ```js
 const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData)
 ```
-In these snippets, the fetcher is the function `fetchData`. In both cases, `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately. 
+In these snippets, the fetcher is the function `fetchData`, and `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately. 
 In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`. 
-It will be called again whenever the value of `sourceSignal` changes, it will always be passed to `fetchData` as its first argument.
+It will be called again whenever the value of `sourceSignal` changes, and that value will always be passed to `fetchData` as its first argument.
 
-Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
+You can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
 `data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`. 
 But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#<errorboundary>).)
