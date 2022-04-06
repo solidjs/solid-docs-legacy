@@ -322,9 +322,10 @@ return (
 );
 ```
 
-When the `username` signal updates, `searchForUser` will get called just once
-to update the `user` memo, and then both list items will update automatically
-(if the returned user actually changed).
+When the `username` signal updates, `searchForUser` will get called just once.
+If the returned user actually changed, the `user` memo updates, and then both
+list items will update automatically.
+
 If we had instead defined `user` as a plain function
 `() => searchForUser(username())`, then `searchForUser` would have been
 called twice, once when updating each list item.
