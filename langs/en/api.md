@@ -294,8 +294,10 @@ function createMemo<T>(
 Memos let you efficiently re-use a derived value as a dependency in multiple
 other reactive computations.
 `createMemo` creates a readonly derived signal equal to the return value of
-the given function, which gets called immediately and whenever the
-executed code's dependencies update.  It returns a getter for this signal.
+the given function.  The comparison of before & after computed values is
+'strctly equals' (`===`), which gets called immediately and whenever the
+executed code's dependencies update.  `createMemo` returns a getter for
+this signal.
 
 ```js
 const value = createMemo(() => computeExpensiveValue(a(), b()));
