@@ -38,7 +38,7 @@ function createSignal<T>(
 import type { Signal, Accessor, Setter } from 'solid-js';
 type Signal<T> = [get: Accessor<T>, set: Setter<T>];
 type Accessor<T> = () => T;
-type Setter<T> = (v: T) => T;  // simplified version of real type
+type Setter<T> = (v: T | ((prev?: T) => T)) => T;
 ```
 
 Signals are the most basic reactive primitive.  They track a single value
