@@ -89,6 +89,13 @@ two possibilities for the passed argument: you can call `setCount` with
 a simple `number`, or a
 function taking the previous value (if there was one) and returning a number.
 
+The actual `Setter` type is more complicated, to detect accidentally passing
+a function to the setter when you might have wanted to set the signal to that
+function value instead of calling the function to determine the new value.
+If you're getting a TypeScript error "Argument ... is not assignable to
+parameter" when calling `setCount(value)`, then try wrapping the setter
+argument as in `setCount(() => value)` to make sure that `value` isn't called.
+
 ##### Defaults
 
 We can avoid having to explicitly provide the type of the signal when calling
