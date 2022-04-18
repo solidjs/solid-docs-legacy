@@ -396,6 +396,8 @@ Here are two workarounds for this issue:
 
 ## Special JSX Attributes and Directives
 
+### `on:___`/`oncapture:___`
+
 If you use custom event handlers via Solid's
 [`on:___`/`oncapture:___` attributes](https://www.solidjs.com/docs/latest/api#on%3A___%2Foncapture%3A___),
 you should define corresponding types for the resulting `Event` objects
@@ -426,6 +428,8 @@ declare module "solid-js" {
 <div on:Name={(event) => console.log('name is', event.detail.name)}/>
 ```
 
+### `prop:___`/`attr:___`
+
 If you use forced properties via Solid's
 [`prop:___` attributes](https://www.solidjs.com/docs/latest/api#prop%3A___),
 or custom attributes via Solid's
@@ -451,6 +455,8 @@ declare module "solid-js" {
 <my-web-component attr:name={name()} attr:count={count()}/>
 ```
 
+### `use:___`
+
 If you define custom directives for Solid's
 [`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
 you can type them in the `Directives` interface, like so:
@@ -474,3 +480,31 @@ let [name, setName] = createSignal('');
 
 <input type="text" use:model={[name, setName]} />;
 ```
+
+If you're `import`ing a directive `d` from another module, and `d` is used only
+as a directive `use:d`, then TypeScript (or more precisely,
+[`babel-preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript))
+will by default remove the `import` of `d` (for fear that `d` is a type,
+as TypeScript doesn't understand `use:d` as a reference to `d`).
+There are two ways around this issue:
+
+1. Use
+   [`babel-preset-typescript`'s `onlyRemoveTypeImports: true`](https://babeljs.io/docs/en/babel-preset-typescript#onlyremovetypeimports)
+   configuration option,
+   which prevents it from removing any `import`s except for `import type ...`.
+   If you're using `vite-plugin-solid`, you can specify this option via
+   `solidPlugin({ typescript: { onlyRemoveTypeImports: true } })`
+   in `vite.config.ts`.
+
+   Note that this option can be problematic if you don't vigilantly use
+   `export type` and `import type` throughout your codebase.
+
+2. Add a fake access like `false && d;` to every module `import`ing
+   directive `d`.
+   This will stop TypeScript from removing the `import` of `d`, and assuming
+   you're tree-shaking via e.g. [Terser](https://terser.org/),
+   this code will be omitted from your final code bundle.
+
+   The simpler fake access `d;` will also prevent the `import` from being
+   removed, but will typically not be tree-shaken away, so will end up in
+   your final code bundle.
