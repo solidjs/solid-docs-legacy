@@ -69,7 +69,9 @@ const [count, setCount] = createSignal<number>();
 The first `createSignal` has return type `Signal<number>`, corresponding to 
 the type we passed to it. This is a tuple of the getter and 
 setter, which each have a generic type: 
+
 ```ts 
+import type { Signal, Accessor, Setter } from 'solid-js';
 type Signal<T> = [get: Accessor<T>, set: Setter<T>];
 ```
 
@@ -86,6 +88,13 @@ complicated type definition corresponding roughly to
 two possibilities for the passed argument: you can call `setCount` with 
 a simple `number`, or a
 function taking the previous value (if there was one) and returning a number.
+
+The actual `Setter` type is more complicated, to detect accidentally passing
+a function to the setter when you might have wanted to set the signal to that
+function value instead of calling the function to determine the new value.
+If you're getting a TypeScript error "Argument ... is not assignable to
+parameter" when calling `setCount(value)`, then try wrapping the setter
+argument as in `setCount(() => value)` to make sure that `value` isn't called.
 
 ##### Defaults
 
@@ -175,7 +184,7 @@ defined.
 ## Component Types
 
 ```ts
-import type {PropsWithChildren, Component} from 'solid-js';
+import type { JSX, PropsWithChildren, Component } from 'solid-js';
 type PropsWithChildren<P = {}> = P & { children?: JSX.Element };
 type Component<P = {}> = (props: PropsWithChildren<P>) => JSX.Element
 ```
@@ -186,7 +195,7 @@ where `P` is the type of the `props` argument and should be an [object type](htt
 `{ children?: JSX.Element }` is automatically added to the type
 (via the `PropsWithChildren<P>` wrapper).  For example:
 
-```ts
+```tsx
 const Counter: Component<{initialValue: number}> = (props) => {
   [count, setCount] = createSignal(props.initialValue);
   return (
@@ -211,13 +220,16 @@ for all the types provided.
 
 ## Event Handlers
 
-One useful helper type provided by the `JSX` namespace is `JSX.EventHandler<T>`,
-which represents a single-argument event handler for a DOM element type `T`.
+One useful helper type provided by the `JSX` namespace is
+`JSX.EventHandler<T, E>`,
+which represents a single-argument event handler for a DOM element type `T`
+and event type `E`.
 You can use this to type any event handlers you define outside JSX.
 For example:
 
-```ts
-const onInput: JSX.EventHandler<HTMLInputElement> = (event) => {
+```tsx
+import type { JSX } from 'solid-js';
+const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = (event) => {
   console.log('input changed to', event.currentTarget.value);
 };
 
@@ -229,7 +241,7 @@ Handlers defined inline within
 (with built-in event types) are automatically typed as the appropriate
 `JSX.EventHandler`:
 
-```ts
+```tsx
 <input onInput={(event) => {
   console.log('input changed to', event.currentTarget.value);
 }}/>;
@@ -251,6 +263,7 @@ captured by the event handler, which can be any DOM element.
 When we use the `ref` attribute with a variable, we tell Solid to assign the
 DOM element to 
 the variable once the element is rendered. Without TypeScript, this looks like:
+
 ```jsx
 let divRef;
 
@@ -270,7 +283,7 @@ as an `HTMLDivElement`, even though it's only set as such after rendering?
 
 Here is one common pattern for using `ref` variables with TypeScript:
 
-```ts
+```tsx
 let divRef!: HTMLDivElement;
 let buttonRef!: HTMLButtonElement;
 
@@ -299,7 +312,7 @@ to a quirk with
 TypeScript and JSX, you'll need to add the non-null assertion using the `ref` 
 attribute in JSX:
 
-```ts
+```tsx
 let divRef: HTMLDivElement;
 let buttonRef: HTMLButtonElement;
 
@@ -329,7 +342,7 @@ A common pattern is to use
 [`<Show>`](https://www.solidjs.com/docs/latest/api#%3Cshow%3E)
 to display data only when that data is defined:
 
-```ts
+```tsx
 const [name, setName] = createSignal<string>();
 
 return (
@@ -350,7 +363,7 @@ Here are two workarounds for this issue:
    using TypeScript's
    [non-null assertion operator `!`](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-):
 
-   ```ts
+   ```tsx
    return (
      <Show when={name()}>
        Hello {name()!.replace(/\s+/g, '\xa0')}!
@@ -361,7 +374,7 @@ Here are two workarounds for this issue:
 2. You can use the callback form of `<Show>`, which passes in the value of the
    `when` prop when it is truthy:
 
-   ```ts
+   ```tsx
    return (
      <Show when={name()}>
        {(n) =>
@@ -389,7 +402,7 @@ you should define corresponding types for the resulting `Event` objects
 by overriding the `CustomEvents` and `CustomCaptureEvents` interfaces
 within module `"solid-js"`'s `JSX` namespace, like so:
 
-```ts
+```tsx
 class NameEvent extends CustomEvent {
   type: 'Name';
   detail: {name: string};
@@ -420,7 +433,7 @@ or custom attributes via Solid's
 you can define their types in the `ExplicitProperties` and
 `ExplicitAttributes` interfaces, respectively:
 
-```ts
+```tsx
 declare module "solid-js" {
   namespace JSX {
     interface ExplicitProperties { // prop:___
@@ -442,7 +455,7 @@ If you define custom directives for Solid's
 [`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
 you can type them in the `Directives` interface, like so:
 
-```ts
+```tsx
 function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
   const [field, setField] = value();
   createRenderEffect(() => (element.value = field()));
