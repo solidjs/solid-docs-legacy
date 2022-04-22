@@ -87,9 +87,9 @@ Since Solid supports asynchronous and stream rendering on the server, you get to
 
 For more information, read the [Server guide](/guides/server#server-side-rendering).
 
-## No Compilation?
+## Buildless options
 
-Dislike JSX? Don't mind doing manual work to wrap expressions, experiencing worse performance, and having larger bundle sizes? Alternatively, you can create a Solid app using Tagged Template Literals or HyperScript in non-compiled environments.
+If you dislike JSX, you can create a Solid app using [`html` Tagged Template Literals](https://github.com/solidjs/solid/tree/main/packages/solid/html) or [HyperScript `h()` functions](https://github.com/solidjs/solid/tree/main/packages/solid/h) in non-compiled environments such as plain HTML file, https://codepen.io, etc. Keep in mind that this means build-time optimization won't be in place, meaning app startup speed will be slightly slower because each template gets compiled at runtime, but for many use cases this perf hit is imperceivable. Ongoing speed after startup will remain the same with the `html` template tag as with JSX, but `h()` will always have slower ongoing speed due to its inability to statically analyze a whole template before it is executed.  
 
 You can run them straight from the browser using [Skypack](https://www.skypack.dev/):
 
