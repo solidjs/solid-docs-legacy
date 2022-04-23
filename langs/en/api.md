@@ -536,20 +536,8 @@ createEffect(on(a, (v) => console.log(v), { defer: true }));
 setA("new"); // now it runs
 ```
 
-Please note that on nested objects, adding or removing a property from the parent object will trigger an effect. This is done to support Iteraction on objects, like Array.
+Please note that on `stores` and `mutable`, adding or removing a property from the parent object will trigger an effect. See [`createMutable`](#createMutable)
 
-```js
-let state = createMutable({ nested: { a: 1 } });
-
-createEffect(
-  on(
-    () => state.nested.a,
-    () => console.log("could be unexpected")
-  )
-);
-
-setTimeout(() => (state.nested.b = 2)); // triggers effect
-```
 
 ## `createRoot`
 
@@ -1156,6 +1144,21 @@ const user = createMutable({
     [this.firstName, this.lastName] = value.split(" ");
   },
 });
+```
+
+Adding or removing a property from the parent object would trigger an effect which may not be expected. This is done to support Iteration on objects, like Array.
+
+```js
+let state = createMutable({ nested: { a: 1 } });
+
+createEffect(
+  on(
+    () => state.nested.a,
+    () => console.log("could be unexpected")
+  )
+);
+
+setTimeout(() => (state.nested.b = 2)); // triggers effect
 ```
 
 # Component APIs
