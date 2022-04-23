@@ -536,6 +536,22 @@ createEffect(on(a, (v) => console.log(v), { defer: true }));
 setA("new"); // now it runs
 ```
 
+Please note that on nested objects, adding or removing a property from the parent object will trigger an effect. This is done to support Iteraction on objects, like Array.
+
+```js
+let state = createMutable({ nested: { a: 1 } });
+
+createEffect(
+  on(
+    () => state.nested.a,
+    () => console.log("could be unexpected"),
+    { defer: true }
+  )
+);
+
+setTimeout(() => (state.nested.b = 2)); // triggers effect
+```
+
 ## `createRoot`
 
 ```ts
