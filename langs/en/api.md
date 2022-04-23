@@ -544,8 +544,7 @@ let state = createMutable({ nested: { a: 1 } });
 createEffect(
   on(
     () => state.nested.a,
-    () => console.log("could be unexpected"),
-    { defer: true }
+    () => console.log("could be unexpected")
   )
 );
 
