@@ -87,11 +87,11 @@ Since Solid supports asynchronous and stream rendering on the server, you get to
 
 For more information, read the [Server guide](/guides/server#server-side-rendering).
 
-## No Compilation?
+## Buildless options
 
-Dislike JSX? Don't mind doing manual work to wrap expressions, experiencing worse performance, and having larger bundle sizes? Alternatively, you can create a Solid app using Tagged Template Literals or HyperScript in non-compiled environments.
+If you need or prefer to use Solid in non-compiled environments such as plain HTML files, https://codepen.io, etc, you can use [``` html`` ``` Tagged Template Literals](https://github.com/solidjs/solid/tree/main/packages/solid/html) or [HyperScript `h()` functions](https://github.com/solidjs/solid/tree/main/packages/solid/h) in plain JavaScript instead of Solid's compile-time-optimized JSX syntax.
 
-You can run them straight from the browser using [Skypack](https://www.skypack.dev/):
+You can run them straight from the browser using [Skypack](https://www.skypack.dev/), for example:
 
 ```html
 <html>
@@ -109,6 +109,8 @@ You can run them straight from the browser using [Skypack](https://www.skypack.d
           timer = setInterval(() => setCount(count() + 1), 1000);
         onCleanup(() => clearInterval(timer));
         return html`<div>${count}</div>`;
+        // or
+        return h('div', {}, count)
       };
       render(App, document.body);
     </script>
@@ -116,4 +118,26 @@ You can run them straight from the browser using [Skypack](https://www.skypack.d
 </html>
 ```
 
-Remember you still need the corresponding DOM Expressions library for these to work with TypeScript. You can use Tagged Template Literals with [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) or HyperScript with [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
+The advantages of going buildless come with tradeoffs:
+
+- Expressions need to always be a wrapped in a getter function or they won't be reactive.
+  The following will not update when the `first` or `last` values change because the values are not being accessed inside an effect that the template creates internally, therefore dependencies will not be tracked:
+  ```js
+  html`
+    <h1>Hello ${first() + ' ' + last()}</h1>
+  `
+  // or
+  h('h1', {}, 'Hello ', first() + ' ' + last())
+  ```
+  The following will update as expected when `first` or `last` change because the template will read from the getter within an effect and dependencies will be tracked:
+  ```js
+  html`
+    <h1>Hello ${() => first() + ' ' + last()}</h1>
+  `
+  // or
+  h('h1', {}, 'Hello ', () => first() + ' ' + last())
+  ```
+  Solid's JSX doesn't have this issue because of its compile-time abilities, and an expression like `<h1>Hello {first() + ' ' + last()}</h1>` will be reactive.
+- Build-time optimizations won't be in place like they are with Solid JSX, meaning app startup speed will be slightly slower because each template gets compiled at runtime the first time it is executed, but for many use cases this perf hit is imperceivable. Ongoing speed after startup will remain the same with the ``` html`` ``` template tag as with JSX. `h()` calls will always have slower ongoing speed due to their inability to statically analyze whole templates before being executed.
+
+You need the corresponding DOM Expressions library for these to work with TypeScript. You can use Tagged Template Literals with [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) or HyperScript with [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).
