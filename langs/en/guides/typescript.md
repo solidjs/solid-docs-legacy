@@ -267,74 +267,114 @@ the variable once the element is rendered. Without TypeScript, this looks like:
 ```jsx
 let divRef;
 
-console.log(divRef); //undefined
+console.log(divRef); // undefined
 
 onMount(() => {
-  console.log(divRef) //<div></div>
+  console.log(divRef); // <div> element
 })
 
 return (
-  <div ref={divRef}></div>
+  <div ref={divRef}/>
 )
 ```
 
 This presents a challenge for typing that variable: should we type `divRef` 
 as an `HTMLDivElement`, even though it's only set as such after rendering?
+(Here we assume TypeScript's `strictNullChecks` mode is turned on;
+otherwise, TypeScript ignores potentially `undefined` variables.)
 
-Here is one common pattern for using `ref` variables with TypeScript:
-
-```tsx
-let divRef!: HTMLDivElement;
-let buttonRef!: HTMLButtonElement;
-
-return (
-  <div ref={divRef}>
-    <button ref={buttonRef}>...</button>
-  </div>
-);
-```
-
-The [non-null assertions (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)
-on the declarations effectively tell TypeScript to assume that the refs have 
-been set, allowing you to call `HTMLDivElement` properties (e.g. `divRef.offsetWidth`) without a type assertion.
-
-The downside to this approach is that it doesn't reflect the full picture: 
-these ref variables 
-won't actually be set (and will still be undefined)
-until after the rendering phase.  You can safely use them in [`onMount`](/docs/latest/api#onmount) or a
-[`createEffect`](/docs/latest/api#createeffect),
-for example, but not in the body of the component function.
-
-Instead, you can leave off the non-null assertion in the declaration, and 
-check for nullity when you access the variable later on.
-Additionally, due 
-to a quirk with 
-TypeScript and JSX, you'll need to add the non-null assertion using the `ref` 
-attribute in JSX:
+The safest pattern in TypeScript is to acknowledge that `divRef` is `undefined`
+for a period of time, and check when using it:
 
 ```tsx
-let divRef: HTMLDivElement;
-let buttonRef: HTMLButtonElement;
+let divRef: HTMLDivElement | undefined;
+
+divRef.focus();  // correctly reported as an error at compile time
+
+onMount(() => {
+  if (!divRef) return;
+  divRef.focus();  // correctly allowed
+});
 
 return (
   <div ref={divRef!}>
-    <button ref={buttonRef!}>...</button>
+    ...
   </div>
 );
 ```
 
-This is because TypeScript assumes 
-that the variable is being used to set the ref attribute (and thus 
-believes 
-that the variable must be defined), 
-when in fact the `ref` attribute tells Solid to 
-set _the variable_ later on. 
+Alternatively, because we know `onMount` gets called only after the `<div>`
+element gets rendered, we could use a
+[non-null assertion (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)
+when accessing `divRef` within `onMount`:
 
-With this pattern, TypeScript will correctly flag any accidental uses of the
+```tsx
+onMount(() => {
+  divRef!.focus();
+});
+```
+
+Another fairly safe pattern is to omit `undefined` from `divRef`'s type,
+and use a
+[definite assignment assertion (`!`)](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html#definite-assignment-assertions)
+in the `ref` attribute:
+
+```tsx
+let divRef: HTMLDivElement;
+
+divRef.focus();  // correctly reported as an error at compile time
+
+onMount(() => {
+  divRef.focus();  // correctly allowed
+});
+
+return (
+  <div ref={divRef!}>
+    ...
+  </div>
+);
+```
+
+We need to use `ref={divRef!}` because TypeScript assumes that the `ref`
+attribute is being set to the `divRef` variable, and thus `divRef` should
+already be assigned.  In Solid, it's the other way around: `divRef` gets
+assigned to by the `ref` attribute.  The definite assignment assertion
+`divRef!` effectively convinces TypeScript that this is what's happening:
+TypeScript will understand that `divRef` has been assigned after this line.
+
+With this pattern, TypeScript will correctly flag any accidental uses of
 refs inside the body of the function (before the JSX block where they get
-defined).  However, TypeScript currently does not flag use of refs inside
-`createMemo` and `createRenderEffect`, even though they won't be defined there,
-so you still need to be careful.
+defined).  However, TypeScript currently does not flag use of potentially
+undefined variables within nested functions.  In the context of Solid,
+you need to take care not to use refs inside `createMemo`, `createRenderEffect`,
+and `createComputed` (before the JSX block that defines the refs),
+because those functions are called immediately,
+so the refs won't be defined yet (yet TypeScript won't flag this as an error).
+By contrast, the previous pattern would catch these errors.
+
+Another common, but less safe, pattern is to put the definite assignment
+assertion at the point of variable declaration.
+
+```tsx
+let divRef!: HTMLDivElement;
+
+divRef.focus();  // allowed despite causing an error
+
+onMount(() => {
+  divRef.focus();  // correctly allowed
+});
+
+return (
+  <div ref={divRef}>
+    ...
+  </div>
+);
+```
+
+This approach effectively turns off assignment checking for that variable,
+which is an easy workaround, but requires additional care.
+In particular, unlike the previous pattern, it incorrectly allows premature
+use of the variable, even outside nested functions.
 
 ## Control Flow Narrowing
 
