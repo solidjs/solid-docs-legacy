@@ -6,7 +6,7 @@ const myDiv = <div>My Element</div>;
 
 However, there is benefit to not breaking your elements out and instead putting them in a single contiguous JSX template, as it allows Solid to better optimize their creation.
 
-Instead you can get a reference to an element in Solid using the `ref` attribute. Refs are basically assignments like the example above, which happen at creation time before they are attached to the document DOM. Simply declare a variable and it will be assigned to:
+Instead you can get a reference to an element in Solid using the `ref` attribute. Refs are basically assignments like the example above, which happen at creation time before they are attached to the document DOM. Just declare a variable, pass it in as a `ref` attribute, and the variable will be assigned to:
 
 ```jsx
 let myDiv;

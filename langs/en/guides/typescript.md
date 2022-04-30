@@ -86,8 +86,8 @@ The signal setter `setCount` has type `Setter<number>`, which is a more
 complicated type definition corresponding roughly to
 `(value?: number | ((prev?: number) => number)) => number`, representing the
 two possibilities for the passed argument: you can call `setCount` with 
-a simple `number`, or a
-function taking the previous value (if there was one) and returning a number.
+either a `number` or a
+function taking the previous value (if there was one) and returning a `number`.
 
 The actual `Setter` type is more complicated, to detect accidentally passing
 a function to the setter when you might have wanted to set the signal to that

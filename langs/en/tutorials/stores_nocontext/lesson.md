@@ -1,6 +1,6 @@
 Context is a great tool for stores. It handles injection, ties ownership to the reactive graph, automatically manages disposal, and has no render overhead given Solid's fine-grained rendering.
 
-However, you could just use the reactive system directly for simple things. It's almost not worth pointing out but a simple writeable store is just a Signal:
+Sometimes context is overkill, though; an alternative is to use the reactive system directly. For example, we can build a global reactive data store by creating a signal in a global scope, and `export`ing it for other modules to use:
 
 ```js
 import { createSignal } from 'solid-js';

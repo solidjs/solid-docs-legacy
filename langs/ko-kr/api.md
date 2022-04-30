@@ -779,7 +779,7 @@ function from<T>(
 ): () => T;
 ```
 
-A simple helper to make it easier to interopt with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
+A simple helper to make it easier to interop with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
 
 ```js
 const signal = from(obsv$);
