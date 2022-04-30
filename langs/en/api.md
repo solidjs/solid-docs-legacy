@@ -754,7 +754,7 @@ import { observable } from "solid-js";
 function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable.
+This method takes a signal and produces an Observable.
 You can consume it from another Observable library of your choice, typically
 with the `from` operator.
 
@@ -790,7 +790,7 @@ function from<T>(
 ): () => T;
 ```
 
-A simple helper to make it easier to interopt with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
+A helper to make it easier to interop with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
 
 ```js
 const signal = from(obsv$);
@@ -933,7 +933,8 @@ const [state, setState] = createStore({
 });
 ```
 
-These are simple getters, so you still need to use a memo if you want to cache a value:
+These are getters that rerun when accessed,
+so you still need to use a memo if you want to cache a value:
 
 ```js
 let fullName;
@@ -1604,7 +1605,7 @@ The options are for the `nonce` to be put on the script tag and any event names 
 
 # Control Flow
 
-For reactive control flow to be performant, we have to control how elements are created. For example, with lists, a simple `map` is inefficient as it always maps the entire array.
+For reactive control flow to be performant, we have to control how elements are created. For example, calling `array.map` is inefficient as it always maps the entire array.
 
 This means helper functions. Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flow components.
 
@@ -1624,7 +1625,8 @@ function For<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Simple referentially keyed loop. The callback takes the current item as the first argument:
+A referentially keyed loop with efficient updating of only changed items.
+The callback takes the current item as the first argument:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -1690,7 +1692,8 @@ type MatchProps<T> = {
 function Match<T>(props: MatchProps<T>);
 ```
 
-Useful for when there are more than 2 mutual exclusive conditions. Can be used to do things like simple routing.
+Useful for when there are more than 2 mutual exclusive conditions.
+For example, it can be used to perform basic routing:
 
 ```jsx
 <Switch fallback={<div>Not Found</div>}>
@@ -1890,11 +1893,12 @@ declare module "solid-js" {
 Refs are a way of getting access to underlying DOM elements in our JSX. While it is true one could just assign an element to a variable, it is more optimal to leave components in the flow of JSX. Refs are assigned at render time but before the elements are connected to the DOM. They come in 2 flavors.
 
 ```js
-// simple assignment
+// variable assigned directly by ref
 let myDiv;
 
 // use onMount or createEffect to read after connected to DOM
 onMount(() => console.log(myDiv));
+
 <div ref={myDiv} />
 
 // Or, callback function (called before connected to DOM)
@@ -1994,10 +1998,10 @@ function handler(itemId, e) {
 ```
 
 Events are never rebound and the bindings are not reactive, as it is expensive to attach and detach listeners.
-Since event handlers are called like any other function each time an event fires, there is no need for reactivity; simply shortcut your handler if desired.
+Since event handlers are called like any other function each time an event fires, there is no need for reactivity; shortcut your handler if desired.
 
 ```jsx
-// if defined call it, otherwised don't.
+// if defined, call it; otherwise don't.
 <div onClick={() => props.handleClick?.()} />
 ```
 
@@ -2005,7 +2009,7 @@ Note that `onChange` and `onInput` work according to their native behavior. `onI
 
 ## `on:___`/`oncapture:___`
 
-For any other events, perhaps ones with unusual names, or ones you wish not to be delegated there are the `on` namespace events. This simply adds an event listener verbatim.
+For any other events, perhaps ones with unusual names, or ones you wish not to be delegated, there are the `on` namespace events. This attribute adds an event listener verbatim.
 
 ```jsx
 <div on:Weird-Event={(e) => alert(e.detail)} />
@@ -2013,7 +2017,7 @@ For any other events, perhaps ones with unusual names, or ones you wish not to b
 
 ## `use:___`
 
-These are custom directives. In a sense this is just syntax sugar over ref but allows us to easily attach multiple directives to a single element. A directive is simply a function with the following signature:
+These are custom directives. In a sense this is just syntax sugar over ref but allows us to easily attach multiple directives to a single element. A directive is a function with the following signature:
 
 ```ts
 function directive(element: Element, accessor: () => any): void;
@@ -2063,9 +2067,9 @@ Forces the prop to be treated as a attribute instead of an property. Useful for 
 
 ## `/* @once */`
 
-Solid's compiler uses a simple heuristic for reactive wrapping and lazy evaluation of JSX expressions. Does it contain a function call, a property access, or JSX? If yes we wrap it in a getter when passed to components or in an effect if passed to native elements.
+Solid's compiler uses a heuristic for reactive wrapping and lazy evaluation of JSX expressions. Does it contain a function call, a property access, or JSX? If yes we wrap it in a getter when passed to components or in an effect if passed to native elements.
 
-Knowing this we can reduce overhead of things we know will never change simply by accessing them outside of the JSX. A simple variable will never be wrapped. We can also tell the compiler not to wrap them by starting the expression with a comment decorator `/_ @once _/`.
+Knowing this heuristic and its limitations, we can reduce overhead of things we know will never change by accessing them outside of the JSX. A lone variable will never be wrapped. We can also tell the compiler not to wrap them by starting the expression with a comment decorator `/_ @once _/`.
 
 ```jsx
 <MyComponent static={/*@once*/ state.wontUpdate} />

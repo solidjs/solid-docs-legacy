@@ -143,4 +143,4 @@ However, a new starter is in the works [SolidStart](https://github.com/solidjs/s
 
 ## Getting Started with Static Site Generation
 
-[solid-ssr](https://github.com/solidjs/solid/blob/main/packages/solid-ssr) also ships with a simple utility for generating static or prerendered sites. Read the README for more information.
+[solid-ssr](https://github.com/solidjs/solid/blob/main/packages/solid-ssr) also ships with a utility for generating static or prerendered sites. Read the README for more information.

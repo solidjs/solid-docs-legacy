@@ -5,7 +5,7 @@ sort: 4
 ---
 # Testing Solid 
 
-To use your Solid code in production, it needs to be tested. Since you don't want to test everything manually, you need automated tests. Testing Solid code can be simple, once you got everything set up and know a few useful patterns for testing.
+To use your Solid code in production, it needs to be tested. Since you don't want to test everything manually, you need automated tests. This guide describes how to set everything up and a few useful patterns for testing Solid code.
 
 ## Testing Setup
 
@@ -497,7 +497,7 @@ clickTest.run();
 
 ### Testing components
 
-Let's take a very simple click-counter component that we want to test:
+Let's take a simple click-counter component that we want to test:
 
 ```ts
 // main.tsx
