@@ -167,8 +167,9 @@ import { createEffect } from "solid-js";
 function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Effects are a general way to make arbitrary code run whenever dependencies
-change. `createEffect` creates a new computation that runs the given function
+Effects are a general way to make arbitrary code ("side effects")
+run whenever dependencies change, e.g., to modify the DOM manually.
+`createEffect` creates a new computation that runs the given function
 in a tracking scope, thus automatically tracking its dependencies,
 and automatically reruns the function whenever the dependencies update.
 For example:
@@ -194,10 +195,18 @@ createEffect((prev) => {
 }, 0);
 ```
 
-The effect function is automatically wrapped in [`batch`](#batch),
+Effects are meant primarily for side effects that read but don't write
+to the reactive system:
+it's best to avoid setting signals in effects, which without care
+can cause additional rendering or even infinite effect loops.
+Instead, prefer using [`createMemo`](#creatememo) to compute new values
+that depend on other reactive values, so the reactive system knows what
+depends on what, and can optimize accordingly.
+If you do set signals in an effect,
+the effect function is automatically wrapped in [`batch`](#batch),
 meaning that all signal changes inside the effect propagate only after the
-effect finishes. This lets you update several signals while triggering only
-one update, and avoids unwanted side-effects from happening in the middle
+effect finishes. This causes several signal updates to trigger only
+one update, and avoids unwanted side effects from happening in the middle
 of your side effects.
 In fact, if multiple effects all trigger at once, they collectively
 get wrapped into a single `batch`.
@@ -207,7 +216,7 @@ it's scheduled to run after the current rendering phase
 (e.g., after calling the function passed to [`render`](#render),
 [`createRoot`](#createroot), or [`runWithOwner`](#runwithowner)).
 If you want to wait for the first execution to occur, use
-[`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask).
+[`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask)
 (which runs before the browser renders the DOM) or
 `await Promise.resolve()` or `setTimeout(..., 0)`
 (which run after browser rendering).
