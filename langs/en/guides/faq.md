@@ -114,7 +114,7 @@ Other libraries have been adding support for these features but that has been an
 
 Stores automatically wrap nested values making it ideal for deep data structures, and for things like models. For most other things Signals are lightweight and do the job wonderfully.
 
-As much we would love to wrap these together as a single thing, you can't proxy primitives. Functions are the simplest interface and any reactive expression (including state access) can be wrapped in one on transport so this provides a universal API. You can name your signals and state as you choose and it stays minimal. Last thing we'd want to do is force typing `.get()` `.set()` on the end-user or even worse `.value`. At least the former can be aliased for brevity, whereas the latter is just the least terse way to call a function.
+As much we would love to wrap these together as a single thing, you can't proxy primitive values, so in this case we use functions. Any reactive expression (including state access) can be wrapped in a function on transport, so this provides a universal API. You can name your signals and state as you choose and it stays minimal. Last thing we'd want to do is force typing `.get()` `.set()` on the end-user or even worse `.value`. At least the former can be aliased for brevity, whereas the latter is just the least terse way to call a function.
 
 ### Why can I not just assign a value to Solid's Store as I can in Vue, Svelte, or MobX? Where is the 2-way binding?
 

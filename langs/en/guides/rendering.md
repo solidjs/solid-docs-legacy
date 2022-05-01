@@ -44,7 +44,7 @@ import { render } from "solid-js/web";
 render(() => <App />, document.getElementById("main"));
 ```
 
-> **Important** The first argument needs to be a function. Otherwise we can't properly track and schedule the reactive system. This simple ommission will cause your Effects not to run.
+> **Important** The first argument needs to be a function. Otherwise we can't properly track and schedule the reactive system. Omitting the function wrapper will cause your Effects not to run.
 
 ## Components
 

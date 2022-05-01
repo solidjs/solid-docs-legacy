@@ -8,7 +8,7 @@ sort: 0
 
 By far the easiest way to get started with Solid is to try it online. Our REPL at https://playground.solidjs.com is the perfect way to try out ideas. As is https://codesandbox.io/ where you can modify any of [our Examples](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
 
-Alternatively, you can use our simple [Vite templates](https://github.com/solidjs/templates) by running these commands in your terminal:
+Alternatively, you can use our [Vite templates](https://github.com/solidjs/templates) by running these commands in your terminal:
 
 ```sh
 > npx degit solidjs/templates/js my-app
@@ -44,7 +44,7 @@ function MyComponent(props) {
 
 Components are lightweight in that they are not stateful themselves and have no instances. Instead, they serve as factory functions for DOM elements and reactive primitives.
 
-Solid's fine-grained reactivity is built on 3 simple primitives: Signals, Memos, and Effects. Together, they form an auto-tracking synchronization engine that ensures your view stays up to date. Reactive computations take the form of simple function-wrapped expressions that execute synchronously.
+Solid's fine-grained reactivity is built on three core primitives: Signals, Memos, and Effects. Together, they form an auto-tracking synchronization engine that ensures your view stays up to date. Reactive computations take the form of function-wrapped expressions that execute synchronously.
 
 ```js
 const [first, setFirst] = createSignal("JSON");
