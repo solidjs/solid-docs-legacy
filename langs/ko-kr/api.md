@@ -1,109 +1,86 @@
 ---
 title: API
-description: Description of all of Solid's API
+description: Solid 전체 API 설명
 sort: 0
 ---
 
 # Basic Reactivity
 
-Solid's overall approach to reactivity is to wrap any reactive computation in
-a function, and rerun that function when its dependencies update.
-The Solid JSX compiler also wraps most JSX expressions (code in braces) with a
-function, so they automatically update (and trigger corresponding DOM updates)
-when their dependencies change.
-More precisely, automatic rerunning of a function happens whenever the function
-gets called in a *tracking scope*, such as a JSX expression
-or API calls that build "computations" (`createEffect`, `createMemo`, etc.).
-By default, the dependencies of a function get tracked automatically
-when they're called in a tracking scope, by detecting when the function reads
-reactive state (e.g., via a Signal getter or Store attribute).
-As a result, you generally don't need to worry about dependencies yourselves.
-(But if automatic dependency tracking ever doesn't produce the results you
-want, you can [override dependency tracking](#reactive-utilities).)
-This approach makes reactivity *composable*: calling one function
-within another function generally causes the calling function
-to inherit the dependencies of the called function.
+반응성에 대한 Solid의 전반적인 접근 방식은 모든 리액티브 계산을 함수로 래핑하고 디펜던시가 업데이트될 때 해당 함수를 다시 실행하는 것입니다.
+Solid JSX 컴파일러는 또는 대부분의 JSX 표현식 (중괄호 안의 코드)을 함수로 래핑하므로, 디펜던시가 변경되면 자동으로 업데이트(및 해당 DOM 업데이트)합니다.
+보다 정확하게는, 함수의 자동 재실행은 _추적 범위_ 내에서 함수가 호출될 때마다 발생합니다. 추적 범위는 JSX 표현식이나 "계산"(`createEffect`, `createMemo`, 등)을 빌드하는 API 호출을 의미합니다.
+기본적으로 함수의 디펜던시는 추적 범위에서 호출될 때 함수가 리액티브 상태를 읽는 것(예: 시그널 getter 혹은 Store 속성을 통해)을 감지하여 자동으로 추적됩니다.
+결과적으로, 보통은 디펜던시에 대해 걱정할 필요가 없습니다(하지만 자동 디펜던시 추적이 원하는 결과를 생성하지 않는 경우, [디펜던시 추적을 오버라이드](#reactive-utilities) 할 수 있습니다.)
+이 접근 방식은 반응성을 _구성 가능_ 하게 만듭니다: 다른 함수에서 하나의 함수를 호출하면 일반적으로 호출하는 함수가 호출되는 함수의 디펜던시를 상속합니다.
 
 ## `createSignal`
 
 ```ts
-import { createSignal } from 'solid-js';
+import { createSignal } from "solid-js";
 
 function createSignal<T>(
   initialValue: T,
   options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): [get: () => T, set: (v: T) => T];
 
-// available types for return value of createSignal:
-import type { Signal, Accessor, Setter } from 'solid-js';
+// createSignal 반환값에 사용 가능한 타입:
+import type { Signal, Accessor, Setter } from "solid-js";
 type Signal<T> = [get: Accessor<T>, set: Setter<T>];
 type Accessor<T> = () => T;
-type Setter<T> = (v: T) => T;  // simplified version of real type
+type Setter<T> = (v: T | ((prev?: T) => T)) => T;
 ```
 
-Signals are the most basic reactive primitive.  They track a single value
-(which can be any JavaScript object) that changes over time.
-The Signal's value starts out equal to the passed first argument
-`initialValue` (or `undefined` if there are no arguments).
-The `createSignal` function returns a pair of functions as a two-element array:
-a *getter* (or *accessor*) and a *setter*.  In typical use, you would
-destructure this array into a named Signal like so:
+시그널은 가장 기본적인 리액티브 프리미티브입니다. 이는 시간에 따라 변하는 단일 값(자바스크립트 객체)을 추적합니다.
+시그널의 초기값은 전달된 첫 번째 인자인 `initialValue` (미지정시 `undefined`) 값으로 시작합니다.
+`createSignal` 함수는 _getter_ (또는 _accessor_)와 _setter_ 함수 2개를 가진 배열을 반환합니다. 보통은 다음과 같이 디스트럭처링을 사용해 배열을 이름을 가진 시그널에 할당합니다:
 
 ```js
 const [count, setCount] = createSignal(0);
 const [ready, setReady] = createSignal(false);
 ```
 
-Calling the getter (e.g., `count()` or `ready()`)
-returns the current value of the Signal.
-Crucial to automatic dependency tracking, calling the getter
-within a tracking scope causes the calling function to depend on this Signal,
-so that function will rerun if the Signal gets updated.
+getter (예: `count()` 혹은 `ready()`)를 호출하면 시그널의 현재 값을 반환합니다.
+자동 디펜던시 추적에 있어 중요한 부분은, 추적 범위 내에서 getter를 호출하게 되면 호출하는 함수는 해당 시그널에 의존하게 되므로, 시그널이 업데이트되면 해당 함수가 다시 실행됩니다.
 
-Calling the setter (e.g., `setCount(nextCount)` or `setReady(nextReady)`)
-sets the Signal's value and *updates* the Signal
-(triggering dependents to rerun)
-if the value actually changed (see details below).
-As its only argument, the setter takes either the new value for the signal,
-or a function that maps the last value of the signal to a new value.
-The setter also returns the updated value.  For example:
+setter(예: `setCount(nextCount)` 혹은 `setReady(nextReady)`)를 호출하면 시그널의 값을 설정하고, 값이 실제로 변경된 경우 (자세한 내용은 아래쪽 참고) 시그널을 _업데이트_(디펜던시가 있는 항목을 다시 실행하도록 트리거링)합니다 .
+
+setter의 유일한 인수로 시그널의 새 값이나 시그널의 마지막 값을 새 값에 매핑하는 함수를 사용합니다.
+setter는 업데이트된 값도 반환합니다. 예를 들어:
 
 ```js
-// read signal's current value, and
-// depend on signal if in a tracking scope
-// (but nonreactive outside of a tracking scope):
+// 시그널의 현재 값
+// 추적 범위 내에 있는 경우 시그널에 디펜던시를 가집니다.
+// (추적 범위 밖에서는 리액티브하지 않음):
 const currentCount = count();
 
-// or wrap any computation with a function,
-// and this function can be used in a tracking scope:
+// 또는 계산식을 함수로 래핑
+// 이 함수는 추적 범위 내에서 사용될 수 있습니다:
 const doubledCount = () => 2 * count();
 
-// or build a tracking scope and depend on signal:
+// 또는 추적 범위를 생성하고, 시그널에 의존성을 가집니다:
 const countDisplay = <div>{count()}</div>;
 
-// write signal by providing a value:
+// 시그널 setter에 값 설정:
 setReady(true);
 
-// write signal by providing a function setter:
+// 시그널 setter에 함수 사용:
 const newCount = setCount((prev) => prev + 1);
 ```
 
-> If you want to store a function in a Signal you must use the function form:
+> 시그널에 함수를 저장하고 싶다면 함수 형식를 사용해야 합니다:
 >
 > ```js
 > setValue(() => myFunction);
 > ```
 >
-> However, functions are not treated specially as the `initialValue` argument
-> to `createSignal`, so you should pass a function initial value as is:
+> 함수를 `createSignal`의 `initialValue` 인수로 사용시에는 그대로 전달해야 합니다:
 >
 > ```js
 > const [func, setFunc] = createSignal(myFunction);
 > ```
 
-Unless you're in a [batch](#batch), [effect](#createEffect), or
-[transition](#use-transition), signals update immediately when you set them.
-For example:
+[batch](#batch), [effect](#createEffect), [transition](#use-transition)에 있는 것이 아니라면, 시그널은 설정하는 즉시 업데이트됩니다.
+예를 들어:
 
 ```js
 setReady(false);
@@ -112,130 +89,107 @@ setReady(true);
 console.assert(ready() === true);
 ```
 
-If you're not sure whether your code will be run in a batch or transition
-(e.g., library code), you should avoid making this assumption.
+코드가 배치 혹은 트랜지션(예: 라이브러리 코드)으로 실행될지 확실하지 않다면, 이러한 가정은 피해야 합니다.
 
 ##### Options
 
-Several primitives in Solid take an "options" object
-as an optional last argument.
-`createSignal`'s options object allows you to provide an
-`equals` option.  For example:
+Solid의 여러 프리미티브들은 "options" 객체를 마지막 옵셔널 인수로 받습니다.
+`createSignal`의 옵션 객체에는 `equals` 옵션이 있습니다. 예를 들어:
 
 ```js
-const [getValue, setValue] = createSignal(initialValue,
-  { equals: false });
+const [getValue, setValue] = createSignal(initialValue, { equals: false });
 ```
 
-By default, when calling a signal's setter, the signal only updates (and causes
-dependents to rerun) if the new value is actually different than the old value,
-according to JavaScript's `===` operator.
-
-Alternatively, you can set `equals` to `false` to always rerun dependents after
-the setter is called, or you can pass your own function for testing equality.
-Some examples:
+기본적으로 시그널의 setter를 호출할 때, 자바스크립트의 `===` 연산자에 따라 새 값이 이전 값과 다른 경우에만 시그널이 업데이트되고 디펜던시 항목들이 재실행됩니다.
+`equals`를 `false`로 설정하면 setter가 호출된 후 디펜던시 항목들을 항상 다시 실행하거나, 동등성 테스트를 위한 커스텀 함수를 제공할 수 있습니다.
+몇 가지 예를 살펴보면:
 
 ```js
-// use { equals: false } to allow modifying object in-place;
-// normally this wouldn't be seen as an update because the
-// object has the same identity before and after change
+// 객체의 내용을 변경하는 것을 허용하려면 { equals: false } 을 사용합니다;
+// 일반적으로는 변경 전후에 동일한 객체를 가리키고 있기 때문에, 업데이트로 보지 않습니다.
 const [object, setObject] = createSignal({ count: 0 }, { equals: false });
 setObject((current) => {
   current.count += 1;
-  current.updated = new Date;
+  current.updated = new Date();
   return current;
 });
 
-// use { equals: false } signal as trigger without value:
+// { equals: false } 시그널의 값을 지정하지 않는 경우 트리거로 사용할 수 있습니다:
 const [depend, rerun] = createSignal(undefined, { equals: false });
-// now calling depend() in a tracking scope
-// makes that scope rerun whenever rerun() gets called
+// 추적 범위에서 depend() 를 호출하면 rerun() 이 호출될 때마다 해당 범위가 다시 실행됩니다.
 
-// define equality based on string length:
+// 문자열의 길이에 따라 동등성 비교 정의:
 const [myString, setMyString] = createSignal("string", {
   equals: (newVal, oldVal) => newVal.length === oldVal.length,
 });
 
-setMyString("strung"); // considered equal to the last value and won't cause updates
-setMyString("stranger"); // considered different and will cause updates
+setMyString("strung"); // 이전 값과 동일한 것으로 판단해 업데이트가 발생하지 않습니다.
+setMyString("stranger"); // 이전 값과 다른 것으로 판단해 업데이트가 발생합니다.
 ```
 
 ## `createEffect`
 
 ```ts
-import { createEffect } from 'solid-js';
+import { createEffect } from "solid-js";
 
 function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Effects are a general way to make arbitrary code run whenever dependencies
-change.  `createEffect` creates a new computation that runs the given function
-in a tracking scope, thus automatically tracking its dependencies,
-and automatically reruns the function whenever the dependencies update.
-For example:
+이펙트는 디펜던시가 변경될 때마다 임의의 코드("사이드 이펙트": 예를 들면, DOM을 수동으로 변경하는 것과 같은)를 실행하도록 하는 일반적인 방법입니다. `createEffect`는 추적 범위에서 주어진 함수를 실행하는 새 계산을 생성하여 디펜던시를 자동으로 추적하고, 디펜던시가 업데이트될 때마다 함수를 자동으로 다시 실행합니다.
+예를 들면:
 
 ```js
 const [a, setA] = createSignal(initialValue);
 
-// effect that depends on signal `a`
+// 시그널 `a`에 디펜던시를 가지는 이펙트
 createEffect(() => doSideEffect(a()));
 ```
 
-The effect function gets called with an argument equal to the value returned
-from the effect function's last execution, or on the first call,
-equal to the optional second argument to `createEffect`.
-This allows you to compute diffs without creating an additional closure
-to remember the last computed value.  For example:
+이펙트 함수는 이펙트 함수의 마지막 실행에서 반환된 값과 동일한 인수로 호출됩니다.
+첫 호출시에는 `createEffect` 호출시 사용한 2번째 인수를 사용해 호출됩니다.
+이렇게 하면 마지막으로 계산된 값을 기억하기 위해 추가 클로저를 만들지 않고도 diff를 계산할 수 있습니다.
+예를 들어:
 
 ```js
 createEffect((prev) => {
   const sum = a() + b();
-  if (sum !== prev)
-    console.log('sum changed to', sum);
+  if (sum !== prev) console.log("sum changed to", sum);
   return sum;
 }, 0);
 ```
 
-The effect function is automatically wrapped in [`batch`](#batch),
-meaning that all signal changes inside the effect propagate only after the
-effect finishes.  This lets you update several signals while triggering only
-one update, and avoids unwanted side-effects from happening in the middle
-of your side effects.
-In fact, if multiple effects all trigger at once, they collectively
-get wrapped into a single `batch`.
+이펙트는 주로 리액티브 시스템에 쓰기를 하지 않고 읽기만 하는 사이드 이펙트에 대한 것입니다:
+이펙트 안에서는 시그널을 설정하지 않는것이 가장 좋습니다. 부주의하게 사용하는 경우 추가 렌더링이나 무한 이펙트 루프를 유발할 수 있습니다.
+대신 [`createMemo`](#creatememo)를 사용하여 다른 리액티브 값에 의존하는 새 값을 계산하는 편이 좋습니다. 이렇게 하면 리액티브 시스템은 의존 관계를 파악할 수 있으므로 그에 따라 최적화할 수 있습니다.
 
-The *first* execution of the effect function is not immediate;
-it's scheduled to run after the current rendering phase
-(e.g., after calling the function passed to [`render`](#render),
-[`createRoot`](#createroot), or [`runWithOwner`](#runwithowner)).
-If you want to wait for the first execution to occur, use
-[`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask).
-(which runs before the browser renders the DOM) or
-`await Promise.resolve()` or `setTimeout(..., 0)`
-(which run after browser rendering).
-After this first execution, effects generally run immediately when
-their dependencies update (unless you're in a [batch](#batch) or
-[transition](#use-transition)).  For example:
+이펙트 안에서 시그널을 설정하면, 이펙트 함수는 자동으로 [`batch`](#batch)로 래핑되며, 이는 이펙트 내부의 모든 시그널 변경 사항은 이펙트가 완료된 후에만 전파됨을 의미합니다.
+이렇게 되면 여러 시그널 업데이트는 하나의 업데이트만 트리거하면서, 사이드 이펙트 중간에 원치 않는 사이드 이펙트가 발생하는 것을 방지할 수 있습니다.
+실제로 여러 이펙트가 한꺼번에 트리거되면, 이들은 모두 묶어 하나의 `batch`로 래핑됩니다.
+
+이펙트 함수의 _첫 번째_ 실행은 바로 실행되지 않으며, 현재 렌더링 단계 이후에 실행되도록 예약됩니다(예: [`render`](#render), [`createRoot`](#createroot), [`runWithOwner`](#runwithowner) 에 전달된 함수를 호출한 후).
+첫 번째 실행시까지 대기하려면, 브라우저가 DOM을 렌더링하기 전에 실행되는 [`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask) 를 사용하거나, 브라우저 렌더링 후에 실행되는 `await Promise.resolve()` 혹은 `setTimeout(..., 0)` 을 사용하세요.
+첫 번째 실행 후, 이펙트는 일반적으로 디펜던시가 업데이트될 때 즉시 실행됩니다([batch](#batch) 혹은 [transition](#use-transition)인 경우는 예외입니다). 
+예를 들어:
 
 ```js
-// assume this code is in a component function, so is part of a rendering phase
+// 이 코드는 컴포넌트 함수 안에 있다고 가정하며, 따라서 렌더링 단계의 일부입니다.
 const [count, setCount] = createSignal(0);
 
-// this effect prints count at the beginning and when it changes
-createEffect(() => console.log('count =', count()));
-// effect won't run yet
-console.log('hello');
-setCount(1);  // effect still won't run yet
-setCount(2);  // effect still won't run yet
+// 이 이펙트는 처음 실행시와 변경시 count를 출력합니다.
+createEffect(() => console.log("count =", count()));
+// 이펙트 아직 미실행
+console.log("hello");
+setCount(1);  // 이펙트 아직 미실행
+setCount(2);  // 이펙트 아직 미실행
 
 queueMicrotask(() => {
-  // now `count = 2` will print
-  console.log('microtask');
-  setCount(3);  // immediately prints `count = 3`
-  console.log('goodbye');
+  // 이제 `count = 2` 출력
+  console.log("microtask");
+  setCount(3);  // 바로 `count = 3` 출력
+  console.log("goodbye");
 });
 
-// --- overall output: ---
+// --- 전체 출력: ---
 // hello
 // count = 2
 // microtask
@@ -243,34 +197,22 @@ queueMicrotask(() => {
 // goodbye
 ```
 
-This delay in first execution is useful because it means
-an effect defined in a component scope runs after
-the JSX returned by the component gets added the DOM.
-In particular, [`ref`](#ref)s will already be set.
-Thus you can use an effect to manipulate the DOM manually,
-call vanilla JS libraries, or other side effects.
+첫 번째 실행 지연은 컴포넌트에서 반환된 JSX가 DOM에 추가된 후에 컴포넌트 스코프에 정의된 이펙트가 실행된다는 의미이므로 유용합니다.
+특히, [`ref`](#ref) 는 이미 설정된 상태가 됩니다.
+따라서 이펙트를 사용해 DOM을 수동으로 조작하거나, 바닐라 JS 라이브러리를 호출하거나, 다른 사이드 이펙트를 일으킬 수 있습니다.
 
-Note that the first run of the effect still runs before the browser renders
-the DOM to the screen (similar to React's `createLayoutEffect`).
-If you need to wait until after rendering (e.g., to measure the rendering),
-you can use `await Promise.resolve()` (or `Promise.resolve().then(...)`),
-but note that subsequent use of reactive state (such as signals)
-will not trigger the effect to rerun, as tracking is not
-possible after an `async` function uses `await`.
-Thus you should use all dependencies before the promise.
+이펙트의 첫 번째 실행은 브라우저가 DOM을 렌더링하기 전에 실행됩니다(리액트의 `createLayoutEffect`와 유사합니다).
+렌더링 후까지 대기해야 하는 경우 (예: 렌더링 시간 측정), `await Promise.resolve()` (혹은 `Promise.resolve().then(...)`)를 사용할 수 있지만, 시그널 같은 리액티브 상태를 사용하게 되면 재실행을 위한 이펙트가 트리거되지 않게 됩니다. 이는 `async` 함수가 `await`를 사용한 후에는 추적이 불가능하기 때문입니다.
+따라서 promise 전에 모든 디펜던시를 사용해야 합니다.
 
-If you'd rather an effect run immediately even for its first run,
-use [`createRenderEffect`](#createrendereffect) or
-[`createComputed`](#createcomputed).
+이펙트를 처음 실행할 때도 즉시 실행하려면, [`createRenderEffect`](#createrendereffect) 또는 [`createComputed`](#createcomputed) 를 사용하세요.
 
-You can clean up your side effects in between executions of the effect function
-by calling [`onCleanup`](#oncleanup) *inside* the effect function.
-Such a cleanup function gets called both in between effect executions and
-when the effect gets disposed (e.g., the containing component unmounts).
-For example:
+이펙트 함수 _안_에서 [`onCleanup`](#oncleanup)을 호출해 이펙트 함수 실행 사이의 사이드 이펙트를 정리할 수 있습니다.
+이런 클린업 함수는 이펙트 실행 사이와 이펙트가 삭제(예: 포함하는 컴포넌트가 언마운트)될 때 모두 호출됩니다.
+예를 들어:
 
 ```js
-// listen to event dynamically given by eventName signal
+// eventName 시그널에서 발생하는 이벤트 리스닝
 createEffect(() => {
   const event = eventName();
   const callback = (e) => console.log(e);
@@ -282,7 +224,7 @@ createEffect(() => {
 ## `createMemo`
 
 ```ts
-import { createMemo } from 'solid-js';
+import { createMemo } from "solid-js";
 
 function createMemo<T>(
   fn: (v: T) => T,
@@ -291,75 +233,58 @@ function createMemo<T>(
 ): () => T;
 ```
 
-Memos let you efficiently re-use a derived value as a dependency in multiple
-other reactive computations.
-`createMemo` creates a readonly derived signal equal to the return value of
-the given function, which gets called immediately and whenever the
-executed code's dependencies update.  It returns a getter for this signal.
+메모를 사용하면 파생된 값을 많은 리액티브 계산에서 효율적으로 재사용할 수 있습니다.
+`createMemo`는 주어진 함수의 반환 값과 동일한 읽기 전용 리액티브 값을 생성하고, 디펜던시가 변경될 때만 함수가 실행되도록 합니다.
 
 ```js
 const value = createMemo(() => computeExpensiveValue(a(), b()));
 
-// read value
+// 값 읽기
 value();
 ```
 
-In Solid, you often don't need to wrap functions in memos;
-you can alternatively just define and call a regular function
-to get similar reactive behavior.
-The main difference is when you call the function in multiple reactive settings.
-In this case, when the function's dependencies update, the function will get
-called multiple times unless it is wrapped in `createMemo`.  For example:
+Solid에서는 함수를 메모로 래핑할 필요가 없는 경우가 종종 있습니다; 대신 유사한 리액티브 동작을 얻기 위해 일반 함수를 정의하고 호출할 수 있습니다.
+주요 차이점은 여러 리액티브 설정들에서 함수를 호출하는 경우입니다.
+함수의 디펜던시가 업데이트될 때, `createMemo`로 래핑되어 있지 않으면 한 함수가 여러 번 호출됩니다.
+예를 들어:
 
 ```js
 const user = createMemo(() => searchForUser(username()));
-// compare with: const user = () => searchForUser(username());
+// 다음 함수와 비교: const user = () => searchForUser(username());
 return (
   <ul>
     <li>Your name is "{user()?.name}"</li>
-    <li>Your email is <code>{user()?.email}</code></li>
+    <li>
+      Your email is <code>{user()?.email}</code>
+    </li>
   </ul>
 );
 ```
 
-When the `username` signal updates, `searchForUser` will get called just once
-to update the `user` memo, and then both list items will update automatically
-(if the returned user actually changed).
-If we had instead defined `user` as a plain function
-`() => searchForUser(username())`, then `searchForUser` would have been
-called twice, once when updating each list item.
+`username` 시그널이 업데이트되면, `searchForUser`가 한 번만 호출됩니다.
+반환된 `user`가 실제로 변경되면 `user` 메모가 업데이트되고, 두 리스트 항목이 자동으로  업데이트됩니다.
+만일 `user` 정의를 `() => searchForUser(username())` 일반 함수로 교체하면, `searchForUser`는 두 번(각 리스트 아이템 업데이트시마다) 호출됩니다.
 
-Another key difference is that a memo can shield dependents from updating
-when the memo's dependencies change but the resulting memo value doesn't.
-Like [`createSignal`](#createsignal), the derived signal made by `createMemo`
-*updates* (and triggers dependents to rerun) only when the value returned by
-the memo function actually changes from the previous value,
-according to JavaScript's `===` operator.
-Alternatively, you can pass an options object with `equals` set to `false`
-to always update the memo when its dependencies change,
-or you can pass your own `equals` function for testing equality.
+또 다른 주요 차이점은 메모의 디펜던시가 변경되었지만 메모의 값이 변경되지 않은 경우, 의존 항목이 업데이트되지 않도록 보호할 수 있다는 점입니다.
+[`createSignal`](#createsignal)과 마찬가지로, `createMemo`에 의해 생성된 파생 시그널은 메모 함수에서 반환된 값이 `===` 연산자에 따라 이전값에서 변경된 경우만 _업데이트_하고, 의존 항목들을 다시 실행하도록 트리거합니다.
+또는  `equals`가 `false`로 설정된 옵션 객체를 전달해 디펜던시가 변경되면 메모를 항상 업데이트하거나, 동등성 비교를 위한 커스텀 `equals` 함수를 전달할 수 있습니다.
 
-The memo function gets called with an argument equal to the value returned
-from the memo function's last execution, or on the first call,
-equal to the optional second argument to `createMemo`.
-This is useful for reducing computations, for example:
+메모 함수는 메모 함수의 마지막 실행에서 반환된 값과 동일한 인수로 호출되며, 첫 번째 호출시에는 `createMemo` 실행시 전달한 두 번째 옵셔널 인수를 사용해 호출됩니다.
+이는 계산을 줄이는데 유용합니다. 예를 들면:
 
 ```js
-// track the sum of all values taken on by input() as it updates
+// input()이 취한 모든 값의 합을 추적합니다.
 const sum = createMemo((prev) => input() + prev, 0);
 ```
 
-The memo function should not change other signals by calling setters
-(it should be "pure").
-This enables Solid to optimize the execution order of memo updates
-according to their dependency graph, so that all memos can update
-at most once in response to a dependency change.
+메모 함수는 setter를 호출해 다른 시그널을 변경해서는 안되며, "순수" 함수여야 합니다.
+이를 통해 Solid는 디펜던시 그래프에 따라 메모 업데이트 순서를 최적화할 수 있으므로, 디펜던시 변경에 대한 응답으로 모든 메모가 한꺼번에 업데이트될 수 있습니다.
 
 ## `createResource`
 
 ```ts
-import { createResource } from 'solid-js';
-import type { ResourceReturn } from 'solid-js';
+import { createResource } from "solid-js";
+import type { ResourceReturn } from "solid-js";
 
 type ResourceReturn<T> = [
   {
@@ -391,57 +316,58 @@ function createResource<T, U>(
 ): ResourceReturn<T>;
 ```
 
-Creates a signal that reflects the result of an async request. 
+비동기 요청의 결과를 반영하는 시그널을 생성합니다.
 
-`createResource` takes an asynchronous fetcher function and returns a signal that is updated with the resulting data when the fetcher completes.
-
-There are two ways to use `createResource`:  you can pass the fetcher function as the sole argument, or you can additionally pass a source signal as the first argument. The source signal will retrigger the fetcher whenever it changes, and its value will be passed to the fetcher.
+`createResource`는 비동기 fetcher 함수를 실행하고, fetcher 실행이 끝나면 결과 데이터로 업데이트되는 시그널을 반환합니다.
+`createResource`를 사용하는 2가지 방법이 있습니다: fetcher 함수만 인수로 전달하거나, 소스 시그널을 첫 번째 인수로 추가로 전달할 수 있습니다.
+소스 시그널은 변경될 때마다 fetcher를 다시 트리거하고 그 값은 fetcher에 전달됩니다.
 ```js
-const [data, { mutate, refetch }] = createResource(fetchData)
+const [data, { mutate, refetch }] = createResource(fetchData);
 ```
 ```js
-const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData)
+const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 ```
-In these snippets, the fetcher is the function `fetchData`. In both cases, `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately. 
-In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`. 
-It will be called again whenever the value of `sourceSignal` changes, it will always be passed to `fetchData` as its first argument.
+이 스니펫에서 `fetchData`가 fetcher 함수이며, `fetchData`가 실행을 끝낼때까지 `data()`는 정의되지 않습니다.
+첫 번째 경우, `fetchData`는 즉시 실행됩니다.
+두 번째 경우, `sourceSignal`이 `false`, `null`, `undefined` 이외의 값을 갖는 즉시 `fetchData`가 호출됩니다.
+`sourceSignal` 값이 변경될 때마다 다시 호출되며, 그 값은 항상 `fetchData` 함수의 첫 번째 인수로 전달됩니다.
 
-Either way, you can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
+`mutate`를 호출해 `data` 시그널을 직접 업데이트((다른 시그널 setter 처럼 동작)할 수 있습니다.
+`refetch`를 호출해 fetcher를 직접 다시 실행하고, `refetch(info)`와 같이 옵셔널 인수를 전달하여 fetcher에 추가 정보를 제공할 수 있습니다: .
 
-`data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`. 
-But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#<errorboundary>).)
+`data`는 일반 시그널 getter처럼 작동합니다: `data()`를 사용해 `fetchData`의 마지막 반환 값을 읽습니다. 
+하지만 두 가지 추가 속성이 있습니다: `data.loading`은 fetcher가 호출되었지만 아직 반환되지 않았는지를 알려주며, `data.error`는 요청에 에러가 발생했는지 알려줍니다; 에러에는 fetcher에서 발생한 오류도 포합됩니다. (참고: 에러가 예상된다면, [ErrorBoundary](#<errorboundary>)에 `createResource`를 래핑할 수 있습니다.)
 
-`loading` and `error` are reactive getters and can be tracked. 
+`loading`과 `error`는 리액티브 getter이며 추적 가능합니다.
 
-The `fetcher` is the async function that you provide to `createResource` to actually fetch the data.
-It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: `value` and `refetching`. `value` tells you the previously fetched value.
-`refetching` is `true` if the fetcher was triggered using the `refetch` function and `false` otherwise. 
-If the `refetch` function was called with an argument (`refetch(info)`), `refetching` is set to that argument.
+`fetcher`는 데이터를 가져오기 위해 `createResource`에 제공하는 비동기 함수입니다.
+fetcher에는 두 개의 인수가 전달됩니다. 소스 시그널의 값(제공된 경우), 그리고 `value`, `refetching` 속성을 가진 정보 객체입니다. `value`는 이전에 가져온 값을 알려줍니다.
+fetcher가 `refetch` 함수를 사용해 트리거된 경우 `refetching` 값이 `true`가 되며, 그 외의 경우 `false`가 됩니다.
+`refetch` 함수가 `refetch(info)`처럼 인수와 함께 호출된 경우, `refetching`이 해당 인수로 설정됩니다.
 
 ```js
 async function fetchData(source, { value, refetching }) {
-  // Fetch the data and return a value.
-  //`source` tells you the current value of the source signal; 
-  //`value` tells you the last returned value of the fetcher;
-  //`refetching` is true when the fetcher is triggered by calling `refetch()`,
-  // or equal to the optional data passed: `refetch(info)`
-}
+  // 데이터를 가져와 값을 반환합니다.
+  //`source`: 소스 시그널의 현재 값을 알려줍니다;
+  //`value`: fetcher의 마지막 반환값을 알려줍니다;
+  //`refetching`: fetcher가 `refetch()`를 호출해 트리거될 때, 또는 `refetch(info)` 처럼 전달된 옵셔널 인수와 동일한 경우 true
+  
 
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
 
-// read value
+// 값 읽기
 data();
 
-// check if loading
+// 로딩중인지 확인
 data.loading;
 
-// check if errored
+// 에러 발생 여부 확인
 data.error;
 
-// directly set value without creating promise
+// promise를 생성하지 않고 직접 값 설정
 mutate(optimisticValue);
 
-// refetch the last request explicitly
+// 마지막 요청을 명시적으로 다시 가져옵니다
 refetch();
 ```
 
@@ -450,61 +376,67 @@ refetch();
 ## `onMount`
 
 ```ts
-import { onMount } from 'solid-js';
+import { onMount } from "solid-js";
 
 function onMount(fn: () => void): void;
 ```
 
-Registers a method that runs after initial render and elements have been mounted. Ideal for using `ref`s and managing other one time side effects. It is equivalent to a `createEffect` which does not have any dependencies.
+초기 렌더링 및 엘리먼트가 마운트된 후 실행되는 메서드를 등록합니다.
+`ref`를 사용하고 다른 일회성 사이드 이펙트를 관리하는 데 이상적입니다.
+디펜던시가 없는 `createEffect`와 동일합니다.
 
 ## `onCleanup`
 
 ```ts
-import { onCleanup } from 'solid-js';
+import { onCleanup } from "solid-js";
 
 function onCleanup(fn: () => void): void;
 ```
 
-Registers a cleanup method that executes on disposal or recalculation of the current reactive scope. Can be used in any Component or Effect.
+현재 리액티브 스코프를 폐기하거나 재계산시 실행되는 클린업 메서드를 등록합니다.
+모든 컴포넌트와 이펙트에서 사용 가능합니다.
 
 ## `onError`
 
 ```ts
-import { onError } from 'solid-js';
+import { onError } from "solid-js";
 
 function onError(fn: (err: any) => void): void;
 ```
 
-Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
+자식 스코프에서 에러가 발생한 경우 실행되는 에러 핸들러 메서드를 등록합니다.
+가장 가까운 스코프에 있는 에러 핸들러만 실행되며, 상위로 전달하려면 에러를 다시 던지면 됩니다.
 
 # Reactive Utilities
 
-These helpers provide the ability to better schedule updates and control how reactivity is tracked.
+이 헬퍼 함수들은 보다 나은 업데이트 스케줄 및 반응성 추적을 제어하는 기능을 제공합니다.
 
 ## `untrack`
 
 ```ts
-import { untrack } from 'solid-js';
+import { untrack } from "solid-js";
 
 function untrack<T>(fn: () => T): T;
 ```
 
-Ignores tracking any of the dependencies in the executing code block and returns the value.
+실행 코드 블럭의 디펜던시 추적을 무시하고 값을 반환합니다.
 
 ## `batch`
 
 ```ts
-import { batch } from 'solid-js';
+import { batch } from "solid-js";
 
 function batch<T>(fn: () => T): T;
 ```
 
-Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method and Effects automatically wrap their code in a batch.
+불필요한 재계산을 막기 위해, 블럭 내에서의 업데이트 커밋을 마지막까지 미룹니다.
+이는 다음 행에서 읽는 값이 아직 업데이트되지 않았음을 의미합니다.
+[Solid 스토의](#createstore)의 set 메서드와 이펙트는 자동으로 해당 코드를 일괄 처리합니다.
 
 ## `on`
 
 ```ts
-import { on } from 'solid-js';
+import { on } from "solid-js";
 
 function on<T extends Array<() => any> | (() => any), U>(
   deps: T,
@@ -513,152 +445,131 @@ function on<T extends Array<() => any> | (() => any), U>(
 ): (prevValue?: U) => U | undefined;
 ```
 
-`on` is designed to be passed into a computation to make its dependencies explicit. If an array of dependencies is passed, `input` and `prevInput` are arrays.
+`on`은 디펜던시가 명시적으로 계산에 전달되로록 디자인되었습니다.
+디펜던시 배열이 전달되는 경우, `input`과 `prevInput`도 배열입니다.
 
 ```js
 createEffect(on(a, (v) => console.log(v, b())));
 
-// is equivalent to:
+// 위 코드는 다음 코드와 동일합니다:
 createEffect(() => {
   const v = a();
   untrack(() => console.log(v, b()));
 });
 ```
 
-You can also not run the computation immediately and instead opt in for it to only run on change by setting the defer option to true.
+defer 옵션을 true로 설정해 계산을 바로 실행하지 않고 변경시에만 실행되도록 선택할 수 있습니다.
 
 ```js
-// doesn't run immediately
+// 바로 실행하지 않습니다
 createEffect(on(a, (v) => console.log(v), { defer: true }));
 
-setA("new"); // now it runs
+setA("new"); // 여기서 실행됩니다.
 ```
+
+`stores`와 `mutable`에서 부모 객체에서 속성을 추가하거나 삭제하면 이펙트가 트리거됩니다.
+[`createMutable`](#createMutable) 참조.
 
 ## `createRoot`
 
 ```ts
-import { createRoot } from 'solid-js';
+import { createRoot } from "solid-js";
 
 function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-Creates a new non-tracked owner scope that doesn't auto-dispose. This is useful for nested reactive scopes that you do not wish to release when the parent re-evaluates.
+자동으로 삭제되지 않고 추적되지 않은 새 스코프를 생성합니다.
+부모가 재평가할 때, 해제하고 싶지 않은 중첩된 리액티브 스코프가 있는 경우 유용하게 사용할 수 있습니다.
 
-All Solid code should be wrapped in one of these top level as they ensure that all memory/computations are freed up. Normally you do not need to worry about this as `createRoot` is embedded into all `render` entry functions.
+모든 Solid 코드는 모든 메모리와 계산이 해제되도록 보장하기 때문에, 이런 최상위 레벨 중 하나로 래핑되어야 합니다.
+일반적으로 `createRoot`는 모든 `render` 엔트리 함수에 포함되어 있기 때문에 이에 대해 걱정할 필요는 없습니다.
 
 ## `getOwner`
 
 ```ts
-import { getOwner } from 'solid-js';
+import { getOwner } from "solid-js";
 
 function getOwner(): Owner;
 ```
 
-Gets the reactive scope that owns the currently running code, e.g.,
-for passing into a later call to `runWithOwner` outside of the current scope.
+현재 실행중인 코드를 소유하는 리액티브 스코프를 반환합니다. 예를 들면, 나중에 현재 스코프 외부에서 `runWithOwner` 호출시 전달하기 위해 사용합니다.
 
-Internally, computations (effects, memos, etc.) create owners which are
-children of their owner, all the way up to the root owner created by
-`createRoot` or `render`.  In particular, this ownership tree lets Solid
-automatically clean up a disposed computation by traversing its subtree
-and calling all [`onCleanup`](#oncleanup) callbacks.
-For example, when a `createEffect`'s dependencies change, the effect calls
-all descendant `onCleanup` callbacks before running the effect function again.
-Calling `getOwner` returns the current owner node that is responsible
-for disposal of the current execution block.
+내부적으로, 계산(이펙트, 메모, 등)은 `createRoot`나 `render`에 의해 생성된 루트 소유자까지 따라 올라가면서 자식 소유자를 생성합니다.
+Solid는 이러한 소유권 트리를 통해 서브 트리를 탐색하고 모든 [`onCleanup`](#oncleanup) 콜백을 호출함으로써 삭제된 계산을 자동으로 정리할 수 있습니다.
+예를 들어, `createEffect`의 디펜던시가 변경되면, 이펙트는 이펙트 함수를 다시 실행하기 전에 모든 하위 `onCleanup` 콜백을 호출합니다.
+`getOwner`를 호출하면 현재 실행 블럭의 폐기를 담당하는 현재 소유자 노드가 반환됩니다.
 
-Components are not computations, so do not create an owner node, but they are
-typically rendered from a `createEffect` which does, so the result is similar:
-when a component gets unmounted, all descendant `onCleanup` callbacks get
-called.  Calling `getOwner` from a component scope returns the owner that is
-responsible for rendering and unmounting that component.
+컴포넌트는 계산이 아니므로 소유자 노드를 생성하지 않지만, 일반적으로 `createEffect`에서 렌더링되므로 결과는 비슷합니다: 컴포넌트가 언마운트되면 모든 하위 `onCleanup` 콜백이 호출됩니다.
+컴포넌트 스코프에서 `getOwner`를 호출하면 컴포넌트 렌더링과 언마운트를 담당하는 소유자가 반환됩니다.
 
-Note that the owning reactive scope isn't necessarily *tracking*.
-For example, [`untrack`](#untrack) turns off tracking for the duration
-of a function (without creating a new reactive scope), as do
-components created via JSX (`<Component ...>`).
+리액티브 스코프를 소유한다고 해서 반드시 _추적_하는 것은 아닙니다.
+예를 들어, [`untrack`](#untrack)은 JSX (`<Component ...>`)를 통해 생성된 컴포넌트와 마찬가지로 함수 실행시 새로운 리액티브 스코프를 생성하지 않고 추적을 끕니다.
 
 ## `runWithOwner`
 
 ```ts
-import { runWithOwner } from 'solid-js';
+import { runWithOwner } from "solid-js";
 
 function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
 ```
 
-Executes the given function under the provided owner,
-instead of (and without affecting) the owner of the outer scope.
-By default, computations created by `createEffect`, `createMemo`, etc.
-are owned by the owner of the currently executing code (the return value of
-`getOwner`), so in particular will get disposed when their owner does.
-Calling `runWithOwner` provides a way to override this default to a manually
-specified owner (typically, the return value from a previous call to
-`getOwner`), enabling more precise control of when computations get disposed.
+외부 스코프의 소유자 대신, 제공된 소유자 아래에서 주어진 함수를 실행합니다.
+기본적으로 `createEffect`, `createMemo` 등에 의해 생성된 계산은 현재 실행중인 코드의 소유자(`getOwner`의 반환값)가 소유하므로, 소유자가 삭제될 때 같이 삭제됩니다.
+`runWithOwner`를 호출하면 기본값을 지정한 소유자(일반적으로 `getOwner`에 대한 이전 호출의 반환값)로 오버라이드할 수 있으므로, 계산이 삭제되는 시점을 보다 정확하게 제어할 수 있습니다.
 
-Having a (correct) owner is important for two reasons:
+(올바른) 소유자를 갖는 것은 다음과 같은 두 가지 이유때문에 중요합니다:
 
-* Computations without an owner cannot be cleaned up.  For example, if you call
-  `createEffect` without an owner (e.g., in the global scope), the effect will
-  continue running forever, instead of being disposed when its owner gets
-  disposed.
-* [`useContext`](#usecontext) obtains context by walking up the owner tree
-  to find the nearest ancestor providing the desired context.
-  So without an owner you cannot look up any provided context
-  (and with the wrong owner, you might obtain the wrong context).
+- 소유자가 없는 계산은 삭제할 수 없습니다. 예를 들어, 소유자 없이 `createEffect`를 호출하게 되면(예: 전역 스코프), 이펙트는 소유자가 삭제될 때 같이 삭제되는 대신 영원히 실행됩니다. 
+- [`useContext`](#usecontext)는 소유자 트리를 찾아 올라가면서 원하는 컨텍스트를 제공하는 가장 가까운 조상을 찾아 컨텍스트를 얻습니다. 따라서 소유자가 없으면 제공된 컨텍스트를 찾을 수 없으며, 잘못된 소유자가 있다면 잘못된 컨텍스트를 얻을 수 있습니다.
 
-Manually setting the owner is especially helpful when doing reactivity outside
-of any owner scope.  In particular, asynchronous computation
-(via either `async` functions or callbacks like `setTimeout`)
-lose the automatically set owner, so remembering the original owner via
-`getOwner` and restoring it via `runWithOwner` is necessary in these cases.
-For example:
+소유자를 수동으로 설정하면, 소유자의 스코프 외부에서 반응성을 수행할 때 유용합니다.
+특히 `async` 함수나 `setTimeout` 같은 콜백을 통한 비동기 계산은 자동으로 설정된 소유자를 잃기 때문에, `getOwner`를 통해 원래 소유자를 기억하고 `runWithOwner`를 통해 복원하는 작업이 필요합니다.
+예를 들어:
 
 ```js
 const owner = getOwner();
 setTimeout(() => {
-  // This callback gets run without owner.
-  // Restore owner via runWithOwner:
+  // 이 콜백은 소유자없이 실행됩니다.
+  // runWithOwner를 통해 소유자를 복원합니다:
   runWithOwner(owner, () => {
     const foo = useContext(FooContext);
     createEffect(() => {
       console.log(foo);
     });
   });
-}, 1000)
+}, 1000);
 ```
 
-Note that owners are not what determines dependency tracking,
-so `runWithOwner` does not help with tracking in asynchronous functions;
-use of reactive state in the asynchronous part (e.g. after the first `await`)
-will not be tracked as a dependency.
+디펜던시 추적을 결정하는 것은 소유자가 아니므로, `runWithOwner`는 비동기 함수에서 추적하는데 도움이 되지 않습니다; 비동기 파트(예: 첫 번째 `await` 이후)에서 리액티브 상태를 사용하더라도 디펜던시로 추적되지 않습니다.
 
 ## `mergeProps`
 
 ```ts
-import { mergeProps } from 'solid-js';
+import { mergeProps } from "solid-js";
 
 function mergeProps(...sources: any): any;
 ```
 
-A reactive object `merge` method. Useful for setting default props for components in case caller doesn't provide them. Or cloning the props object including reactive properties.
+리액티브 객체를 머지하는 메서드입니다.
+호출자가 설정하지 않은 props의 디폴트 값을 설정하거나, 리액티브 속성을 포함해 props 객체를 복제할 때 유용합니다.
 
-This method works by using a proxy and resolving properties in reverse order. This allows for dynamic tracking of properties that aren't present when the prop object is first merged.
+이 메서드는 프록시를 사용하며 속성을 역순으로 확인하는 식으로 작동하기 때문에, prop 객체가 처음 머지되었을때 존재하지 않은 속성의 동적 추적을 가능하게 합니다.
 
 ```js
-// default props
+// 디폴트 props
 props = mergeProps({ name: "Smith" }, props);
 
-// clone props
+// props 복제
 newProps = mergeProps(props);
 
-// merge props
+// props 머지
 props = mergeProps(props, otherProps);
 ```
 
 ## `splitProps`
 
 ```ts
-import { splitProps } from 'solid-js';
+import { splitProps } from "solid-js";
 
 function splitProps<T>(
   props: T,
@@ -666,29 +577,30 @@ function splitProps<T>(
 ): [...parts: Partial<T>];
 ```
 
-Splits a reactive object by keys.
+리액티브 객체를 키를 사용해 분할합니다.
 
-It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
+리액티브 객체와, 키의 배열들을 인수로 받습니다; 원래 객체에서 키 배열에 있는 속성들만 포함하는 리액티브 객체를 반환합니다.
+반환되는 배열의 마지막 리액티브 객체에는 원래 객체의 나머지 속성들이 포함됩니다.
 
-This can be useful if you want to consume a subset of props and pass the rest to a child.
+props의 일부 속성만 사용하고 나머지는 자식에게 전달하려는 경유 유용합니다.
 ```js
+<MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar" />;
 function MyComponent(props) {
-  const [local, others] = splitProps(props, ["children"]);
-
-  return (
-    <>
-      <div>{local.children}</div>
-      <Child {...others} />
-    </>
-  )
+  console.log(props); // {a: 1, b: 2, c: 3, d: 4, e: 5, foo: "bar"}
+  const [vowels, consonants, leftovers] = splitProps(
+    props,
+    ["a", "e"],
+    ["b", "c", "d"]
+  );
+  console.log(vowels); // {a: 1, e: 5}
+  console.log(consonants); // {b: 2, c: 3, d: 4}
+  console.log(leftovers.foo); // bar
 }
 ```
 
-Because `splitProps` takes any number of arrays, we can split a props object 
-as much as we wish (if, for example, we had multiple child components that 
-each required a subset of the props).
+`splitProps`는 임의의 갯수의 배열을 인수로 받기 때문에 원하는만큼 props 객체를 분할할 수 있습니다. props의 서브셋이 필요한 여러 자식 컴포넌트가 있는 경우를 예로 들 수 있습니다.
 
-Let's say a component was passed six props:
+컴포넌트에 6개의 props가 전달되었다고 가정해 보겠습니다:
 ```js
 <MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar"/>
 function MyComponent(props) {
@@ -700,10 +612,11 @@ function MyComponent(props) {
   console.log(leftovers.foo) // bar
 }
 ```
+
 ## `useTransition`
 
 ```ts
-import { useTransition } from 'solid-js';
+import { useTransition } from "solid-js";
 
 function useTransition(): [
   pending: () => boolean,
@@ -711,46 +624,46 @@ function useTransition(): [
 ];
 ```
 
-Used to batch async updates in a transaction deferring commit until all async processes are complete. This is tied into Suspense and only tracks resources read under Suspense boundaries.
+모든 비동기 프로세스가 완료될 때까지 커밋을 연기하는 트랜잭션에서 비동기 업데이트를 일괄 처리하는데 사용됩니다.
+이는 Suspense와 연결되어 있으며, Suspense 경계에서 읽은 리소스만 추적합니다.
 
 ```js
 const [isPending, start] = useTransition();
 
-// check if transitioning
+// 트랜지션중인지 확인
 isPending();
 
-// wrap in transition
-start(() => setSignal(newValue), () => /* transition is done */)
+// 트랜지션 래핑
+start(() => setSignal(newValue), () => /* 트랜지션 완료 */)
 ```
 
 ## `startTransition`
 
-**New in v1.1.0**
+**v1.1.0 에 추가된 기능**
 
 ```ts
-import { startTransition } from 'solid-js';
+import { startTransition } from "solid-js";
 
 function startTransition: (fn: () => void) => Promise<void>;
 ```
 
-Similar to `useTransition` except there is no associated pending state. This one can just be used directly to start the Transition.
+`useTransition`과 유사하지만, 연결된 pending 상태가 없다는 점이 다릅니다. 트랜지션을 시작하기 위해 직접 사용할 수 있습니다.
 
 ## `observable`
 
 ```ts
-import { observable } from 'solid-js';
+import { observable } from "solid-js";
 
 function observable<T>(input: () => T): Observable<T>;
 ```
 
-This method takes a signal and produces a simple Observable.
-You can consume it from another Observable library of your choice, typically
-with the `from` operator.
+이 메서드는 시그널을 받아 Observable을 생성합니다.
+일반적으로 `from` 오퍼레이터를 사용해 선택한 다른 Observable 라이브러리에서 사용할 수 있습니다.
 
 ```js
-// How to integrate rxjs with a solid.js signal
-import { observable } from 'solid-js';
-import { from } from 'rxjs';
+// solid.js 시그널과 rxjs 연동
+import { observable } from "solid-js";
+import { from } from "rxjs";
 
 const [s, set] = createSignal(0);
 
@@ -759,14 +672,14 @@ const obsv$ = from(observable(s));
 obsv$.subscribe((v) => console.log(v));
 ```
 
-You can also use `from` without `rxjs`; see below.
+`rxjs`없이 `from`을 사용할 수도 있습니다; 아래 참조.
 
 ## `from`
 
-**New in v1.1.0**
+**v1.1.0 에 추가된 기능**
 
 ```ts
-import { from } from 'solid-js';
+import { from } from "solid-js";
 
 function from<T>(
   producer:
@@ -779,13 +692,14 @@ function from<T>(
 ): () => T;
 ```
 
-A simple helper to make it easier to interopt with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
+RxJS Observable 또는 Svelte Store와 같은 외부 생산자와 더 쉽게 연동할 수 있도록 하는 헬퍼 함수입니다.
+이는 기본적으로 모든 구독 가능한 것(`subscribe` 메서드가 있는 객체)을 시그널로 바꾸고, 구독과 폐기를 관리합니다.
 
 ```js
 const signal = from(obsv$);
 ```
 
-It can also take a custom producer function where the function is passed a setter function returns a unsubscribe function:
+또한 setter 함수를 인수로 받아서 구독 취소 함수를 반환하는 커스텀 생산자 함수를 사용할 수 있습니다.
 
 ```js
 const clock = from((set) => {
@@ -794,12 +708,12 @@ const clock = from((set) => {
 });
 ```
 
-> Note: Signals created by `from` have equality checks turned off to interface better with external streams and sources.
+> 참고: `from`에 의해 생성된 시그널은 외부 스트림 및 소스와의 더 나은 인트페이스를 위해 동등성 체크가 꺼져 있습니다.
 
 ## `mapArray`
 
 ```ts
-import { mapArray } from 'solid-js';
+import { mapArray } from "solid-js";
 
 function mapArray<T, U>(
   list: () => readonly T[],
@@ -807,9 +721,12 @@ function mapArray<T, U>(
 ): () => U[];
 ```
 
-Reactive map helper that caches each item by reference to reduce unnecessary mapping on updates. It only runs the mapping function once per value and then moves or removes it as needed. The index argument is a signal. The map function itself is not tracking.
+업데이트시 불필요한 매핑을 줄이기 위해, 참조로 각 항목을 캐시하는 리액티브 map 헬퍼 함수입니다.
+값당 한 번만 매핑 함수를 실행하며, 이 후에는 필요에 따라 이동하거나 삭제합니다.
+인덱스 인수는 시그널입니다.
+map 함수 자체는 추적하지 않습니다.
 
-Underlying helper for the `<For>` control flow.
+`<For>` 제어 흐름 내부에서 사용하고 있습니다.
 
 ```js
 const mapped = mapArray(source, (model) => {
@@ -825,15 +742,15 @@ const mapped = mapArray(source, (model) => {
       return description();
     },
     setName,
-    setDescription
-  }
+    setDescription,
+  };
 });
 ```
 
 ## `indexArray`
 
 ```ts
-import { indexArray } from 'solid-js';
+import { indexArray } from "solid-js";
 
 function indexArray<T, U>(
   list: () => readonly T[],
@@ -841,9 +758,10 @@ function indexArray<T, U>(
 ): () => U[];
 ```
 
-Similar to `mapArray` except it maps by index. The item is a signal and the index is now the constant.
+인덱스로 매핑한다는 점을 제외하면 `mapArray`와 유사합니다.
+각 항목은 시그널이며, 인덱스는 상수입니다.
 
-Underlying helper for the `<Index>` control flow.
+`<Index>` 제어 흐름 내부에서 사용하고 있습니다.
 
 ```js
 const mapped = indexArray(source, (model) => {
@@ -863,52 +781,56 @@ const mapped = indexArray(source, (model) => {
 
 # Stores
 
-These APIs are available at `solid-js/store`. They allow the creation of stores: [proxy objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) that allow a tree of signals to be independently tracked and modified.
+이 API들은 `solid-js/store`에 포함되어 있습니다.
+이 API들을 사용하면 스토어를 생성할 수 있습니다.
+스토어는 시그널 트리를 독립적으로 추적하고 수정할 수 있도록 하는 [프록시 객체](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)입니다.
 
-## Using Stores
+## 스토어 사용하기
 
 ### `createStore`
 
 ```ts
-import { createStore } from 'solid-js/store';
-import type { StoreNode, Store, SetStoreFunction } from 'solid-js/store';
+import { createStore } from "solid-js/store";
+import type { StoreNode, Store, SetStoreFunction } from "solid-js/store";
 
 function createStore<T extends StoreNode>(
   state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
-The create function takes an initial state, wraps it in a store, and returns a readonly proxy object and a setter function.
+create 함수는 초기 상태를 가져와 저장소에 래핑하고, 읽기 전용 프록시 객체와 setter 함수를 반환합니다.
 
 ```js
 const [state, setState] = createStore(initialValue);
 
-// read value
+// 값 읽기
 state.someValue;
 
-// set value
+// 값 설정
 setState({ merge: "thisValue" });
 
 setState("path", "to", "value", newValue);
 ```
 
-As proxies, store objects only track when a property is accessed.
+프록시로서 스토어 객체는 속성에 액세스할 때만 추적합니다.
 
-When nested objects are accessed, stores will produce nested store objects, and this applies all the way down the tree. However, this only applies to arrays and plain objects. Classes are not wrapped, so objects like `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` won't be granularly reactive as properties on a store.
+중첩된 객체에 액세스할 때 스토어는 중첩된 스토어 객체를 생성하며, 이는 트리 아래 끝까지 적용됩니다.
+하지만 이는 배열과 일반 객체에만 적용됩니다.
+클래스는 래핑되지 않기 때문에, `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` 과 같은 객체는 스토어의 속성으로 세분화된 반응성을 제공하지 않습니다.
 
-The top level state object cannot be tracked, so put any lists on a key of state rather than using the state object itself.
+최상위 상태 객체는 추적할 수 없기 때문에, 상태 객체 자체를 사용하는 대신 상태 키에 목록을 저장합니다.
 
 ```js
-// put the list as a key on the state object
+// 목록을 상태 객체의 키에 저장
 const [state, setState] = createStore({ list: [] });
 
-// access the `list` property on the state object
+// 상태 객체의 `list` 속성에 액세스
 <For each={state.list}>{item => /*...*/}</For>
 ```
 
 ### Getters
 
-Store objects support the use of getters to store calculated values.
+스토어 객체는 getter가 계산된 값을 사용하는 것을 지원합니다.
 
 ```js
 const [state, setState] = createStore({
@@ -922,7 +844,7 @@ const [state, setState] = createStore({
 });
 ```
 
-These are simple getters, so you still need to use a memo if you want to cache a value:
+getter는 액세스할 때마다 실행되기 때문에, 값을 캐시하려면 여전히 메모를 사용해야 합니다:
 
 ```js
 let fullName;
@@ -938,9 +860,11 @@ const [state, setState] = createStore({
 fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 ```
 
-### Updating Stores
+### 스토어 업데이트
 
-Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store.
+변경 함수는 이전 상태를 받아서 새 상태나 값을 반환하는 함수의 형태를 취할 수 있습니다.
+객체는 항상 얕게 머지됩니다.
+스토어에서 값을 삭제하려면 값을 `undefined`로 설정하세요.
 
 ```js
 const [state, setState] = createStore({
@@ -955,9 +879,11 @@ setState((state) => ({ preferredName: state.firstName, lastName: "Milner" }));
 // ({ firstName: 'Johnny', preferredName: 'Johnny', middleName: 'Lee', lastName: 'Milner' })
 ```
 
-It supports paths including key arrays, object ranges, and filter functions.
+키 배열, 객체 범위, 필터 함수를 포함하는 경로를 지원합니다.
 
-setState also supports nested setting where you can indicate the path to the change. When nested the state you are updating may be other non Object values. Objects are still merged but other values (including Arrays) are replaced.
+setState는 변경할 경로를 나타낼 수 있는 중첩된 설정도 지원합니다.
+중첩된 상태에서는 업데이트하는 상태가 Object 값이 아닐 수도 있습니다.
+Object는 머지되지만, 다른 값(배열 포함)은 대체됩니다.
 
 ```js
 const [state, setState] = createStore({
@@ -981,7 +907,7 @@ setState('list', 2, 'read', true);
 // }
 ```
 
-Path can be string keys, array of keys, iterating objects ({from, to, by}), or filter functions. This gives incredible expressive power to describe state changes.
+경로는 문자열 키, 키 배열, 반복 객체({from, to, by}), 필터 함수일 수 있으며, 이는 상태 변화를 표시하기 위한 놀라운 표현력을 제공합니다.
 
 ```js
 const [state, setState] = createStore({
@@ -1029,12 +955,12 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 // }
 ```
 
-## Store Utilities
+## 스토어 유틸리티
 
 ### `produce`
 
 ```ts
-import { produce } from 'solid-js/store';
+import { produce } from "solid-js/store";
 
 function produce<T>(
   fn: (state: T) => void
@@ -1043,7 +969,7 @@ function produce<T>(
 ) => T extends NotWrappable ? T : Store<T>;
 ```
 
-Immer inspired API for Solid's Store objects that allows for localized mutation.
+Immer에서 영감을 받은 API로, Solid 스토어 객체에 대한 로컬라이즈된 변경을 허용합니다.
 
 ```js
 setState(
@@ -1057,7 +983,7 @@ setState(
 ### `reconcile`
 
 ```ts
-import { reconcile } from 'solid-js/store';
+import { reconcile } from "solid-js/store";
 
 function reconcile<T>(
   value: T | Store<T>,
@@ -1070,12 +996,15 @@ function reconcile<T>(
 ) => T extends NotWrappable ? T : Store<T>;
 ```
 
-Diffs data changes when we can't apply granular updates. Useful for when dealing with immutable data from stores or large API responses.
+세분화된 업데이트를 적용할 수 없는 경우 데이터 변경 사항에 대한 diff를 수행합니다.
+스토어나 대규모 API 응답의 불변 데이터를 처리할 때 유용합니다.
 
-The key is used when available to match items. By default `merge` false does referential checks where possible to determine equality and replaces where items are not referentially equal. `merge` true pushes all diffing to the leaves and effectively morphs the previous data to the new value.
+key는 항목을 일치시킬 수 있을 때 사용됩니다.
+기본적으로 `merge`는 `false` 이며, 가능하면 참조 검사를 수행해 동등성을 판단하고 항목이 동일한 참조가 아닌 경우 이를 대체합니다.
+`merge`가 `true`이면, 모든 diff를 사용해 이전 데이터를 새 값으로 효과적으로 머지합니다.
 
 ```js
-// subscribing to an observable
+// observable 구독
 const unsubscribe = store.subscribe(({ todos }) => (
   setState('todos', reconcile(todos)));
 );
@@ -1085,42 +1014,46 @@ onCleanup(() => unsubscribe());
 ### `unwrap`
 
 ```ts
-import { unwrap } from 'solid-js/store';
+import { unwrap } from "solid-js/store";
 
 function unwrap(store: Store<T>): T;
 ```
 
-Returns the underlying data in the store without a proxy.
+프록시 없이 스토어 내부 데이터를 반환합니다.
 
 ### `createMutable`
 
 ```ts
-import { createMutable } from 'solid-js/store';
+import { createMutable } from "solid-js/store";
 
 function createMutable<T extends StoreNode>(
   state: T | Store<T>,
 ): Store<T> {
 ```
 
-Creates a new mutable Store proxy object. Stores only trigger updates on values changing. Tracking is done by intercepting property access and automatically tracks deep nesting via proxy.
+새로운 변경 가능한 스토어 프록시 객체를 생성합니다.
+스토어는 값이 변경될 때만 업데이트를 트리거합니다.
+추적은 속성 액세스를 가로채서 수행되며, 프록시를 통해 깊은 중첩을 자동으로 추적합니다.
 
-Useful for integrating external systems or as a compatibility layer with MobX/Vue.
+외부 시스템을 통합하거나, MobX/Vue 와의 호환성 레이어로 유용합니다.
 
-> **Note:** A mutable state can be passed around and mutated anywhere, which can make it harder to follow and easier to break unidirectional flow. It is generally recommended to use `createStore` instead. The `produce` modifier can give many of the same benefits without any of the downsides.
+> **참고:** 변경 가능한 상태는 어디에나 전달되고 변경될 수 있으므로, 단방향 흐름을 따라가기 어렵고, 이를 쉽게 깰 수 있게 됩니다.
+> 일반적으로 `createStore`를 대신 사용하는 것이 좋습니다.
+> `produce` 수정자는 단점은 없이 많은 이점을 제공할 수 있습니다.
 
 ```js
 const state = createMutable(initialValue);
 
-// read value
+// 값 읽기
 state.someValue;
 
-// set value
+// 값 설정
 state.someValue = 5;
 
 state.list.push(anotherValue);
 ```
 
-Mutables support setters along with getters.
+Mutable은 getter와 setter를 지원합니다.
 
 ```js
 const user = createMutable({
@@ -1135,13 +1068,29 @@ const user = createMutable({
 });
 ```
 
+부모 객체에서 프로퍼티를 추가하거나 삭제하면 예상치 못한 이펙트가 트리거됩니다.
+`createMutable`을 사용하면 Array와 같은 객체에서 이터레이션을 지원합니다.
+
+```js
+let state = createMutable({ nested: { a: 1 } });
+
+createEffect(
+  on(
+    () => state.nested.a,
+    () => console.log("could be unexpected")
+  )
+);
+
+setTimeout(() => (state.nested.b = 2)); // 이펙트 트리거
+```
+
 # Component APIs
 
 ## `createContext`
 
 ```ts
-import { createContext } from 'solid-js';
-import type { Context } from 'solid-js';
+import { createContext } from "solid-js";
+import type { Context } from "solid-js";
 
 interface Context<T> {
   id: symbol;
@@ -1152,9 +1101,10 @@ interface Context<T> {
 function createContext<T>(defaultValue?: T): Context<T | undefined>;
 ```
 
-Context provides a form of dependency injection in Solid. It is used to save from needing to pass data as props through intermediate components.
+Solid에서 컨텍스트는 일종의 의존성 주입을 제공합니다. 중간 컴포넌트 props를 따라 데이터를 전달할 필요가 없도록 데이터를 저장하는데 사용됩니다.
 
-This function creates a new context object that can be used with `useContext` and provides the `Provider` control flow. Default Context is used when no `Provider` is found above in the hierarchy.
+이 함수는 `useContext`와 함께 사용할 수 있는 새로운 컨텍스트 객체를 생성하고, `Provider` 제어 흐름을 제공합니다.
+기본 컨텍스트는 계층 구조에서 `Provider`를 찾을 수 없을 때 사용됩니다.
 
 ```js
 export const CounterContext = createContext([{ count: 0 }, {}]);
@@ -1181,17 +1131,18 @@ export function CounterProvider(props) {
 }
 ```
 
-The value passed to provider is passed to `useContext` as is. That means wrapping as a reactive expression will not work. You should pass in Signals and Stores directly instead of accessing them in the JSX.
+프로바이더에 전달된 값은 그대로 `useContext`에 전달되며, 이로 인해 리액티브 표현식으로 래핑해도 작동하지 않습니다.
+시그널과 스토어를 JSX에서 액세스하는 대신 직접 전달해야 합니다.
 
 ## `useContext`
 
 ```ts
-import { useContext } from 'solid-js';
+import { useContext } from "solid-js";
 
 function useContext<T>(context: Context<T>): T;
 ```
 
-Used to grab context to allow for deep passing of props without having to pass them through each Component function.
+props를 각 컴포넌트 함수를 통해 전달하지 않으면서도 깊숙히 전달하기 위해 컨텍스트를 가져옵니다.
 
 ```js
 const [state, { increment, decrement }] = useContext(CounterContext);
@@ -1200,12 +1151,14 @@ const [state, { increment, decrement }] = useContext(CounterContext);
 ## `children`
 
 ```ts
-import { children } from 'solid-js';
+import { children } from "solid-js";
 
 function children(fn: () => any): () => any;
 ```
 
-Used to make it easier to interact with `props.children`. This helper resolves any nested reactivity and returns a memo. Recommended approach to using `props.children` in anything other than passing directly through to JSX.
+`props.children`과 더 쉽게 상호 작용할 수 있도록 하는데 사용됩니다.
+이 헬퍼는 중첩된 반응성을 찾아서 메모를 반환합니다.
+JSX를 통해 직접 전달하는 것 이외에는 모두 `props.children`을 사용하는데 권장되는 방식입니다.
 
 ```js
 const list = children(() => props.children);
@@ -1217,47 +1170,50 @@ createEffect(() => list());
 ## `lazy`
 
 ```ts
-import { lazy } from 'solid-js';
+import { lazy } from "solid-js";
 
 function lazy<T extends Component<any>>(
   fn: () => Promise<{ default: T }>
 ): T & { preload: () => Promise<T> };
 ```
 
-Used to lazy load components to allow for code splitting. Components are not loaded until rendered. Lazy loaded components can be used the same as its statically imported counterpart, receiving props etc... Lazy components trigger `<Suspense>`
+코드 스플리팅을 허용하기 위해 컴포넌트를 지연 로딩하는데 사용됩니다.
+컴포넌트는 렌더링될 때까지 로드되지 않습니다.
+지연 로딩된 컴포넌트는 props를 받는 등의 작업을 정적으로 임프토된 컴포넌트와 동일하게 사용할 수 있습니다.
+지연 컴포넌트는 `<Suspense>`를 트리거합니다.
 
 ```js
-// wrap import
+// 임포트 래핑
 const ComponentA = lazy(() => import("./ComponentA"));
 
-// use in JSX
+// JSX에서 사용
 <ComponentA title={props.title} />;
 ```
 
 ## `createUniqueId`
 
 ```ts
-import { createUniqueId } from 'solid-js';
+import { createUniqueId } from "solid-js";
 
 function createUniqueId(): string;
 ```
 
-A universal id generator that is stable across server/browser.
+서버/브라우저 모두에서 안정적으로 사용할 수 있는 범용 ID 생성기.
 
 ```js
 const id = createUniqueId();
 ```
 
-> **Note** on the server this only works under hydratable components
+> **참고** 서버에서는 하이드레이션 가능한 컴포넌트에서만 작동합니다.
 
 # Secondary Primitives
 
-You probably won't need them for your first app, but these are useful tools to have.
+처음 앱을 만들때는 필요 없을 수 있지만, 있으면 유용한 도구들입니다.
 
 ## `createDeferred`
 
 ```ts
-import { createDeferred } from 'solid-js';
+import { createDeferred } from "solid-js";
 
 function createDeferred<T>(
   source: () => T,
@@ -1268,57 +1224,48 @@ function createDeferred<T>(
 ): () => T;
 ```
 
-Creates a readonly that only notifies downstream changes when the browser is idle. `timeoutMs` is the maximum time to wait before forcing the update.
+브라우저가 아이들 상태일 때 다운스트림 변경 사항을 알려주는 읽기 전용 계산을 생성합니다.
+`timeoutMs` 는 강제 업데이트를 하기 전에 대기하는 최대 시간입니다.
 
 ## `createRenderEffect`
 
 ```ts
-import { createRenderEffect } from 'solid-js';
+import { createRenderEffect } from "solid-js";
 
 function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-A render effect is a computation similar to a regular effect
-(as created by [`createEffect`](#createeffect)),
-but differs in when Solid schedules the first execution of the effect function.
-While `createEffect` waits for the current rendering phase to be complete,
-`createRenderEffect` immediately calls the function.
-Thus the effect runs as DOM elements are being created and updated,
-but possibly before specific elements of interest have been created,
-and probably before those elements have been connected to the document.
-In particular, [`ref`](#ref)s will not be set before the initial effect call.
-Indeed, Solid uses `createRenderEffect` to implement the rendering phase
-itself, including setting of `ref`s.
+render 이펙트는 일반 이펙트([`createEffect`](#createeffect)에 의해 생성)와 유사한 계산이지만, Solid가 이펙트 함수의 첫 실행을 예약할 때 차이가 있습니다.
+`createEffect`는 현재 렌더링 단계가 완료될 때까지 기다리지만, `createRenderEffect`는 함수를 즉시 실행합니다.
+따라서 이펙트는 DOM 엘리먼트가 생성되고 업데이트될 때 실행되지만, 관심있는 특정 엘리먼트가 생성되기 전, 그리고 이 엘리먼트가 도큐먼트에 연결되기 전에 실행될 수 있습니다.
+특히 [`ref`](#ref)는 초기 이펙트 호출 전에는 설정되지 않습니다.
+실제로 Solid는 `ref` 설정을 포함해 렌더링 단계 자체를 구현하기 위해 `createRenderEffect`를 사용합니다.
 
-Reactive updates to render effects are identical to effects: they queue up in
-response to a reactive change (e.g., a single signal update, or a `batch` of
-changes, or collective changes during an entire render phase) and run in a
-single [`batch`](#batch) afterward (together with effects).
-In particular, all signal updates within a render effect are batched.
+render 이펙트에 대한 리액티브 업데이트는 이펙트와 동일합니다: 리액티브 변경(예: 단일 시그널 업데이트, 일괄 변경, 전체 렌더링 단계 동안의 변경 집합)에 대한 응답으로 대기열에 추가되고, 나중에 단일 [일괄<sub>batch</sub>](#batch)로 이펙트와 함께 실행됩니다.
+특히, render 이펙트 내의 모든 시그널 업데이트 일괄 처리됩니다.
 
-Here is an example of the behavior.
-(Compare with the example in [`createEffect`](#createeffect).)
+다음은 동작의 예입니다. ([`createEffect`](#createeffect)의 예와 비교해 보세요.)
 
 ```js
-// assume this code is in a component function, so is part of a rendering phase
+// 이 코드가 컴포넌트 함수에 있다고 가정하고, 렌더링 단계의 일부입니다.
 const [count, setCount] = createSignal(0);
 
-// this effect prints count at the beginning and when it changes
-createRenderEffect(() => console.log('count =', count()));
-// render effect runs immediately, printing `count = 0`
-console.log('hello');
-setCount(1);  // effect won't run yet
-setCount(2);  // effect won't run yet
+// 이 이펙트는 처음과 변경시에 count 를 출력합니다.
+createRenderEffect(() => console.log("count =", count()));
+// render 이펙트는 즉시 실행되며, `count = 0`을 출력합니다.
+console.log("hello");
+setCount(1);  // 아직 이펙트 미실행
+setCount(2);  // 아직 이펙트 미실행
 
 queueMicrotask(() => {
-  // now `count = 2` will print
-  console.log('microtask');
-  setCount(3);  // immediately prints `count = 3`
-  console.log('goodbye');
+  // 이제 `count = 2` 출력
+  console.log("microtask");
+  setCount(3);  // 즉시 `count = 3` 출력
+  console.log("goodbye");
 });
 
-// --- overall output: ---
-// count = 0   [this is the only added line compared to createEffect]
+// --- 전체 출력: ---
+// count = 0   [createEffect와 비교해 유일하게 추가된 라인]
 // hello
 // count = 2
 // microtask
@@ -1326,90 +1273,66 @@ queueMicrotask(() => {
 // goodbye
 ```
 
-Just like `createEffect`, the effect function gets called with an argument
-equal to the value returned from the effect function's last execution,
-or on the first call, equal to the optional second argument to
-`createRenderEffect`.
+`createEffect`와 마찬가지로, 이펙트 함수는 마지막 이펙트 함수 실행에서 반환된 값을 인수로 사용해 호출됩니다.
+첫 실행인 경우에는 `createRenderEffect`호출시 사용한 옵셔널 두 번째 인수를 사용해 호출됩니다.
 
 ## `createComputed`
 
 ```ts
-import { createComputed } from 'solid-js';
+import { createComputed } from "solid-js";
 
 function createComputed<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-`createComputed` creates a new computation that immediately runs the given
-function in a tracking scope, thus automatically tracking its dependencies,
-and automatically reruns the function whenever the dependencies changes.
-The function gets called with an argument equal to the value returned
-from the function's last execution, or on the first call,
-equal to the optional second argument to `createComputed`.
-Note that the return value of the function is not otherwise exposed;
-in particular, `createComputed` has no return value.
+`createComputed`는 추적 범위에서 지정된 함수를 즉시 실행하는 새 계산을 생성하여, 디펜던시를 자동으로 추적하고 디펜던시가 변경될 때마다 함수를 자동으로 다시 실행합니다.
+함수는 함수의 마지막 실행에서 반환된 값을 인수로 사용해 호출되며, 첫번째 호출에서는 `createComputed`의 옵셔널 두 번째 인수를 사용해 호출됩니다.
+그 외의 경우 함수의 반환 값은 노출되지 않습니다. 특히, `createComputed`는 반환 값이 없습니다.
 
-`createComputed` is the most immediate form of reactivity in Solid, and is
-most useful for building other reactive primitives.
-(For example, some other Solid primitives are built from `createComputed`.)
-But it should be used with care, as `createComputed` can easily cause more
-unnecessary updates than other reactive primitives.
-Before using it, consider the closely related primitives
-[`createMemo`](#creatememo) and [`createRenderEffect`](#createrendereffect).
+`createComputed`는 Soild에서 가장 즉각적인 형태의 반응형이며, 다른 프리미티브를 구현하는데 가장 유용합니다. (예를 들어, 일부 다른 Solid 프리미티브들은 `createComputed`를 사용해 구현되어 있습니다.)
+하지만, `createComputed`는 다른 리액티브 프리미티브보다 더 많은 불필요한 업데이트를 쉽게 일으킬 수 있기 때문에 주의해서 사용해야 합니다.
+사용 전에, 밀접하게 관련되어 있는 [`createMemo`](#creatememo)와 [`createRenderEffect`](#createrendereffect)을 고려해보세요.
 
-Like `createMemo`, `createComputed` calls its function immediately on updates
-(unless you're in a [batch](#batch), [effect](#createEffect), or
-[transition](#use-transition)).
-However, while `createMemo` functions should be pure (not set any signals),
-`createComputed` functions can set signals.
-Related, `createMemo` offers a readonly signal for the return value of the
-function, whereas to do the same with `createComputed` you would need to
-set a signal within the function.
-If it is possible to use pure functions and `createMemo`, this is likely
-more efficient, as Solid optimizes the execution order of memo updates,
-whereas updating a signal within `createComputed` will immediately trigger
-reactive updates some of which may turn out to be unnecessary
-(unless you take care by wrapping in
-[`batch`](#batch), [`untrack`](#untrack), etc.).
+`createMemo`와 마찬가지로, `createComputed`는 업데이트시 ([batch](#batch), [이펙트](#createEffect), [트랜지션](#use-transition)이 아닌 경우) 즉시 함수를 호출합니다.
+하지만 `createMemo` 함수는 순수(어떤 시그널도 설정하지 않아야 함)해야 하지만, `createComputed` 함수는 시그널을 설정할 수 있습니다.
+이와 관련해, `createMemo`는 함수 반환 값에 대해 읽기 전용 시그널을 제공하는 반면, `createComputed`로 동일한 작업을 수행하려면 함수 내에서 시그널을 설정해야 합니다.
 
-Like `createRenderEffect`, `createComputed` calls its function for the first
-time immediately.  But they differ in how updates are performed.
-While `createComputed` generally updates immediately, `createRenderEffect`
-updates queue to run in a single `batch` (along with `createEffect`s)
-after the current render phase.
-Thus `createRenderEffect` can perform fewer overall updates,
-but is slightly less immediate.
+`createComputed`내에서 시그널을 업데이트하면 불필요([`batch`](#batch), [`untrack`](#untrack) 등으로 래핑해 처리하지 않은 경우)할 수도 있는 리액티브 업데이트를 즉시 트리거합니다.
+반면에 순수 함수와 `createMemo`를 사용할 수 있다면, Solid가 메모 업데이트 실행 순서를 최적화하기 때문에 이것이 더 효율적일 수 있습니다.
+
+`createRenderEffect`와 마찬가지로, `createComputed`는 처음에는 해당 함수를 즉시 실행하지만, 업데이트가 수행되는 방식이 다릅니다.
+일반적으로 `createComputed`는 즉시 업데이트하지만, `createRenderEffect`는 현재 렌더링 단계 후에 `createEffect`와 함께 단일 `batch`로 실행되도록 대기열을 업데이트합니다.
+따라서 `createRenderEffect`는 전체 업데이트를 더 적게 수행할 수 있지만, 약간 덜 즉각적입니다.
 
 ## `createReaction`
 
-**New in v1.3.0**
+**v1.3.0 추가**
 
 ```ts
-import { createReaction } from 'solid-js';
+import { createReaction } from "solid-js";
 
-function createReaction(
-  onInvalidate: () => void
-): (fn: () => void) => void;
+function createReaction(onInvalidate: () => void): (fn: () => void) => void;
 ```
 
-Sometimes it is useful to separate tracking from re-execution. This primitive registers a side effect that is run the first time the expression wrapped by the returned tracking function is notified of a change.
+때로는 추적과 재실행을 분리하는 것이 유용합니다.
+이 프리미티브는 반환된 추적 함수에 의해 래핑된 표현식이 변경 사항에 대해 알림을 받을 때 처음 실행될 사이드 이펙트를 등록합니다.
 
 ```js
 const [s, set] = createSignal("start");
 
 const track = createReaction(() => console.log("something"));
 
-// next time s changes run the reaction
+// 다음에 s가 변경되면 리액션을 실행합니다.
 track(() => s());
 
 set("end"); // "something"
 
-set("final"); // no-op as reaction only runs on first update, need to call track again.
+set("final"); // 리액션은 첫 업데이트에서만 실행되기 때문에 작동하지 않으며, track 을 다시 호출해야 합니다.
 ```
 
 ## `createSelector`
 
 ```ts
-import { createSelector } from 'solid-js';
+import { createSelector } from "solid-js";
 
 function createSelector<T, U>(
   source: () => T,
@@ -1417,7 +1340,8 @@ function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Creates a conditional signal that only notifies subscribers when entering or exiting their key matching the value. Useful for delegated selection state. As it makes the operation O(2) instead of O(n).
+값과 일치하는 키가 들어오거나 나가는 경우에만 구독자에게 알리는 조건부 시그널을 생성합니다.
+O(n) 대신 O(2) 연산을 수행하기 때문에, 위임된 선택 상태에 유용하게 사용할 수 있습니다.
 
 ```js
 const isSelected = createSelector(selectedId);
@@ -1429,20 +1353,19 @@ const isSelected = createSelector(selectedId);
 
 # Rendering
 
-These imports are exposed from `solid-js/web`.
+사용되는 함수들은 `solid-js/web`에서 가져옵니다.
 
 ## `render`
 
 ```ts
 import { render } from 'solid-js/web';
 
-function render(
-  code: () => JSX.Element,
-  element: MountableElement
-): () => void;
+function render(code: () => JSX.Element, element: MountableElement): () => void;
 ```
 
-This is the browser app entry point. Provide a top level component definition or function and an element to mount to. It is recommended this element be empty as the returned dispose function will wipe all children.
+이 함수는 브라우저 앱 진입점입니다. 
+마운트할 최상위 컴포넌트나 함수, 그리고 마운트할 대상 엘리먼트를 지정합니다.
+반환되는 dispose 함수가 마운트 대상의 모든 자식들을 지우기 때문에, 이 엘리먼트는 비워두는 것이 좋습니다.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
@@ -1451,15 +1374,13 @@ const dispose = render(App, document.getElementById("app"));
 ## `hydrate`
 
 ```ts
-import { hydrate } from 'solid-js/web';
+import { hydrate } from "solid-js/web";
 
-function hydrate(
-  fn: () => JSX.Element,
-  node: MountableElement
-): () => void;
+function hydrate(fn: () => JSX.Element, node: MountableElement): () => void;
 ```
 
-This method is similar to `render` except it attempts to rehydrate what is already rendered to the DOM. When initializing in the browser a page has already been server rendered.
+이 메서드는 DOM에 이미 렌더링된 것을 다시 하이드레이션 하려고 시도한다는 점만 빼면 `render`와 유사합니다.
+브라우저에서 초기화할 때 페이지는 이미 서버에서 렌더링된 상태입니다.
 
 ```js
 const dispose = hydrate(App, document.getElementById("app"));
@@ -1468,7 +1389,7 @@ const dispose = hydrate(App, document.getElementById("app"));
 ## `renderToString`
 
 ```ts
-import { renderToString } from 'solid-js/web';
+import { renderToString } from "solid-js/web";
 
 function renderToString<T>(
   fn: () => T,
@@ -1479,9 +1400,11 @@ function renderToString<T>(
 ): string;
 ```
 
-Renders to a string synchronously. The function also generates a script tag for progressive hydration. Options include eventNames to listen to before the page loads and play back on hydration, and nonce to put on the script tag.
+문자열로 렌더링하며, 동기식으로 작동합니다.
+이 함수는 또한 프로그레시브 하이드레이션을 위한 스크립트 태그를 생성합니다.
+옵션에는 페이지가 로드되기 전에 수신하고 하이드레이션시에 실행할 이벤트 이름과, 스크립트 태그에 넣을 nonce가 포함됩니다.
 
-`renderId` is used to namespace renders when having multiple top level roots.
+`renderId` 는 여러 최상위 루트가 있는 경우 네임스페이스 렌더링에 사용됩니다.
 
 ```js
 const html = renderToString(App);
@@ -1490,7 +1413,7 @@ const html = renderToString(App);
 ## `renderToStringAsync`
 
 ```ts
-import { renderToStringAsync } from 'solid-js/web';
+import { renderToStringAsync } from "solid-js/web";
 
 function renderToStringAsync<T>(
   fn: () => T,
@@ -1502,9 +1425,10 @@ function renderToStringAsync<T>(
 ): Promise<string>;
 ```
 
-Same as `renderToString` except it will wait for all `<Suspense>` boundaries to resolve before returning the results. Resource data is automatically serialized into the script tag and will be hydrated on client load.
+결과를 반환하기 전에 모든 `<Suspense>` 경계가 해결될 때까지 대기한다는 점만 제외하면 `renderToString`과 동일합니다.
+리소스 데이터는 자동으로 스크립트 태그로 직렬화되며, 클라이언트 로드시 하이드레이트됩니다.
 
-`renderId` is used to namespace renders when having multiple top level roots.
+`renderId` 는 여러 최상위 루트가 있는 경우 네임스페이스 렌더링에 사용됩니다.
 
 ```js
 const html = await renderToStringAsync(App);
@@ -1512,10 +1436,10 @@ const html = await renderToStringAsync(App);
 
 ## `renderToStream`
 
-**New in v1.3.0**
+**v1.3.0 추가**
 
 ```ts
-import { renderToStream } from 'solid-js/web';
+import { renderToStream } from "solid-js/web";
 
 function renderToStream<T>(
   fn: () => T,
@@ -1531,7 +1455,8 @@ function renderToStream<T>(
 };
 ```
 
-This method renders to a stream. It renders the content synchronously including any Suspense fallback placeholders, and then continues to stream the data and HTML from any async resource as it completes.
+이 메서드는 스트립으로 렌더링합니다.
+Suspense 폴백 플레이스홀더를 포함하여 컨텐츠를 동기적으로 렌더링한 다음, 완려되면 비동기 리소스에서 데이터과 HTML을 계속 스트리밍합니다.
 
 ```js
 // node
@@ -1542,32 +1467,35 @@ const { readable, writable } = new TransformStream();
 renderToStream(App).pipeTo(writable);
 ```
 
-`onCompleteShell` fires when synchronous rendering is complete before writing the first flush to the stream out to the browser. `onCompleteAll` is called when all server Suspense boundaries have settled. `renderId` is used to namespace renders when having multiple top level roots.
+`onCompleteShell`은 스트림에 대한 첫 플러시를 브라우저에 쓰기전에, 동기 렌더링이 완료되면 실행됩니다.  
+`onCompleteAll`은 모든 서버 Suspense 경계가 해결되면 호출됩니다.
+`renderId` 는 여러 최상위 루트가 있는 경우 네임스페이스 렌더링에 사용됩니다.
 
-> Note this API replaces the previous `pipeToWritable` and `pipeToNodeWritable` APIs.
+> 이 API는 이전의 `pipeToWritable`, `pipeToNodeWritable` API를 대체합니다.
 
 ## `isServer`
 
 ```ts
-import { isServer } from 'solid-js/web';
+import { isServer } from "solid-js/web";
 
 const isServer: boolean;
 ```
 
-This indicates that the code is being run as the server or browser bundle. As the underlying runtimes export this as a constant boolean it allows bundlers to eliminate the code and their used imports from the respective bundles.
+코드가 서버 또는 브라우저 번들로 실행되고 있음을 나타냅니다.
+기본 런타임이 이 값을 boolean 상수값으로 익스포트하기 때문에, 번들러는 이 코드와 해당 번들에서 사용된 임포트들을 제거할 수 있습니다.
 
 ```js
 if (isServer) {
-  // I will never make it to the browser bundle
+  // 브라우저 번들에 포함되지 않음
 } else {
-  // won't be run on the server;
+  // 서버에서 실행되지 않음
 }
 ```
 
 ## `HydrationScript`
 
 ```ts
-import { generateHydrationScript, HydrationScript } from 'solid-js/web';
+import { generateHydrationScript, HydrationScript } from "solid-js/web";
 
 function generateHydrationScript(options: {
   nonce?: string;
@@ -1580,24 +1508,31 @@ function HydrationScript(props: {
 }): JSX.Element;
 ```
 
-Hydration Script is a special script that should be placed once on the page to bootstrap hydration before Solid's runtime has loaded. It comes both as a function that can be called and inserted in an your HTML string, or as a Component if you are rendering JSX from the `<html>` tag.
+하이드레이션 스크립트는 Solid 런타임이 로드되기 전에 하이드레이션을 부트스트랩하기 위해 페이지에 배치되어야 하는 특별한 스크립트입니다.
+HTML 문자열에서 호출 및 삽입할 수 있는 함수로 제공되거나, `<html>` 태그에서 JSX를 렌더링하는 경우 컴포넌트로 제공됩니다.
 
-The options are for the `nonce` to be put on the script tag and any event names for that Solid should capture before scripts have loaded and replay during hydration. These events are limited to those that Solid delegates which include most UI Events that are composed and bubble. By default it is only `click` and `input` events.
+옵션에는 스크립트 태그에 추가할 `nounce`, 그리고 스크립트가 로드된 후 하이드레이션 재실행 중에 캡쳐해야하는 이벤트 이름들이 있습니다.
+이 이벤트들은 구성 및 버블링되는 대부분의 UI 이벤트를 포함하는 Solid가 위임하는 이벤트로 한정됩니다.
+기본적으로는 `click`, `input` 이벤트만 있습니다.
 
 # Control Flow
 
-For reactive control flow to be performant, we have to control how elements are created. For example, with lists, a simple `map` is inefficient as it always maps the entire array.
+리액티브 제어 흐름이 성능을 발휘하려면, 엘리먼트가 생성되는 방식을 제어해야 합니다.
+예를 들어, `array.map`을 호출하면 항상 전체 배열을 매핑하므로 비효율적입니다.
 
-This means helper functions. Wrapping these in components is convenient way for terse templating and allows users to compose and build their own control flow components.
+이는 헬퍼 함수를 의미합니다.
+이들을 컴포넌트로 래핑하는 것은 간결한 템플릿을 위한 편리한 방법이며, 사용자가 커스텀 제어 흐름 컴포넌트를 만들어 구성할 수 있도록 합니다.
 
-These built-in control flow components will be automatically imported. All except `Portal` and `Dynamic` are exported from both `solid-js` and `solid-js/web`. `Portal` and `Dynamic`, which are DOM-specific, are exported by `solid-js/web`.
+이러한 기본 제어 흐름 컴포넌트들은 자동으로 임포트됩니다.
+`Portal`, `Dynamic`을 제외한 모든 항목들은 `solid-js`와 `solid-js/web`에서 익스포트됩니다.
+DOM 전용인 `Portal`과 `Dynamic`은 `solid-js/web`에서 익스포트됩니다.
 
-> Note: All callback/render function children of control flow are non-tracking. This allows for nesting state creation, and better isolates reactions.
+> 참고: 제어 흐름의 모든 콜백/렌더 함수는 추적되지 않습니다. 이 덕분에 중첩된 상태를 생성할 수 있으며, 리액션을 더 잘 분리할 수 있게 됩니다.
 
 ## `<For>`
 
 ```ts
-import { For } from 'solid-js';
+import { For } from "solid-js";
 
 function For<T, U extends JSX.Element>(props: {
   each: readonly T[];
@@ -1606,7 +1541,7 @@ function For<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Simple referentially keyed loop. The callback takes the current item as the first argument:
+변경된 항목만 효율적으로 업데이트하는 참조 키 루프. 콜백 함수의 첫 번째 인수는 현재 항목이 전달됩니다.
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -1614,7 +1549,7 @@ Simple referentially keyed loop. The callback takes the current item as the firs
 </For>
 ```
 
-The optional second argument is an index signal:
+옵셔널인 두 번째 인수는 인덱스 시그널이 전달됩니다:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -1629,7 +1564,7 @@ The optional second argument is an index signal:
 ## `<Show>`
 
 ```ts
-import { Show } from 'solid-js';
+import { Show } from "solid-js";
 
 function Show<T>(props: {
   when: T | undefined | null | false;
@@ -1638,7 +1573,8 @@ function Show<T>(props: {
 }): () => JSX.Element;
 ```
 
-The Show control flow is used to conditional render part of the view: it renders `children` when the `when` is truthy, an `fallback` otherwise. It is similar to the ternary operator (`when ? children : fallback`) but is ideal for templating JSX.
+Show 제어 흐름은 뷰의 일부를 조건부로 렌더링하는 데 사용됩니다: `when` 조건이 참인 경우 `children`을 렌더링하며, 그렇지 않은 경우  `fallback`을 렌더링합니다.
+삼항 연산자(`when ? children : fallback`)와 유사하지만 JSX 템플링에는 이 방법이 좋습니다.
 
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
@@ -1646,7 +1582,8 @@ The Show control flow is used to conditional render part of the view: it renders
 </Show>
 ```
 
-Show can also be used as a way of keying blocks to a specific data model. Ex the function is re-executed whenever the user model is replaced.
+Show는 특정 데이터 모델을 표시하는데도 사용할 수 있습니다.
+예를 들어, 아래 함수는 user 모델이 교체될 때마다 다시 실행됩니다.
 
 ```jsx
 <Show when={state.user} fallback={<div>Loading...</div>}>
@@ -1657,8 +1594,8 @@ Show can also be used as a way of keying blocks to a specific data model. Ex the
 ## `<Switch>`/`<Match>`
 
 ```ts
-import { Switch, Match } from 'solid-js';
-import type { MatchProps } from 'solid-js';
+import { Switch, Match } from "solid-js";
+import type { MatchProps } from "solid-js";
 
 function Switch(props: {
   fallback?: JSX.Element;
@@ -1672,7 +1609,8 @@ type MatchProps<T> = {
 function Match<T>(props: MatchProps<T>);
 ```
 
-Useful for when there are more than 2 mutual exclusive conditions. Can be used to do things like simple routing.
+2개 이상의 상호 배타적인 조건이 있는 유용합니다.
+예를 들어, 기본 라우팅에 사용할 수 있습니다.
 
 ```jsx
 <Switch fallback={<div>Not Found</div>}>
@@ -1685,12 +1623,12 @@ Useful for when there are more than 2 mutual exclusive conditions. Can be used t
 </Switch>
 ```
 
-Match also supports function children to serve as keyed flow.
+Match는 함수 형태의 자식도 지원합니다.
 
 ## `<Index>`
 
 ```ts
-import { Index } from 'solid-js';
+import { Index } from "solid-js";
 
 function Index<T, U extends JSX.Element>(props: {
   each: readonly T[];
@@ -1699,9 +1637,10 @@ function Index<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Non-keyed list iteration (rendered nodes are keyed to an array index). This is useful when there is no conceptual key, like if the data consists of primitives and it is the index that is fixed rather than the value.
+키가 없는 리스트 반복에 사용하며, 렌더링된 노드는 배열 인덱스로 키가 지정됩니다.
+데이터가 프리미티브로 구성이 되어 있고, 값 대신 인덱스가 고정되어 있는 경우와 같이 개념적인 키가 없을 때 유용합니다.
 
-The item is a signal:
+아래 코드에서 item은 시그널입니다:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1709,7 +1648,7 @@ The item is a signal:
 </Index>
 ```
 
-Optional second argument is an index number:
+2번째 인수는 index를 나타냅니다:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1724,7 +1663,7 @@ Optional second argument is an index number:
 ## `<ErrorBoundary>`
 
 ```ts
-import { ErrorBoundary } from 'solid-js';
+import { ErrorBoundary } from "solid-js";
 
 function ErrorBoundary(props: {
   fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element);
@@ -1732,7 +1671,7 @@ function ErrorBoundary(props: {
 }): () => JSX.Element;
 ```
 
-Catches uncaught errors and renders fallback content.
+처리되지 않은 에러를 캐치해서 대체 콘텐츠를 렌더링합니다.
 
 ```jsx
 <ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
@@ -1740,7 +1679,7 @@ Catches uncaught errors and renders fallback content.
 </ErrorBoundary>
 ```
 
-Also supports callback form which passes in error and a reset function.
+또한 에러와 리셋 함수를 전달하는 콜백 형식도 지원합니다.
 
 ```jsx
 <ErrorBoundary
@@ -1753,7 +1692,7 @@ Also supports callback form which passes in error and a reset function.
 ## `<Suspense>`
 
 ```ts
-import { Suspense } from 'solid-js';
+import { Suspense } from "solid-js";
 
 function Suspense(props: {
   fallback?: JSX.Element;
@@ -1761,7 +1700,8 @@ function Suspense(props: {
 }): JSX.Element;
 ```
 
-A component that tracks all resources read under it and shows a fallback placeholder state until they are resolved. What makes `Suspense` different than `Show` is it is non-blocking in that both branches exist at the same time even if not currently in the DOM.
+자식에서 읽는 모든 리소스를 추적하고 해결될 때까지 폴백 플레이스 홀더를 표시하는 컴포넌트입니다.
+`Suspense`가 `Show`와 다른 점은, 현재 DOM에 없더라도 두 컴포넌트가 동시에 존재한다는 점에서 논블로킹이라는 점입니다.
 
 ```jsx
 <Suspense fallback={<div>Loading...</div>}>
@@ -1769,10 +1709,10 @@ A component that tracks all resources read under it and shows a fallback placeho
 </Suspense>
 ```
 
-## `<SuspenseList>` (Experimental)
+## `<SuspenseList>` (실험 단계)
 
 ```ts
-import { SuspenseList } from 'solid-js';
+import { SuspenseList } from "solid-js";
 
 function SuspenseList(props: {
   children: JSX.Element;
@@ -1781,7 +1721,8 @@ function SuspenseList(props: {
 }): JSX.Element;
 ```
 
-`SuspenseList` allows for coordinating multiple parallel `Suspense` and `SuspenseList` components. It controls the order in which content is revealed to reduce layout thrashing and has an option to collapse or hide fallback states.
+`SuspenseList`는 여러 병렬 `Suspense`와 `SuspenseList` 컴포넌트를 조정할 수 있습니다.
+레이아웃 스래싱을 줄이기 위해 컨텐츠가 표시되는 순서를 제어하고, 폴백 상태를 축소하거나 숨길수 있는 옵션이 있습니다.
 
 ```jsx
 <SuspenseList revealOrder="forwards" tail="collapsed">
@@ -1795,12 +1736,12 @@ function SuspenseList(props: {
 </SuspenseList>
 ```
 
-SuspenseList is still experimental and does not have full SSR support.
+SuspenseList 는 아직 실험 단계이며, SSR 을 완전하게 지원하지 않습니다.
 
 ## `<Dynamic>`
 
 ```ts
-import { Dynamic } from 'solid-js/web';
+import { Dynamic } from "solid-js/web";
 
 function Dynamic<T>(
   props: T & {
@@ -1810,7 +1751,7 @@ function Dynamic<T>(
 ): () => JSX.Element;
 ```
 
-This component lets you insert an arbitrary Component or tag and passes the props through to it.
+이 컴포넌트를 사용하면 임의의 컴포넌트 또는 태그를 삽입하고 props를 전달할 수 있습니다.
 
 ```jsx
 <Dynamic component={state.component} someProp={state.something} />
@@ -1819,7 +1760,7 @@ This component lets you insert an arbitrary Component or tag and passes the prop
 ## `<Portal>`
 
 ```ts
-import { Portal } from 'solid-js/web';
+import { Portal } from "solid-js/web";
 
 function Portal(props: {
   mount?: Node;
@@ -1829,9 +1770,11 @@ function Portal(props: {
 }): Text;
 ```
 
-This inserts the element in the mount node. Useful for inserting Modals outside of the page layout. Events still propagate through the Component Hierarchy.
+mount 노드에 컴포넌트를 삽입합니다. 
+페이지 레이아웃 외부에 모달을 삽입는데 유용하게 사용할 수 있으며, 이벤트는 컴포넌트 계층을 통해 전파됩니다.
 
-The portal is mounted in a `<div>` unless the target is the document head. `useShadow` places the element in a Shadow Root for style isolation, and `isSVG` is required if inserting into an SVG element so that the `<div>` is not inserted.
+대상이 `HTMLHeadElement`가 아니라면 Portal 은 `<div>`에 마운트됩니다.
+`useShadow`는 스타일 격리를 위해 섀도우 루트에 엘리먼트를 배치하고, SVG 엘리먼트에 삽입하는 경우 `<div>`가 삽입되지 않도록 `isSVG` 설정이 필요합니다.
 
 ```jsx
 <Portal mount={document.getElementById("modal")}>
@@ -1839,11 +1782,12 @@ The portal is mounted in a `<div>` unless the target is the document head. `useS
 </Portal>
 ```
 
-# Special JSX Attributes
+# 특별한 JSX 속성
 
-In general Solid attempts to stick to DOM conventions. Most props are treated as attributes on native elements and properties on Web Components, but a few of them have special behavior.
+일반적으로 Solid는 DOM 컨벤션을 지키려고 합니다.
+대부분의 props는 기본 엘리먼트의 속성 및 웹 컴포넌트의 프로퍼티로 취급되지만, 그 중 일부는 특별한 동작을 합니다.
 
-For custom namespaced attributes with TypeScript you need to extend Solid's JSX namespace:
+타입스크립트 사용시 커스텀 네임스페이스 속성은 Solid의 JSX 네임스페이스를 확장해야 합니다:
 
 ```ts
 declare module "solid-js" {
@@ -1869,21 +1813,23 @@ declare module "solid-js" {
 
 ## `ref`
 
-Refs are a way of getting access to underlying DOM elements in our JSX. While it is true one could just assign an element to a variable, it is more optimal to leave components in the flow of JSX. Refs are assigned at render time but before the elements are connected to the DOM. They come in 2 flavors.
+ref는 JSX의 기본 DOM 엘리먼트에 액세스하기 위한 방법입니다.
+엘리먼트를 변수에 할당할 수도 있지만, JSX의 플로우에 컴포넌트를 그대로 두는 것이 더 좋습니다.
+ref는 렌더링 시점에 엘리먼트가 DOM에 연결되기 전에 할당됩니다.
 
 ```js
-// simple assignment
+// ref에 의해 직접 할당되는 변수
 let myDiv;
 
-// use onMount or createEffect to read after connected to DOM
+// onMount 또는 createEffect를 사용해 DOM에 연결된 후 읽음
 onMount(() => console.log(myDiv));
 <div ref={myDiv} />
 
-// Or, callback function (called before connected to DOM)
+// 또는, 콜백 함수 사용 (DOM에 연결되기 전에 호출됨)
 <div ref={el => console.log(el)} />
 ```
 
-Refs can also be used on Components. They still need to be attached on the other side.
+ref는 컴포넌트에서도 사용할 수 있으며, 다른 쪽에도 부착되어야 합니다.
 
 ```jsx
 function MyComp(props) {
@@ -1899,7 +1845,8 @@ function App() {
 
 ## `classList`
 
-A helper that leverages `element.classList.toggle`. It takes an object whose keys are class names and assigns them when the resolved value is true.
+`element.classList.toggle`를 활용하는 헬퍼입니다.
+키가 class 이름인 객체를 받아서, 이 값이 true인 경우에 해당 class를 할당합니다.
 
 ```jsx
 <div
@@ -1909,27 +1856,27 @@ A helper that leverages `element.classList.toggle`. It takes an object whose key
 
 ## `style`
 
-Solid's `style` helper works with either a string or with an object.
+Solid의 `style` 헬퍼는 문자열이나 객체를 사용할 수 있습니다.
 
 ```jsx
-// string
+// 문자열
 <div style={`color: green; height: ${state.height}px`} />
 
-// object
+// 객체
 <div style={{
   color: "green", 
   height: state.height + "px" }}
 />
 ```
-Unlike React's `style` helper, Solid uses `element.style.setProperty` under the hood. This means you need to use
-the lower-case, dash-separated version of property names, like `"background-color"` rather than
-`backgroundColor`. This actually leads to better performance and consistency with SSR output.
+리액트의 `style` 헬퍼와 달리 Solid는 내부적으로 `element.style.setProperty`를 사용합니다.
+즉, `backgroundColor`가 아닌 `"background-color"`와 같이 소문자이면서 `-`로 구분된 속성 이름을 사용해야 합니다.
+이는 실제로 더 나은 성능과 SSR 출력의 일관성으로 이어집니다.
 
 ```jsx
-// string
+// 문자열
 <div style={`color: green; background-color: ${state.color}; height: ${state.height}px`} />
 
-// object
+// 객체
 <div style={{
   color: "green",
   "background-color": state.color,
@@ -1937,16 +1884,18 @@ the lower-case, dash-separated version of property names, like `"background-colo
 />
 ```
 
-It also means you can use CSS variables! This just works:
+또한 CSS 변수도 사용할 수 있으며, 다음 코드도 작동합니다:
 
 ```jsx
-// css variable
+// css 변수
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
 
 ## `innerHTML`/`textContent`
 
-These work the same as their property equivalent. Set a string and they will be set. **Be careful!!** Setting `innerHTML` with any data that could be exposed to an end user as it could be a vector for malicious attack. `textContent` while generally not needed is actually a performance optimization when you know the children will only be text as it bypasses the generic diffing routine.
+이는 해당 프로퍼티와 동일하게 문자열을 설정하면 작동합니다.
+**조심하세요!!** `innerHTML`에 설정하는 데이터는 최종 사용자에게 노출되며, 악성 공격에 사용될 수 있습니다. 
+`textContent`는 일반적으로는 필요하지 않지만, 일반적인 diffing 루틴을 건너뛰기 때문에 자식이 텍스트로만 구성되어 있다는 것을 알고 있는 경우 사용하면 성능을 최적화할 수 있습니다.
 
 ```jsx
 <div textContent={state.text} />
@@ -1954,15 +1903,17 @@ These work the same as their property equivalent. Set a string and they will be 
 
 ## `on___`
 
-Event handlers in Solid typically take the form of `onclick` or `onClick` depending on style.
+Solid의 이벤트 핸들러는 일반적으로 스타일에 따라 `onclick` 이나 `onClick` 형식을 취합니다.
 
-Solid uses semi-synthetic event delegation for common UI events that are composed and bubble. This improves performance for these common events.
+Solid는 버블링되는 일반 UI 이벤트에 대해 반-합성<sub>semi-synthetic</sub> 이벤트 위임을 사용합니다.
+이로 인해 일반적인 이벤트의 성능이 향상됩니다.
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
 ```
 
-Solid also supports passing an array to the event handler to bind a value to the first argument of the event handler. This doesn't use `bind` or create an additional closure, so it is a highly optimized way of delegating events.
+Solid는 이벤트 핸들러의 첫 번째 인수에 값을 바인딩하기 위해 배열을 사용할 수 있습니다. 
+이는 `bind`를 사용하거나 추가 클로저를 생성하지 않으므로, 이벤트를 위임하는 고도로 최적화된 방법입니다.
 
 ```jsx
 function handler(itemId, e) {
@@ -1974,19 +1925,20 @@ function handler(itemId, e) {
 </ul>;
 ```
 
-Events are never rebound and the bindings are not reactive, as it is expensive to attach and detach listeners.
-Since event handlers are called like any other function each time an event fires, there is no need for reactivity; simply shortcut your handler if desired.
+이벤트는 리바운드되지 않으며 바인딩은 리액티브하지 않습니다. 이는 리스너를 추가, 삭제하는데 비용이 많이 들기 때문입니다.
+이벤트 핸들러는 이벤트 발생시마다 일반 함수처럼 호출되기 때문에 반응성이 필요없습니다; 원하는 경우 바로 가면 됩니다.
 
 ```jsx
-// if defined call it, otherwised don't.
+// 정의된 경우 호출하며, 그렇지 않으면 호출하지 않음
 <div onClick={() => props.handleClick?.()} />
 ```
 
-Note that `onChange` and `onInput` work according to their native behavior. `onInput` will fire immediately after the value has changed; for `<input>` fields, `onChange` will only fire after the field loses focus.
+`onChange`와 `onInput`은 기본 동작에 따라 작동합니다. `onInput`은 값이 변경된 직후 실행됩니다; `<input>` 필드의 경우 `onChange`는 필드가 포커스를 잃은 후에만 실행됩니다.
 
 ## `on:___`/`oncapture:___`
 
-For any other events, perhaps ones with unusual names, or ones you wish not to be delegated there are the `on` namespace events. This simply adds an event listener verbatim.
+특이한 이름을 가진 이벤트나, 위임을 원하지 않는 이벤트의 경우 `on` 네임스페이스 이벤트를 사용합니다.
+이 속성은 이벤트 리스너를 그대로 추가합니다.
 
 ```jsx
 <div on:Weird-Event={(e) => alert(e.detail)} />
@@ -1994,13 +1946,15 @@ For any other events, perhaps ones with unusual names, or ones you wish not to b
 
 ## `use:___`
 
-These are custom directives. In a sense this is just syntax sugar over ref but allows us to easily attach multiple directives to a single element. A directive is simply a function with the following signature:
+이는 커스텀 디렉티브입니다. 어떤 의미에서 이는 ref에 대한 문법적 설탕이지만 단일 엘리먼트에 여러 디렉티브를 쉽게 연결할 수 있습니다.
+디렉티브는 다음과 같은 시그니처를 가지는 함수입니다.
 
 ```ts
 function directive(element: Element, accessor: () => any): void;
 ```
 
-Directive functions are called at render time but before being added to the DOM. You can do whatever you'd like in them including create signals, effects, register clean-up etc.
+디렉티브 함수는 DOM에 추가되기 전에 렌더링시에 호출됩니다.
+시그널, 이펙트 생성, 클린업 등록등을 포함하는 모든 원하는 작업을 수행할 수 있습니다.
 
 ```js
 const [name, setName] = createSignal("");
@@ -2014,7 +1968,7 @@ function model(el, value) {
 <input type="text" use:model={[name, setName]} />;
 ```
 
-To register with TypeScript extend the JSX namespace.
+타입스크립트 사용시 JSX 네임스페이스를 확장해 등록합니다.
 
 ```ts
 declare module "solid-js" {
@@ -2028,7 +1982,7 @@ declare module "solid-js" {
 
 ## `prop:___`
 
-Forces the prop to be treated as a property instead of an attribute.
+prop이 속성<sub>attribute</sub> 대신 프로퍼티로 처리되도록 합니다.
 
 ```jsx
 <div prop:scrollTop={props.scrollPos + "px"} />
@@ -2036,7 +1990,8 @@ Forces the prop to be treated as a property instead of an attribute.
 
 ## `attr:___`
 
-Forces the prop to be treated as a attribute instead of an property. Useful for Web Components where you want to set attributes.
+prop이 프로퍼티 대신 속성<sub>attribute</sub>로 처리되도록 합니다.
+웹 컴포넌트에서 속성을 설정하려는 경우 유용합니다.
 
 ```jsx
 <my-element attr:status={props.status} />
@@ -2044,15 +1999,18 @@ Forces the prop to be treated as a attribute instead of an property. Useful for 
 
 ## `/* @once */`
 
-Solid's compiler uses a simple heuristic for reactive wrapping and lazy evaluation of JSX expressions. Does it contain a function call, a property access, or JSX? If yes we wrap it in a getter when passed to components or in an effect if passed to native elements.
+Solid의 컴파일러는 JSX 표현식의 리액티브 래핑 및 지연 평가에 휴리스틱을 사용합니다.
+함수 호출, 프로퍼티 액세스, JSX가 포함되어 있다면 컴포넌트에 전달할 때는 getter로 래핑하고, 기본 엘리먼트에 전달하는 경우에는 이펙트로 래핑합니다.
 
-Knowing this we can reduce overhead of things we know will never change simply by accessing them outside of the JSX. A simple variable will never be wrapped. We can also tell the compiler not to wrap them by starting the expression with a comment decorator `/_ @once _/`.
+이 휴리스틱과 그 한계를 알고 있으면 JSX 외부에서 액세스하여 절대 변경되지 않는 항목의 오버헤드를 줄일 수 있습니다.
+홀로 있는 변수는 절대 래핑되지 않습니다.
+또한 표현식 앞에 `/_ @once _/` 주석 데코레이터를 추가하여 컴파일러가 래핑하지 않도록 할 수 있습니다.
 
 ```jsx
 <MyComponent static={/*@once*/ state.wontUpdate} />
 ```
 
-This also works on children.
+이는 자식에도 적용됩니다.
 
 ```jsx
 <MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>

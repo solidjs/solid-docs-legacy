@@ -11,9 +11,9 @@ const [pending, start] = useTransition();
 const updateTab = (index) => () => start(() => setTab(index));
 ```
 
-`useTransition`은 pending Signal 인디케이터와 트랜지션 시작 메서드를 반환합니다.
+`useTransition`은 pending 시그널 인디케이터와 트랜지션 시작 메서드를 반환합니다.
 
-pending Signal을 사용해 인디케이터를 UI에 제공해야 하는데, 탭 컨테이너 div에 pending 클래스를 추가합니다:
+pending 시그널을 사용해 인디케이터를 UI에 제공해야 하는데, 탭 컨테이너 div에 pending 클래스를 추가합니다:
 
 ```js
 <div class="tab" classList={{ pending: pending() }}>

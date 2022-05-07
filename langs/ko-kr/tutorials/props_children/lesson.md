@@ -30,7 +30,7 @@ export default function ColoredList(props) {
 }
 ```
 
-이제 엘리먼트를 업데이트하기 위해 Effect를 생성해 보겠습니다:
+이제 엘리먼트를 업데이트하기 위해 이펙트를 생성해 보겠습니다:
 ```jsx
 createEffect(() => c().forEach(item => item.style.color = props.color));
 ```

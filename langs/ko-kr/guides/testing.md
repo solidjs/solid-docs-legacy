@@ -5,7 +5,7 @@ sort: 4
 ---
 # Solid 테스트
 
-프로덕션에서 Solid 코드를 사용하려면 테스트가 필요합니다. 모든 테스트를 수동으로 하고 싶지는 않을테니, 자동화된 테스트가 필요합니다. Solid 코드를 테스트하는 것은 간단합니다. 모든 것을 설정해두고, 몇 가지 유용한 테스트 패턴만 알고 있으면 됩니다.
+프로덕션에서 Solid 코드를 사용하려면 테스트가 필요합니다. 모든 테스트를 수동으로 하고 싶지는 않을테니, 자동화된 테스트가 필요합니다. 이 가이드에는 모든 설정 방법과 함께 Solid 코드 테스트를 위한 몇 가지 유용한 테스트 패턴에 대해 설명합니다.
 
 ## 테스트 설정
 
@@ -270,10 +270,10 @@ export default defineConfig({
 ### 리액티브 상태 테스트
 
 유지 보수를 쉽게 하거나 여러 개의 뷰를 지원하기 위해 컴포넌트와 상태를 분리해 유지할 수 있습니다. 이 경우 테스트하는 인터페이스는 상태 그 자체입니다.
-[리액티브 루트](https://www.solidjs.com/docs/latest/api#createroot)에서 벗어나면 상태가 추적되지 않으며, 업데이트가 되더라도 effect 와 memo 가 트리거되지 않습니다.
+[리액티브 루트](https://www.solidjs.com/docs/latest/api#createroot)에서 벗어나면 상태가 추적되지 않으며, 업데이트가 되더라도 이펙트와 메모가 트리거되지 않습니다.
 
-또한, effect 는 비동기로 트리거되기 때문에, 최종 effect 에서 어설션을 래핑하는 것이 도움이 됩니다.
-또는, 여러 변경 사항에 걸친 일련의 effect를 관찰하려면, `createRoot`에서 필요한 도구를 반환하고, 비동기 테스트 함수에서 이를 실행하는 것이 도움이 될 수 있습니다. (이는 `createRoot` 자체는 비동기 함수를 받을 수 없기 때문입니다).
+또한, 이펙트는 비동기로 트리거되기 때문에, 최종 이펙트에서 어설션을 래핑하는 것이 도움이 됩니다.
+또는, 여러 변경 사항에 걸친 일련의 이펙트를 관찰하려면, `createRoot`에서 필요한 도구를 반환하고, 비동기 테스트 함수에서 이를 실행하는 것이 도움이 될 수 있습니다. (이는 `createRoot` 자체는 비동기 함수를 받을 수 없기 때문입니다).
 
 예를 들어, [todo 예제](https://www.solidjs.com/examples/todos)에서 `createLocalStorage` 를 테스트 하려면:
 
@@ -321,7 +321,7 @@ describe("createLocalStore", () => {
   test("it stores new state to localStorage", () => createRoot(dispose => {
     const [state, setState] = createLocalStore(initialState);
     setState("newTitle", "updated");
-    // effect를 캐치하려면, effect 를 사용합니다.
+    // 이펙트를 캐치하려면, 이펙트를 사용합니다.
     return new Promise<void>((resolve) => createEffect(() => {
       expect(JSON.parse(localStorage.todos || ""))
         .toEqual({ todos: [], newTitle: "updated" });
@@ -381,7 +381,7 @@ todoTest("it stores new state to localStorage", () =>
   createRoot(dispose => {
     const [_, setState] = createLocalStore(initialState);
     setState("newTitle", "updated");
-    // effect를 캐치하려면, effect 를 사용합니다.
+    // 이펙트를 캐치하려면, 이펙트를 사용합니다.
     return new Promise<void>((resolve) => createEffect(() => {
       assert.equal(
         JSON.parse(localStorage.todos || ""),

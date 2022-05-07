@@ -3,26 +3,18 @@ title: 타입스크립트
 description: Solid와 타입스크립트를 함께 사용하기 위한 팁
 sort: 3
 ---
-# TypeScript
+# 타입스크립트
 
-Solid is designed to be easy to use with TypeScript:
-its use of standard JSX makes code largely understood by TypeScript,
-and it provides sophisticated built-in types for its API.
-This guide covers some useful tips for working with TypeScript and
-typing your Solid code.
+Solid는 타입스크립트와 함께 사용하기 쉽도록 설계되었습니다:
+표준 JSX를 사용하기 때문에 타입스크립트는 코드를 대부분 이해할 수 있으며, API에 정교한 내장 타입을 제공합니다.
+이 가이드는 타입스크립트로 Solid 코드를 작성하는데 유용한 팁을 다룹니다.
 
-## Configuring TypeScript
+## 타입스크립트 설정
 
-The [Solid starter templates](https://github.com/solidjs/templates/)
-offer good starting points for
-[`tsconfig.json`](https://github.com/solidjs/templates/blob/master/ts/tsconfig.json).
+[Solid starter templates](https://github.com/solidjs/templates/)는 [`tsconfig.json`](https://github.com/solidjs/templates/blob/master/ts/tsconfig.json)을 위한 좋은 시작점을 제공합니다.
 
-Most importantly, to use TypeScript with the Solid JSX compiler,
-you need to configure TypeScript to leave JSX constructs alone via
-[`"jsx": "preserve"`](https://www.typescriptlang.org/tsconfig#jsx),
-and tell TypeScript where the JSX types come from via
-[`"jsxImportSource": "solid-js"`](https://www.typescriptlang.org/tsconfig#jsxImportSource).
-So, a minimal `tsconfig.json` would look like this:
+Solid JSX 컴파일러와 타입스크립트를 함께 사용하려면, [`"jsx": "preserve"`](https://www.typescriptlang.org/tsconfig#jsx) 설정을 사용해 JSX 구조를 그대로 유지해야 하며, [`"jsxImportSource": "solid-js"`](https://www.typescriptlang.org/tsconfig#jsxImportSource) 으로 JSX 타입을 지정해야 합니다.
+따라서, 최소한의 `tsconfig.json` 파일은 다음과 같습니다:
 
 ```json
 {
@@ -33,127 +25,100 @@ So, a minimal `tsconfig.json` would look like this:
 }
 ```
 
-If your code base uses a mix of JSX types (e.g., some files are React
-while other files are Solid), you can set the default `jsxImportSource`
-in `tsconfig.json` for the majority of your code, and then
-[override the `jsxImportSource` option](https://www.typescriptlang.org/tsconfig#jsxImportSource)
-in specific `.tsx` files using the following pragma:
+코드 베이스가 여러 JSX 타입을 사용(예를 들어, 리액트와 Solid를 같이 사용)하는 경우, 가장 많이 사용하는 코드 타입을 `tsconfig.json` 파일의 `jsxImportSource` 기본값으로 설정한 다음, 다른 타입을 사용하는 파일에서 아래와 같은 프래그마를 사용해 [`jsxImportSource` 옵션을 오버라이드](https://www.typescriptlang.org/tsconfig#jsxImportSource)합니다:
 
 ```ts
 /** @jsxImportSource solid-js */
 ```
 
-or
+또는
 
 ```ts
 /** @jsxImportSource react */
 ```
 
-## API Types
+## API 타입
 
-Solid is written in TypeScript, so everything is typed out of the box.
-The [API documentation](https://www.solidjs.com/docs/latest/api) details the
-types for all API calls, as well as several helpful type definitions to make it
-easier to refer to Solid notions when you need to specify explicit types.
-Here, we explore the resulting types when using a few core primitives.
+Solid는 타입스크립트로 작성되었기 때문에, 모든 것이 타입이 지정되어 있습니다.
+[API 문서](https://www.solidjs.com/docs/latest/api)에는 API 호출 타입과 함께 유용한 몇 가지 타입들에 대해 자세히 설명하고 있습니다.
+여기에서 핵심 프리미티브 사용시 결과 타입에 대해서 알아보겠습니다.
 
-### Signals
+### Signal
 
-`createSignal<T>` is parameterized by the type `T` of the object stored in the
-signal.  For example:
+`createSignal<T>` 는 시그널에 저장된 객체 타입 `T`에 의해 파라미터화됩니다. 예를 들어:
 
 ```ts
 const [count, setCount] = createSignal<number>();
 ```
 
-The first `createSignal` has return type `Signal<number>`, corresponding to 
-the type we passed to it. This is a tuple of the getter and 
-setter, which each have a generic type: 
+`createSignal`은 전달한 타입에 해당하는 `Signal<number>` 타입을 반환하며, 이는 제네릭 타입을 갖는 getter와 setter의 튜플입니다:
+
 ```ts 
+import type { Signal, Accessor, Setter } from 'solid-js';
 type Signal<T> = [get: Accessor<T>, set: Setter<T>];
 ```
 
-In this case, the signal getter `count` has type
-`Accessor<number | undefined>`. `Accessor<T>` is a type definition
-provided by Solid, in this case equivalent to `() => number | undefined`.
-The `| undefined` gets added in this example because we did not provide a
-default value to `createSignal`, so the signal value indeed starts out as
-`undefined`.
+이 경우, `count` getter의 타입은 `Accessor<number | undefined>`입니다.
+`Accessor<T>`는 Solid에서 제공하는 타입 정의이며, 이 경우 `() => number | undefined`와 동일합니다.
+예제에서는 `createSignal`에 디폴트 값을 지정하지 않았기 때문에 `| undefined` 타입이 추가되었습니다.
+시그널의 디폴트 값은 따라서 `undefined`가 됩니다.
 
-The signal setter `setCount` has type `Setter<number>`, which is a more
-complicated type definition corresponding roughly to
-`(value?: number | ((prev?: number) => number)) => number`, representing the
-two possibilities for the passed argument: you can call `setCount` with 
-a simple `number`, or a
-function taking the previous value (if there was one) and returning a number.
+`setCount` setter는 `Setter<number>` 타입이며, 대략 `(value?: number | ((prev?: number) => number)) => number` 에 해당하는 복잡한 타입입니다.
+`number` 타입, 혹은 이전 값을 받아서 숫자를 반환하는 함수를 인수로 사용해 `setCount`를 호출할 수 있습니다.
 
-##### Defaults
+실제 `Setter` 타입은 더 복잡합니다.
+새 값을 결정하기 위해 함수를 호출하는 대신 시그널을 해당 함수 값으로 설정하고 싶은 경우, 실수로 함수를 setter에 전달하는 것을 감지합니다.
+`setCount(value)`를 호출할 때 "Argument ... is not assignable to parameter"라는 타입스크립트 에러가 표시된다면, setter 인수를 래핑해 `setCount(() => value)` 처럼 호출을 해서 `value`가 호출되지 않도록 해보세요.
 
-We can avoid having to explicitly provide the type of the signal when calling
-`createSignal`, and avoid the `| undefined` part of the type, by providing
-a default value to `createSignal`:
+##### 디폴트 값
+
+`createSignal`을 호출할 때 디폴트 값을 제공하게 되면 명시적으로 시그널 타입을 지정하지 않아도 되며, 타입에서 `| undefined`를 제거할 수 있습니다:
 
 ```ts
 const [count, setCount] = createSignal(0);
 const [name, setName] = createSignal('');
 ```
 
-In this case, TypeScript infers that the signal types are `number` and `string`
-respectively.  Thus, for example, `count` obtains type `Accessor<number>`
-and `name` obtains type `Accessor<string>` (without `| undefined`).
+이 경우, 타입스크립트는 시그널 타입을 `number`, `string`으로 추론합니다.
+따라서, `count`는 `Accessor<number>` 타입이 되며, `name`는 `Accessor<string>` 타입을 얻게 됩니다(`| undefined` 타입 없음).
 
 ### Context
 
-Similar to signals,
-[`createContext<T>`](https://www.solidjs.com/docs/latest/api#createcontext)
-is parameterized by the type `T` of the context value.
-We can provide this type explicitly:
+시그널과 유사하게 [`createContext<T>`](https://www.solidjs.com/docs/latest/api#createcontext)는 컨텍스트 값 타입 `T`로 파라미터화 됩니다.
+다음과 같이 타입을 명시할 수 있습니다:
 
 ```ts
 type Data = {count: number, name: string};
 const dataContext = createContext<Data>();
 ```
 
-In this case, `dataContext` has type `Context<Data | undefined>`,
-causing `useContext(dataContext)` to have matching return type `Data | 
-undefined`.
-The reason for `| undefined` is that the context might not be provided in the
-ancestors of the current component, in which case `useContext` returns
-`undefined`.
+이 경우, `dataContext`는 `Context<Data | undefined>` 타입이며, `useContext(dataContext)`는 `Data | undefined` 타입을 반환합니다.
+`| undefined`가 붙은 이유는, 현재 컴포넌트의 부모에서 컨텍스트를 제공하지 않은 경우 `useContext`가 `undefined`를 반환하기 때문입니다.
 
-If we instead provide a default value to `createContext`, we avoid the
-`| undefined` part of the type, and often avoid having to explicitly specify
-the type of the `createContext` as well:
+`createContext`에 디폴트 값을 제공하게 되면 `| undefined` 타입을 제거할 수 있으며, `createContext`의 타입을 명시적으로 지정하지 않아도 됩니다:
 
 ```ts
 const dataContext = createContext({count: 0, name: ''});
 ```
 
-In this case, TypeScript infers that `dataContext` has type
-`Context<{count: number, name: string}>`, which is equivalent to
-`Context<Data>` (without `| undefined`).
+이 경우, 타입스크립트는 `dataContext` 타입을 `Context<{count: number, name: string}>`으로 추론하며, `Context<Data>`와 동일합니다(`| undefined` 타입 없음).
 
-Another common pattern is to define a factory function that produces the
-value for a context.  Then we can grab the return type of that function using 
-TypeScript's
-[`ReturnType`](https://www.typescriptlang.org/docs/handbook/utility-types.
-html#returntypetype)
-type helper, and use that to type the context:
+다른 일반적인 패턴은 컨텍스트에 대한 값을 생성하는 팩토리 함수를 정의하는 것입니다.
+타입스크립트의 [`ReturnType`](https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype) 유틸리티 타입을 사용해 함수의 리턴 타입을 가져와 컨텍스트 타입으로 사용할 수 있습니다:
 
 ```ts
 export const makeCountNameContext = (initialCount = 0, initialName = '') => {
   const [count, setCount] = createSignal(initialCount);
   const [name, setName] = createSignal(initialName);
   return [{count, name}, {setCount, setName}] as const;
-    // `as const` forces tuple type inference
+    // `as const` 는 튜플 타입으로 추론하도록 합니다.
 };
 type CountNameContextType = ReturnType<typeof makeCountNameContext>;
 export const CountNameContext = createContext<CountNameContextType>();
 export const useCountNameContext = () => useContext(CountNameContext);
 ```
 
-In this example, `CountNameContextType` corresponds to the return value of 
-`makeCountNameContext`:
+이 예제에서 `CountNameContextType` 는 `makeCountNameContext`의 반환 타입에 해당합니다:
 ```ts
 [
   {readonly count: Accessor<number>, readonly name: Accessor<string>},
@@ -161,33 +126,29 @@ In this example, `CountNameContextType` corresponds to the return value of
 ]
 ```
 
-and `useCountNameContext` has type `() => CountNameContextType | undefined`.
+`useCountNameContext`는 `() => CountNameContextType | undefined` 타입을 가집니다.
 
-If you want to avoid the `undefined` possibility, you could assert that the
-context is always provided when used:
+`undefined` 발생 가능성을 피하고자 한다면, 항상 컨텍스트가 제공된다고 지정할 수 있습니다:
 ```ts
 export const useCountNameContext = () => useContext(CountNameContext)!;
 ```
 
-This is a dangerous assumption; it would be safer to actually provide a 
-default argument to `createContext` so that the context is always 
-defined.
+이렇게 가정하는 것은 위험하며, 항상 컨텍스트가 정의되도록 `createContext`에 기본값을 지정하는 것이 더 안전합니다.
 
-## Component Types
+## 컴포넌트 타입
 
 ```ts
-import type {PropsWithChildren, Component} from 'solid-js';
+import type { JSX, PropsWithChildren, Component } from 'solid-js';
 type PropsWithChildren<P = {}> = P & { children?: JSX.Element };
 type Component<P = {}> = (props: PropsWithChildren<P>) => JSX.Element
 ```
 
-To type a component function, use the `Component<P>` type,
-where `P` is the type of the `props` argument and should be an [object type](https://www.typescriptlang.org/docs/handbook/2/objects.html)
-`P` doesn't need to explicitly mention the `children` property;
-`{ children?: JSX.Element }` is automatically added to the type
-(via the `PropsWithChildren<P>` wrapper).  For example:
+컴포넌트 함수의 타입을 지정하려면, `Component<P>` 타입을 사용합니다.
+여기서 `P`는 `props`의 타입이며, [object type](https://www.typescriptlang.org/docs/handbook/2/objects.html)이어야 합니다.
+`P`에는 `children` 프로퍼티를 명시적으로 추가하지 않아도 (`PropsWithChildren<P>` 래퍼를 통해) `{ children?: JSX.Element }`가 자동으로 타입에 추가됩니다.
+예를 들면:
 
-```ts
+```tsx
 const Counter: Component<{initialValue: number}> = (props) => {
   [count, setCount] = createSignal(props.initialValue);
   return (
@@ -198,139 +159,139 @@ const Counter: Component<{initialValue: number}> = (props) => {
 };
 ```
 
-This code automatically types `props` to
-`{initialValue: number, children?: JSX.Element}`
-and forces the return value of `Counter` to be `JSX.Element`
-(which can be a DOM node, an array of `JSX.Element`s,
-a function returning a `JSX.Element`, a boolean, or anything
-else the renderer can handle).
+이 코드에서 `props` 타입은 자동으로 `{initialValue: number, children?: JSX.Element}`이 되며, `Counter`의 반환 타입은 `JSX.Element`가 됩니다.
 
-The namespace `JSX` offers a suite of useful types for working with HTML DOM
-in particular.  See the
-[definition of JSX in dom-expressions](https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/jsx.d.ts)
-for all the types provided.
+`JSX` 네임스페이스는 HTML DOM 작업에 유용한 타입 모음을 제공합니다.
+제공되는 모든 타입들은 [dom-expressions의 JSX 정의](https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/jsx.d.ts)를 참고하세요.
 
-## Event Handlers
+## 이벤트 핸들러
 
-One useful helper type provided by the `JSX` namespace is `JSX.EventHandler<T>`,
-which represents a single-argument event handler for a DOM element type `T`.
-You can use this to type any event handlers you define outside JSX.
-For example:
+`JSX` 네임스페이스의 유용한 헬퍼 타입 중 하나인 `JSX.EventHandler<T, E>`는 DOM 엘리먼트 타입 `T`와 이벤트 타입 `E`에 대한 단일 인수 이벤트 핸들러를 나타냅니다.
+이를 사용해 JSX 외부에서 정의한 이벤트 핸들러 타입을 지정할 수 있습니다.
+예를 들어:
 
-```ts
-const onInput: JSX.EventHandler<HTMLInputElement> = (event) => {
+```tsx
+import type { JSX } from 'solid-js';
+const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = (event) => {
   console.log('input changed to', event.currentTarget.value);
 };
 
 <input onInput={onInput}/>
 ```
 
-Handlers defined inline within
-[`on___` JSX attributes](https://www.solidjs.com/docs/latest/api#on___)
-(with built-in event types) are automatically typed as the appropriate
-`JSX.EventHandler`:
+[`on___` JSX 속성](https://www.solidjs.com/docs/latest/api#on___)(내장 이벤트 타입) 안에 인라인으로 정의된 핸들러는 자동으로 적절한 `JSX.EventHandler` 타입으로 지정됩니다.
 
-```ts
+```tsx
 <input onInput={(event) => {
   console.log('input changed to', event.currentTarget.value);
 }}/>;
 ```
 
-Note that `JSX.EventHandler<T>` constrains the event's
-[`currentTarget` attribute](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget)
-to be of type `T` (in the example, `event.currentTarget` is typed
-as `HTMLInputEvent`, so has attribute `value`).  However, the event's
-[`target` attribute](https://developer.mozilla.org/en-US/docs/Web/API/Event/target)
-could be any `DOMElement`.
-This is because `currentTarget` is the element that the
-event handler was attached to, so has a known type, whereas `target` is
-whatever the user interacted with that caused the event to bubble to or get
-captured by the event handler, which can be any DOM element.
+`JSX.EventHandler<T>`는 이벤트의 [`currentTarget` 속성](https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget)을 `T`타입으로 제한합니다(위 코드에서 `event.currentTarget`은 `HTMLInputEvent`타입이며, 여기에는 `value` 속성이 있습니다).
+하지만, 이벤트의 [`target` 속성](https://developer.mozilla.org/en-US/docs/Web/API/Event/target)은 모든 `DOMElement`가 될 수 있습니다.
+`currentTarget`은 이벤트 핸들러가 연결된 엘리먼트이므로 타입을 알 수 있지만, `target`은 사용자 인터랙션으로 인해 버블된 이벤트이거나, 이벤트 핸들러에 의해 캡처된 이벤트이기 때문에 모든 DOM 엘리먼트가 될 수 있습니다.
 
-## The ref Attribute
+## ref 속성
 
-When we use the `ref` attribute with a variable, we tell Solid to assign the
-DOM element to 
-the variable once the element is rendered. Without TypeScript, this looks like:
+변수와 함께 `ref` 속성을 사용는 경우, Solid는 엘리먼트가 렌더링되면 해당 DOM 엘리먼트를 변수에 할당합니다. 타입스크립트를 사용하지 않는 경우 다음과 같습니다:
 ```jsx
 let divRef;
 
-console.log(divRef); //undefined
+console.log(divRef); // undefined
 
 onMount(() => {
-  console.log(divRef) //<div></div>
+  console.log(divRef); // <div> 엘리먼트
 })
 
 return (
-  <div ref={divRef}></div>
+  <div ref={divRef}/>
 )
 ```
 
-This presents a challenge for typing that variable: should we type `divRef` 
-as an `HTMLDivElement`, even though it's only set as such after rendering?
+이 경우 변수의 타입을 정하기 힘든 문제가 있습니다. `divRef`는 렌더링 후에만 `HTMLDivElement`로 설정되는데, 이를 `HTMLDivElement` 타입으로 해야 할까요? (여기서는 타입스크립트의 `strictNullChecks` 모드가 활성화되어 있다고 가정합니다. 그렇지 않으면, 타입스크립트는 `undefined`가 될 수 있는 변수를 무시합니다.)
 
-Here is one common pattern for using `ref` variables with TypeScript:
+타입스크립트에서 가장 안전한 패턴은 `divRef`가 일정 기간동안 `undefined`라는 것을 알고, 사용시에 확인하는 것입니다:
 
-```ts
-let divRef!: HTMLDivElement;
-let buttonRef!: HTMLButtonElement;
+```tsx
+let divRef: HTMLDivElement | undefined;
 
-return (
-  <div ref={divRef}>
-    <button ref={buttonRef}>...</button>
-  </div>
-);
-```
+divRef.focus();  // 컴파일시 에러 발생
 
-The [non-null assertions (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)
-on the declarations effectively tell TypeScript to assume that the refs have 
-been set, allowing you to call `HTMLDivElement` properties (e.g. `divRef.offsetWidth`) without a type assertion.
-
-The downside to this approach is that it doesn't reflect the full picture: 
-these ref variables 
-won't actually be set (and will still be undefined)
-until after the rendering phase.  You can safely use them in [`onMount`](/docs/latest/api#onmount) or a
-[`createEffect`](/docs/latest/api#createeffect),
-for example, but not in the body of the component function.
-
-Instead, you can leave off the non-null assertion in the declaration, and 
-check for nullity when you access the variable later on.
-Additionally, due 
-to a quirk with 
-TypeScript and JSX, you'll need to add the non-null assertion using the `ref` 
-attribute in JSX:
-
-```ts
-let divRef: HTMLDivElement;
-let buttonRef: HTMLButtonElement;
+onMount(() => {
+  if (!divRef) return;
+  divRef.focus();  // 허용됨
+});
 
 return (
   <div ref={divRef!}>
-    <button ref={buttonRef!}>...</button>
+    ...
   </div>
 );
 ```
 
-This is because TypeScript assumes 
-that the variable is being used to set the ref attribute (and thus 
-believes 
-that the variable must be defined), 
-when in fact the `ref` attribute tells Solid to 
-set _the variable_ later on. 
+또는 `div` 엘리먼트가 렌더링된 후에만 `onMount`가 호출된다는 것을 알고 있기 때문에, `onMount` 내에서 `divRef`에 액세스할 때 [non-null assertion (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)을 사용할 수 있습니다.
 
-With this pattern, TypeScript will correctly flag any accidental uses of the
-refs inside the body of the function (before the JSX block where they get
-defined).  However, TypeScript currently does not flag use of refs inside
-`createMemo` and `createRenderEffect`, even though they won't be defined there,
-so you still need to be careful.
+```tsx
+onMount(() => {
+  divRef!.focus();
+});
+```
 
-## Control Flow Narrowing
+또 다른 안전한 패턴은 `divRef` 타입에서 `undefined`를 생략하고, `ref` 속성에 
+[definite assignment assertion (`!`)](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html#definite-assignment-assertions)을 사용하는 것입니다.
 
-A common pattern is to use
-[`<Show>`](https://www.solidjs.com/docs/latest/api#%3Cshow%3E)
-to display data only when that data is defined:
+```tsx
+let divRef: HTMLDivElement;
 
-```ts
+divRef.focus();  // 컴파일시 에러 발생
+
+onMount(() => {
+  divRef.focus();  // 허용됨
+});
+
+return (
+  <div ref={divRef!}>
+    ...
+  </div>
+);
+```
+
+타입스크립트는 `ref` 속성이 `divRef` 변수로 설정되고, `divRef`가 이미 할당되어 있다고 가정하기 때문에 `ref={divRef!}`를 사용해야 합니다.
+Solid에서는 그 반대입니다: `divRef`는 `ref` 속성에 의해 할당됩니다.
+`divRef!` 어설션을 사용한 할당 덕분에 타입스크립트는 이 라인 뒤에서 `divRef`가 할당되었다고 확신하게 됩니다.
+
+이 패턴을 사용하면, 타입스크립트는 함수 내에서 정의된 ref를 정의된 JSX 블럭 이전에 사용하는 경우 올바르게 플래그를 지정합니다.
+하지만 타입스크립트는 중첩된 함수 내에서 `undefined` 일 수 있는 변수의 사용에 대해서는 플래그를 설정하지 않습니다.
+Solid의 컨텍스트에서, `createMemo`, `createRenderEffect`, `createComputed` 내부(ref가 정의된 JSX 블럭 이전)에서는 ref를 사용하지 않도록 주의해야 합니다.
+이 함수들은 즉시 실행되기 때문에, 아직 ref가 생성되지 않은 상태이기 때문입니다. 타입스크립트는 이를 에러로 표시하지 않습니다.
+반면에 이전 패턴은 이러한 에러를 잡아냅니다.
+
+또 다른 일반적이지만 덜 안전한 패턴은, 변수 선언 시점에 할당 어설션을 사용하는 것입니다.
+
+```tsx
+let divRef!: HTMLDivElement;
+
+divRef.focus();  // 컴파일은 성공하지만 에러 발생
+
+onMount(() => {
+  divRef.focus();  // OK
+});
+
+return (
+  <div ref={divRef}>
+    ...
+  </div>
+);
+```
+
+이 접근 방식은 해당 변수에 대한 할당 검사를 하지 않기 때문에, 쉬운 해결 방법이기는 하지만 추가적으로 주의가 필요합니다.
+특히 이전 패턴과 달리, 중첩된 함수 외부에서도 변수가 할당되기 전에 미리 사용하는 잘못된 사용을 허용합니다.
+
+## 제어 흐름 좁히기
+
+[`<Show>`](https://www.solidjs.com/docs/latest/api#%3Cshow%3E)를 사용해 데이터가 정의된 경우에만 데이터를 표시하는게 일반적인 패턴입니다:
+
+```tsx
 const [name, setName] = createSignal<string>();
 
 return (
@@ -340,18 +301,13 @@ return (
 );
 ```
 
-In this case, TypeScript can't determine that the two calls to `name()` will
-return the same value, and that the second call will happen only if the first
-call returned a truthy value.  Thus it will complain that `name()` might be
-`undefined` when trying to call `.replace()`.
+이 경우, 타입스크립트는 2번의 `name()` 함수 호출이 동일한 값을 반환하는지를 알 수 없기 때문에, 첫 번째 호출이 truthy 값을 반환하는 경우에만 두 번째 호출이 일어난다고 결정할 수 없습니다. 따라서 `.replace()`를 호출하려고 할 때, `name()` 값이 `undefined`일 수도 있다고 에러를 냅니다.
 
-Here are two workarounds for this issue:
+이 문제를 해결할 수 있는 2가지 방법이 있습니다:
 
-1. You can manually assert that `name()` will be non-null in the second call
-   using TypeScript's
-   [non-null assertion operator `!`](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-):
+1. 타입스크립트 [non-null assertion 연산자 `!`](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)를 사용해 직접 `name()`이 not-null 값을 반환한다고 어설션을 합니다:
 
-   ```ts
+   ```tsx
    return (
      <Show when={name()}>
        Hello {name()!.replace(/\s+/g, '\xa0')}!
@@ -359,10 +315,9 @@ Here are two workarounds for this issue:
    );
    ```
 
-2. You can use the callback form of `<Show>`, which passes in the value of the
-   `when` prop when it is truthy:
+2. `when` prop의 값이 truthy인 경우 이 값을 전달하는 하는 `<Show>`의 콜백 형식을 사용합니다:
 
-   ```ts
+   ```tsx
    return (
      <Show when={name()}>
        {(n) =>
@@ -372,25 +327,18 @@ Here are two workarounds for this issue:
    );
    ```
 
-   In this case, the typing of the `Show` component is clever enough to tell
-   TypeScript that `n` is truthy, so it can't be `undefined` (or `null` or
-   `false`).
+   이 경우, `Show` 컴포넌트 타입은 `n` 값이 truthy 라고 타입스크립트에 알려주기 때문에, `undefined`(또는 `null`, `false`) 값이 될 수 없습니다.
 
-   Note, however, that this form of `<Show>` forces the entirety of the 
-   children to render
-   from scratch every time `name()` changes, instead of doing this just when `name()` changes from a falsey to a truthy value.
-   This means that the children don't have the full benefits of fine-grained
-   reactivity (re-using unchanged parts and updating just what changed).
+   하지만, 이 형식의 `<Show>`는 `name()`이 falsy 에서 truthy 로 변경될 때만 수행하는 것이 아니라 `name()`이 변경될 때마다 자식 전체를 처음부터 다시 렌더링합니다.
+   이는 자식 컴포넌트가 세밀한 반응성(변경되지 않는 부분은 재사용하고 변경된 부분만 업데이트)을 충분히 누리지 못하고 있음을 의미합니다.
 
-## Special JSX Attributes and Directives
+## 특수 JSX 속성 및 디렉티브
 
-If you use custom event handlers via Solid's
-[`on:___`/`oncapture:___` attributes](https://www.solidjs.com/docs/latest/api#on%3A___%2Foncapture%3A___),
-you should define corresponding types for the resulting `Event` objects
-by overriding the `CustomEvents` and `CustomCaptureEvents` interfaces
-within module `"solid-js"`'s `JSX` namespace, like so:
+### `on:___`/`oncapture:___`
 
-```ts
+Solid의 [`on:___`/`oncapture:___` 속성](https://www.solidjs.com/docs/latest/api#on%3A___%2Foncapture%3A___)을 통해 커스텀 핸들러를 사용한다면, `"solid-js"`의 `JSX` 네임스페이스 내에서 `CustomEvents` 와 `CustomCaptureEvents` 인터페이스를 오버라이딩하여 결과 `Event` 객체에 해당하는 타입을 정의해야 합니다.
+
+```tsx
 class NameEvent extends CustomEvent {
   type: 'Name';
   detail: {name: string};
@@ -414,14 +362,11 @@ declare module "solid-js" {
 <div on:Name={(event) => console.log('name is', event.detail.name)}/>
 ```
 
-If you use forced properties via Solid's
-[`prop:___` attributes](https://www.solidjs.com/docs/latest/api#prop%3A___),
-or custom attributes via Solid's
-[`attr:___` attributes](https://www.solidjs.com/docs/latest/api#attr%3A___),
-you can define their types in the `ExplicitProperties` and
-`ExplicitAttributes` interfaces, respectively:
+### `prop:___`/`attr:___`
 
-```ts
+Solid의 [`prop:___` 속성](https://www.solidjs.com/docs/latest/api#prop%3A___)을 통해 강제된 프로퍼티를 사용하거나, Solid의 [`attr:___` 속성](https://www.solidjs.com/docs/latest/api#attr%3A___)을 통해 커스텀 속성을 사용하는 경우, `ExplicitProperties` 와 `ExplicitAttributes` 인터페이스에서 각각의 타입을 정의할 수 있습니다:
+
+```tsx
 declare module "solid-js" {
   namespace JSX {
     interface ExplicitProperties { // prop:___
@@ -439,11 +384,11 @@ declare module "solid-js" {
 <my-web-component attr:name={name()} attr:count={count()}/>
 ```
 
-If you define custom directives for Solid's
-[`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
-you can type them in the `Directives` interface, like so:
+### `use:___`
 
-```ts
+Solid의 [`use:___` 속성](https://www.solidjs.com/docs/latest/api#use%3A___)에 대한 커스텀 디렉티브를 정의하는 경우, `Directives` 인터페이스에 다음과 같이 타입을 정의할 수 있습니다:
+
+```tsx
 function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
   const [field, setField] = value();
   createRenderEffect(() => (element.value = field()));
@@ -462,3 +407,17 @@ let [name, setName] = createSignal('');
 
 <input type="text" use:model={[name, setName]} />;
 ```
+
+다른 모듈에 있는 `d` 디렉티브를 `import`하고, `d`가 `use:d` 디렉티브 형식으로만 사용된다고 하면, 타입스크립트(정확히는 [`babel-preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript))는 기본적으로 `d`를 `import`하는 것을 삭제합니다.
+이는 `d`가 타입일 가능성 때문에 타입스크립트가 `use:d`를 `d`에 대한 참조로 확신하지 못하기 때문입니다.
+이 문제를 해결하는 방법은 2 가지가 있습니다:
+
+1. [`babel-preset-typescript`의 `onlyRemoveTypeImports: true`](https://babeljs.io/docs/en/babel-preset-typescript#onlyremovetypeimports) 설정 옵션을 사용하게 되면 `import type ...` 으로 타입을 임포트하는 것을 제외한 모든 `import`를 제거하지 않습니다.
+`vite-plugin-solid`를 사용하는 경우, `vite.config.ts` 파일에서 `solidPlugin({ typescript: { onlyRemoveTypeImports: true } })` 을 사용해 이 옵션을 설정할 수 있습니다.
+
+  코드 베이스 전체에서 `export type`, `import type`을 주의깊게 사용하지 않으면 이 옵션이 문제가 될 수 있습니다.
+
+2. `d` 디렉티브를 `import`하는 모든 모듈에서 `false && d;` 처럼 페이크 액세스를 추가합니다.
+이렇게 하면 타입스크립트가 `d` `import`를 제거하는 것을 방지하고, [Terser](https://terser.org/)를 사용해 트리 쉐이킹을 한다고 가정하면, 코드는 최종 코드 번들에서 빠지게 됩니다.
+
+  `d;` 처럼 보다 간단한 페이크 액세스를 추가하더라도 `import`가 제거되는 것을 방지하지만, 트리 쉐이킹에서 제거되지 않기 때문에 최종 코드 번들에는 포함됩니다.

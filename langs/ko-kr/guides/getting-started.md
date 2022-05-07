@@ -8,7 +8,7 @@ sort: 0
 
 Solid를 사용하기 위한 가장 쉬운 방법은 온라인으로 시도해 보는 것입니다. https://playground.solidjs.com 의 REPL은 이를 위한 완벽한 방법을 제공합니다. 또한 [예제](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md)를 편집해 볼 수 있는 https://codesandbox.io/ 도 있습니다.
 
-또한, 터미널에서 다음 명령을 실행해서 [Vite 템플릿](https://github.com/solidjs/templates)을 사용할 수 있습니다:
+또한, 터미널에서 다음 명령을 실행해서 간단한 [Vite 템플릿](https://github.com/solidjs/templates)을 사용할 수 있습니다:
 
 ```sh
 > npx degit solidjs/templates/js my-app
@@ -44,7 +44,7 @@ function MyComponent(props) {
 
 컴포넌트는 자체적으로 상태를 저장하지 않고 인스턴스가 없다는 점에서 가볍습니다. 대신, DOM 엘리먼트와 리액티브 프리미티브를 위한 팩토리 함수 역할을 합니다.
 
-Solid의 세밀한 반응성<sub>Reactivity</sub>은 Signal, Memo, Effect의 3개의 간단한 프리미티브들을 기반으로 합니다. 이들은 뷰를 최신 상태로 유지하는 자동 추적 동기화 엔진을 형성합니다. 리액티브 계산은 동기식으로 실행되는, 간단한 함수로 래핑된 표현식의 형태를 취합니다.
+Solid의 세밀한 반응성<sub>Reactivity</sub>은 시그널, 메모, 이펙트의 3개의 핵심 프리미티브들을 기반으로 합니다. 이들은 뷰를 최신 상태로 유지하는 자동 추적 동기화 엔진을 형성합니다. 리액티브 계산은 동기식으로 실행되는, 함수로 래핑된 표현식의 형태를 취합니다.
 
 ```js
 const [first, setFirst] = createSignal("JSON");
@@ -87,11 +87,11 @@ Solid는 서버에서 비동기 렌더링과 스트림 렌더링을 지원하기
 
 자세한 내용은 [서버 가이드](/guides/server#server-side-rendering)를 읽어보시기 바랍니다.
 
-## 컴파일 미사용?
+## 빌드리스 옵션
 
-JSX를 싫어하시나요? 수동으로 표현식을 래핑하고, 형편없는 성능을 경험하고, 번들 크기가 커지는 것이 싫으신가요? Tagged 템플릿 리터럴이나 하이퍼스크립트를 사용해 컴파일되지 않은 환경에서 Solid 앱을 작성할 수 있습니다.
+일반 HTML 파일, https://codepen.io 등과 같이 컴파일을 사용하지 않는 환경에서 Solid를 사용하고 싶은 경우, Solid의 컴파일 타임 최적화된 JSX 문법 대신 평범한 자바스크립트에서 [``` html`` ``` 태그드 템플릿 리터럴](https://github.com/solidjs/solid/tree/main/packages/solid/html) 이나 [HyperScript `h()` 함수](https://github.com/solidjs/solid/tree/main/packages/solid/h)를 사용할 수 있습니다.
 
-[Skypack](https://www.skypack.dev/)을 사용해 브라우저에서 직접 실행 가능합니다:
+[Skypack](https://www.skypack.dev/)을 사용해 브라우저에서 직접 실행 가능합니다. 예를 들면:
 
 ```html
 <html>
@@ -109,6 +109,8 @@ JSX를 싫어하시나요? 수동으로 표현식을 래핑하고, 형편없는 
           timer = setInterval(() => setCount(count() + 1), 1000);
         onCleanup(() => clearInterval(timer));
         return html`<div>${count}</div>`;
+        // 혹은
+        return h('div', {}, count)
       };
       render(App, document.body);
     </script>
@@ -116,5 +118,32 @@ JSX를 싫어하시나요? 수동으로 표현식을 래핑하고, 형편없는 
 </html>
 ```
 
-타입스크립트와 함께 작동하려면, 관련 DOM Expression 라이브러리가 필요합니다. Tagged 템플릿 리터럴을 사용하려면 [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions)가 필요하며, 하이퍼스크립트는 [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions)가 필요합니다.
+빌드리스의 장점에는 트레이드 오프가 있습니다:
+
+- 표현식은 항상 getter 함수로 래핑되어야 하며, 그렇지 않으면 리액티브하지 않게 됩니다.
+  다음 코드는 템플릿이 내부적으로 생성하는 이펙트 안에서 값을 액세스하지 않았기 때문에, `first`나 `last`가 변경되더라도 업데이트되지 않으며, 디펜던시가 추적되지 않습니다:
+  ```js
+  html`
+    <h1>Hello ${first() + ' ' + last()}</h1>
+  `
+  // 혹은
+  h('h1', {}, 'Hello ', first() + ' ' + last())
+  ```
+  
+  다음 코드는 템플릿이 이펙트 안에서 getter를 읽기 때문에 `first`나 `last`가 변경되면 예상대로 업데이트되며, 디펜던시도 추적됩니다:
+  
+  ```js
+  html`
+    <h1>Hello ${() => first() + ' ' + last()}</h1>
+  `
+  // 혹은
+  h('h1', {}, 'Hello ', () => first() + ' ' + last())
+  ```
+  
+  Solid의 JSX는 컴파일을 하기 때문에 이 문제가 없으며, `<h1>Hello {first() + ' ' + last()}</h1>` 같은 표현식은 리액티브하게 됩니다.
+
+- 빌드 시간 최적화는 Solid JSX 에서 처럼 동작하지 않습니다. 각 템플릿이 런타임 중에 처음 실행될 때 컴파일되기 때문에 앱 시작 속도가 약간 느려지기는 하지만, 대부분의 경우 이를 알아채지 못합니다. 시작 후 실행 속도는 JSX에서의 ``` html`` ``` 템플릿 태그와 동일하게 유지됩니다. `h()` 호출은 실행되기 전에 전체 템플릿을 정적으로 분석할 수 없기 때문에 항상 느린 실행 속도를 갖습니다.
+
+
+타입스크립트와 함께 작동하려면, 여전히 관련 DOM Expression 라이브러리가 필요하다는 것을 기억해야 합니다. 태그드 템플릿 리터럴을 사용하려면 [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions)가 필요하며, 하이퍼스크립트는 [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions)가 필요합니다.
 
