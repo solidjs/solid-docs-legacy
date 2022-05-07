@@ -30,7 +30,7 @@ Finally, there is no VDOM so imperative VDOM APIs like `React.Children` and `Rea
 
 ## Vue
 
-Solid is not particularly influenced by Vue design-wise, but they are comparable in approach. They both use Proxies in their Reactive system with read based auto-tracking. But that is where the similarities end. Vue's fine grained dependency detection just feeds into a less fine-grained Virtual DOM and Component system whereas Solid keeps its granularity right down to its direct DOM updates.
+Solid is not particularly influenced by Vue design-wise, but they are comparable in approach. They both use Proxies in their Reactive system with read based auto-tracking. But that is where the similarities end. Vue's fine-grained dependency detection just feeds into a less fine-grained Virtual DOM and Component system whereas Solid keeps its granularity right down to its direct DOM updates.
 
 Vue values easiness where Solid values transparency. Although Vue's new direction with Vue 3 aligns more with the approach Solid takes. These libraries might align more over time depending on how they continue to evolve.
 
@@ -50,7 +50,7 @@ Developer experience is different enough that while some things are analogous it
 
 ## Knockout.js
 
-This library owes its existence to Knockout. Modernizing its model for fine grained dependency detection was the motivation for this project. Knockout was released in 2010 and supports Microsoft Explorer back to IE6 while much of Solid doesn't support IE at all.
+This library owes its existence to Knockout. Modernizing its model for fine-grained dependency detection was the motivation for this project. Knockout was released in 2010 and supports Microsoft Explorer back to IE6 while much of Solid doesn't support IE at all.
 
 Knockout's bindings are just strings in HTML which are walked over at runtime. They depend on cloning context ($parent etc...). Whereas Solid uses JSX or Tagged Template Literals for templating opting for an in JavaScript API.
 
@@ -64,7 +64,7 @@ If you are used to Knockout, Solid's primitives might look strange to you. The r
 
 These libraries are incredibly similar and have had some influence on Solid. Mostly that Solid's compiled code uses a very similar method to performantly initially render the DOM. Cloning Template elements and using comment placeholders are something that Solid and these libraries share in common.
 
-The biggest difference is that while these libraries do not use the Virtual DOM they treat rendering the same way, top down, requiring component partitioning to keep things sane. By contrast, Solid uses its fine grained Reactive Graph to only update what has changed and in doing so only shares this technique for its initial render. This approach takes advantage from the initial speed only available to native DOM and also have the most performant approach to updates.
+The biggest difference is that while these libraries do not use the Virtual DOM they treat rendering the same way, top down, requiring component partitioning to keep things sane. By contrast, Solid uses its fine-grained Reactive Graph to only update what has changed and in doing so only shares this technique for its initial render. This approach takes advantage from the initial speed only available to native DOM and also have the most performant approach to updates.
 
 #### Advice for migrating:
 
@@ -76,7 +76,7 @@ This library had the greatest influence on Solid's reactive design. Solid used S
 
 ## RxJS
 
-RxJS is a Reactive library. While Solid has a similar idea of Observable data it uses a much different application of the observer pattern. While Signals are like a simple version of an Observable (only the next), the pattern of auto dependency detection supplants RxJS' hundred or so operators. Solid could have taken this approach, and indeed earlier, versions of the library included similar operators, but in most cases it is more straightforward to write your own transformation logic in a computation. Where Observables are cold starting, unicast and push-based, many problems on the client lend themselves to hot startup and being multicast which is Solid's default behavior.
+RxJS is a Reactive library. While Solid has a similar idea of Observable data it uses a much different application of the observer pattern. While Signals are like a restricted form of an Observable (only the next), the pattern of auto dependency detection supplants RxJS' hundred or so operators. Solid could have taken this approach, and indeed earlier, versions of the library included similar operators, but in most cases it is more straightforward to write your own transformation logic in a computation. Where Observables are cold starting, unicast and push-based, many problems on the client lend themselves to hot startup and being multicast which is Solid's default behavior.
 
 ## Others
 

@@ -1,6 +1,6 @@
 Stores are most often created in Solid using Solid's Store proxies. Sometimes we wish to interface with immutable libraries like Redux, Apollo, or XState and need to perform granular updates against these.
 
-In the example, we have a simple wrapper around Redux. You can see the implementation in `useRedux.tsx`. The definition of the store and the actions are in the remaining files.
+In the example, we have a basic wrapper around Redux. You can see the implementation in `useRedux.tsx`. The definition of the store and the actions are in the remaining files.
 
 The core behavior is that we created a Store object and subscribe to the Redux store to update state on update.
 

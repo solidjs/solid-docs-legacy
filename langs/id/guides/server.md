@@ -6,11 +6,11 @@ sort: 3
 
 # Rendering di Server
 
-Solid menghandel rendering di Server dengan mengkompilasi template JSX menjadi kode string yang akan ditambahkan yang sangat effisien. Kita dapat melakukannya dengan menggunakan plugin babel atau dengan memasukkan `generate: "ssr"` ke presetnya. Untuk mengenerasi kode hydration yang cocok untuk klien dan server kamu bisa memasukkan `hydratable: true`.
+Solid menangani rendering di Server dengan mengkompilasi template JSX menjadi kode string yang akan ditambahkan dengan sangat effisien. Kita dapat melakukannya dengan menggunakan plugin babel atau dengan memasukkan `generate: "ssr"` ke presetnya. Untuk mengenerasi kode hydration yang cocok untuk klien dan server kamu bisa memasukkan `hydratable: true`.
 
-Runtime `solid-js` dan `solid-js/web` ditukar dengan non-reaktif counterparts mereka ketika dijalankan di lingkungan node. Untuk lingkungan-lingkungan yang lain kamu harus membundel kode servernya dengan mengeset kondisional eksport ke `node`. Kebanyakan bundlers punya cara masing-masing untuk melakukan ini. Secara umum, kami juga menyarankan untuk menggunakan kondisional eksport `solid` karena kami menyarankan untuk tiap library mengirimkan source mereka dibawah export `solid`.
+Runtime `solid-js` dan `solid-js/web` ditukar dengan non-reaktif counterparts mereka ketika dijalankan di lingkungan node. Untuk lingkungan-lingkungan yang lain kamu harus membundel kode servernya dengan mengeset kondisional eksport ke `node`. Kebanyakan bundler-bundler punya cara masing-masing untuk melakukan ini. Secara umum, kami juga menyarankan untuk menggunakan kondisional eksport `solid` karena kami merekomendasikan untuk tiap library mengirimkan source mereka dibawah export `solid`.
 
-Membangun untuk SSR pastinya akan membutuhkan sedikit lebih banyak konfigurasi karena kita akan mengenerate ke 2 bundle yang terpisah. Untuk entry klien harus menggunakan `hydrate`:
+Membangun SSR pastinya akan membutuhkan sedikit lebih banyak konfigurasi karena kita akan menghasilkan ke 2 bundle yang terpisah. Untuk entry klien seharusnya menggunakan `hydrate`:
 
 ```jsx
 import { hydrate } from "solid-js/web";
@@ -58,7 +58,7 @@ if (isServer) {
 
 ## Hydration Script
 
-Untuk bisa meng-hydrate secara progresif bahkan sebelum Solid runtime terload, sebuah script spesial harus di masukkan ke dalam pagenya. Bisa dengan cara digenerate dan dimasukkan melalui `generateHydrationScript` atau disertakan sebagai bagian dari JSX dengan menggunakan tag `<HydrationScript />`.
+Untuk bisa meng-hydrate secara progresif bahkan sebelum runtime Solid terload, sebuah script spesial harus di masukkan ke dalam halamannya. Bisa dengan cara dihasilkan dan dimasukkan melalui `generateHydrationScript` atau disertakan sebagai bagian dari JSX dengan menggunakan tag `<HydrationScript />`.
 
 ```js
 import { generateHydrationScript } from "solid-js/web";
@@ -110,23 +110,23 @@ Ketika meng-hydrate dari document, memasukkan aset-aset (assets) yang tidak ters
 
 ## Async dan Streaming SSR
 
-Mekanisme-mekanisme ini dibuat atas pengetahuan Solid tentang bagaimana aplikasi kamu bekerja. Dengan cara menggunakan Suspense dan Resource API di server, daripada melakukan fetching terlebih dahulu lalu me-rendering. Solid men-fetch bersamaan dengan me-render di server sebagaimana yang dilakukan di klien. Kode kamu dan pola-pola eksekusi akan di tulis dengan cara yang sama persis.
+Mekanisme-mekanisme ini dibuat atas pengetahuan Solid tentang bagaimana aplikasi kamu bekerja. Dengan cara menggunakan Suspense dan Resource API di server, daripada melakukan fetching terlebih dahulu lalu me-render. Solid men-fetch bersamaan dengan me-render di server sebagaimana yang dilakukan di klien. Kode kamu dan pola-pola eksekusi akan di tulis dengan cara yang sama persis.
 
 Rendering asinkron menunggu sampai semua Suspense selesai dan mengirim hasilnya (atau menulisnya ke dalam sebuah file pada kasus seperti "Static Site Generation").
 
-Streaming memulai flusing konten synchronous ke browser dengan langsung me-rendering Suspense Fallbacks kamu di server. Lalu saat data asinkron selesai di server dia akan mengirimkan data ke stream yang sama, lalu ke klien untuk menyelesaikan Suspense dimana browser menyelesaikan jobnya dan mengganti fallback dengan konten aslinya.
+Streaming memulai flusing konten synchronous ke browser dengan langsung me-render Suspense Fallback kamu di server dan mengirimkannya ke klien. Lalu saat data asinkron selesai dimuat di server dia akan mengirimkan data ke stream yang sama, lalu klien menyelesaikan Suspense dimana browser menyelesaikan pekerjaannya dan mengganti fallback dengan konten aslinya.
 
 Keuntungan dengan cara ini:
 
-- Server tidak harus mengunggu sampai data asinkron merespon. Aset-aset (Assets) dapat langsung terload lebih cepat di browser, dan user dapat langsung melihat kontennya lebih cepat juga.
-- Dibandingkan dengan "clien fetching" seperti JAMStack, pemuatan data mulai di server secara langsung dan tidak perlu menunggu untuk Javascript klien terload.
+- Server tidak harus mengunggu sampai data asinkron merespon. Aset-aset (Assets) dapat langsung dimuat terlebih dahulu di browser, dan user dapat langsung melihat kontennya lebih cepat juga.
+- Dibandingkan dengan "client fetching" seperti JAMStack, pemuatan data dimulai di server secara langsung dan tidak perlu menunggu untuk Javascript klien terload.
 - Semua data telah diserialisasikan dan di pindahkan dari server ke klien secara otomatis.
 
 ## Kekurangan SSR
 
-Solusi "Isomorphic SSR" Solid sangat kuat dimana kamu dapat menulis kode kamu kebanyakan dalam kode basis tunggal (single code base) yang berjalan dengan serupa di kedua lingkungan. Tetapi ada beberapa ekspektasi yang diharapkan dari hydration. Sebagian besar adalah, tampilan yang telah terender di klien akan sama dengan yang terender di server. Tidak perlu sampai dalam hal seperti teksnya, yang penting struktur markupnya harus sama.
+Solusi "Isomorphic SSR" Solid sangat kuat dimana kamu dapat menulis kode kamu kebanyakan dalam kode basis tunggal (single code base) yang berjalan dengan serupa di kedua lingkungan. Namun ada beberapa ekspektasi yang diharapkan dari hydration. Sebagian besar adalah, tampilan yang telah terender di klien akan sama dengan yang terender di server. Tidak perlu sampai dalam hal seperti teksnya, yang penting struktur markupnya harus sama.
 
-Kami menggunakan marker-marker yang terender di server untuk mencocokkan elemen dan "resource locations" di server. Untuk alasan ini klien dan server harus punya komponen-komponen yang sama. Ini biasanya bukanlah masalah, mengingat Solid merender dengan cara yang sama di klien dan server. Tetapi saat ini belum ada cara untuk merender sesuatu di server yang tidak akan terhydrate di klien. Saat ini, belum ada cara untuk meng-hydrate secara partial seluruh halaman, dan tidak mengenerate marker hydration untuk itu. Bisa dibilang, Hydrate semuanya atau tidak sama sekali. Partial Hydration adalah sesuatu yang kami ingin untuk selidiki lebih dalam di masa yang akan datang.
+Kami menggunakan penanda-penanda yang terender di server untuk mencocokkan elemen dan "resource locations" di server. Untuk alasan ini klien dan server harus punya komponen-komponen yang sama. Ini biasanya bukanlah masalah, mengingat Solid merender dengan cara yang sama di klien dan server. Tetapi saat ini belum ada cara untuk merender sesuatu di server yang tidak akan terhydrate di klien. Saat ini, belum ada cara untuk meng-hydrate secara partial seluruh halaman, dan tidak menghasilkan penanda hydration untuk itu. Bisa dibilang, Hydrate semuanya atau tidak sama sekali. Partial Hydration adalah sesuatu yang kami ingin untuk selidiki lebih dalam di masa yang akan datang.
 
 Terakhir, semua resources harus di definisikan di dalam `render` tree. Mereka secara otomatis diserialisasi dan diambil di browser, tapi itu bekerja karena method `render` dan `pipeTo` melacak progres dari rendernya. Sesuatu yang tidak bisa kita lakukan jika mereka dibuat di konteks yang terisolasi. Sama halnya dengan tidak ada reaktifitas di server jadi jangan memperbarui signals di render awal dan mengharapkan mereka ter-refleksi di tree yang lebih atas. Meskipun kita memiliki batasan Suspense, SSR Solid pada dasarnya dari atas ke bawah.
 

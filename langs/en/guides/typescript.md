@@ -69,7 +69,9 @@ const [count, setCount] = createSignal<number>();
 The first `createSignal` has return type `Signal<number>`, corresponding to 
 the type we passed to it. This is a tuple of the getter and 
 setter, which each have a generic type: 
+
 ```ts 
+import type { Signal, Accessor, Setter } from 'solid-js';
 type Signal<T> = [get: Accessor<T>, set: Setter<T>];
 ```
 
@@ -84,8 +86,15 @@ The signal setter `setCount` has type `Setter<number>`, which is a more
 complicated type definition corresponding roughly to
 `(value?: number | ((prev?: number) => number)) => number`, representing the
 two possibilities for the passed argument: you can call `setCount` with 
-a simple `number`, or a
-function taking the previous value (if there was one) and returning a number.
+either a `number` or a
+function taking the previous value (if there was one) and returning a `number`.
+
+The actual `Setter` type is more complicated, to detect accidentally passing
+a function to the setter when you might have wanted to set the signal to that
+function value instead of calling the function to determine the new value.
+If you're getting a TypeScript error "Argument ... is not assignable to
+parameter" when calling `setCount(value)`, then try wrapping the setter
+argument as in `setCount(() => value)` to make sure that `value` isn't called.
 
 ##### Defaults
 
@@ -136,8 +145,7 @@ In this case, TypeScript infers that `dataContext` has type
 Another common pattern is to define a factory function that produces the
 value for a context.  Then we can grab the return type of that function using 
 TypeScript's
-[`ReturnType`](https://www.typescriptlang.org/docs/handbook/utility-types.
-html#returntypetype)
+[`ReturnType`](https://www.typescriptlang.org/docs/handbook/utility-types.html#returntypetype)
 type helper, and use that to type the context:
 
 ```ts
@@ -176,18 +184,18 @@ defined.
 ## Component Types
 
 ```ts
-import type {PropsWithChildren, Component} from 'solid-js';
+import type { JSX, PropsWithChildren, Component } from 'solid-js';
 type PropsWithChildren<P = {}> = P & { children?: JSX.Element };
 type Component<P = {}> = (props: PropsWithChildren<P>) => JSX.Element
 ```
 
 To type a component function, use the `Component<P>` type,
-where `P` is the type of the `props` argument and should be an [object type](https://www.typescriptlang.org/docs/handbook/2/objects.html)
+where `P` is the type of the `props` argument and should be an [object type](https://www.typescriptlang.org/docs/handbook/2/objects.html).
 `P` doesn't need to explicitly mention the `children` property;
 `{ children?: JSX.Element }` is automatically added to the type
 (via the `PropsWithChildren<P>` wrapper).  For example:
 
-```ts
+```tsx
 const Counter: Component<{initialValue: number}> = (props) => {
   [count, setCount] = createSignal(props.initialValue);
   return (
@@ -212,13 +220,16 @@ for all the types provided.
 
 ## Event Handlers
 
-One useful helper type provided by the `JSX` namespace is `JSX.EventHandler<T>`,
-which represents a single-argument event handler for a DOM element type `T`.
+One useful helper type provided by the `JSX` namespace is
+`JSX.EventHandler<T, E>`,
+which represents a single-argument event handler for a DOM element type `T`
+and event type `E`.
 You can use this to type any event handlers you define outside JSX.
 For example:
 
-```ts
-const onInput: JSX.EventHandler<HTMLInputElement> = (event) => {
+```tsx
+import type { JSX } from 'solid-js';
+const onInput: JSX.EventHandler<HTMLInputElement, InputEvent> = (event) => {
   console.log('input changed to', event.currentTarget.value);
 };
 
@@ -230,7 +241,7 @@ Handlers defined inline within
 (with built-in event types) are automatically typed as the appropriate
 `JSX.EventHandler`:
 
-```ts
+```tsx
 <input onInput={(event) => {
   console.log('input changed to', event.currentTarget.value);
 }}/>;
@@ -252,77 +263,118 @@ captured by the event handler, which can be any DOM element.
 When we use the `ref` attribute with a variable, we tell Solid to assign the
 DOM element to 
 the variable once the element is rendered. Without TypeScript, this looks like:
+
 ```jsx
 let divRef;
 
-console.log(divRef); //undefined
+console.log(divRef); // undefined
 
 onMount(() => {
-  console.log(divRef) //<div></div>
+  console.log(divRef); // <div> element
 })
 
 return (
-  <div ref={divRef}></div>
+  <div ref={divRef}/>
 )
 ```
 
 This presents a challenge for typing that variable: should we type `divRef` 
 as an `HTMLDivElement`, even though it's only set as such after rendering?
+(Here we assume TypeScript's `strictNullChecks` mode is turned on;
+otherwise, TypeScript ignores potentially `undefined` variables.)
 
-Here is one common pattern for using `ref` variables with TypeScript:
+The safest pattern in TypeScript is to acknowledge that `divRef` is `undefined`
+for a period of time, and check when using it:
 
-```ts
-let divRef!: HTMLDivElement;
-let buttonRef!: HTMLButtonElement;
+```tsx
+let divRef: HTMLDivElement | undefined;
 
-return (
-  <div ref={divRef}>
-    <button ref={buttonRef}>...</button>
-  </div>
-);
-```
+divRef.focus();  // correctly reported as an error at compile time
 
-The [non-null assertions (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)
-on the declarations effectively tell TypeScript to assume that the refs have 
-been set, allowing you to call `HTMLDivElement` properties (e.g. `divRef.offsetWidth`) without a type assertion.
-
-The downside to this approach is that it doesn't reflect the full picture: 
-these ref variables 
-won't actually be set (and will still be undefined)
-until after the rendering phase.  You can safely use them in [`onMount`](/docs/latest/api#onmount) or a
-[`createEffect`](/docs/latest/api#createeffect),
-for example, but not in the body of the component function.
-
-Instead, you can leave off the non-null assertion in the declaration, and 
-check for nullity when you access the variable later on.
-Additionally, due 
-to a quirk with 
-TypeScript and JSX, you'll need to add the non-null assertion using the `ref` 
-attribute in JSX:
-
-```ts
-let divRef: HTMLDivElement;
-let buttonRef: HTMLButtonElement;
+onMount(() => {
+  if (!divRef) return;
+  divRef.focus();  // correctly allowed
+});
 
 return (
   <div ref={divRef!}>
-    <button ref={buttonRef!}>...</button>
+    ...
   </div>
 );
 ```
 
-This is because TypeScript assumes 
-that the variable is being used to set the ref attribute (and thus 
-believes 
-that the variable must be defined), 
-when in fact the `ref` attribute tells Solid to 
-set _the variable_ later on. 
+Alternatively, because we know `onMount` gets called only after the `<div>`
+element gets rendered, we could use a
+[non-null assertion (`!`)](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-)
+when accessing `divRef` within `onMount`:
 
-With this pattern, TypeScript will correctly flag any accidental uses of the
+```tsx
+onMount(() => {
+  divRef!.focus();
+});
+```
+
+Another fairly safe pattern is to omit `undefined` from `divRef`'s type,
+and use a
+[definite assignment assertion (`!`)](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-7.html#definite-assignment-assertions)
+in the `ref` attribute:
+
+```tsx
+let divRef: HTMLDivElement;
+
+divRef.focus();  // correctly reported as an error at compile time
+
+onMount(() => {
+  divRef.focus();  // correctly allowed
+});
+
+return (
+  <div ref={divRef!}>
+    ...
+  </div>
+);
+```
+
+We need to use `ref={divRef!}` because TypeScript assumes that the `ref`
+attribute is being set to the `divRef` variable, and thus `divRef` should
+already be assigned.  In Solid, it's the other way around: `divRef` gets
+assigned to by the `ref` attribute.  The definite assignment assertion
+`divRef!` effectively convinces TypeScript that this is what's happening:
+TypeScript will understand that `divRef` has been assigned after this line.
+
+With this pattern, TypeScript will correctly flag any accidental uses of
 refs inside the body of the function (before the JSX block where they get
-defined).  However, TypeScript currently does not flag use of refs inside
-`createMemo` and `createRenderEffect`, even though they won't be defined there,
-so you still need to be careful.
+defined).  However, TypeScript currently does not flag use of potentially
+undefined variables within nested functions.  In the context of Solid,
+you need to take care not to use refs inside `createMemo`, `createRenderEffect`,
+and `createComputed` (before the JSX block that defines the refs),
+because those functions are called immediately,
+so the refs won't be defined yet (yet TypeScript won't flag this as an error).
+By contrast, the previous pattern would catch these errors.
+
+Another common, but less safe, pattern is to put the definite assignment
+assertion at the point of variable declaration.
+
+```tsx
+let divRef!: HTMLDivElement;
+
+divRef.focus();  // allowed despite causing an error
+
+onMount(() => {
+  divRef.focus();  // correctly allowed
+});
+
+return (
+  <div ref={divRef}>
+    ...
+  </div>
+);
+```
+
+This approach effectively turns off assignment checking for that variable,
+which is an easy workaround, but requires additional care.
+In particular, unlike the previous pattern, it incorrectly allows premature
+use of the variable, even outside nested functions.
 
 ## Control Flow Narrowing
 
@@ -330,7 +382,7 @@ A common pattern is to use
 [`<Show>`](https://www.solidjs.com/docs/latest/api#%3Cshow%3E)
 to display data only when that data is defined:
 
-```ts
+```tsx
 const [name, setName] = createSignal<string>();
 
 return (
@@ -351,7 +403,7 @@ Here are two workarounds for this issue:
    using TypeScript's
    [non-null assertion operator `!`](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#non-null-assertion-operator-postfix-):
 
-   ```ts
+   ```tsx
    return (
      <Show when={name()}>
        Hello {name()!.replace(/\s+/g, '\xa0')}!
@@ -362,7 +414,7 @@ Here are two workarounds for this issue:
 2. You can use the callback form of `<Show>`, which passes in the value of the
    `when` prop when it is truthy:
 
-   ```ts
+   ```tsx
    return (
      <Show when={name()}>
        {(n) =>
@@ -384,13 +436,15 @@ Here are two workarounds for this issue:
 
 ## Special JSX Attributes and Directives
 
+### `on:___`/`oncapture:___`
+
 If you use custom event handlers via Solid's
 [`on:___`/`oncapture:___` attributes](https://www.solidjs.com/docs/latest/api#on%3A___%2Foncapture%3A___),
 you should define corresponding types for the resulting `Event` objects
 by overriding the `CustomEvents` and `CustomCaptureEvents` interfaces
 within module `"solid-js"`'s `JSX` namespace, like so:
 
-```ts
+```tsx
 class NameEvent extends CustomEvent {
   type: 'Name';
   detail: {name: string};
@@ -414,6 +468,8 @@ declare module "solid-js" {
 <div on:Name={(event) => console.log('name is', event.detail.name)}/>
 ```
 
+### `prop:___`/`attr:___`
+
 If you use forced properties via Solid's
 [`prop:___` attributes](https://www.solidjs.com/docs/latest/api#prop%3A___),
 or custom attributes via Solid's
@@ -421,7 +477,7 @@ or custom attributes via Solid's
 you can define their types in the `ExplicitProperties` and
 `ExplicitAttributes` interfaces, respectively:
 
-```ts
+```tsx
 declare module "solid-js" {
   namespace JSX {
     interface ExplicitProperties { // prop:___
@@ -439,11 +495,13 @@ declare module "solid-js" {
 <my-web-component attr:name={name()} attr:count={count()}/>
 ```
 
+### `use:___`
+
 If you define custom directives for Solid's
 [`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
 you can type them in the `Directives` interface, like so:
 
-```ts
+```tsx
 function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
   const [field, setField] = value();
   createRenderEffect(() => (element.value = field()));
@@ -462,3 +520,31 @@ let [name, setName] = createSignal('');
 
 <input type="text" use:model={[name, setName]} />;
 ```
+
+If you're `import`ing a directive `d` from another module, and `d` is used only
+as a directive `use:d`, then TypeScript (or more precisely,
+[`babel-preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript))
+will by default remove the `import` of `d` (for fear that `d` is a type,
+as TypeScript doesn't understand `use:d` as a reference to `d`).
+There are two ways around this issue:
+
+1. Use
+   [`babel-preset-typescript`'s `onlyRemoveTypeImports: true`](https://babeljs.io/docs/en/babel-preset-typescript#onlyremovetypeimports)
+   configuration option,
+   which prevents it from removing any `import`s except for `import type ...`.
+   If you're using `vite-plugin-solid`, you can specify this option via
+   `solidPlugin({ typescript: { onlyRemoveTypeImports: true } })`
+   in `vite.config.ts`.
+
+   Note that this option can be problematic if you don't vigilantly use
+   `export type` and `import type` throughout your codebase.
+
+2. Add a fake access like `false && d;` to every module `import`ing
+   directive `d`.
+   This will stop TypeScript from removing the `import` of `d`, and assuming
+   you're tree-shaking via e.g. [Terser](https://terser.org/),
+   this code will be omitted from your final code bundle.
+
+   The simpler fake access `d;` will also prevent the `import` from being
+   removed, but will typically not be tree-shaken away, so will end up in
+   your final code bundle.

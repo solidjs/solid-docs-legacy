@@ -1,5 +1,5 @@
 JSX ist die HTML-artige Syntax, die wir in diesen Beispielen gesehen haben und die Grundlage in Solid, um Komponenten zu bauen.
-JSX fügt dynamische Ausdrücke hinzu, die es erlauben, Variablen und Funktionen innerhalb des HTMLs mit der `{ ]`-Syntax zu referenzieren.
+JSX fügt dynamische Ausdrücke hinzu, die es erlauben, Variablen und Funktionen innerhalb des HTMLs mit der `{ }`-Syntax zu referenzieren.
 In diesem Beispiel verwenden wir den String `name` in unserem HTML, indem wir `{name}` in einem div benutzen. Genauso binden wir ein HTML-Element ein, das direkt in die `svg`-Variable zugewiesen wurde.
 
 Anders als andere Frameworks, die JSX benutzen, versucht Solid, so nahe wie möglich an HTML-Standards zu bleiben, um einfaches Kopieren und Einfügen von Anworten auf Stack Overflow oder die Nutzung von Template-Buildern durch Designer zu ermöglichen.

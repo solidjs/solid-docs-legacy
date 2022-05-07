@@ -6,7 +6,7 @@ sort: 4
 
 # Perbandingan dengan Library lainnya
 
-Bagian ini tidak dapat lepas dari beberapa bias tetapi saya pikir penting untuk memahami di mana solusi Solid berada dibandingkan dengan library lain. Ini bukan tentang performa. Untuk melihat yang lebih definitif pada permorfa silahkan lihat ke [JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark).
+Bagian ini tidak dapat lepas dari beberapa bias tetapi saya pikir penting untuk memahami di mana solusi Solid berada dibandingkan dengan library lain. Ini bukan tentang performa. Untuk melihat yang lebih definitif pada performa silahkan lihat ke [JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark).
 
 ## React
 
@@ -32,7 +32,7 @@ Sebagai library reaktif modern lainnya, melakukan migrasi dari Vue 3 harusnya te
 
 Svelte memelopori "precompiled disappearing" framework yang juga digunakan Solid sampai tingkat tertentu. Kedua library ini benar-benar reaktif dan dapat menghasilkan bundel kode eksekusi yang sangat kecil meskipun Svelte adalah pemenang di sini untuk demo-demo kecil. Solid membutuhkan sedikit lebih eksplisit dalam deklarasinya, kurang mengandalkan analisis implisit dari kompiler, tetapi itu adalah bagian dari apa yang memberikan Solid kinerja superior. Solid juga menyimpan kelebihan lebih banyak di runtime yang skalanya lebih baik di aplikasi yang lebih besar. Implementasi demo RealWorld Solid 25% lebih kecil dari Svelte.
 
-Kedua library bertujuan untuk membantu developer-developer mereka menulis kode lebih sedikit tetapi melakukan pendekatan yang sama sekali berbeda. Svelte 3 berfokus pada optimalisasi kemudahan menangani perubahan lokal yang berfokus pada interaksi objek biasa dan pengikatan dua arah (two-way binding). Sebaliknya Solid berfokus pada aliran data dengan sengaja merangkul CQRS dan antarmuka yang tidak dapat diubah. Dengan komposisi template yang fungsional, dalam banyak kasus, Solid memungkinkan developer untuk menulis kode yang lebih sedikit daripada Svelte meskipun sintaks template Svelte jelas lebih ringkas.
+Kedua library bertujuan untuk membantu developer-developer mereka menulis kode lebih sedikit tetapi melakukan pendekatan yang sama sekali berbeda. Svelte 3 berfokus pada optimalisasi kemudahan menangani perubahan lokal yang berfokus pada interaksi objek biasa dan pengikatan dua arah (two-way binding). Sebaliknya Solid berfokus pada aliran data dengan sengaja merangkul CORS dan antarmuka yang tidak dapat diubah. Dengan komposisi template yang fungsional, dalam banyak kasus, Solid memungkinkan developer untuk menulis kode yang lebih sedikit daripada Svelte meskipun sintaks template Svelte jelas lebih ringkas.
 
 #### Saran untuk migrasi:
 
@@ -48,7 +48,7 @@ Perbedaan terbesar mungkin adalah pendekatan Solid terhadap perubahan batch yang
 
 #### Saran untuk migrasi:
 
-Jika kamue terbiasa dengan Knockout, primitif Solid mungkin terlihat aneh bagi kamu. Pemisahan baca/tulis-nya disengaja dan bukan hanya untuk membuat hidup lebih sulit. Lihatlah untuk mengadopsi model mental state/action (Flux). Walau library-library ini terlihat serupa, mereka mempromosikan praktik terbaik yang berbeda.
+Jika kamu terbiasa dengan Knockout, primitif Solid mungkin terlihat aneh bagi kamu. Pemisahan baca/tulis-nya disengaja dan bukan hanya untuk membuat hidup lebih sulit. Lihatlah untuk mengadopsi model mental state/action (Flux). Walau library-library ini terlihat serupa, mereka mempromosikan praktik terbaik yang berbeda.
 
 ## Lit & LighterHTML
 
