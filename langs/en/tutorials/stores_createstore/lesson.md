@@ -11,12 +11,16 @@ The setter function in its most basic form takes an object whose properties will
 Let's look at how much easier it is to achieve nested reactivity with a Store. We can replace the initialization of our component with this:
 
 ```js
-const [store, setStore] = createStore({ todos: [] });
+const [todos, setTodos] = createStore([]);
 const addTodo = (text) => {
-  setStore('todos', (todos) => [...todos, { id: ++todoId, text, completed: false }]);
+  setTodos([...todos, { id: ++todoId, text, completed: false }]);
 };
 const toggleTodo = (id) => {
-  setStore('todos', (t) => t.id === id, 'completed', (completed) => !completed);
+  setTodos(
+    (todo) => todo.id === id,
+    "completed",
+    (completed) => !completed
+  );
 };
 ```
 
