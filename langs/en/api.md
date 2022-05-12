@@ -374,6 +374,7 @@ type ResourceReturn<T> = [
     (): T | undefined;
     loading: boolean;
     error: any;
+    latest: T | undefined;
   },
   {
     mutate: (v: T | undefined) => T | undefined;
@@ -413,16 +414,18 @@ const [data, { mutate, refetch }] = createResource(fetchData);
 const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 ```
 
-In these snippets, the fetcher is the function `fetchData`, and `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately. 
-In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`. 
+In these snippets, the fetcher is the function `fetchData`, and `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately.
+In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`.
 It will be called again whenever the value of `sourceSignal` changes, and that value will always be passed to `fetchData` as its first argument.
 
 You can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
 `data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`.
-But it also has two extra properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#<errorboundary>).)
+But it also has extra reactive properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#<errorboundary>).)
 
-`loading` and `error` are reactive getters and can be tracked.
+As of **1.4.0**, `data.latest` will return the last returned value and won't trigger [Suspense](#<suspense>) and [transitions](#usetransition); if no value has been returned yet, `data.latest` acts the same as `data()`. This can be useful if you want to show the out-of-date data while the new data is loading.
+
+`loading`, `error`, and `latest` are reactive getters and can be tracked.
 
 The `fetcher` is the async function that you provide to `createResource` to actually fetch the data.
 It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: `value` and `refetching`. `value` tells you the previously fetched value.
@@ -454,6 +457,20 @@ mutate(optimisticValue);
 
 // refetch the last request explicitly
 refetch();
+```
+
+**New in v1.4.0**
+
+If you're using `renderToStream`, you can tell Solid to wait for a resource before flushing the stream using the `deferStream` option:
+
+```js
+// fetches a user and streams content as soon as possible
+const [user] = createResource(() => params.id, fetchUser);
+
+// fetches a user but only streams content after this resource has loaded
+const [user] = createResource(() => params.id, fetchUser, {
+  deferStream: true,
+});
 ```
 
 # Lifecycles
@@ -546,7 +563,6 @@ setA("new"); // now it runs
 ```
 
 Please note that on `stores` and `mutable`, adding or removing a property from the parent object will trigger an effect. See [`createMutable`](#createMutable)
-
 
 ## `createRoot`
 
@@ -916,7 +932,28 @@ As proxies, store objects only track when a property is accessed.
 
 When nested objects are accessed, stores will produce nested store objects, and this applies all the way down the tree. However, this only applies to arrays and plain objects. Classes are not wrapped, so objects like `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` won't be granularly reactive as properties on a store.
 
-The top level state object cannot be tracked, so put any lists on a key of state rather than using the state object itself.
+As of version **1.4.0**, the top level state object can be an array. In prior versions, create an object to wrap the array:
+
+```jsx
+//After Solid 1.4.0
+const [todos, setTodos] = createStore([
+  { id: 1, title: "Thing I have to do", done: false },
+  { id: 2, title: "Learn a New Framework", done: false },
+]);
+...
+<For each={todos}>{todo => <Todo todo={todo} />}</For>;
+```
+
+```jsx
+//Before 1.4.0
+const [state, setState] = createStore({
+  todos: [
+    { id: 1, title: "Thing I have to do", done: false },
+    { id: 2, title: "Learn a New Framework", done: false },
+  ],
+});
+<For each={state.todos}>{(todo) => <Todo todo={todo} />}<For>;
+```
 
 ```js
 // put the list as a key on the state object
