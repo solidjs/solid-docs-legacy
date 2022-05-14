@@ -184,41 +184,128 @@ defined.
 ## Component Types
 
 ```ts
-import type { JSX, PropsWithChildren, Component } from 'solid-js';
-type PropsWithChildren<P = {}> = P & { children?: JSX.Element };
-type Component<P = {}> = (props: PropsWithChildren<P>) => JSX.Element
+import type { JSX, Component } from 'solid-js';
+type Component<P = {}> = (props: P) => JSX.Element;
 ```
 
-To type a component function, use the `Component<P>` type,
+To type a basic component function, use the `Component<P>` type,
 where `P` is the type of the `props` argument and should be an [object type](https://www.typescriptlang.org/docs/handbook/2/objects.html).
-`P` doesn't need to explicitly mention the `children` property;
-`{ children?: JSX.Element }` is automatically added to the type
-(via the `PropsWithChildren<P>` wrapper).  For example:
+This will enforce that correctly typed props get passed in as attributes,
+and that the return value is something that can be rendered by Solid:
+a `JSX.Element` can be a DOM node, an array of `JSX.Element`s,
+a function returning a `JSX.Element`, a boolean, `undefined`/`null`, etc.
+Here are some examples:
 
 ```tsx
-const Counter: Component<{initialValue: number}> = (props) => {
-  [count, setCount] = createSignal(props.initialValue);
+const Counter: Component = () => {
+  const [count, setCount] = createSignal(0);
   return (
-    <button onClick={setCount((c) => c+1)}>
+    <button onClick={() => setCount((c) => c+1)}>
+      {count()}
+    </button>
+  );
+};
+
+<Counter/>;              // good
+<Counter initial={5}/>;  // type error: no initial prop
+<Counter>hi</Counter>    // type error: no children prop
+
+const InitCounter: Component<{initial: number}> = (props) => {
+  const [count, setCount] = createSignal(props.initial);
+  return (
+    <button onClick={() => setCount((c) => c+1)}>
+      {count()}
+    </button>
+  );
+};
+
+<InitCounter initial={5}/>;  // good
+```
+
+If you want your component to take JSX children, you can either explicitly
+add a type for `children` to `P`, or you can use the `ParentComponent` type
+which automatically adds `children?: JSX.Element`.  Alternatively, if you'd
+like to declare your component with `function` instead of `const`, you can
+use the `ParentProps` helper to type `props`.  Some examples:
+
+```tsx
+import { JSX, ParentComponent, ParentProps } from 'solid-js';
+type ParentProps<P = {}> = P & { children?: JSX.Element };
+type ParentComponent<P = {}> = Component<ParentProps<P>>;
+
+// Equivalent typings:
+//const CustomCounter: Component<{children?: JSX.Element}> = ...
+//function CustomCounter(props: ParentProps): JSX.Element { ...
+const CustomCounter: ParentComponent = (props) => {
+  const [count, setCount] = createSignal(0);
+  return (
+    <button onClick={() => setCount((c) => c+1)}>
       {count()}
       {props.children}
-    </button>;
+    </button>
+  );
+};
+
+// Equivalent typings:
+//const CustomInitCounter: Component<{initial: number, children?: JSX.Element}> = ...
+//function CustomInitCounter(props: ParentProps<{initial: number}>): JSX.Element { ...
+const CustomInitCounter: ParentComponent<{initial: number}> = (props) => {
+  const [count, setCount] = createSignal(props.initial);
+  return (
+    <button onClick={() => setCount((c) => c+1)}>
+      {count()}
+      {props.children}
+    </button>
+  );
 };
 ```
 
-This code automatically types `props` to
-`{initialValue: number, children?: JSX.Element}`
-and forces the return value of `Counter` to be `JSX.Element`
-(which can be a DOM node, an array of `JSX.Element`s,
-a function returning a `JSX.Element`, a boolean, or anything
-else the renderer can handle).
+In the latter example, the `props` parameter automatically gets typed as
+`props: ParentProps<{initial: number}>` which is equivalent to
+`props: {initial: number, children?: JSX.Element}`.
+(Note that, before Solid 1.4, `Component` was equivalent to `ParentComponent`.)
+
+Solid provides two other `Component` subtypes for dealing with `children`:
+
+```ts
+import {JSX, FlowComponent, FlowProps, VoidComponent, VoidProps} from 'solid-js';
+type FlowProps<P = {}, C = JSX.Element> = P & { children: C };
+type FlowComponent<P = {}, C = JSX.Element> = Component<FlowProps<P, C>>;
+type VoidProps<P = {}> = P & { children?: never };
+type VoidComponent<P = {}> = Component<VoidProps<P>>;
+```
+
+`VoidComponent` is for components that definitely do not support `children`.
+`VoidComponent<P>` is equivalent to `Component<P>` when `P` doesn't provide
+a type for `children`.
+
+`FlowComponent` is intended for "control flow" components like Solid's
+`<Show>` and `<For>`.  Such components generally require `children` to make
+sense, and sometimes have specific types for `children`, such as requiring it
+to be a single function.  For example:
+
+```tsx
+const CallMeMaybe: FlowComponent<{when: boolean}, () => void> = (props) => {
+  createEffect(() => {
+    if (props.when)
+      props.children();
+  });
+  return <>{props.when ? 'Calling' : 'Not Calling'}</>;
+};
+
+<CallMeMaybe when={true}/>;  // type error: missing children
+<CallMeMaybe when={true}>hi</CallMeMaybe>;  // type error: children
+<CallMeMaybe when={true}>
+  {() => console.log("Here's my number")}
+</CallMeMaybe>;              // good
+```
+
+## Event Handlers
 
 The namespace `JSX` offers a suite of useful types for working with HTML DOM
 in particular.  See the
 [definition of JSX in dom-expressions](https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/jsx.d.ts)
 for all the types provided.
-
-## Event Handlers
 
 One useful helper type provided by the `JSX` namespace is
 `JSX.EventHandler<T, E>`,
