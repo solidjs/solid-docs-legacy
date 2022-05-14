@@ -138,33 +138,117 @@ export const useCountNameContext = () => useContext(CountNameContext)!;
 ## 컴포넌트 타입
 
 ```ts
-import type { JSX, PropsWithChildren, Component } from 'solid-js';
-type PropsWithChildren<P = {}> = P & { children?: JSX.Element };
-type Component<P = {}> = (props: PropsWithChildren<P>) => JSX.Element
+import type { JSX, Component } from 'solid-js';
+type Component<P = {}> = (props: P) => JSX.Element;
 ```
 
-컴포넌트 함수의 타입을 지정하려면, `Component<P>` 타입을 사용합니다.
-여기서 `P`는 `props`의 타입이며, [object type](https://www.typescriptlang.org/docs/handbook/2/objects.html)이어야 합니다.
-`P`에는 `children` 프로퍼티를 명시적으로 추가하지 않아도 (`PropsWithChildren<P>` 래퍼를 통해) `{ children?: JSX.Element }`가 자동으로 타입에 추가됩니다.
-예를 들면:
+기본 컴포넌트 함수의 타입을 지정하려면, `Component<P>` 타입을 사용합니다.
+여기서 `P`는 `props`의 타입이며, [object 타입](https://www.typescriptlang.org/docs/handbook/2/objects.html)이어야 합니다.
+이런식으로 알맞은 타입의 props와 속성이 전달되며, Solid에서 렌더링 할 수 있는 값이 반환됩니다: `JSX.Element`는 DOM 노드, `JSX.Element` 배열, `JSX.Element`를 반환하는 함수, boolean, `undefined`/`null` 등과 같은 값이 될 수 있습니다.
+여기 몇 가지 예제가 있습니다:
 
 ```tsx
-const Counter: Component<{initialValue: number}> = (props) => {
-  [count, setCount] = createSignal(props.initialValue);
+const Counter: Component = () => {
+  const [count, setCount] = createSignal(0);
   return (
-    <button onClick={setCount((c) => c+1)}>
+    <button onClick={() => setCount((c) => c+1)}>
+      {count()}
+    </button>
+  );
+};
+
+<Counter/>;              // OK
+<Counter initial={5}/>;  // 타입 에러: initial prop이 존재하지 않음
+<Counter>hi</Counter>    // 타입 에러: children prop이 존재하지 않음
+
+const InitCounter: Component<{initial: number}> = (props) => {
+  const [count, setCount] = createSignal(props.initial);
+  return (
+    <button onClick={() => setCount((c) => c+1)}>
+      {count()}
+    </button>
+  );
+};
+
+<InitCounter initial={5}/>;  // OK
+```
+
+컴포넌트가 JSX 자식을 가지려면, `P`에 명시적으로 `children` 타입을 추가하거나, 자동으로 `children?: JSX.Element`를 추가하는 `ParentComponent` 타입을 사용할 수 있습니다.
+또는 컴포넌트를 `const` 대신 `function`으로 선언하려면, `ParentProps` 헬퍼를 사용해 `props` 타입을 설정할 수 있습니다.
+예를 들자면:
+
+```tsx
+import { JSX, ParentComponent, ParentProps } from 'solid-js';
+type ParentProps<P = {}> = P & { children?: JSX.Element };
+type ParentComponent<P = {}> = Component<ParentProps<P>>;
+
+// 다음은 이와 동일한 타입입니다:
+//const CustomCounter: Component<{children?: JSX.Element}> = ...
+//function CustomCounter(props: ParentProps): JSX.Element { ...
+const CustomCounter: ParentComponent = (props) => {
+  const [count, setCount] = createSignal(0);
+  return (
+    <button onClick={() => setCount((c) => c+1)}>
       {count()}
       {props.children}
-    </button>;
+    </button>
+  );
+};
+
+// 다음은 이와 동일한 타입입니다:
+//const CustomInitCounter: Component<{initial: number, children?: JSX.Element}> = ...
+//function CustomInitCounter(props: ParentProps<{initial: number}>): JSX.Element { ...
+const CustomInitCounter: ParentComponent<{initial: number}> = (props) => {
+  const [count, setCount] = createSignal(props.initial);
+  return (
+    <button onClick={() => setCount((c) => c+1)}>
+      {count()}
+      {props.children}
+    </button>
+  );
 };
 ```
 
-이 코드에서 `props` 타입은 자동으로 `{initialValue: number, children?: JSX.Element}`이 되며, `Counter`의 반환 타입은 `JSX.Element`가 됩니다.
+후자의 경우, `props` 파라미터는 자동으로 `props: ParentProps<{initial: number}>` 타입이 되며, 이는 `props: {initial: number, children?: JSX.Element}`와 동일합니다.
+(Solid 1.4 이전에는, `Component`는 `ParentComponent`와 동일했습니다.)
+
+Solid는 `children`을 처리하기 위해 두 가지 다른 `Component` 서브 타입을 제공합니다:
+
+```ts
+import {JSX, FlowComponent, FlowProps, VoidComponent, VoidProps} from 'solid-js';
+type FlowProps<P = {}, C = JSX.Element> = P & { children: C };
+type FlowComponent<P = {}, C = JSX.Element> = Component<FlowProps<P, C>>;
+type VoidProps<P = {}> = P & { children?: never };
+type VoidComponent<P = {}> = Component<VoidProps<P>>;
+```
+
+`VoidComponent`는 `children`을 지원하지 않는 컴포넌트입니다.
+`P`가 `children` 타입을 제공하지 않는 경우, `VoidComponent<P>`는 `Component<P>`와 동일합니다.
+
+`FlowComponent`는 Solid의 `<Show>`와 `<For>`와 같은 "흐름 제어" 컴포넌트를 위한 것입니다.
+이런 컴포넌트는 일반적으로 `children`이 의미가 있어야 하며, 때로는 `children`이 단일 함수여야 한다는 것과 같은 특정 타입이 있습니다.
+예를 들자면:
+
+```tsx
+const CallMeMaybe: FlowComponent<{when: boolean}, () => void> = (props) => {
+  createEffect(() => {
+    if (props.when)
+      props.children();
+  });
+  return <>{props.when ? 'Calling' : 'Not Calling'}</>;
+};
+
+<CallMeMaybe when={true}/>;  // 타입 에러: children 미지정
+<CallMeMaybe when={true}>hi</CallMeMaybe>;  // 타입 에러: children
+<CallMeMaybe when={true}>
+  {() => console.log("Here's my number")}
+</CallMeMaybe>;              // OK
+```
+
+## 이벤트 핸들러
 
 `JSX` 네임스페이스는 HTML DOM 작업에 유용한 타입 모음을 제공합니다.
 제공되는 모든 타입들은 [dom-expressions의 JSX 정의](https://github.com/ryansolid/dom-expressions/blob/main/packages/dom-expressions/src/jsx.d.ts)를 참고하세요.
-
-## 이벤트 핸들러
 
 `JSX` 네임스페이스의 유용한 헬퍼 타입 중 하나인 `JSX.EventHandler<T, E>`는 DOM 엘리먼트 타입 `T`와 이벤트 타입 `E`에 대한 단일 인수 이벤트 핸들러를 나타냅니다.
 이를 사용해 JSX 외부에서 정의한 이벤트 핸들러 타입을 지정할 수 있습니다.

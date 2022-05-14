@@ -291,6 +291,7 @@ type ResourceReturn<T> = [
     (): T | undefined;
     loading: boolean;
     error: any;
+    latest: T | undefined;
   },
   {
     mutate: (v: T | undefined) => T | undefined;
@@ -336,9 +337,11 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 `refetch`를 호출해 fetcher를 직접 다시 실행하고, `refetch(info)`와 같이 옵셔널 인수를 전달하여 fetcher에 추가 정보를 제공할 수 있습니다: .
 
 `data`는 일반 시그널 getter처럼 작동합니다: `data()`를 사용해 `fetchData`의 마지막 반환 값을 읽습니다. 
-하지만 두 가지 추가 속성이 있습니다: `data.loading`은 fetcher가 호출되었지만 아직 반환되지 않았는지를 알려주며, `data.error`는 요청에 에러가 발생했는지 알려줍니다; 에러에는 fetcher에서 발생한 오류도 포합됩니다. (참고: 에러가 예상된다면, [ErrorBoundary](#<errorboundary>)에 `createResource`를 래핑할 수 있습니다.)
+하지만 두 가지 추가 리액티브 속성이 있습니다: `data.loading`은 fetcher가 호출되었지만 아직 반환되지 않았는지를 알려주며, `data.error`는 요청에 에러가 발생했는지 알려줍니다; 에러에는 fetcher에서 발생한 오류도 포합됩니다. (참고: 에러가 예상된다면, [ErrorBoundary](#<errorboundary>)에 `createResource`를 래핑할 수 있습니다.)
 
-`loading`과 `error`는 리액티브 getter이며 추적 가능합니다.
+**1.4.0** 버전에서는, `data.latest`는 마지막으로 반환된 값을 반환하며, [Suspense](#<suspense>)와 [트랜지션](#usetransition)을 트리거하지 않습니다; 아직 값이 반환된 적이 없다면, `data.latest`는 `data()`와 동일하게 작동합니다. 이는 새 데이터를 로딩하는 도중에는 이전 데이터를 보여주고자 하는 경우 유용합니다.
+
+`loading`, `error`, `latest`는 리액티브 getter이며 추적 가능합니다.
 
 `fetcher`는 데이터를 가져오기 위해 `createResource`에 제공하는 비동기 함수입니다.
 fetcher에는 두 개의 인수가 전달됩니다. 소스 시그널의 값(제공된 경우), 그리고 `value`, `refetching` 속성을 가진 정보 객체입니다. `value`는 이전에 가져온 값을 알려줍니다.
@@ -369,6 +372,20 @@ mutate(optimisticValue);
 
 // 마지막 요청을 명시적으로 다시 가져옵니다
 refetch();
+```
+
+**v1.4.0 에서 추가됨**
+
+`renderToStream`을 사용중이라면, `deferStream` 옵션을 사용해 리소스가 준비될 때까지 Solid가 스트림 플러시를 하지 않고 기다리도록 할 수 있습니다:
+
+```js
+// user 데이터를 가져오는 것과 컨텐츠 스트리밍을 최대한 빨리 진행합니다.
+const [user] = createResource(() => params.id, fetchUser);
+
+// user 데이터를 가져와 리소스가 로드된 후, 컨텐츠 스트리밍을 진핸합니다.
+const [user] = createResource(() => params.id, fetchUser, {
+  deferStream: true,
+});
 ```
 
 # Lifecycles
@@ -818,7 +835,28 @@ setState("path", "to", "value", newValue);
 하지만 이는 배열과 일반 객체에만 적용됩니다.
 클래스는 래핑되지 않기 때문에, `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` 과 같은 객체는 스토어의 속성으로 세분화된 반응성을 제공하지 않습니다.
 
-최상위 상태 객체는 추적할 수 없기 때문에, 상태 객체 자체를 사용하는 대신 상태 키에 목록을 저장합니다.
+**1.4.0** 버전에서는, 최상위 상태 객체는 배열이 될 수 있습니다. 이전 버전에서는 배열을 감싸는 객체를 사용해야 합니다:
+
+```jsx
+// Solid 1.4.0 이상
+const [todos, setTodos] = createStore([
+  { id: 1, title: "Thing I have to do", done: false },
+  { id: 2, title: "Learn a New Framework", done: false },
+]);
+...
+<For each={todos}>{todo => <Todo todo={todo} />}</For>;
+```
+
+```jsx
+// 1.4.0 미만
+const [state, setState] = createStore({
+  todos: [
+    { id: 1, title: "Thing I have to do", done: false },
+    { id: 2, title: "Learn a New Framework", done: false },
+  ],
+});
+<For each={state.todos}>{(todo) => <Todo todo={todo} />}<For>;
+```
 
 ```js
 // 목록을 상태 객체의 키에 저장
