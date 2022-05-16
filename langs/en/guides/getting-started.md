@@ -4,6 +4,14 @@ description: A guide for how to get started with Solid.
 sort: 0
 ---
 # Getting Started
+
+## See Solid
+
+For quick video overviews of Solid's core concepts, check out:
+
+* [Solid in 100 seconds](https://youtu.be/hw3Bx5vxKl0)
+* [Solid reactivity in 10 minutes](https://youtu.be/J70HXl1KhWE)
+
 ## Try Solid
 
 By far the easiest way to get started with Solid is to try it online. Our REPL at https://playground.solidjs.com is the perfect way to try out ideas. As is https://codesandbox.io/ where you can modify any of [our Examples](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
