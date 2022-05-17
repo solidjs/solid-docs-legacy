@@ -244,8 +244,8 @@ const newProps = mergeProps(props);
 props = mergeProps(props, otherProps);
 
 // split props into multiple props objects
-const [local, others] = splitProps(props, ["className"])
-<div {...others} className={cx(local.className, theme.component)} />
+const [local, others] = splitProps(props, ["class"])
+<div {...others} class={cx(local.class, theme.component)} />
 ```
 
 ## Children
