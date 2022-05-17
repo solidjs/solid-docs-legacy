@@ -1,4 +1,4 @@
-Solid supports using both `class` and `className` to set the `className` property on an element. However it is often convenient to conditionally set classes. For that reason, Solid has a built-in `classList` JSX attribute that takes an object where the key is the class name(s) and the value is a boolean expression. When true, the class is applied, and when false, it is removed.
+Solid uses `class` to set the `className` property on an element. However it is often convenient to conditionally set classes. For that reason, Solid has a built-in `classList` JSX attribute that takes an object where the key is the class name(s) and the value is a boolean expression. When true, the class is applied, and when false, it is removed.
 
 In the example, we can replace:
 
