@@ -1967,13 +1967,53 @@ function App() {
 
 ## `classList`
 
-A helper that leverages `element.classList.toggle`. It takes an object whose keys are class names and assigns them when the resolved value is true.
+Solid offers two ways to set the `class` of an element:
+`class` and `classList`.
+
+First, you can set `class=...` like any other attribute.
+For example, `class="active editing"` sets two static classes;
+`class={state.active ? 'active' : undefined}` sets one dynamic class,
+and deletes the `class` attribute if it's not needed; and
+``class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}}``
+sets two dynamic classes.
+(Note that `className={...}` was deprecated in Solid 1.4.)
+
+Second, you can use `classList`, which offers a more convenient and
+fine-grained way to conditionally set multiple classes.
+The `classList` pseudo-attribute takes in an object where each key is a class
+and the value is a boolean representing whether to include that class.
+For example (matching the previous example):
 
 ```jsx
 <div
   classList={{ active: state.active, editing: state.currentId === row.id }}
 />
 ```
+
+This code compiles to a [render effect](#createrendereffect)
+that dynamically calls
+[`element.classList.toggle`](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle)
+to turn each class on or off, only when the corresponding boolean changes.
+For example, when `state.active` becomes `true` [`false`], the element gains
+[loses] the `active` class.
+
+Note that the object values passed to `classList` are not automatically
+converted to boolean.  If you might pass other values, you should manually cast
+them via `Boolean(...)`.  In particular, a reactive value of `undefined` is not
+treated as `false` (and can have the unintended behavior of toggling the class
+between on and off).
+
+It's also possible, but dangerous, to mix `class` and `classList`.
+The main situation in which this is safe is when `class` is set to a string
+and `classList` is reactive.  (`class` could also be set to a static computed
+value as in `class={baseClass()}`, but then it should appear before the
+`classList` pseudo-attribute.)
+If both `class` and `classList` are reactive, you can get expected behavior:
+when the `class` value changes, Solid sets the entire `class` attribute,
+so will overwrite any toggles made by `classList`.
+
+Because `classList` is a compile-time pseudo-attribute, it does not work in a
+prop spread like `<div {...props} />`.
 
 ## `style`
 
