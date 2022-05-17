@@ -1510,11 +1510,21 @@ import { render } from "solid-js/web";
 function render(code: () => JSX.Element, element: MountableElement): () => void;
 ```
 
-This is the browser app entry point. Provide a top level component definition or function and an element to mount to. It is recommended this element be empty as the returned dispose function will wipe all children.
+This is the browser app entry point.
+Provide a top-level component function and an element to mount to.
+It is recommended this element be empty:
+while `render` will just append children,
+the returned `dispose` function will remove all children.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
+// or
+const dispose = render(() => <App/>, document.getElementById("app"));
 ```
+
+It's important that the first argument is a function: do not pass JSX directly
+(as in `render(<App/>, ...)`), because this will call `App` before `render` can
+set up a root to track signal dependencies within `App`.
 
 ## `hydrate`
 
