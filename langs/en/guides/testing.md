@@ -1,139 +1,58 @@
 ---
-title: Testing Solid 
+title: Testing Solid
 description: How to test your Solid app
 sort: 4
 ---
-# Testing Solid 
+
+# Testing Solid
 
 To use your Solid code in production, it needs to be tested. Since you don't want to test everything manually, you need automated tests. This guide describes how to set everything up and a few useful patterns for testing Solid code.
 
 ## Testing Setup
 
-Before you set up testing, you need to choose your test runner. There is an abundance of choices, but we'll focus on two very different projects that are opposite extremes, jest and uvu, and also show a newer alternative called vitest. Jest is heavily integrated, uvu only brings the bare necessities, vitest is full-featured yet frugal. If you want to use another test runner, the setup for uvu should work for most other test runners.
+We offer support for two test runners:
+
+- jest - very well established with many features
+
+- uvu - only brings the bare necessities
+
+Both are based around [solid-testing-library](https://github.com/solidjs/solid-testing-library), which integrates [Testing Library](https://testing-library.com/) into Solid. Testing Library mimics a light-weight browser and provides an API to interact with it from your tests.
+
+We maintain a starter template for Solid and Jest tests. We recommend you base your project on it, or alternatively install the starter template in a scratch project and copy the configuration from it into your own project.
+
+The templates use the [degit](https://github.com/Rich-Harris/degit) utility for installation.
 
 ### Setting up Jest
 
-Unfortunately, integrated though it may be, jest will not support esm or typescript out of the box, but needs its transformer configuration set up.
+The Jest integration is based around the [solid-jest/preset/browser](https://github.com/solidjs/solid-jest) Jest configuration preset which lets you use Solid as in the browser. This uses babel to transform the Solid code.
 
-The main options are solid-jest, which uses babel to transform the Solid code, omitting type checks on testing if TypeScript is used, and ts-jest, which uses the TypeScript compiler and checks the types within the tests.
+It uses [jest-dom](https://github.com/testing-library/jest-dom) to extend `expect` with a bunch of custom matchers that help you write tests.
 
-If you are not using TypeScript, use solid-jest, otherwise choose if you want to check for types while running your tests or not.
+#### Jest with TypeScript (`ts-jest`)
 
-#### Using solid-jest
-
-Install the required dependencies:
-
-```sh
-> npm i --save-dev jest solid-jest # or yarn add -D or pnpm
+```bash
+$ npx degit solidjs/templates/ts-jest my-solid-project
+$ cd my-solid-project
+$ npm install # or pnpm install or yarn install
 ```
 
-Or for TypeScript:
-
-```sh
-> npm i --save-dev jest solid-jest @types/jest # or yarn add -D or pnpm
-```
-
-Next, you need to define your `.babelrc` if you haven't already done so:
-
-```js
-{
-  "presets": [
-    "@babel/preset-env",
-    "babel-preset-solid",
-    // only if you use TS with solid-jest
-    "@babel/preset-typescript"
-  ]
-}
-```
-
-And amend your `package.json` so that it looks like this:
-
-```js
-{
-  "scripts": {
-    // your other scripts go here
-    "test": "jest"
-  },
-  "jest": {
-    "preset": "solid-jest/preset/browser",
-    // insert setupFiles and other config
-  }
-}
-```
-
-#### Using ts-jest
-
-To use ts-jest, you need first to install it:
-
-```sh
-> npm i --save-dev jest ts-jest @types/jest # or yarn add -D or pnpm
-```
-
-And then configure it in `package.json`:
-
-```js
-{ 
-  "scripts": {
-    // your other scripts go here
-    "test": "jest"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.json",
-        "babelConfig": {
-          "presets": [
-            "babel-preset-solid",
-            "@babel/preset-env"
-          ]
-        }
-      }
-    },
-    // insert setupFiles and other config
-    // you probably want to test in browser mode:
-    "testEnvironment": "jsdom",
-    // unfortunately, solid cannot detect browser mode here,
-    // so we need to manually point it to the right versions:
-    "moduleNameMapper": {
-      "solid-js/web": "<rootDir>/node_modules/solid-js/web/dist/web.cjs",
-      "solid-js": "<rootDir>/node_modules/solid-js/dist/solid.cjs"
-    }
-    // windows users have to replace "/" with "\"
-  }
-}
-```
-
-### TypeScript and Jest
-
-Since jest is injecting its testing facilities into the global scope, you need to load its types into tsconfig.json to satisfy the typescript compiler:
-
-```js
-{
-  // part of tsconfig.json
-  "types": ["jest"]
-}
-```
-
-This requires the installation of `@types/jest` as mentioned before.
+Note that this template does not do typechecks during testing; you can use your IDE or a custom `tsc --noEmit` script in `package.json` to trigger such checks.
 
 ### Setting up uvu
 
-First, you need to install the required packages:
+We also maintain a starter template for `uvu`.
 
-```sh
-> npm i --save-dev uvu solid-register jsdom # or yarn add -D or pnpm
+It includes [solid-dom-testing](https://www.npmjs.com/package/solid-dom-testing) to help you write assertions useful with Testing Library.
+
+#### Uvu with TypeScript (`ts-uvu`)
+
+```bash
+$ npx degit solidjs/templates/ts-uvu my-solid-project
+$ cd my-solid-project
+$ npm install # or pnpm install or yarn install
 ```
 
-Then setup your test script in `package.json`:
-
-```sh
-> npm set-script test "uvu -r solid-register"
-```
-
-Additional setup files can be added via `-r setup.ts`, ignore non-tests with `-i not-a-test.test.ts`.
-
-### Coverage Reports
+#### Uvu coverage Reports
 
 > Unfortunately, due to a [limitation of babel](https://github.com/babel/babel/issues/4289), we cannot get source maps output for transpiled JSX, which will result in components to show zero coverage. It will work for non-JSX code, though.
 
@@ -148,9 +67,9 @@ Now if you `npm run test:coverage`, you'll see the test coverage.
 
 If you want nice HTML coverage reports, you can use `c8 -r html` instead of `c8` to enable the html reporter.
 
-### Watch Mode
+#### Watch Mode
 
-Neither `uvu` nor `tape` have a watch mode out of the box, but you can use `chokidar-cli` to do the same:
+`uvu` does not have a watch mode out of the box, but you can use `chokidar-cli` to do the same:
 
 ```sh
 > npm i --save-dev chokidar-cli # or yarn add -D or pnpm
@@ -160,115 +79,9 @@ Neither `uvu` nor `tape` have a watch mode out of the box, but you can use `chok
 
 Now if you run `npm run test:watch`, the tests will run every time you change a file.
 
-### solid-testing-library
-
-If you want to test components, you should definitely install `solid-testing-library`:
-
-```sh
-> npm i --save-dev solid-testing-library # or yarn add -D or pnpm
-```
-
-This allows you to render your components, fire events and select elements from a user's perspective.
-
-### @testing-library/jest-dom
-
-If you are using jest, `solid-testing-library` works very well with `@testing-library/jest-dom`:
-
-```sh
-> npm i --save-dev @testing-library/jest-dom # or yarn add -D or pnpm
-```
-
-And import the extensions to expect in a setup file:
-
-```ts
-// test/jest-setup.ts
-import '@testing-library/jest-dom/extend-expect';
-```
-
-And load that in jest using the following entry in package.json:
-
-```js
-{
-  "jest": {
-    // your other settings here
-    setupFiles: ["@testing-library/jest-dom/extend-expect", "regenerator-runtime"]
-  }
-}
-```
-
-Also don't forget to include the types in `tsconfig.json`:
-
-```js
-{
-  // part of tsconfig.json
-  "types": ["jest", "@testing-library/jest-dom"]
-}
-```
-
-### solid-dom-testing
-
-If you are using another test runner, e.g. uvu or tape, there are a few assertion helpers in `solid-dom-testing` that support similar assertions:
-
-```sh
-> npm i --save-dev solid-dom-testing # or yarn add -D or pnpm
-```
-
-There's no setup required, you can just import and use the helpers in your tests as you see fit.
-
-## vitest
-
-There's a new kid on the block of unit testing called [vitest](https://vitest.dev/) and it aims to replace jest with something faster, yet providing almost the same feature set.
-
-Installation is straightforward:
-
-```sh
-> npm i --save-dev vitest jsdom # or yarn add -D or pnpm
-```
-
-If you are using the official starter or solid-start, you are already using vite, so you have a `vite.config.mjs`. Make sure it looks something like this:
-
-```js
-/// <reference types="vitest" />
-/// <reference types="vite/client" />
-
-import { defineConfig } from 'vite'
-import solid from 'solid-start' // or 'vite-plugin-solid'
-
-export default defineConfig({
-  test: {
-    // if you want to have `describe, test, it`
-    // globally, comment out:
-    // globals: true,
-    environment: 'jsdom',
-    transformMode: {
-      web: [/\.[jt]sx$/],
-    },
-    // solid needs to be inline to work around
-    // a resolution issue in vitest:
-    deps: {
-      inline: [/solid-js/],
-    },
-    // if you have few tests, try commenting one
-    // or both out to improve performance:
-    // threads: false,
-    // isolate: false,
-  },
-  plugins: [solid()],
-  resolve: {
-    conditions: ['development', 'browser'],
-  },
-})
-```
-
-Lastly, you can add the test script to `package.json` using:
-
-```sh
-> npm set-script "test" "vitest"
-```
-
 ## Testing Patterns and Best Practices
 
-Now that you have installed your testing tools, you should start to use them. In order to make this easier, solid supports a few nice patterns.
+Now that you have installed your testing tools, you should start to use them. In order to make this easier, Solid supports a few nice patterns.
 
 ### Testing Reactive State
 
@@ -282,72 +95,84 @@ As an example, let's test `createLocalStorage` from the [todo example](https://w
 import { createEffect } from "solid-js";
 import { createStore, Store, SetStoreFunction } from "solid-js/store";
 
-export function createLocalStore<T>(initState: T): [Store<T>, SetStoreFunction<T>] {
-	const [state, setState] = createStore(initState);
-	if (localStorage.todos) setState(JSON.parse(localStorage.todos));
-	createEffect(() => (localStorage.todos = JSON.stringify(state)));
-	return [state, setState];
+export function createLocalStore<T>(
+  initState: T
+): [Store<T>, SetStoreFunction<T>] {
+  const [state, setState] = createStore(initState);
+  if (localStorage.todos) setState(JSON.parse(localStorage.todos));
+  createEffect(() => (localStorage.todos = JSON.stringify(state)));
+  return [state, setState];
 }
 ```
 
 Instead of creating a TODO component, we can test this model in isolation; when we do that, we need to keep in mind that 1. reactive changes only work when they have a tracking context provided by `render` or `createRoot` and 2. are asynchronous, but we can use `createEffect` to catch them. Using `createRoot` has the advantage that we can trigger the disposal manually:
 
-#### Testing in Jest / vitest
+#### Testing with Jest
 
 ```ts
 import { createLocalStore } from "./main.tsx";
 import { createRoot, createEffect } from "solid-js";
 
 describe("createLocalStore", () => {
-  beforeEach(() => { 
+  beforeEach(() => {
     localStorage.removeItem("todos");
   });
 
   const initialState = {
     todos: [],
-    newTitle: ""
+    newTitle: "",
   };
 
-  test("it reads pre-existing state from localStorage", () => createRoot(dispose => {
-    const savedState = { todos: [], newTitle: "saved" };
-    localStorage.setItem("todos", JSON.stringify(savedState));
-    const [state] = createLocalStore(initialState);
-    expect(state).toEqual(savedState);
-    dispose();
-  }));
-
-  test("it stores new state to localStorage", () => createRoot(dispose => {
-    const [state, setState] = createLocalStore(initialState);
-    setState("newTitle", "updated");
-    // to catch an effect, use an effect
-    return new Promise<void>((resolve) => createEffect(() => {
-      expect(JSON.parse(localStorage.todos || ""))
-        .toEqual({ todos: [], newTitle: "updated" });
+  test("it reads pre-existing state from localStorage", () =>
+    createRoot((dispose) => {
+      const savedState = { todos: [], newTitle: "saved" };
+      localStorage.setItem("todos", JSON.stringify(savedState));
+      const [state] = createLocalStore(initialState);
+      expect(state).toEqual(savedState);
       dispose();
-      resolve();
     }));
-  }));
+
+  test("it stores new state to localStorage", () =>
+    createRoot((dispose) => {
+      const [state, setState] = createLocalStore(initialState);
+      setState("newTitle", "updated");
+      // to catch an effect, use an effect
+      return new Promise<void>((resolve) =>
+        createEffect(() => {
+          expect(JSON.parse(localStorage.todos || "")).toEqual({
+            todos: [],
+            newTitle: "updated",
+          });
+          dispose();
+          resolve();
+        })
+      );
+    }));
 
   test("it updates state multiple times", async () => {
-    const {dispose, setState} = createRoot(dispose => {
+    const { dispose, setState } = createRoot((dispose) => {
       const [state, setState] = createLocalStore(initialState);
-      return {dispose, setState};
+      return { dispose, setState };
     });
     setState("newTitle", "first");
     // wait a tick to resolve all effects
     await new Promise((done) => setTimeout(done, 0));
-    expect(JSON.parse(localStorage.todos || ""))
-      .toEqual({ todos: [], newTitle: "first" });
+    expect(JSON.parse(localStorage.todos || "")).toEqual({
+      todos: [],
+      newTitle: "first",
+    });
     setState("newTitle", "second");
     await new Promise((done) => setTimeout(done, 0));
-    expect(JSON.parse(localStorage.todos || ""))
-      .toEqual({ todos: [], newTitle: "first" });
+    expect(JSON.parse(localStorage.todos || "")).toEqual({
+      todos: [],
+      newTitle: "first",
+    });
     dispose();
   });
 });
 ```
 
-#### Testing in uvu
+#### Testing with uvu
 
 ```ts
 import { createLocalStore } from "./main";
@@ -357,38 +182,42 @@ import { createEffect, createRoot } from "solid-js";
 
 const todoTest = suite("createLocalStore");
 
-todoTest.before.each(() => { 
+todoTest.before.each(() => {
   localStorage.removeItem("todos");
 });
 
 const initialState = {
   todos: [],
-  newTitle: ""
+  newTitle: "",
 };
 
-todoTest("it reads pre-existing state from localStorage", () => 
-  createRoot(dispose => {
+todoTest("it reads pre-existing state from localStorage", () =>
+  createRoot((dispose) => {
     const savedState = { todos: [], newTitle: "saved" };
     localStorage.setItem("todos", JSON.stringify(savedState));
     const [state] = createLocalStore(initialState);
     assert.equal(state, savedState);
     dispose();
-  }));
+  })
+);
 
 todoTest("it stores new state to localStorage", () =>
-  createRoot(dispose => {
+  createRoot((dispose) => {
     const [_, setState] = createLocalStore(initialState);
     setState("newTitle", "updated");
     // to catch an effect, we need an effect
-    return new Promise<void>((resolve) => createEffect(() => {
-      assert.equal(
-        JSON.parse(localStorage.todos || ""),
-        { todos: [], newTitle: "updated" }
-      );
-      dispose();
-      resolve();
-    }));
-  }));
+    return new Promise<void>((resolve) =>
+      createEffect(() => {
+        assert.equal(JSON.parse(localStorage.todos || ""), {
+          todos: [],
+          newTitle: "updated",
+        });
+        dispose();
+        resolve();
+      })
+    );
+  })
+);
 
 todoTest.run();
 ```
@@ -399,7 +228,7 @@ todoTest.run();
 
 We could now create a component and use the directive in there, but then we'd be testing the use of directives instead of directly testing the directive. It's simpler to test the surface of the directive by providing a mounted node and the accessor:
 
-#### Testing in Jest / vitest
+#### Testing with Jest
 
 ```ts
 // click-outside.test.ts
@@ -409,7 +238,7 @@ import { fireEvent } from "solid-testing-library";
 
 describe("clickOutside", () => {
   const ref = document.createElement("div");
-  
+
   beforeAll(() => {
     document.body.appendChild(ref);
   });
@@ -418,46 +247,54 @@ describe("clickOutside", () => {
     document.body.removeChild(ref);
   });
 
-  test("will trigger on click outside", () => createRoot((dispose) =>
-    new Promise<void>((resolve) => {
-      let clickedOutside = false;
-      clickOutside(ref, () => () => { clickedOutside = true; });
-      document.body.addEventListener("click", () => {
-        expect(clickedOutside).toBeTruthy();
-        dispose();
-        resolve();
-      });
-      fireEvent.click(document.body);
-    })
-  ));
+  test("will trigger on click outside", () =>
+    createRoot(
+      (dispose) =>
+        new Promise<void>((resolve) => {
+          let clickedOutside = false;
+          clickOutside(ref, () => () => {
+            clickedOutside = true;
+          });
+          document.body.addEventListener("click", () => {
+            expect(clickedOutside).toBeTruthy();
+            dispose();
+            resolve();
+          });
+          fireEvent.click(document.body);
+        })
+    ));
 
-  test("will not trigger on click inside", () => createRoot((dispose) =>
-    new Promise<void>((resolve) => {
-      let clickedOutside = false;
-      clickOutside(ref, () => () => { clickedOutside = true; });
-      ref.addEventListener("click", () => {
-        expect(clickedOutside).toBeFalsy();
-        dispose();
-        resolve();
-      });
-      fireEvent.click(ref);
-    })
-  ));
+  test("will not trigger on click inside", () =>
+    createRoot(
+      (dispose) =>
+        new Promise<void>((resolve) => {
+          let clickedOutside = false;
+          clickOutside(ref, () => () => {
+            clickedOutside = true;
+          });
+          ref.addEventListener("click", () => {
+            expect(clickedOutside).toBeFalsy();
+            dispose();
+            resolve();
+          });
+          fireEvent.click(ref);
+        })
+    ));
 });
 ```
 
-#### Testing in uvu
+#### Testing with uvu
 
 ```ts
 // click-outside.test.ts
-import clickOutside from 'click-outside.tsx';
-import { createRoot } from 'solid-js';
-import { fireEvent } from 'solid-testing-library';
+import clickOutside from "click-outside.tsx";
+import { createRoot } from "solid-js";
+import { fireEvent } from "solid-testing-library";
 
-const clickTest = suite('clickOutside');
+const clickTest = suite("clickOutside");
 
-const ref = document.createElement('div');
-  
+const ref = document.createElement("div");
+
 clickTest.before(() => {
   document.body.appendChild(ref);
 });
@@ -466,31 +303,41 @@ clickTest.after(() => {
   document.body.removeChild(ref);
 });
 
-clickTest('will trigger on click outside', () => createRoot((dispose) =>
-  new Promise<void>((resolve) => {
-    let clickedOutside = false;
-    clickOutside(ref, () => () => { clickedOutside = true; });
-    document.body.addEventListener('click', () => {
-      assert.ok(clickedOutside);
-      dispose();
-      resolve();
-    });
-    fireEvent.click(document.body);
-  })
-));
+clickTest("will trigger on click outside", () =>
+  createRoot(
+    (dispose) =>
+      new Promise<void>((resolve) => {
+        let clickedOutside = false;
+        clickOutside(ref, () => () => {
+          clickedOutside = true;
+        });
+        document.body.addEventListener("click", () => {
+          assert.ok(clickedOutside);
+          dispose();
+          resolve();
+        });
+        fireEvent.click(document.body);
+      })
+  )
+);
 
-clickTest('will not trigger on click inside', () => createRoot((dispose) =>
-  new Promise<void>((resolve) => {
-    let clickedOutside = false;
-    clickOutside(ref, () => () => { clickedOutside = true; });
-    ref.addEventListener('click', () => {
-      assert.is(clickedOutside, false);
-      dispose();
-      resolve();
-    });
-    fireEvent.click(ref);
-  })
-));
+clickTest("will not trigger on click inside", () =>
+  createRoot(
+    (dispose) =>
+      new Promise<void>((resolve) => {
+        let clickedOutside = false;
+        clickOutside(ref, () => () => {
+          clickedOutside = true;
+        });
+        ref.addEventListener("click", () => {
+          assert.is(clickedOutside, false);
+          dispose();
+          resolve();
+        });
+        fireEvent.click(ref);
+      })
+  )
+);
 
 clickTest.run();
 ```
@@ -506,15 +353,17 @@ import { createSignal, Component } from "solid-js";
 export const Counter: Component = () => {
   const [count, setCount] = createSignal(0);
 
-  return <div role="button" onClick={() => setCount(c => c + 1)}>
-    Count: {count()}
-  </div>;
-}
+  return (
+    <div role="button" onClick={() => setCount((c) => c + 1)}>
+      Count: {count()}
+    </div>
+  );
+};
 ```
 
-You should definitely install `solid-testing-library`, if you haven't already done that; it's most important helpers are `render` to render a component to the dom in a managed way, `fireEvent` to dispatch events in a way that resembles actual user events and `screen` to provide global selectors. If you use jest, you should also install `@testing-library/jest-dom` and set it up to have some helpful assertions, otherwise install `solid-dom-testing` as described above.
+Here we use `solid-testing-library`. It's most important helpers are `render` to render a component to the DOM in a managed way, `fireEvent` to dispatch events in a way that resembles actual user events and `screen` to provide global selectors. We also use helpful assertions added to `expect` provided by `@testing-library/jest-dom`.
 
-#### Testing in Jest / vitest
+#### Testing with Jest
 
 ```ts
 // main.test.tsx
@@ -545,7 +394,7 @@ describe("Counter", () => {
 });
 ```
 
-#### Testing in uvu
+#### Testing with uvu
 
 ```ts
 // main.test.tsx
@@ -554,7 +403,6 @@ import * as assert from "uvu/assert";
 import { Counter } from "main";
 import { fireEvent, render, screen } from "solid-testing-library";
 import { isInDocument, hasTextContent } from "solid-dom-testing";
-
 
 const testCounter = suite("Counter");
 
@@ -573,10 +421,16 @@ testCounter("it increases its value on click", async () => {
   fireEvent.click(button);
   // the event loop takes one Promise to resolve to be finished
   await Promise.resolve();
-  assert.ok(hasTextContent(button, "Count: 1"), "not count 1 after first click");
+  assert.ok(
+    hasTextContent(button, "Count: 1"),
+    "not count 1 after first click"
+  );
   fireEvent.click(button);
   await Promise.resolve();
-  assert.ok(hasTextContent(button, "Count: 2"), "not count 2 after first click");
+  assert.ok(
+    hasTextContent(button, "Count: 2"),
+    "not count 2 after first click"
+  );
 });
 
 testCounter.run();
