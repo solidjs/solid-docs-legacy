@@ -26,6 +26,33 @@ Or for TypeScript:
 > npm run dev # or yarn or pnpm
 ```
 
+Or you can install the dependencies in your own project.  To use Solid with JSX
+(recommended), you need to install the `solid-js` NPM library and the
+[Solid JSX compiler](https://github.com/ryansolid/dom-expressions/tree/main/packages/babel-plugin-jsx-dom-expressions)
+Babel plugin:
+
+```sh
+> npm install solid-js babel-preset-solid
+```
+
+Then add `babel-preset-solid` to your `.babelrc`, or to your Babel config in webpack or rollup:
+
+```json
+"presets": ["solid"]
+```
+
+For TypeScript, set your `tsconfig.json` to handle Solid's JSX as follows
+(see the [TypeScript guide](https://www.solidjs.com/guides/typescript)
+for more details):
+
+
+```json
+"compilerOptions": {
+  "jsx": "preserve",
+  "jsxImportSource": "solid-js",
+}
+```
+
 ## Learn Solid
 
 Solid is all about small composable pieces that serve as building blocks for applications. These pieces are mostly functions which make up many shallow top-level APIs. Fortunately, you won't need to know about most of them to get started.
