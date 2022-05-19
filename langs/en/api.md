@@ -1975,10 +1975,10 @@ function App() {
 }
 ```
 
-## `class:___` and `classList`
+## `classList`
 
-Solid offers three ways to set the `class` of an element:
-`class`, `class:___`, and `classList` attributes.
+Solid offers two ways to set the `class` of an element:
+`class` and `classList` attributes.
 
 First, you can set `class=...` like any other attribute.  For example:
 
@@ -1995,17 +1995,7 @@ First, you can set `class=...` like any other attribute.  For example:
 
 (Note that `className=...` was deprecated in Solid 1.4.)
 
-Alternatively, you can set individual classes via `class:___` pseudo-attributes,
-where a true or false attribute value
-indicates whether to include or exclude the class respectively.
-This is especially convenient for dynamic classes.
-For example (matching the last example):
-
-```jsx
-<div class:active={state.active} class:editing={state.currentId === row.id} />
-```
-
-Finally, the `classList` pseudo-attribute lets you specify an object,
+Alternatively, the `classList` pseudo-attribute lets you specify an object,
 where each key is a class and the value is treated as a boolean
 representing whether to include that class.
 For example (matching the last example):
@@ -2016,7 +2006,7 @@ For example (matching the last example):
 />
 ```
 
-The last two examples compile to a [render effect](#createrendereffect)
+This example compiles to a [render effect](#createrendereffect)
 that dynamically calls
 [`element.classList.toggle`](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle)
 to turn each class on or off, only when the corresponding boolean changes.
@@ -2036,23 +2026,22 @@ setClasses((c) => ({...c, active: true}));
 <div classList={classes()} />
 ```
 
-It's also possible, but dangerous, to mix `class`, `class:___`, and `classList`.
+It's also possible, but dangerous, to mix `class` and `classList`.
 The main safe situation is when `class` is set to a static string (or nothing),
-`class:___` and/or `classList` are reactive, and
-`class:___` and `classList` do not share any classes.
+and `classList` is reactive.
 (`class` could also be set to a static computed value as in
 `class={baseClass()}`, but then it should appear
-before any `class:___` or `classList` pseudo-attributes.)
-If both `class` and `classList` are reactive, for example,
+before any `classList` pseudo-attributes.)
+If both `class` and `classList` are reactive,
 you can get unexpected behavior:
 when the `class` value changes, Solid sets the entire `class` attribute,
-so will overwrite any toggles made by `classList` (or `class:___`).
+so will overwrite any toggles made by `classList`.
 
-Because `class:___` and `classList` are compile-time pseudo-attributes,
-they does not work in a prop spread like `<div {...props} />`
+Because `classList` is a compile-time pseudo-attribute,
+it does not work in a prop spread like `<div {...props} />`
 or in `<Dynamic>`.
 
-## `style` and `style:___`
+## `style`
 
 Solid's `style` attribute lets you provide either a CSS string or
 an object where keys are CSS property names:
@@ -2093,22 +2082,6 @@ This also means you can set CSS variables! For example:
 // set css variable
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
-
-Alternatively, you can specify individual CSS styles
-using one or more `style:___` pseudo-attributes.
-(Because of JSX limitations, you cannot set CSS variables this way.)
-For example:
-
-```jsx
-<div
- style:color="green"
- style:background-color={state.color}
- style:height={state.height + "px"} />
-```
-
-If you mix `style` and `style:___` attributes, make sure they don't overlap
-in property names.  Otherwise, whichever one updated reactively most recently
-will override the other.
 
 ## `innerHTML`/`textContent`
 
