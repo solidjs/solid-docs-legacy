@@ -1988,7 +1988,7 @@ and deletes the `class` attribute if it's not needed; and
 sets two dynamic classes.
 (Note that `className={...}` was deprecated in Solid 1.4.)
 
-Second, you can use `classList`, which offers a more convenient and
+Alternatively, you can use `classList`, which offers a more convenient and
 fine-grained way to conditionally set multiple classes.
 The `classList` pseudo-attribute takes in an object where each key is a class
 and the value is a boolean representing whether to include that class.
