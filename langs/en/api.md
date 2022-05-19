@@ -2052,9 +2052,10 @@ Because `class:___` and `classList` are compile-time pseudo-attributes,
 they does not work in a prop spread like `<div {...props} />`
 or in `<Dynamic>`.
 
-## `style`
+## `style` and `style:___`
 
-Solid's `style` helper works with either a string or with an object.
+Solid's `style` attribute lets you provide either a CSS string or
+an object where keys are CSS property names:
 
 ```jsx
 // string
@@ -2067,9 +2068,12 @@ Solid's `style` helper works with either a string or with an object.
 />
 ```
 
-Unlike React's `style` helper, Solid uses `element.style.setProperty` under the hood. This means you need to use
-the lower-case, dash-separated version of property names, like `"background-color"` rather than
-`backgroundColor`. This actually leads to better performance and consistency with SSR output.
+Unlike [React's `style` attribute](https://reactjs.org/docs/dom-elements.html#style),
+Solid uses `element.style.setProperty` under the hood. This means you need to use
+the lower-case, dash-separated version of property names
+instead of the JavaScript camel-cased version,
+such as `"background-color"` rather than `backgroundColor`.
+This actually leads to better performance and consistency with SSR output.
 
 ```jsx
 // string
@@ -2083,12 +2087,28 @@ the lower-case, dash-separated version of property names, like `"background-colo
 />
 ```
 
-It also means you can use CSS variables! This just works:
+This also means you can set CSS variables! For example:
 
 ```jsx
-// css variable
+// set css variable
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
+
+Alternatively, you can specify individual CSS styles
+using one or more `style:___` pseudo-attributes.
+(Because of JSX limitations, you cannot set CSS variables this way.)
+For example:
+
+```jsx
+<div
+ style:color="green"
+ style:background-color={state.color}
+ style:height={state.height + "px"} />
+```
+
+If you mix `style` and `style:___` attributes, make sure they don't overlap
+in property names.  Otherwise, whichever one updated reactively most recently
+will override the other.
 
 ## `innerHTML`/`textContent`
 
