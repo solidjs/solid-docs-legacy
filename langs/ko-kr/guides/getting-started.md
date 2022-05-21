@@ -26,6 +26,28 @@ Solid를 사용하기 위한 가장 쉬운 방법은 온라인으로 시도해 �
 > npm run dev # or yarn or pnpm
 ```
 
+또는 프로젝트에 디펜던시를 설치할 수 있습니다.
+(권장하는 방법인) Solid를 JSX와 함께 사용하려면, `solid-js` NPM 라이브러리와 [Solid JSX compiler](https://github.com/ryansolid/dom-expressions/tree/main/packages/babel-plugin-jsx-dom-expressions) babel 플러그인을 설치해야 합니다:
+
+```sh
+> npm install solid-js babel-preset-solid
+```
+
+그리고 나서, `.babelrc` 파일 혹은 webpack, rollup 에 있는 Babel 설정에 `babel-preset-solid`을 추가합니다:
+
+```json
+"presets": ["solid"]
+```
+
+타입스크립트 사용시, Solid의 JSX를 핸들링하기 위해 `tsconfig.json` 파일을 다음과 같이 설정합니다 (자세한 사항은 [타입스크립트 가이드](https://www.solidjs.com/guides/typescript)를 참고하세요):
+
+```json
+"compilerOptions": {
+  "jsx": "preserve",
+  "jsxImportSource": "solid-js",
+}
+```
+
 ## Solid 배우기
 
 Solid는 애플리케이션 빌딩 블록 역할을 하는 조합 가능한 작은 조각들입니다. 이 조각들은 대부분 얕은 최상위 API를 구성하는 함수들입니다. 다행히도 이들 대부분에 대해서 몰라도 시작할 수 있습니다.

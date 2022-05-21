@@ -13,12 +13,16 @@ setter 함수의 가장 기본적인 형식은 인자로 객체를 받으며, �
 Store를 사용해 중첩된 반응성을 구현하는게 얼마나 간단한지 살펴보겠습니다. 컴포넌트 초기화 코드를 다음과 같이 변경합니다:
 
 ```js
-const [store, setStore] = createStore({ todos: [] });
+const [todos, setTodos] = createStore([]);
 const addTodo = (text) => {
-  setStore('todos', (todos) => [...todos, { id: ++todoId, text, completed: false }]);
+  setTodos([...todos, { id: ++todoId, text, completed: false }]);
 };
 const toggleTodo = (id) => {
-  setStore('todos', (t) => t.id === id, 'completed', (completed) => !completed);
+  setTodos(
+    (todo) => todo.id === id,
+    "completed",
+    (completed) => !completed
+  );
 };
 ```
 

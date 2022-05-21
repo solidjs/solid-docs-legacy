@@ -1403,11 +1403,17 @@ function render(code: () => JSX.Element, element: MountableElement): () => void;
 
 이 함수는 브라우저 앱 진입점입니다. 
 마운트할 최상위 컴포넌트나 함수, 그리고 마운트할 대상 엘리먼트를 지정합니다.
-반환되는 dispose 함수가 마운트 대상의 모든 자식들을 지우기 때문에, 이 엘리먼트는 비워두는 것이 좋습니다.
+이 엘리먼트는 비워두는 것이 좋습니다: 
+`render` 실행 중에 자식을 추가하기 때문에, 반환되는 dispose 함수는 모든 자식들을 삭제합니다.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
+// 또는
+const dispose = render(() => <App/>, document.getElementById("app")); 
 ```
+
+첫 번째 인수가 함수라는 것이 중요합니다:
+`render`가 루트를 설정하고 `App` 내에서 시그널 디펜던시를 추적하기 전에 `App`이 실행되기 때문에, `render(<App/>, ...)` 처럼 JSX를 직접 전달하면 안됩니다.
 
 ## `hydrate`
 
@@ -1883,8 +1889,25 @@ function App() {
 
 ## `classList`
 
-`element.classList.toggle`를 활용하는 헬퍼입니다.
-키가 class 이름인 객체를 받아서, 이 값이 true인 경우에 해당 class를 할당합니다.
+Solid는 엘리먼트의 `class`를 설정하기 위해 `class`와 `classList` 속성을 제공합니다.
+ 
+먼저, 다른 속성들처럼 `class=...`를 사용합니다. 예를 들면: 
+ 
+```jsx 
+// 2개의 정적 class
+<div class="active editing" /> 
+ 
+// 필요없는 경우 class 속성을 삭제하는 하나의 동적 class
+<div class={state.active ? 'active' : undefined} /> 
+ 
+// 2개의 동적 class
+<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}} /> 
+``` 
+ 
+(참고로 `className=...`는 Solid 1.4 부터 더 이상 사용되지 않습니다.) 
+ 
+대신 `classList` 속성을 사용하면 각 키는 class 이고, 해당 class 를 포함할지 여부를 나타내는 boolean 형식의 값을 가지는 객체를 지정할 수 있습니다.
+예를 들면 (위의 마지막 예제에 해당함): 
 
 ```jsx
 <div
@@ -1892,9 +1915,33 @@ function App() {
 />
 ```
 
+이 예제는 해당 boolean 값이 변경될 때만 [`element.classList.toggle`](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle) 을 동적으로 호출하여 각 class 를 켜거나 끄는 [렌더 이펙트](#createrendereffect)로 컴파일됩니다.
+예를 들어, `state.active`가 `true`가 되면, 엘리먼트는 `active` class를 얻게 됩니다.
+ 
+`classList`에 전달되는 값은 적절한 객체로 평가되는 모든 표현식(시그널 getter 포함)이 가능합니다.
+몇 가지 예를 들면: 
+ 
+```jsx 
+// 동적 class 이름, 값
+<div classList={{ [className()]: classOn() }} /> 
+ 
+// 시그널 class 리스트
+const [classes, setClasses] = createSignal({}); 
+setClasses((c) => ({...c, active: true})); 
+<div classList={classes()} /> 
+``` 
+ 
+`class`와 `classList`를 섞어쓸 수는 있지만 위험합니다.
+안전한 상황은 `class`가 정적 문자열로 설정하거나 설정하지 않고, `classList`가 리액티브한 경우입니다.
+(`class` 는 `class={baseClass()}`처럼 정적 계산 값으로 설정할 수도 있지만, `classList` 보다는 앞에 설정해야 합니다) 
+만일 `class`와 `classList` 모두 리액티브하다면, 예상치 못한 동작이 발생할 수 있습니다:
+`class` 값이 변경되면, Solid 는 전체 `class` 속성을 설정하므로, `classList`에서 설정된 모든 토글을 덮어쓰게 됩니다.
+ 
+ `classList`는 컴파일 타임 속성이기 때문에, `<div {...props} />` 과 같은 스프레드 연산자나 `<Dynamic>`내에서는 작동하지 않습니다.
+
 ## `style`
 
-Solid의 `style` 헬퍼는 문자열이나 객체를 사용할 수 있습니다.
+Solid의 `style` 속성에 CSS 문자열이나 키가 CSS 속성 이름인 객체를 사용할 수 있습니다:
 
 ```jsx
 // 문자열
@@ -1906,8 +1953,8 @@ Solid의 `style` 헬퍼는 문자열이나 객체를 사용할 수 있습니다.
   height: state.height + "px" }}
 />
 ```
-리액트의 `style` 헬퍼와 달리 Solid는 내부적으로 `element.style.setProperty`를 사용합니다.
-즉, `backgroundColor`가 아닌 `"background-color"`와 같이 소문자이면서 `-`로 구분된 속성 이름을 사용해야 합니다.
+[리액트의 `style` 속성](https://reactjs.org/docs/dom-elements.html#style)과 달리 Solid는 내부적으로 `element.style.setProperty`를 사용합니다.
+즉, `backgroundColor`와 같은 자바스크립트 카멜 케이스 버전이 아닌 `"background-color"`와 같은 소문자이면서 `-`로 구분된 속성 이름을 사용해야 합니다.
 이는 실제로 더 나은 성능과 SSR 출력의 일관성으로 이어집니다.
 
 ```jsx
@@ -1922,10 +1969,10 @@ Solid의 `style` 헬퍼는 문자열이나 객체를 사용할 수 있습니다.
 />
 ```
 
-또한 CSS 변수도 사용할 수 있으며, 다음 코드도 작동합니다:
+또한 CSS 변수도 설정할 수 있습니다. 예를 들면:
 
 ```jsx
-// css 변수
+// css 변수 설정
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
 
@@ -2042,7 +2089,7 @@ Solid의 컴파일러는 JSX 표현식의 리액티브 래핑 및 지연 평가�
 
 이 휴리스틱과 그 한계를 알고 있으면 JSX 외부에서 액세스하여 절대 변경되지 않는 항목의 오버헤드를 줄일 수 있습니다.
 홀로 있는 변수는 절대 래핑되지 않습니다.
-또한 표현식 앞에 `/_ @once _/` 주석 데코레이터를 추가하여 컴파일러가 래핑하지 않도록 할 수 있습니다.
+또한 표현식 앞에 `/* @once */` 주석 데코레이터를 추가하여 컴파일러가 래핑하지 않도록 할 수 있습니다.
 
 ```jsx
 <MyComponent static={/*@once*/ state.wontUpdate} />

@@ -28,7 +28,7 @@ React의 업데이트 모델이 없으면 가능합니다. JSX는 Svelte나 Vue�
 
 반면에 현재 구현 계획은 없지만 Vue 호환은 가능할 것 같습니다.
 
-반면에, Solid를 React내에서 실행하는 것은 가능합니다. [React Solid State](https://github.com/solidjs/react-solid-state)를 사용하면 React 함수형 컴포넌트에서 Solid API에 접근 가능합니다. [reactjs-solidjs-bridge](https://github.com/Sawtaytoes/reactjs-solidjs-bridge)를 사용하면 React 컴포넌트를 Solid 컴포넌트 내에서 렌더링할 수 있으며, 반대도 가능합니다. 이는 애플리케이션을 점진적으로 포팅하고자 하는 경우 유용합니다.
+반면에, Solid를 React 내에서 실행하는 것은 가능합니다. [React Solid State](https://github.com/solidjs/react-solid-state)를 사용하면 React 함수형 컴포넌트에서 Solid API에 접근 가능합니다. [reactjs-solidjs-bridge](https://github.com/Sawtaytoes/reactjs-solidjs-bridge)를 사용하면 React 컴포넌트를 Solid 컴포넌트 내에서 렌더링할 수 있으며, 반대도 가능합니다. 이는 애플리케이션을 점진적으로 포팅하고자 하는 경우 유용합니다.
 
 ### 왜 템플릿에서 `map`을 사용할 수 없나요? `<For>`와 `<Index>`의 차이점은 뭔가요?
 
@@ -97,9 +97,9 @@ function BlueText({text}) {
 
 라이프사이클이 아니라 데이터와 동작을 함께 그룹화하세요. 이것은 수십년 동안 작동해온 리액티브의 모범 사례입니다.
 
-### 나는 JSX를 아주 싫어합니다. 다른 템플릿 언어를 지원할 생각이 있나요? 아.. 태그가 지정된 템플릿 리터럴 / 하이퍼스크립트가 있군요. 이걸 사용해 볼까요?
+### JSX를 정말 싫어하는데, 다른 템플릿 언어를 지원할 생각이 있나요? 음.. 태그가 지정된 템플릿 리터럴 / 하이퍼스크립트가 있군요. 이걸 사용해 볼까요?
 
-하지 마세요. 우리는 Svelte가 템플릿을 사용하는 방식으로 JSX를 사용하여 최적화된 DOM 명령어를 생성합니다. 태그된 템플릿 리터널 및 하이퍼스크립트 솔루션은 그 자체로 매우 정말 훌륭하지만, 빌드를 하지 않아야하는 것과 같은 현실적인 요구사항이 없는 한 모든 측면에서 더 좋지 않습니다. 번들이 커지고, 성능이 저하되며, 수동으로 값을 래핑해야 합니다.
+우리는 Svelte가 템플릿을 사용하는 방식으로 JSX를 사용하여 최적화된 DOM 명령어를 생성합니다. 태그된 템플릿 리터널 및 하이퍼스크립트 솔루션은 그 자체로 매우 정말 훌륭하지만, 빌드를 하지 않아야하는 것과 같은 현실적인 요구사항이 없는 한 모든 측면에서 더 좋지 않습니다. 번들이 커지고, 성능이 저하되며, 수동으로 값을 래핑해야 합니다.
 
 선택 사항이 있는 것은 좋지만, Solid의 JSX는 정말 최고의 솔루션입니다. 템플릿 DSL도 제한적이긴 하면서도 훌륭하지만, JSX는 많은 것을 무료로 제공합니다: 기존의 파서, 구문 강조 표시, prettier, 코드 완성, 그리고 TypeScript가 있습니다.
  
@@ -125,6 +125,8 @@ function BlueText({text}) {
 
 ### Solid에는 Next.js 나 Material Components 같은 라이브러리가 있나요?
 
- 현재 작업중입니다! 
- Solid의 [라이브러리와 도구 에코시스템은 빠르게 성장](https://www.solidjs.com/resources)하고 있습니다.
- 라이브러리 구축에 관심이 있다면, [Discord](https://discord.com/invite/solidjs)를 통해서 현재 에코시스템에 참여하거나 새로 만들 수도 있습니다.
+Next.js 나 SvelteKit 과 유사한 [SolidStart](https://github.com/solidjs/solid-start)이라는 SSR 스타터 솔루션을 개발중입니다.
+
+컴포넌트 라이브러리의 경우, Material을 위한 [SUID](https://suid.io/), Chakra 와 유사한 [Hope UI](https://hope-ui.com/), [Solid Bootstrap](https://solid-libs.github.io/solid-bootstrap/) 외에도 많은 라이브러리가 있습니다. [빠르게 성장중인 라이브러리와 도구 에코시스템](https://www.solidjs.com/ecosystem)을 참고해 보세요.
+
+에코시스템 도구 구축에 관심이 있다면, [Discord](https://discord.com/invite/solidjs)를 통해서 현재 에코시스템에 참여하거나 새로 만들 수도 있습니다.

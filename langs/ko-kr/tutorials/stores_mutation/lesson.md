@@ -10,18 +10,16 @@ Todo 예제에서 이벤트 핸들러를 다음과 같이 변경해서 `produce`
 
 ```jsx
 const addTodo = (text) => {
-  setStore(
-    'todos',
+  setTodos(
     produce((todos) => {
       todos.push({ id: ++todoId, text, completed: false });
-    }),
+    })
   );
 };
 const toggleTodo = (id) => {
-  setStore(
-    'todos',
-    todo => todo.id === id,
-    produce((todo) => (todo.completed = !todo.completed)),
+  setTodos(
+    (todo) => todo.id === id,
+    produce((todo) => (todo.completed = !todo.completed))
   );
 };
 ```
