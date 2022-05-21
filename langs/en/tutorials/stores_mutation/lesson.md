@@ -6,18 +6,16 @@ This is a nice tool to have to allow small zones of mutation without relinquishi
 
 ```jsx
 const addTodo = (text) => {
-  setStore(
-    'todos',
+  setTodos(
     produce((todos) => {
       todos.push({ id: ++todoId, text, completed: false });
-    }),
+    })
   );
 };
 const toggleTodo = (id) => {
-  setStore(
-    'todos',
-    todo => todo.id === id,
-    produce((todo) => (todo.completed = !todo.completed)),
+  setTodos(
+    (todo) => todo.id === id,
+    produce((todo) => (todo.completed = !todo.completed))
   );
 };
 ```

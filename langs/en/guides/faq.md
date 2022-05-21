@@ -28,7 +28,7 @@ No. And there likely never will be. While the APIs are similar and components of
 
 Vue-Compat, on the other hand, would be doable, although there are no plans to implement it currently.
 
-On the other hand, it is possible to run Solid *within* React. [React Solid State](https://github.com/solidjs/react-solid-state) makes the Solid API accessible in React function components. [reactjs-solidjs-bridge](https://github.com/Sawtaytoes/reactjs-solidjs-bridge) lets you render React components within Solid components and vice versa, which is useful when gradually porting an app.
+On the other hand, it is possible to run Solid _within_ React. [React Solid State](https://github.com/solidjs/react-solid-state) makes the Solid API accessible in React function components. [reactjs-solidjs-bridge](https://github.com/Sawtaytoes/reactjs-solidjs-bridge) lets you render React components within Solid components and vice versa, which is useful when gradually porting an app.
 
 ### Why shouldn't I use `map` in my template, and what's the difference between `<For>` and `<Index>`?
 
@@ -36,16 +36,16 @@ If your array is static, there's nothing wrong with using map. But if you're loo
 
 `<For>` and `<Index>` both provide a loop solution that is smarter than this. They couple each rendered node with an element in the array, so when an array element changes, only the corresponding node will rerender.
 
-`<Index>` will do this _by index_: each node corresponds to an index in the array; `<For>` will do this _by value_: each node corresponds to a piece of data in the array. This is why, in the callback, `<Index>` gives you a signal for the item: the index for each item is considered fixed, but the data at that index can change. On the other hand, `<For>` gives you a signal for the index: the content of the item is considered fixed, but it can move around if elements get moved in the array. 
+`<Index>` will do this _by index_: each node corresponds to an index in the array; `<For>` will do this _by value_: each node corresponds to a piece of data in the array. This is why, in the callback, `<Index>` gives you a signal for the item: the index for each item is considered fixed, but the data at that index can change. On the other hand, `<For>` gives you a signal for the index: the content of the item is considered fixed, but it can move around if elements get moved in the array.
 
-For example, if two elements in the array are swapped, `<For>` will reposition the two corresponding DOM nodes and update their `index()` signals along the way. `<Index>` won't reposition any DOM nodes, but will update the `item()` signals for the two DOM nodes and cause them to rerender. 
+For example, if two elements in the array are swapped, `<For>` will reposition the two corresponding DOM nodes and update their `index()` signals along the way. `<Index>` won't reposition any DOM nodes, but will update the `item()` signals for the two DOM nodes and cause them to rerender.
 
 For an in-depth demonstration of the difference, see [this segment](https://www.youtube.com/watch?v=YxroH_MXuhw&t=2164s) of Ryan's stream.
 
 ### Why do I lose reactivity when I destructure props?
 
 With a props object, reactivity is enabled by tracking on property access.
-If you access the property within a _tracking scope_ 
+If you access the property within a _tracking scope_
 like a JSX expression or an effect, then the JSX expression will rerender or the effect will rerun when that property changes.
 
 When you destructure, you access the properties of the object. If this takes place outside of a tracking scope, Solid won't track and rerun
@@ -87,6 +87,7 @@ function BlueText({text}) {
 ...
 <BlueText text={mySignal()}/>
 ```
+
 If you prefer the style of early destructuring, though, there are two different Babel
 transforms you can use to make (certain styles of) destructuring reactive
 again: [babel-plugin-solid-undestructure](https://github.com/orenelbaum/babel-plugin-solid-undestructure)
@@ -104,7 +105,7 @@ Group data and its behaviors together, rather than lifecycles. This is a reactiv
 
 ### I really dislike JSX, any chance of a different template language? Oh, I see you have Tagged Template Literals/HyperScript. Maybe I will use those...
 
-Don't. Stop you right there. We use JSX the way Svelte uses their templates, to create optimized DOM instructions. The Tagged Template Literal and HyperScript solutions may be really impressive in their own right, but unless you have a real reason like a no-build requirement they are inferior in every way. Larger bundles, slower performance, and the need for manual workaround wrapping values.
+We use JSX the way Svelte uses their templates, to create optimized DOM instructions. The Tagged Template Literal and HyperScript solutions may be really impressive in their own right, but unless you have a real reason like a no-build requirement they are inferior in every way. Larger bundles, slower performance, and the need for manual workaround wrapping values.
 
 It's good to have options, but Solid's JSX is really the best solution here. A Template DSL would be great as well, albeit more restrictive, but JSX gives us so much for free. Existing Parsers, Syntax Highlighting, Prettier, Code Completion, and last but not least TypeScript.
 
@@ -130,4 +131,8 @@ To list a few to try: [Solid](https://github.com/solidjs/solid), [MobX](https://
 
 ### Does Solid have a Next.js or Material Components like library I can use?
 
-They're in the works! Solid has a [rapidly growing ecosystem of libraries and tools](https://www.solidjs.com/resources). If you are interested in building one, we are readily available on our [Discord](https://discord.com/invite/solidjs), where you can join existing ecosystem efforts or start your own. 
+We're working on [SolidStart](https://github.com/solidjs/solid-start), which is our SSR starter solution similar to Next.js or SvelteKit.
+
+For component libraries, we've got [SUID](https://suid.io/) for Material, [Hope UI](https://hope-ui.com/) for a Chakra-like solution, [Solid Bootstrap](https://solid-libs.github.io/solid-bootstrap/) and plenty more! Check out our [rapidly growing ecosystem of libraries and tools](https://www.solidjs.com/ecosystem).
+
+If you are interested in building your own ecosystem tool, we are readily available on our [Discord](https://discord.com/invite/solidjs), where you can join existing ecosystem efforts or start your own.

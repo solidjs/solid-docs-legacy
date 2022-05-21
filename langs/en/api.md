@@ -1510,11 +1510,21 @@ import { render } from "solid-js/web";
 function render(code: () => JSX.Element, element: MountableElement): () => void;
 ```
 
-This is the browser app entry point. Provide a top level component definition or function and an element to mount to. It is recommended this element be empty as the returned dispose function will wipe all children.
+This is the browser app entry point.
+Provide a top-level component function and an element to mount to.
+It is recommended this element be empty:
+while `render` will just append children,
+the returned `dispose` function will remove all children.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
+// or
+const dispose = render(() => <App/>, document.getElementById("app"));
 ```
+
+It's important that the first argument is a function: do not pass JSX directly
+(as in `render(<App/>, ...)`), because this will call `App` before `render` can
+set up a root to track signal dependencies within `App`.
 
 ## `hydrate`
 
@@ -1967,7 +1977,28 @@ function App() {
 
 ## `classList`
 
-A helper that leverages `element.classList.toggle`. It takes an object whose keys are class names and assigns them when the resolved value is true.
+Solid offers two ways to set the `class` of an element:
+`class` and `classList` attributes.
+
+First, you can set `class=...` like any other attribute.  For example:
+
+```jsx
+// Two static classes
+<div class="active editing" />
+
+// One dynamic class, deleting class attribute if it's not needed
+<div class={state.active ? 'active' : undefined} />
+
+// Two dynamic classes
+<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}} />
+```
+
+(Note that `className=...` was deprecated in Solid 1.4.)
+
+Alternatively, the `classList` pseudo-attribute lets you specify an object,
+where each key is a class and the value is treated as a boolean
+representing whether to include that class.
+For example (matching the last example):
 
 ```jsx
 <div
@@ -1975,9 +2006,45 @@ A helper that leverages `element.classList.toggle`. It takes an object whose key
 />
 ```
 
+This example compiles to a [render effect](#createrendereffect)
+that dynamically calls
+[`element.classList.toggle`](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle)
+to turn each class on or off, only when the corresponding boolean changes.
+For example, when `state.active` becomes `true` [`false`], the element gains
+[loses] the `active` class.
+
+The value passed into `classList` can be any expression (including a signal
+getter) that evaluates to an appropriate object.  Some examples:
+
+```jsx
+// Dynamic class name and value
+<div classList={{ [className()]: classOn() }} />
+
+// Signal class list
+const [classes, setClasses] = createSignal({});
+setClasses((c) => ({...c, active: true}));
+<div classList={classes()} />
+```
+
+It's also possible, but dangerous, to mix `class` and `classList`.
+The main safe situation is when `class` is set to a static string (or nothing),
+and `classList` is reactive.
+(`class` could also be set to a static computed value as in
+`class={baseClass()}`, but then it should appear
+before any `classList` pseudo-attributes.)
+If both `class` and `classList` are reactive,
+you can get unexpected behavior:
+when the `class` value changes, Solid sets the entire `class` attribute,
+so will overwrite any toggles made by `classList`.
+
+Because `classList` is a compile-time pseudo-attribute,
+it does not work in a prop spread like `<div {...props} />`
+or in `<Dynamic>`.
+
 ## `style`
 
-Solid's `style` helper works with either a string or with an object.
+Solid's `style` attribute lets you provide either a CSS string or
+an object where keys are CSS property names:
 
 ```jsx
 // string
@@ -1990,9 +2057,12 @@ Solid's `style` helper works with either a string or with an object.
 />
 ```
 
-Unlike React's `style` helper, Solid uses `element.style.setProperty` under the hood. This means you need to use
-the lower-case, dash-separated version of property names, like `"background-color"` rather than
-`backgroundColor`. This actually leads to better performance and consistency with SSR output.
+Unlike [React's `style` attribute](https://reactjs.org/docs/dom-elements.html#style),
+Solid uses `element.style.setProperty` under the hood. This means you need to use
+the lower-case, dash-separated version of property names
+instead of the JavaScript camel-cased version,
+such as `"background-color"` rather than `backgroundColor`.
+This actually leads to better performance and consistency with SSR output.
 
 ```jsx
 // string
@@ -2006,10 +2076,10 @@ the lower-case, dash-separated version of property names, like `"background-colo
 />
 ```
 
-It also means you can use CSS variables! This just works:
+This also means you can set CSS variables! For example:
 
 ```jsx
-// css variable
+// set css variable
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
 
@@ -2115,7 +2185,7 @@ Forces the prop to be treated as a attribute instead of an property. Useful for 
 
 Solid's compiler uses a heuristic for reactive wrapping and lazy evaluation of JSX expressions. Does it contain a function call, a property access, or JSX? If yes we wrap it in a getter when passed to components or in an effect if passed to native elements.
 
-Knowing this heuristic and its limitations, we can reduce overhead of things we know will never change by accessing them outside of the JSX. A lone variable will never be wrapped. We can also tell the compiler not to wrap them by starting the expression with a comment decorator `/_ @once _/`.
+Knowing this heuristic and its limitations, we can reduce overhead of things we know will never change by accessing them outside of the JSX. A lone variable will never be wrapped. We can also tell the compiler not to wrap them by starting the expression with a comment decorator `/* @once */`.
 
 ```jsx
 <MyComponent static={/*@once*/ state.wontUpdate} />
