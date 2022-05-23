@@ -1642,7 +1642,7 @@ if (isServer) {
 ## `DEV`
 
 ```ts
-import { DEV } from "solid-js/web";
+import { DEV } from "solid-js";
 
 const DEV: object | undefined;
 ```
@@ -1658,7 +1658,8 @@ you can check whether the `DEV` export is defined.  Note that it is always
 defined on the server, so you may want to combine with [`isServer`](#isserver):
 
 ```ts
-import { DEV, isServer } from "solid-js/web";
+import { DEV } from "solid-js";
+import { isServer } from "solid-js/web";
 
 if (DEV && !isServer) {
   console.log(...);
