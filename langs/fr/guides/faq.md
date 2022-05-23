@@ -24,7 +24,7 @@ Ce sont actuellement ces techniques uniques combinés qui donne à Solid un avan
 
 ### 3. Est-ce qu’il y a un React-Compat ?
 
-Non. Et il se pourrait qu’il n’y en aura jamais. Bien que l’API soit similaire et les composants peuvent souvent être converti avec des ajustements mineurs, le système de mise à jour est fondamentalement différent. Les composants de React s’exécute encore et encore donc le code en dehors de Hooks fonctionnent très différemment. Les closures et les règles de hook ne sont pas seulement inutile, mais elles peuvent être utilisées d’une manière qui ne fonctionne pas dans notre cas.
+Non. Et il se pourrait qu’il n’y en ait jamais. Bien que l’API soit similaire et les composants peuvent souvent être converti avec des ajustements mineurs, le système de mise à jour est fondamentalement différent. Les composants de React s’exécute encore et encore donc le code en dehors de Hooks fonctionnent très différemment. Les closures et les règles de hook ne sont pas seulement inutile, mais elles peuvent être utilisées d’une manière qui ne fonctionne pas dans notre cas.
 
 D’autre part, Vue-compat est complètement faisable. Même s’il n’y a pas de plan de l’implémenter actuellement.
 
