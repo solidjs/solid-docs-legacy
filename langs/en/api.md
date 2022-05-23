@@ -1274,12 +1274,14 @@ const [state, { increment, decrement }] = useContext(CounterContext);
 
 ```ts
 import { children } from "solid-js";
+import type { JSX, ResolvedChildren } from "solid-js";
 
-function children(fn: () => any): () => any;
+function children(fn: () => JSX.Element): () => ResolvedChildren;
 ```
 
 The `children` helper is for complicated interactions with `props.children`,
-when you're not just using `{props.children}` in JSX.
+when you're not just passing children on to another component
+using `{props.children}` once in JSX.
 Normally you pass in a getter for `props.children` like so:
 
 ```js
@@ -1303,14 +1305,20 @@ whenever `props.children` gets accessed.  Two particular consequences:
 - If you access `props.children` outside of a tracking scope (e.g., in an
   event handler), then you create children that will never be cleaned up.
   If you instead call `resolved()`, you re-use the already resolved children.
+  You also guarantee that the children are tracked in the current component,
+  as opposed to another tracking scope such as another component.
 
 In addition, the `children` helper "resolves" children by
 calling argumentless functions and flattening arrays of arrays into an array.
-If the given `props.children` is not an array, however, the `children` helper
-will not normalize it into an array.
+For example, a child specified with JSX like `{signal() * 2}` gets wrapped into
+a getter function `() => count() * 2` in `props.children`, but gets evaluated
+to an actual number in `resolved`, properly depending on a `count` signal.
+
+If the given `props.children` is not an array
+(which occurs when the JSX tag has a single child),
+then the `children` helper will not normalize it into an array.
 This is useful behavior e.g. when the intention is to pass a single function
-as a child, which can be detected via `typeof resolved() === 'function'`
-(instead of checking array length and then checking the first element type).
+as a child, which can be detected via `typeof resolved() === 'function'`.
 If you want to normalize to an array, you can use
 `Array.isArray(resolved()) ? resolved() : [resolved()]`.
 
@@ -1361,7 +1369,7 @@ return (
 );
 ```
 
-To evaluate the children only when the `<Show>` would render them, you can
+To evaluate the children only when `<Show>` would render them, you can
 push the call to `children` inside a component or a function within `<Show>`,
 which only evaluates its children when the `when` condition is true.
 Another nice workaround is to pass `props.children` to the `children` helper
@@ -1590,6 +1598,7 @@ These imports are exposed from `solid-js/web`.
 
 ```ts
 import { render } from "solid-js/web";
+import type { JSX, MountableElement } from "solid-js/web";
 
 function render(code: () => JSX.Element, element: MountableElement): () => void;
 ```
