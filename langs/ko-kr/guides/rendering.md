@@ -44,7 +44,7 @@ import { render } from "solid-js/web";
 render(() => <App />, document.getElementById("main"));
 ```
 
-> **중요** 첫 번째 인자는 함수여야 합니다. 그렇지 않으면 리액티브 시스템을 제대로 추적하고 스케줄할 수 없습니다. 이 간단한 부분을 누락하게 되면 Effect가 실행되지 않습니다.
+> **중요** 첫 번째 인자는 함수여야 합니다. 그렇지 않으면 리액티브 시스템을 제대로 추적하고 스케줄할 수 없습니다. 함수 래퍼를 누락하게 되면 이펙트가 실행되지 않습니다.
 
 ## 컴포넌트
 
@@ -243,8 +243,8 @@ const newProps = mergeProps(props);
 props = mergeProps(props, otherProps);
 
 // props를 여러개의 props 객체로 분할
-const [local, others] = splitProps(props, ["className"])
-<div {...others} className={cx(local.className, theme.component)} />
+const [local, others] = splitProps(props, ["class"])
+<div {...others} class={cx(local.class, theme.component)} />
 ```
 
 ## 자식 컴포넌트

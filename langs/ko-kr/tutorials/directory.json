@@ -12,19 +12,19 @@
     "internalName": "introduction_components"
   },
   {
-    "lessonName": "소개/Signal",
+    "lessonName": "소개/시그널",
     "internalName": "introduction_signals"
   },
   {
-    "lessonName": "소개/Effect",
+    "lessonName": "소개/이펙트",
     "internalName": "introduction_effects"
   },
   {
-    "lessonName": "소개/파생된 Signal",
+    "lessonName": "소개/파생된 시그널",
     "internalName": "introduction_derived"
   },
   {
-    "lessonName": "소개/Memo",
+    "lessonName": "소개/메모",
     "internalName": "introduction_memos"
   },
   {

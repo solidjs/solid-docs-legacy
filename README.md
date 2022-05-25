@@ -21,7 +21,7 @@ Solid's documentation is available in 10 languages:
 | 🇮🇩 Indonesian (id) | 100%              | 100%   | 0%        | [athif23](https://github.com/athif23)                                                                                                                                      |
 | 🇩🇪 German (de)     | 100%              | 100%   | 100       | [atk](https://github.com/atk)                                                                                                                                              |
 | 🇷🇺 Russian (ru)    | 100%              | 100%   | 100%      | [Pheianox](https://github.com/pheianox), [TheFedaikin](https://github.com/TheFedaikin), [nairabrab](https://github.com/nairabrab), [Norskeld](https://github.com/norskeld) |
-| 🇰🇷 Korean (ko-kr)  | 0%                | 100%   | 3%        | [LechuckRoh](https://github.com/lechuckroh)                             |
+| 🇰🇷 Korean (ko-kr)  | 100%              | 100%   | 100%      | [LechuckRoh](https://github.com/lechuckroh)                             |
 
 # Support
 
