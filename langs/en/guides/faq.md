@@ -129,7 +129,7 @@ Of course. While we haven't exported a standalone package it is easy to install 
 
 To list a few to try: [Solid](https://github.com/solidjs/solid), [MobX](https://github.com/mobxjs/mobx), [Knockout](https://github.com/knockout/knockout), [Svelte](https://github.com/sveltejs/svelte), [S.js](https://github.com/adamhaile/S), [CellX](https://github.com/Riim/cellx), [Derivable](https://github.com/ds300/derivablejs), [Sinuous](https://github.com/luwes/sinuous), and even recently [Vue](https://github.com/vuejs/vue). Much more goes into making a reactive library than tagging it onto a renderer like, [lit-html](https://github.com/Polymer/lit-html) for example, but it's a good way to get a feel.
 
-### Does Solid have a Next.js or Material Components-like library I can use?
+### Does Solid have a Next.js or Material Components like library I can use?
 
 We're working on [SolidStart](https://github.com/solidjs/solid-start), which is our SSR starter solution similar to Next.js or SvelteKit.
 
