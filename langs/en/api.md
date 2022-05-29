@@ -1157,7 +1157,7 @@ import { createMutable } from 'solid-js/store';
 
 function createMutable<T extends StoreNode>(
   state: T | Store<T>,
-): Store<T> {
+): Store<T>;
 ```
 
 Creates a new mutable Store proxy object. Stores only trigger updates on values changing. Tracking is done by intercepting property access and automatically tracks deep nesting via proxy.
