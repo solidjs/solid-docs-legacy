@@ -3,6 +3,7 @@
     "introduction_basics": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -11,6 +12,7 @@
     "introduction_jsx": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -19,6 +21,7 @@
     "introduction_components": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -27,6 +30,7 @@
     "introduction_signals": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -35,6 +39,7 @@
     "introduction_effects": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -43,6 +48,7 @@
     "introduction_derived": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -51,6 +57,7 @@
     "introduction_memos": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -59,6 +66,7 @@
     "flow_show": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -67,6 +75,7 @@
     "flow_for": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -75,6 +84,7 @@
     "flow_index": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -83,6 +93,7 @@
     "flow_switch": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -91,6 +102,7 @@
     "flow_dynamic": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -99,6 +111,7 @@
     "flow_portal": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -107,6 +120,7 @@
     "flow_error_boundary": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -115,6 +129,7 @@
     "lifecycles_onmount": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -123,6 +138,7 @@
     "lifecycles_oncleanup": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -131,6 +147,7 @@
     "bindings_events": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -139,6 +156,7 @@
     "bindings_style": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -147,6 +165,7 @@
     "bindings_classlist": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -155,6 +174,7 @@
     "bindings_refs": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -163,6 +183,7 @@
     "bindings_forward_refs": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -171,6 +192,7 @@
     "bindings_spreads": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -179,6 +201,7 @@
     "bindings_directives": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -187,6 +210,7 @@
     "props_defaults": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -195,6 +219,7 @@
     "props_split": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -203,6 +228,7 @@
     "props_children": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -211,6 +237,7 @@
     "stores_nested_reactivity": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -219,6 +246,7 @@
     "stores_createstore": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -227,6 +255,7 @@
     "stores_mutation": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -235,6 +264,7 @@
     "stores_context": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -243,6 +273,7 @@
     "stores_immutable": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -251,6 +282,7 @@
     "stores_nocontext": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -259,6 +291,7 @@
     "reactivity_batch": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -267,6 +300,7 @@
     "reactivity_untrack": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -275,6 +309,7 @@
     "reactivity_on": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -283,6 +318,7 @@
     "async_lazy": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -291,6 +327,7 @@
     "async_resources": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -299,6 +336,7 @@
     "async_suspense": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -307,6 +345,7 @@
     "async_suspense_list": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
@@ -315,6 +354,7 @@
     "async_transitions": [
       "de",
       "en",
+      "it",
       "ja",
       "ko-kr",
       "ru",
