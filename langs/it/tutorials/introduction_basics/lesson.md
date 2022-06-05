@@ -1,4 +1,4 @@
-# introduzione
+# Introduzione
 
 Questo tutorial interattivo ti guiderà e ti aiuterà a capire come funzionano gli API di Solid. Puoi anche guardare la lista di API e guide per imparare di più su come funziona Solid.
 
