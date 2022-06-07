@@ -1193,21 +1193,6 @@ const user = createMutable({
 });
 ```
 
-Adding or removing a property from the parent object would trigger an effect which may not be expected. This is done to support Iteration on objects, like Array.
-
-```js
-let state = createMutable({ nested: { a: 1 } });
-
-createEffect(
-  on(
-    () => state.nested.a,
-    () => console.log("could be unexpected")
-  )
-);
-
-setTimeout(() => (state.nested.b = 2)); // triggers effect
-```
-
 # Component APIs
 
 ## `createContext`
