@@ -10,210 +10,74 @@ Para usar su código Solid en producción, necesita probarse. Como no desea prob
 
 ## Configuración de pruebas
 
-Antes de configurar las pruebas, debe elegir su framework de pruebas. Hay una gran cantidad de opciones, pero nos centraremos en dos proyectos muy diferentes que son extremos opuestos, jest y uvu. Jest está fuertemente integrado, uvu solo trae lo básico necesario. Si desea utilizar otro corredor de pruebas, la configuración de uvu debería funcionar para la mayoría de los demás framework de pruebas.
+Ofrecemos soporte para dos herramientas para correr tests:
+
+- jest - Muy bien establecida y con muchas funcionalidades
+
+- uvu - Solo tiene lo mínimo y necesario
+
+Ambas opciones están basadas en [solid-testing-library](https://github.com/solidjs/solid-testing-library), que integra which integrates [Testing Library](https://testing-library.com/) a Solid. Testing Library simula un navegador liviano y provee una API para interactuar con el mismo desde tus tests.
+
+Mantenemos un template para empezar a usar tests con Jest en Solid. Recomendamos que tu proyecto se base en este template, o también puedes instalar el template en un proyecto nuevo y copiar su configuración a tu proyecto existente.
+
+Los templates usan la herramienta [degit](https://github.com/Rich-Harris/degit) para su instalación.
 
 ### Configurando Jest
 
-Desafortunadamente, aunque esté integrado, jest no admitirá esm o typescript de forma inmediata, sino que necesita configurar su transformador.
+La intragración de Jest se basa en la configuración de Jest [solid-jest/preset/browser](https://github.com/solidjs/solid-jest), la cual le permite usar Solid como si lo utilizara en el navegador. Esto usa Babel para transformar a código Solid.
 
-Las opciones principales son solid-jest, que usa babel para transformar el código de Solid, omitiendo las comprobaciones de tipo al probar si se usa TypeScript, y ts-jest, que usa el compilador de TypeScript y comprueba los tipos dentro de las pruebas.
+Utiliza [jest-dom](https://github.com/testing-library/jest-dom) para extender `expect` con muchos matchers personalizados para ayudarlo a escribir sus tests.
 
-Si no está utilizando TypeScript, use solid-jest; de lo contrario, elija si desea verificar los tipos mientras ejecuta sus pruebas o no.
+#### Jest con Typescript (`ts-jest`)
 
-#### Usando solid-jest
-
-Instala las dependencias requeridas:
-
-```sh
-> npm i --save-dev jest solid-jest # o yarn add -D o pnpm
+```bash
+$ npx degit solidjs/templates/ts-jest my-solid-project
+$ cd my-solid-project
+$ npm install # o pnpm install o yarn install
 ```
 
-Para TypeScript:
-
-```sh
-> npm i --save-dev jest solid-jest @types/jest # o yarn add -D o pnpm
-```
-
-A continuación, debe definir su `.babelrc` si aún no lo ha hecho:
-
-```js
-{
-  "presets": [
-    "@babel/preset-env",
-    "babel-preset-solid",
-    // solo si usas TS con solid-jest
-    "@babel/preset-typescript"
-  ]
-}
-```
-
-Y modifique su `package.json` para que se vea así:
-
-```js
-{
-  "scripts": {
-    // tus otros scripts van aquí
-    "test": "jest"
-  },
-  "jest": {
-    "preset": "solid-jest/preset/browser",
-
-    // inserte archivos de configuración y otras configuraciones
-  }
-}
-```
-
-#### Usando ts-jest
-
-Para usar ts-jest, necesitas instalarlo primero:
-
-```sh
-> npm i --save-dev jest ts-jest @types/jest # o yarn add -D o pnpm
-```
-
-Y después configurarlo en `package.json`:
-
-```js
-{
-  "scripts": {
-    // tus otros scripts van aquí
-    "test": "jest"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.json",
-        "babelConfig": {
-          "presets": [
-            "babel-preset-solid",
-            "@babel/preset-env"
-          ]
-        }
-      }
-    },
-    // inserte archivos de configuración y otras configuraciones
-    // probablemente quieras realizar las pruebas en modo navegador:
-    "testEnvironment": "jsdom",
-    // desafortunadamente, solid no puede detectar el modo navegador aquí,
-    // así que necesitamos indicarle las versiones correctas:
-    "moduleNameMapper": {
-      "solid-js/web": "<rootDir>/node_modules/solid-js/web/dist/web.cjs",
-      "solid-js": "<rootDir>/node_modules/solid-js/dist/solid.cjs"
-    }
-    // los usuarios de windows tienen que reemplazar "/" con "\"
-  }
-}
-```
-
-### TypeScript y Jest
-
-Dado que jest está inyectando sus instalaciones de prueba en el ámbito global, debe cargar sus tipos en tsconfig.json para satisfacer el compilador de TypeScript:
-
-```js
-{
-  // parte de tsconfig.json
-  "types": ["jest"]
-}
-```
-
-Esto requiere la instalación de `@types/jest` como se mencionó anteriormente.
+Notar que este template no tiene chequeo de tipos durante el testing; puedes usar un IDE o un comando personalizado `tsc --noEmit` en el archivo `package.json` para activar dichos chequeos.
 
 ### Configurando uvu
 
-Primero, necesita instalar los paquetes requeridos:
+También mantenemos un template para comenzar para `uvu`.
 
-```sh
-> npm i --save-dev uvu solid-register jsdom # o yarn add -D o pnpm
+Incluye [solid-dom-testing](https://www.npmjs.com/package/solid-dom-testing) para ayudar a escribir aserciones útiles con Testing Library.
+
+#### Uvu con Typescript (`ts-uvu`)
+
+```bash
+$ npx degit solidjs/templates/ts-uvu my-solid-project
+$ cd my-solid-project
+$ npm install # o pnpm install o yarn install
 ```
 
-Then setup your test script in `package.json`:
+#### Reportes de cobertura con Uvu
+
+> Desafortunadamente, debido a una [limitación de babel](https://github.com/babel/babel/issues/4289) no podemos obtener mapas de origen desde un JSX transpilado, lo que resulta en que los componentes muestren 0% de cobertura. Sí funciona para código que no contiene JSX.
+
+Si deseas tener cobertura de código en tus tests, la herramienta preferida para uvu es c8. Para instalarla y configurarla, corre:
 
 ```sh
-> npm set-script test "uvu -r solid-register"
-```
-
-Se pueden agregar archivos de configuración adicionales a través de `-r setup.ts`, ignore los que no son pruebas con `-i not-a-test.test.ts`.
-
-### Informes de cobertura
-
-Si desea verificar la cobertura de código de sus pruebas, la herramienta favorita para uvu es c8. Para instalarlo y configurarlo, ejecute:
-
-```sh
-> npm i --save-dev c8 # o yarn add -D o pnpm
+> npm i --save-dev c8 # or yarn add -D or pnpm
 > npm set-script "test:coverage" "c8 uvu -r solid-register"
 ```
 
-Ahora, si ejecutas `npm run test:coverage`, verá la cobertura de la prueba.
+Ahora, al correr `npm run test:coverage`, podrás ver la cobertura de tests para tu código.
 
-Si desea buenos informes de cobertura en HTML, puede
+Si deseas tener buenos reportes de cobertura para HTML, puedes usar `c8 -r html` en lugar de `c8` para habilitar los reportes html.
 
-### Modo Watch
+#### Modo Watch
 
-Ni `uvu` ni `tape` tienen un modo watch listo para usar, pero puedes usar `chokidar-cli` para hacer lo mismo:
+`uvu` no tiene un modo watch por defecto, pero puedes usar `chokidar-cli` para conseguir lo mismo:
 
 ```sh
 > npm i --save-dev chokidar-cli # o yarn add -D o pnpm
 > npm set-script "test:watch" "chokidar src/**/*.ts src/**/*.tsx -c \"uvu -r solid-register\"
-# use .js/.jsx instead of .ts/.tsx
+# use .js/.jsx en lugar de .ts/.tsx
 ```
 
-Ahora, si ejecuta `npm run test:watch`, las pruebas se ejecutarán cada vez que cambie un archivo.
-
-### solid-testing-library
-
-Si desea probar componentes, definitivamente debe instalar `solid-testing-library`:
-
-```sh
-> npm i --save-dev solid-testing-library # o yarn add -D o pnpm
-```
-
-Esto le permite renderizar sus componentes, disparar eventos y seleccionar elementos desde la perspectiva del usuario.
-
-### @testing-library/jest-dom
-
-Si estás usando jest, `solid-testing-library` funciona muy bien con `@testing-library/jest-dom`:
-
-```sh
-> npm i --save-dev @testing-library/jest-dom # o yarn add -D o pnpm
-```
-
-E importe las extensiones esperadas en un archivo de instalación:
-
-```ts
-// test/jest-setup.ts
-import "@testing-library/jest-dom/extend-expect";
-```
-
-Y carga eso en jest usando la siguiente entrada en package.json:
-
-```js
-{
-  "jest": {
-    // tus otros settings aquí
-    setupFiles: ["@testing-library/jest-dom/extend-expect", "regenerator-runtime"]
-  }
-}
-```
-
-Tampoco olvides incluir los types en `tsconfig.json`:
-
-```js
-{
-  // parte de tsconfig.json
-  "types": ["jest", "@testing-library/jest-dom"]
-}
-```
-
-### solid-dom-testing
-
-Si está utilizando otro framework de prueba como uvu o tape, hay algunos helpers de afirmación en `solid-dom-testing` que admiten afirmaciones similares:
-
-```sh
-> npm i --save-dev solid-dom-testing # o yarn add -D o pnpm
-```
-
-No se requiere configuración, puedes simplemente importar y usar los helpers en sus pruebas como mejor le parezca.
+Ahora, si corres `npm run test:watch`, las pruebas correran cada vez que cambies un archivo.
 
 ## Patrones de Prueba y Mejores Prácticas
 
@@ -483,7 +347,7 @@ export const Counter: Component = () => {
 };
 ```
 
-Definitivamente deberías instalar `solid-testing-library`, si aún no lo has hecho. Sus helpers más importantes son `render` para representar un componente en el dom de forma controlada, `fireEvent` para enviar eventos de forma que se asemeje a los eventos reales del usuario y `screen` para proporcionar selectores globales. Si usa jest, también debe instalar `@testing-library/jest-dom` y configurarlo para que tenga algunas afirmaciones útiles; de lo contrario, instale `solid-dom-testing` como se describe anteriormente.
+Aquí usamos `solid-testing-library`. Es muy importante que los helpers sean `render` para renderizar un componente de una forma controlada, `fireEvent` para despachar eventos de una forma similar a los eventos de usuario y `screen` para proveer selectores globales. También usamos aserciones útiles que fueron agregadas a `expect` provistas por `@testing-library/jest-dom`.
 
 #### Pruebas en Jest
 

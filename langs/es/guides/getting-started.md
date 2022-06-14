@@ -6,6 +6,14 @@ sort: 0
 
 # Empezando
 
+**Estamos trabajando en una nueva documentación. Puedes echar un vistazo a nuestro nuevo tutorial para principiantes [aquí](https://docs.solidjs.com/guides/getting-started-with-solid/welcome), y unete a nuestros esfuerzos en [Discord!](http://discord.com/invite/solidjs)
+
+## Mira Solid
+
+Para revisiones rápidas sore los conceptos principales de Solid, mira lo siguiente:
+- [Solid en 100 segundos](https://youtu.be/hw3Bx5vxKl0)
+- [Reactividad de Solid en 10 minutos](https://youtu.be/J70HXl1KhWE)
+
 ## Prueba Solid
 
 Por mucho, la forma mas fácil de empezar con Solid es probarlo online. Nuestro REPL en https://playground.solidjs.com es el lugar perfecto para probar ideas. Igual que https://codesandbox.io/ donde puedes modificar cualquiera de [nuestros Ejemplos](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
@@ -26,6 +34,27 @@ Si necesitas TypeScript:
 > cd nombre-app
 > npm i # o yarn o pnpm
 > npm run dev # o yarn o pnpm
+```
+
+O puedes instalar las dependencias en tu propio proyecto. Para usar Solid con JSX (recomendado), neceistarás instalar la librería `solid-js` de NPM y el [compilador de Solid JSX](https://github.com/ryansolid/dom-expressions/tree/main/packages/babel-plugin-jsx-dom-expressions) para babel:
+
+```sh
+> npm install solid-js babel-preset-solid
+```
+
+Luego, agrega `babel-preset-solid` a tu `.babelrc`, o a tu configuración de Babel en webpack o:
+
+```json
+"presets": ["solid"]
+```
+
+Para TypeScript, configura tu `tsconfig.json` para manejar el JSX provisto por Solid de la siguiente manera (mira la [guía de TypeScript](https://www.solidjs.com/guides/typescript) para más detalles):
+
+```json
+"compilerOptions": {
+  "jsx": "preserve",
+  "jsxImportSource": "solid-js",
+}
 ```
 
 ## Aprende Solid
@@ -89,30 +118,53 @@ Ya que Solid soporta renderizado asíncrono y streameable en el servidor, puedes
 
 Para mas información, lee la [Guía de Servidor](/guides/server#server-side-rendering).
 
-## Sin compilar?
+## Opciones sin compilar
 
-Te desagrada JSX? No te molesta hacer trabajo manual para envolver expresiones, experimentando un peor desempeño, tener tamaños de bundle mas grandes? Alternativamente, puedes crear una App Solid usando Tagged Template Literals o HyperScript en entornos no compilados.
+Si necesitas o prefieres usar Solid en un entorno sin compilar, como archivos HTML, https://codepen.io, etc, puedes usar [` html`` ` Tagged Template Literals](https://github.com/solidjs/solid/tree/main/packages/solid/html) o [HyperScript `h()` functions](https://github.com/solidjs/solid/tree/main/packages/solid/h) usando JavaScript puro en lugar de la sintaxis JSX optimizada de Solid.
 
 Puedes ejecutarlos directo en el navegador usando [Skypack](https://www.skypack.dev/):
 
 ```html
 <html>
-	<body>
-		<script type="module">
-			import { createSignal, onCleanup } from "https://cdn.skypack.dev/solid-js";
-			import { render } from "https://cdn.skypack.dev/solid-js/web";
-			import html from "https://cdn.skypack.dev/solid-js/html";
+  <body>
+    <script type="module">
+      import {
+        createSignal,
+        onCleanup,
+      } from "https://cdn.skypack.dev/solid-js";
+      import { render } from "https://cdn.skypack.dev/solid-js/web";
+      import html from "https://cdn.skypack.dev/solid-js/html";
 
-			const App = () => {
-				const [contador, setContador] = createSignal(0),
-					timer = setInterval(() => setCount(count() + 1), 1000);
-				onCleanup(() => clearInterval(timer));
-				return html`<div>${contador}</div>`;
-			};
-			render(App, document.body);
-		</script>
-	</body>
+      const App = () => {
+        const [count, setCount] = createSignal(0),
+          timer = setInterval(() => setCount(count() + 1), 1000);
+        onCleanup(() => clearInterval(timer));
+        return html`<div>${count}</div>`;
+        // o
+        return h("div", {}, count);
+      };
+      render(App, document.body);
+    </script>
+  </body>
 </html>
 ```
+
+Las ventajas de usar Solid sin compilar tiene algunos puntos a considerar:
+
+- Las expresiones siempre tienen que estar contenidas en una función getter o no serán reactivas.
+El siguiente ejemplo no se actualizará cuando los valores de `first` ni `last` cambien ya que los valores no están siendo accedidos dentro de un efecto que el template crea internamente, por lo tanto, las dependencias no serán observadas:
+  ```js
+  html` <h1>Hola ${first() + " " + last()}</h1> `;
+  // o
+  h("h1", {}, "Hola ", first() + " " + last());
+  ```
+El siguiente ejemplo se actualizará cómo se espera cuando los valores de `first` o `last` cambien porque el template va a leer dichos valores desde una función getter dentro de un effect y las dependencias se observarán:
+  ```js
+  html` <h1>Hola ${() => first() + " " + last()}</h1> `;
+  // o
+  h("h1", {}, "Hola ", () => first() + " " + last());
+  ```
+La sintaxis JSX de Solid no tiene este problema porque, gracias a sus habilidades en tiempo de compilación, una expresión como `<h1>Hola {first() + ' ' + last()}</h1>` va a ser reactiva.
+- Las optimizaciónes en tiempo de build no estarán presentes a diferencia de si usaramos la sintáxis JSX de Solid, lo que significa que la aplicación empezará a correr en un tiempo un poco mayor ya que cada template es compilado en tiempo de ejecución la primera vez que es ejecutado, pero para muchos usos este golpe de rendimiento es casi inperceptible. La velocidad luego de que la aplicación está corriendo va a ser la misma tanto para templates ` html`` ` como para JSX. Las llamadas `h()` siempre serán más lentas debido a la que no se puede analizar estáticamente todas las templates antes de que sean ejecutadas.
 
 Recuerda que aún necesitaras la correspondiente librería de expresiones DOM para que estos funciones con TypeScript. Puedes usar Tagged Template Literals con [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) o HyperScript usando [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions).

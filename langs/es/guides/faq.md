@@ -40,9 +40,49 @@ Por ejemplo, si se intercambian dos elementos del array, `<For>` reubicará los 
 
 Para ver una demostración detallada de la diferencia, consulte [este segmento](https://www.youtube.com/watch?v=YxroH_MXuhw&t=2164s) del stream de Ryan.
 
-### ¿Por qué la desestructuración no funciona con props o stores?
+### ¿Por qué pierdo reactividad cuando uso desestructuración en el objeto props?
 
-Con props y store objects, la reactividad se rastrea en el acceso a la propiedad: cuando llamas a `props.loquesea` dentro de un contexto reactivo, le dice a Solid que realice un seguimiento de ese contexto y lo actualice cuando cambie la prop. Al desestructurar, separa el valor del objeto, lo que le da el valor en ese momento y pierde reactividad.
+Con un objeto props, la reactividad se da gracias al seguimiento de acceso a una propiedad.
+Si accedes a una propiedad dentro de un _tracking scope_,
+como una expresión JSX o un efecto, entonces, la expresión JSX se volverá a renderizar o el efecto se volverá a ejecutar cuando esa propiedad cambie.
+
+En este ejemplo, el acceso a la propiedad ocurre dentro de un template JSX, por lo tanto, se le realiza un seguimiento y el contenido del texto es actualizado cuando la señal cambia:
+
+```jsx
+function TextoAzul(props) {
+  return (
+    <span style="color: blue">{props.text}</span>
+  );
+}
+...
+<TextoAzul text={mySignal()}/>
+```
+
+Pero en ningúno de estos ejemplos se actualiza el texto debido a que la propiedad se accede por fuera del template:
+
+```jsx
+function TextoAzul(props) {
+  const text = props.text;
+  return (
+    <span style="color: blue">{text}</span>
+  );
+}
+...
+<TextoAzul text={mySignal()}/>
+```
+
+```jsx
+function TextoAzul({text}) {
+  return (
+    <span style="color: blue">{text}</span>
+  );
+}
+...
+<TextoAzul text={mySignal()}/>
+```
+
+Si prefieres usar desestructuración, existen dos plugins de Babel que permiten usar reactividad y desestructuración: [babel-plugin-solid-undestructure](https://github.com/orenelbaum/babel-plugin-solid-undestructure)
+y [Solid Labels'](https://github.com/LXSMNSYC/solid-labels) [object features](https://github.com/LXSMNSYC/solid-labels/blob/main/docs/ctf.md#objects).
 
 ### ¿Por qué mi controlador de eventos `onChange` no se activa a tiempo?
 
@@ -81,5 +121,11 @@ Por supuesto. Si bien no hemos exportado un paquete independiente, es fácil ins
 Para enumerar algunos para probar: [Solid](https://github.com/solidjs/solid), [MobX](https://github.com/mobxjs/mobx), [Knockout](https://github .com/knockout/knockout), [Svelte](https://github.com/sveltejs/svelte), [S.js](https://github.com/adamhaile/S), [CellX](https: //github.com/Riim/cellx), [Derivable](https://github.com/ds300/derivablejs), [Sinuous](https://github.com/luwes/sinuous), e incluso recientemente [Vue ](https://github.com/vuejs/vue). Se necesita mucho más para crear una biblioteca reactiva que etiquetarla en un renderizador como [lit-html](https://github.com/Polymer/lit-html), por ejemplo, pero es una buena manera de hacerse a la idea.
 
 ### ¿Solid tiene Next.js o Material Components como biblioteca que pueda usar?
+
+Estamos trabajando en [SolidStart](https://github.com/solidjs/solid-start), que está en nuestra solución SSR para empezar similar a Next.js o SvelteKit.
+
+En cuanto a librerías de componentes, tenemos [SUID](https://suid.io/) para Material, [Hope UI](https://hope-ui.com/) para soluciones similares a Chakra, [Solid Bootstrap](https://solid-libs.github.io/solid-bootstrap/) y muchas más. Echale un vistazo a nuestro [creciente ecosistema de librerías y herramientas](https://www.solidjs.com/ecosystem).
+
+Si estás interesado en construir tu propio ecosistema de herramientas, estamos disponibles en nuestro [Discord](https://discord.com/invite/solidjs), donde puedes sumarte a los esfuerzos para ecosistemas existentes o comenzar el tuyo.
 
 ¡Están en proceso! Si está interesado en construir uno, estamos disponibles en nuestro [Discord] (https://discord.com/invite/solidjs), donde puede unirse a los esfuerzos del ecosistema existente o comenzar el suyo propio.
