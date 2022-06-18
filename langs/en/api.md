@@ -932,6 +932,8 @@ As proxies, store objects only track when a property is accessed.
 
 When nested objects are accessed, stores will produce nested store objects, and this applies all the way down the tree. However, this only applies to arrays and plain objects. Classes are not wrapped, so objects like `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` won't be granularly reactive as properties on a store.
 
+#### Arrays in stores
+
 As of version **1.4.0**, the top level state object can be an array. In prior versions, create an object to wrap the array:
 
 ```jsx
@@ -955,12 +957,17 @@ const [state, setState] = createStore({
 <For each={state.todos}>{(todo) => <Todo todo={todo} />}<For>;
 ```
 
-```js
-// put the list as a key on the state object
-const [state, setState] = createStore({ list: [] });
+Note that modifying an array inside a store will not trigger computations that subscribe to the array directly. For example:
 
-// access the `list` property on the state object
-<For each={state.list}>{item => /*...*/}</For>
+```js
+createEffect(() => {
+  console.log(state.todos);
+});
+
+//This will not trigger the effect:
+setState(todos, state.todos.length, { id: 3 });
+//This will trigger the effect, because the array reference changes:
+setState("todos", (prev) => [...prev, { id: 3 }]);
 ```
 
 ### Getters
@@ -1295,7 +1302,7 @@ has some important advantages in some scenarios.
 The underlying issue is that, when you specify component children via JSX,
 Solid automatically defines `props.children` as a property getter,
 so that the children are created (in particular, DOM is created)
-whenever `props.children` gets accessed.  Two particular consequences:
+whenever `props.children` gets accessed. Two particular consequences:
 
 - If you access `props.children` multiple times, the children
   (and associated DOM) get created multiple times.
@@ -1330,10 +1337,8 @@ const resolved = children(() => props.children);
 
 createEffect(() => {
   let list = resolved();
-  if (!Array.isArray(list))
-    list = [list];
-  for (let child of list)
-    child?.setAttribute?.('class', myClass());
+  if (!Array.isArray(list)) list = [list];
+  for (let child of list) child?.setAttribute?.("class", myClass());
 });
 
 return <div>{resolved()}</div>;
@@ -1356,17 +1361,13 @@ const Wrapper = (props) => {
 An important aspect of the `children` helper is that it forces the children
 to be created and resolved, as it accesses `props.children` immediately.
 This can be undesirable for conditional rendering,
-e.g., when using the children within a [`<Show>`](#&lt;show&gt;) component.
+e.g., when using the children within a [`<Show>`](#<show>) component.
 For example, the following code always evaluates the children:
 
 ```tsx
 const resolved = children(() => props.children);
 
-return (
-  <Show when={visible()}>
-    {resolved()}
-  </Show>
-);
+return <Show when={visible()}>{resolved()}</Show>;
 ```
 
 To evaluate the children only when `<Show>` would render them, you can
@@ -1612,7 +1613,7 @@ the returned `dispose` function will remove all children.
 ```js
 const dispose = render(App, document.getElementById("app"));
 // or
-const dispose = render(() => <App/>, document.getElementById("app"));
+const dispose = render(() => <App />, document.getElementById("app"));
 ```
 
 It's important that the first argument is a function: do not pass JSX directly
@@ -1747,7 +1748,7 @@ Development mode provides some additional checking — e.g. detecting accidental
 use of multiple instances of Solid — which are removed in production builds.
 
 If you want code to run only in development mode (most useful in libraries),
-you can check whether the `DEV` export is defined.  Note that it is always
+you can check whether the `DEV` export is defined. Note that it is always
 defined on the server, so you may want to combine with [`isServer`](#isserver):
 
 ```ts
@@ -2100,7 +2101,7 @@ function App() {
 Solid offers two ways to set the `class` of an element:
 `class` and `classList` attributes.
 
-First, you can set `class=...` like any other attribute.  For example:
+First, you can set `class=...` like any other attribute. For example:
 
 ```jsx
 // Two static classes
@@ -2134,16 +2135,16 @@ For example, when `state.active` becomes `true` [`false`], the element gains
 [loses] the `active` class.
 
 The value passed into `classList` can be any expression (including a signal
-getter) that evaluates to an appropriate object.  Some examples:
+getter) that evaluates to an appropriate object. Some examples:
 
 ```jsx
 // Dynamic class name and value
-<div classList={{ [className()]: classOn() }} />
+<div classList={{ [className()]: classOn() }} />;
 
 // Signal class list
 const [classes, setClasses] = createSignal({});
-setClasses((c) => ({...c, active: true}));
-<div classList={classes()} />
+setClasses((c) => ({ ...c, active: true }));
+<div classList={classes()} />;
 ```
 
 It's also possible, but dangerous, to mix `class` and `classList`.
