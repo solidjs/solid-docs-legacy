@@ -3,7 +3,9 @@ title: はじめに
 description: Solid を使い始めるためのガイド
 sort: 0
 ---
+
 # はじめに
+
 ## Solid を試す
 
 Solid を使い始める最も簡単な方法は、オンラインで試すことです。https://playground.solidjs.com の REPL は、アイデアを試すのに最適な方法です。また、いくつかの[サンプル](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md)を編集できる https://codesandbox.io/ もあります。
@@ -53,7 +55,7 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-[Solid のリアクティビティ](#リアクティビティ)と [Solid のレンダリング](#レンダリング)の詳細をご覧いただけます。
+[Solid のリアクティビティ](/guides/reactivity)と [Solid のレンダリング](/guides/rendering)の詳細をご覧いただけます。
 
 ## Solid に考える
 
@@ -85,7 +87,7 @@ Solid は、真のアイソモーフィックな開発を可能にする動的�
 
 Solid はサーバー上での非同期レンダリングとストリームレンダリングをサポートしているため、コードを一方的に記述し、それをサーバー上で実行できます。つまり、[render-as-you-fetch](https://reactjs.org/docs/concurrent-mode-suspense.html#approach-3-render-as-you-fetch-using-suspense) やコード分割などの機能が Solid でも機能するということです。
 
-詳細については、[サーバーガイド](#サーバーサイドレンダリング)をご覧ください。
+詳細については、[サーバーガイド](/guides/server#サーバーサイドレンダリング)をご覧ください。
 
 ## コンパイルなし？
 
