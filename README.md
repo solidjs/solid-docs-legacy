@@ -13,15 +13,15 @@ Solid's documentation is available in 10 languages:
 | Language           | API Documentation | Guides | Tutorials | Contibutors                                                                                                                                                                |
 | ------------------ | ----------------- | ------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🇫🇷 French (fr)     | 100%              | 100%   | 0%        | [xstevenyung](https://github.com/xstevenyung)                                                                                                                              |
-| 🇮🇹 Italian (it)    | 100%              | 100%   | 0%        | [davedbase](https://github.com/davedbase)                                                                                                                                  |
+| 🇮🇹 Italian (it)    | 100%              | 100%   | 0%        | [davedbase](https://github.com/davedbase), [Nusakan](https://github.com/GabrielMarisescu),                                                                                 |
 | 🇵🇹 Portuguese (pt) | 100%              | 100%   | 0%        | [candidosales](https://github.com/candidosales)                                                                                                                            |
 | 🇨🇳 Chinese (zh-cn) | 100%              | 100%   | 100%      | [Gavin-Gong](https://github.com/Gavin-Gong)                                                                                                                                |
 | 🇯🇵 Japanese (ja)   | 100%              | 100%   | 100%      | [jay-es](https://github.com/jay-es)                                                                                                                                        |
-| 🇪🇸 Spanish (es)    | 10%               | 0%     | 0%        | [jnfrati](https://github.com/jnfrati)                                                                                                                                      |
+| 🇪🇸 Spanish (es)    | 10%               | 0%     | 0%        | [jnfrati](https://github.com/jnfrati), [augusto1024](https://github.com/augusto1024)                                                                                       |
 | 🇮🇩 Indonesian (id) | 100%              | 100%   | 0%        | [athif23](https://github.com/athif23)                                                                                                                                      |
 | 🇩🇪 German (de)     | 100%              | 100%   | 100       | [atk](https://github.com/atk)                                                                                                                                              |
 | 🇷🇺 Russian (ru)    | 100%              | 100%   | 100%      | [Pheianox](https://github.com/pheianox), [TheFedaikin](https://github.com/TheFedaikin), [nairabrab](https://github.com/nairabrab), [Norskeld](https://github.com/norskeld) |
-| 🇰🇷 Korean (ko-kr)  | 100%              | 100%   | 100%      | [LechuckRoh](https://github.com/lechuckroh)                             |
+| 🇰🇷 Korean (ko-kr)  | 100%              | 100%   | 100%      | [LechuckRoh](https://github.com/lechuckroh)                                                                                                                                |
 
 # Support
 
@@ -33,6 +33,7 @@ To start a translation project, create a folder with the language code in the `l
 If you feel the documentation is missing anything important, please feel free to open an issue or submit a modifying PR.
 
 # Language READMEs
+
 Each language folder has a `README.md` file that lets you know what changes have been made to the English documentation since the language has been updated.
 The tables are automatically updated using [`markdown-magic`](https://github.com/DavidWells/markdown-magic) when a commit is made to the main branch.
 Note that the READMEs are only updated on the main branch.
@@ -40,6 +41,7 @@ Note that the READMEs are only updated on the main branch.
 (If you create a new language folder, it will automatically get a `README.md` file when the PR is merged.)
 
 These READMEs are also a place for translation maintainers to write any notes about their translation.
+
 # Building
 
 This package serves to build the markdown files into a consumable format imported by [solid-site](https://github.com/solidjs/solid-site).
@@ -55,37 +57,43 @@ The script mentioned above uses shiki to process the code which in turn uses VSC
 All you have to do is retrieve the JSON file describing your favorite theme (see ./build/github-light.json for an example), paste it into the build folder and refer to it in the fetchReleases.ts file around line 158: const theme = await loadTheme(resolve(\_\_dirname, 'your-theme.json'));.
 
 ## Importing Docs and Tutorials
+
 This section probably won't be relevant unless you're working on solid-site.
 The package exposes async functions to load the documentation using dynamic imports.
 
 ```ts
 getSupported(resourcePath: string, lang?: string)
 ```
+
 Takes a _resource path_ and returns a list of language codes that support that resource.
 If passed a language code, it will return `true` if that language supports the resource.
 
 ```js
-getSupported("tutorials/async_lazy") //[ 'de', 'en', 'ja', 'ru', 'zh-cn' ]
-getSupported("guides/comparison", "fr") // true
+getSupported('tutorials/async_lazy'); //[ 'de', 'en', 'ja', 'ru', 'zh-cn' ]
+getSupported('guides/comparison', 'fr'); // true
 ```
+
 Resource paths follow the directory structure of the language folders.
 Currently, there are guide resources (`guides/name`), tutorial resources (`tutorials/name`), and the API resource (`api`).
 
 ```ts
 getAllResourcePaths(lang: string): Promise<string[]>
 ```
+
 Returns a list of all resource paths for a given language.
 
 ```ts
 getGuides(lang: string): Promise<Array<{resource: string, title: string, description: string}>>
 ```
+
 Takes a language code and returns an array of metadata for all supported guides. The array is sorted by the sort number in the
 guide metadata.
 
 ```ts
 getDoc(lang: string, resource: string): Promise<DocFile | false>
 ```
-Takes a language code matching a `langs` subdirectory and a resource name and returns a documentation file (see `src/types.ts`) if it exists. 
+
+Takes a language code matching a `langs` subdirectory and a resource name and returns a documentation file (see `src/types.ts`) if it exists.
 Use this to get the compiled output for all resources except tutorials.
 
 ```ts

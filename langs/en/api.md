@@ -258,7 +258,7 @@ Thus you can use an effect to manipulate the DOM manually,
 call vanilla JS libraries, or other side effects.
 
 Note that the first run of the effect still runs before the browser renders
-the DOM to the screen (similar to React's `createLayoutEffect`).
+the DOM to the screen (similar to React's `useLayoutEffect`).
 If you need to wait until after rendering (e.g., to measure the rendering),
 you can use `await Promise.resolve()` (or `Promise.resolve().then(...)`),
 but note that subsequent use of reactive state (such as signals)
@@ -1164,7 +1164,7 @@ import { createMutable } from 'solid-js/store';
 
 function createMutable<T extends StoreNode>(
   state: T | Store<T>,
-): Store<T> {
+): Store<T>;
 ```
 
 Creates a new mutable Store proxy object. Stores only trigger updates on values changing. Tracking is done by intercepting property access and automatically tracks deep nesting via proxy.
@@ -1198,21 +1198,6 @@ const user = createMutable({
     [this.firstName, this.lastName] = value.split(" ");
   },
 });
-```
-
-Adding or removing a property from the parent object would trigger an effect which may not be expected. This is done to support Iteration on objects, like Array.
-
-```js
-let state = createMutable({ nested: { a: 1 } });
-
-createEffect(
-  on(
-    () => state.nested.a,
-    () => console.log("could be unexpected")
-  )
-);
-
-setTimeout(() => (state.nested.b = 2)); // triggers effect
 ```
 
 # Component APIs
