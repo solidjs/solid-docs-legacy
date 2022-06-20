@@ -1,8 +1,8 @@
 Signals are trackable values, but they are only one half of the equation. To complement those are observers that can be updated by those trackable values. An _effect_ is one such observer; it  runs a side effect that depends on signals.
 
-An effect can be created by importing `createEffect` from `solid-js` and providing it a function. The effect automatically subscribes to any signal that is read during the function's execution and reruns when any of them change.
+An effect can be created by importing `createEffect` from `solid-js` and providing it a function. The effect automatically subscribes to any signal that is read during the function's execution and returns when any of them change.
 
-So let's create an Effect that reruns whenever `count` changes:
+So let's create an Effect that returns whenever `count` changes:
 
 ```jsx
 createEffect(() => {
