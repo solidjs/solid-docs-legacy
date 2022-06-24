@@ -912,6 +912,7 @@ import type { StoreNode, Store, SetStoreFunction } from "solid-js/store";
 function createStore<T extends StoreNode>(
   state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
+type Store<T> = T;  // conceptually readonly, but not typed as such
 ```
 
 The create function takes an initial state, wraps it in a store, and returns a readonly proxy object and a setter function.
