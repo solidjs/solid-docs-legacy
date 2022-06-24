@@ -1201,6 +1201,78 @@ const user = createMutable({
 });
 ```
 
+### `modifyMutable`
+
+**New in v1.4.0**
+
+```ts
+import { modifyMutable } from 'solid-js/store';
+
+function modifyMutable<T>(mutable: T, modifier: (state: T) => T): void;
+```
+
+This helper function simplifies making multiple changes to a mutable Store
+(as returned by [`createMutable`](#createmutable))
+in a single [`batch`](#batch),
+so that dependant computations update just once instead of once per update.
+The first argument is the mutable Store to modify,
+and the second argument is a Store modifier such as those returned by
+[`reconcile`](#reconcile) or [`produce`](#produce).
+
+For example, suppose we have a UI depending on multiple fields of a mutable:
+
+```tsx
+const state = createMutable({
+  user: {
+    firstName: "John",
+    lastName: "Smith",
+  },
+});
+
+<h1>Hello {state.user.firstName + ' ' + state.user.lastName}</h1>
+```
+
+Modifying *n* fields in sequence will cause the UI to update *n* times:
+
+```ts
+state.user.firstName = "Jake";  // triggers update
+state.user.lastName = "Johnson";  // triggers another update
+```
+
+To trigger just a single update, we could modify the fields in a `batch`:
+
+```ts
+batch(() => {
+  state.user.firstName = "Jake";  // triggers update
+  state.user.lastName = "Johnson";  // triggers another update
+  // state.user.firstName is still the old value "John" here
+});
+```
+
+`modifyMutable` combined with `reconcile` or `produce`
+provides two alternate ways to do similar things:
+
+```ts
+// Replace state.user with the specified object (deleting any other fields)
+modifyMutable(state.user, reconcile({
+  firstName: "Jake",
+  lastName: "Johnson",
+});
+
+// Modify two fields in batch, triggering just one update
+modifyMutable(state, produce((s) => {
+  s.user.firstName = "Jake";  // triggers update
+  s.user.lastName = "Johnson";  // triggers another update
+  // s.user.firstName is the new value "Jake" here!
+});
+```
+
+In particular, `modifyMutable(state, produce((s) => { ... }))` avoids
+the counterintuitive behavior that the mutable Store has its old values
+within `batch`; within `produce`, all values are their latest.
+This makes this pattern suitable for wrapping code that is expecting
+a regular object instead of being aware of reactivity.
+
 # Component APIs
 
 ## `createContext`
