@@ -1271,9 +1271,11 @@ modifyMutable(state, produce((s) => {
 
 In particular, `modifyMutable(state, produce((s) => { ... }))` avoids
 the counterintuitive behavior that the mutable Store has its old values
-within `batch`; within `produce`, all values are their latest.
+within `batch`, even if it is wrapped within another `batch`:
+within the `{ ... }` code block, all Store values are their latest.
 This makes this pattern suitable for wrapping code that is expecting
-a regular object instead of being aware of reactivity.
+a regular object instead of being aware of reactivity, which can otherwise
+behave poorly when it is wrapped within `batch` or an effect.
 
 # Component APIs
 
