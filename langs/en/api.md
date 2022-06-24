@@ -1218,6 +1218,8 @@ so that dependant computations update just once instead of once per update.
 The first argument is the mutable Store to modify,
 and the second argument is a Store modifier such as those returned by
 [`reconcile`](#reconcile) or [`produce`](#produce).
+(If you pass in your own modifier function, beware that its argument is
+an unwrapped version of the Store.)
 
 For example, suppose we have a UI depending on multiple fields of a mutable:
 
