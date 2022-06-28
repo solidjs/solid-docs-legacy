@@ -527,7 +527,7 @@ import { batch } from "solid-js";
 function batch<T>(fn: () => T): T;
 ```
 
-Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method and Effects automatically wrap their code in a batch.
+Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method, [Mutable Store](#createmutable)'s array methods, and Effects automatically wrap their code in a batch.
 
 ## `on`
 
@@ -1198,6 +1198,72 @@ const user = createMutable({
   set fullName(value) {
     [this.firstName, this.lastName] = value.split(" ");
   },
+});
+```
+
+### `modifyMutable`
+
+**New in v1.4.0**
+
+```ts
+import { modifyMutable } from 'solid-js/store';
+
+function modifyMutable<T>(mutable: T, modifier: (state: T) => T): void;
+```
+
+This helper function simplifies making multiple changes to a mutable Store
+(as returned by [`createMutable`](#createmutable))
+in a single [`batch`](#batch),
+so that dependant computations update just once instead of once per update.
+The first argument is the mutable Store to modify,
+and the second argument is a Store modifier such as those returned by
+[`reconcile`](#reconcile) or [`produce`](#produce).
+(If you pass in your own modifier function, beware that its argument is
+an unwrapped version of the Store.)
+
+For example, suppose we have a UI depending on multiple fields of a mutable:
+
+```tsx
+const state = createMutable({
+  user: {
+    firstName: "John",
+    lastName: "Smith",
+  },
+});
+
+<h1>Hello {state.user.firstName + ' ' + state.user.lastName}</h1>
+```
+
+Modifying *n* fields in sequence will cause the UI to update *n* times:
+
+```ts
+state.user.firstName = "Jake";  // triggers update
+state.user.lastName = "Johnson";  // triggers another update
+```
+
+To trigger just a single update, we could modify the fields in a `batch`:
+
+```ts
+batch(() => {
+  state.user.firstName = "Jake";  // triggers update
+  state.user.lastName = "Johnson";  // triggers another update
+});
+```
+
+`modifyMutable` combined with `reconcile` or `produce`
+provides two alternate ways to do similar things:
+
+```ts
+// Replace state.user with the specified object (deleting any other fields)
+modifyMutable(state.user, reconcile({
+  firstName: "Jake",
+  lastName: "Johnson",
+});
+
+// Modify two fields in batch, triggering just one update
+modifyMutable(state.user, produce((u) => {
+  u.firstName = "Jake";  // triggers update
+  u.lastName = "Johnson";  // triggers another update
 });
 ```
 
