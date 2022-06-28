@@ -1247,7 +1247,6 @@ To trigger just a single update, we could modify the fields in a `batch`:
 batch(() => {
   state.user.firstName = "Jake";  // triggers update
   state.user.lastName = "Johnson";  // triggers another update
-  // state.user.firstName is still the old value "John" here
 });
 ```
 
@@ -1262,20 +1261,11 @@ modifyMutable(state.user, reconcile({
 });
 
 // Modify two fields in batch, triggering just one update
-modifyMutable(state, produce((s) => {
-  s.user.firstName = "Jake";  // triggers update
-  s.user.lastName = "Johnson";  // triggers another update
-  // s.user.firstName is the new value "Jake" here!
+modifyMutable(state.user, produce((u) => {
+  u.firstName = "Jake";  // triggers update
+  u.lastName = "Johnson";  // triggers another update
 });
 ```
-
-In particular, `modifyMutable(state, produce((s) => { ... }))` avoids
-the counterintuitive behavior that the mutable Store has its old values
-within `batch`, even if it is wrapped within another `batch`:
-within the `{ ... }` code block, all Store values are their latest.
-This makes this pattern suitable for wrapping code that is expecting
-a regular object instead of being aware of reactivity, which can otherwise
-behave poorly when it is wrapped within `batch` or an effect.
 
 # Component APIs
 
