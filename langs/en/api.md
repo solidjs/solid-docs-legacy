@@ -1245,8 +1245,8 @@ To trigger just a single update, we could modify the fields in a `batch`:
 
 ```ts
 batch(() => {
-  state.user.firstName = "Jake";  // triggers update
-  state.user.lastName = "Johnson";  // triggers another update
+  state.user.firstName = "Jake";
+  state.user.lastName = "Johnson";
 });
 ```
 
@@ -1262,8 +1262,8 @@ modifyMutable(state.user, reconcile({
 
 // Modify two fields in batch, triggering just one update
 modifyMutable(state.user, produce((u) => {
-  u.firstName = "Jake";  // triggers update
-  u.lastName = "Johnson";  // triggers another update
+  u.firstName = "Jake";
+  u.lastName = "Johnson";
 });
 ```
 
