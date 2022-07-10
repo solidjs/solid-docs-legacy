@@ -1,9 +1,3 @@
----
-title: Renderização
-description: Discute os diferentes modelos e opções de renderização em Solid.
-sort: 2
----
-
 # Renderização
 
 Solid oferece suporte a modelos em 3 formas JSX, Tagged Template Literals e variante de HyperScript do Solid, embora JSX seja a forma predominante. Por quê? JSX é um ótimo DSL feito para compilação. Tem sintaxe clara, suporta TypeScript, funciona com Babel e suporta outras ferramentas como Code Syntax Highlighting e Prettier. Foi muito pragmático usar uma ferramenta que basicamente oferece tudo isso de graça. Como uma solução compilada, fornece excelente DX. Por que lutar com DSLs de sintaxe personalizados quando você pode usar um com suporte tão amplo?

@@ -1,9 +1,3 @@
----
-title: Pendahuluan
-description: Panduan untuk cara memulai menggunakan Solid.
-sort: 0
----
-
 # Pendahuluan
 
 ## Mencoba Solid

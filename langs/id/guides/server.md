@@ -1,9 +1,3 @@
----
-title: Server
-description: Penjelasan tentang kemampuan sisi-server Solid.
-sort: 3
----
-
 # Rendering di Server
 
 Solid menangani rendering di Server dengan mengkompilasi template JSX menjadi kode string yang akan ditambahkan dengan sangat effisien. Kita dapat melakukannya dengan menggunakan plugin babel atau dengan memasukkan `generate: "ssr"` ke presetnya. Untuk mengenerasi kode hydration yang cocok untuk klien dan server kamu bisa memasukkan `hydratable: true`.

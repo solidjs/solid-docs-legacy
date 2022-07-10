@@ -1,9 +1,3 @@
----
-title: 入门指南
-description: Solid 入门指南。
-sort: 0
----
-
 # 入门指南
 
 ## 使用 Solid

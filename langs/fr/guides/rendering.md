@@ -1,9 +1,3 @@
----
-title: Rendu
-description: Discussion entre les différentes options de template et de rendu avec Solid
-sort: 2
----
-
 # Rendu
 
 Solid supporte 3 formes de template JSX, Tagged Template Literals et sa propre variation de HyperScript, même si JSX est la forme prédominante. Pourquoi ? JSX est un super DSL fait pour la compilation. Il possède une syntaxe claire, supporte TypeScript, fonctionne avec Babel et supporte d'autres outils comme le Surlignage Syntaxique et Prettier. Il est pragmatique d'utiliser un outil qui vous donne tout cela inclus. En tant que solution compilée, il offre une expérience développeur géniale. Pourquoi s'embêter avec une syntaxe DSL personnalisée quand vous pouvez en utiliser une qui est déjà supportée à grande échelle ?

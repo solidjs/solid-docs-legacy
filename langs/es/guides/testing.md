@@ -1,9 +1,3 @@
----
-title: Testeando Solid
-description: Como realizar pruebas a tu app Solid
-sort: 4
----
-
 # Testeando Solid
 
 Para usar su código Solid en producción, necesita probarse. Como no desea probar todo manualmente, necesita pruebas automatizadas. Probar el código sólido puede ser simple, una vez que haya configurado todo y conozca algunos patrones útiles para las pruebas.

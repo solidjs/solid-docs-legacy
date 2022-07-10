@@ -1,9 +1,3 @@
----
-title: Reaktivität
-description: Vollständige Zusammenfassung von Solids Reaktivität.
-sort: 1
----
-
 # Reaktivität
 
 Die Datenverwaltung in Solid baut auf einer Reihe von flexiblen reaktiven Primitiven auf, die verantwortlich für alle Updates sind. Sie nimmt dazu einen sehr ähnlichen Ansatz wie MobX oder Vue, außer dass die Granularität nicht zugunsten eines VDOM eingeschränkt wird. Abhängigkeiten werden automatisch verfolgt wenn die reaktiven Werte in den Effekten und im JSX-Code ausgelesen werden.

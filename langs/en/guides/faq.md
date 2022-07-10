@@ -1,9 +1,3 @@
----
-title: FAQ
-description: Frequently asked questions from the community.
-sort: 6
----
-
 # FAQ
 
 ### JSX without a virtual DOM? Is this vaporware? I've heard prominent voices say that this isn't possible.

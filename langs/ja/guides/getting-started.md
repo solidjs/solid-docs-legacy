@@ -1,9 +1,3 @@
----
-title: はじめに
-description: Solid を使い始めるためのガイド
-sort: 0
----
-
 # はじめに
 
 ## Solid を試す

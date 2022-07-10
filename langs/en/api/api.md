@@ -1,9 +1,3 @@
----
-title: API
-description: Description of all of Solid's API
-sort: 0
----
-
 # Basic Reactivity
 
 Solid's overall approach to reactivity is to wrap any reactive computation in

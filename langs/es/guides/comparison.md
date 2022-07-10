@@ -1,9 +1,3 @@
----
-title: Comparaciones
-description: Comparaciones de Solid contra otros frameworks.
-sort: 5
----
-
 # Comparaciones con otros frameworks
 
 Esta sección no puede escapar a cierto sesgo, pero creo que es importante entender dónde se encuentra la solución de Solid en comparación con otras bibliotecas. Esto no se trata de rendimiento. Para obtener una visión definitiva del rendimiento, no dude en consultar [JS Framework Benchmark] (https://github.com/krausest/js-framework-benchmark).

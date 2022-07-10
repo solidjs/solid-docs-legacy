@@ -1,9 +1,3 @@
----
-title: Reactivity
-description: Full rundown of Solid's reactivity.
-sort: 1
----
-
 # Reactivity
 
 Solid's data management is built off a set of flexible reactive primitives which are responsible for all the updates. It takes a very similar approach to MobX or Vue except it never trades its granularity for a VDOM. Dependencies are automatically tracked when you access your reactive values in your Effects and JSX View code.

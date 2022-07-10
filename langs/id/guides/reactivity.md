@@ -1,9 +1,3 @@
----
-title: Reaktifitas
-description: Penjelasan lengkap tentang reaktifitas Solid.
-sort: 1
----
-
 # Reaktifitas
 
 Manajemen data pada Solid dibuat dari seperangkat primitif-primitif reaktif yang fleksibel yang akan bertanggung jawab untuk semua pembaruan. Ini hampir sama yang dilakukan MobX atau Vue kecuali kita tidak mengorbankan granularitas untuk VDOM. Dependencies secara otomatis akan dilacak ketika kamu mengakses nilai reaktif kamu di Effects kamu dan kode JSX View.

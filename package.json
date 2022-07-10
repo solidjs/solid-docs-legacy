@@ -5,39 +5,36 @@
     "dist"
   ],
   "main": "dist/index.js",
-  "repository": "git@github.com:solidjs/solid-docs.git",
+  "repository": "https://github.com/solidjs/solid-docs.git",
   "author": "Solid Team",
   "license": "MIT",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
+  "type": "module",
   "devDependencies": {
-    "@rollup/plugin-dynamic-import-vars": "^1.4.1",
+    "@mdx-js/rollup": "^2.1.2",
+    "@rollup/plugin-dynamic-import-vars": "^1.4.3",
     "@rollup/plugin-json": "^4.1.0",
-    "@types/node": "^16.11.3",
-    "front-matter": "^4.0.2",
+    "@rollup/plugin-typescript": "^8.3.3",
+    "@types/node": "^18.0.3",
     "gitlog": "^4.0.4",
-    "htmlnano": "^1.1.1",
-    "jiti": "^1.12.9",
-    "markdown-it": "^12.2.0",
-    "markdown-it-anchor": "^8.4.1",
-    "markdown-magic": "^2.5.2",
-    "npm-run-all": "^4.1.5",
-    "rollup": "^2.58.3",
-    "rollup-plugin-typescript2": "^0.31.2",
-    "shiki": "^0.9.12",
+    "jiti": "^1.14.0",
+    "markdown-magic": "^2.6.0",
+    "patch-package": "^6.4.7",
+    "rehype-autolink-headings": "^6.1.1",
+    "rehype-highlight": "^5.0.2",
+    "rehype-slug": "^5.0.1",
+    "remark-mdx-toc": "^0.2.0",
+    "rollup": "^2.76.0",
     "tablemark": "^3.0.0",
-    "tslib": "^2.3.1",
-    "typescript": "^4.4.4"
+    "typescript": "^4.7.4"
   },
   "scripts": {
-    "build": "jiti scripts/build.ts && rollup --config",
-    "build:watch": "jiti scripts/build.ts --watch",
+    "build": "rollup --config",
+    "watch": "rollup --config --watch",
     "todos": "jiti scripts/todos.ts",
-    "rollup:watch": "rollup --config --watch",
-    "watch": "run-p build:watch rollup:watch",
-    "publish": "npm publish --access public"
+    "prepare": "patch-package"
   },
   "dependencies": {
-    "@types/markdown-it": "^12.2.3",
-    "node-watch": "^0.7.2"
+    "solid-jsx": "^0.9.0"
   }
 }
