@@ -1,0 +1,42 @@
+[
+  {
+    "resource": "getting-started",
+    "title": "시작하기",
+    "description": "Solid 시작 가이드"
+  },
+  {
+    "resource": "reactivity",
+    "title": "반응성",
+    "description": "Solid의 반응성에 대한 전체 개요"
+  },
+  {
+    "resource": "rendering",
+    "title": "렌더링",
+    "description": "Discusses the different templating and rendering options in Solid."
+  },
+  {
+    "resource": "server",
+    "title": "서버 사이드 렌더링",
+    "description": "Solid의 서버 사이드 렌더링 기능에 대한 설명."
+  },
+  {
+    "resource": "typescript",
+    "title": "타입스크립트",
+    "description": "Solid와 타입스크립트를 함께 사용하기 위한 팁"
+  },
+  {
+    "resource": "testing",
+    "title": "Solid 테스트",
+    "description": "Solid 앱 테스트하기"
+  },
+  {
+    "resource": "comparison",
+    "title": "다른 라이브러리와의 비교",
+    "description": "Solid와 다른 프레임워크 비교."
+  },
+  {
+    "resource": "faq",
+    "title": "자주하는 질문",
+    "description": "커뮤니티에 자주 올라오는 질문."
+  }
+]

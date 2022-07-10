@@ -1,0 +1,32 @@
+[
+  {
+    "resource": "getting-started",
+    "title": "Einstieg in Solid",
+    "description": "Ein Handbuch zum Einstieg in Solid."
+  },
+  {
+    "resource": "reactivity",
+    "title": "Reaktivität",
+    "description": "Vollständige Zusammenfassung von Solids Reaktivität."
+  },
+  {
+    "resource": "rendering",
+    "title": "Rendering",
+    "description": "Bespricht die verschiedenen Templating- und Rendering-Optionen in Solid."
+  },
+  {
+    "resource": "server",
+    "title": "Server",
+    "description": "Eine Erklärung von Solids serverseitigen Fähigkeiten"
+  },
+  {
+    "resource": "comparison",
+    "title": "Vergleich",
+    "description": "Vergleich zwischen Solid und anderen Frameworks."
+  },
+  {
+    "resource": "faq",
+    "title": "FAQ",
+    "description": "Häufig gestellte Fragen aus der Gemeinschaft."
+  }
+]

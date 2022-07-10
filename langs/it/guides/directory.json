@@ -1,0 +1,32 @@
+[
+  {
+    "resource": "getting-started",
+    "title": "Iniziare",
+    "description": "Una guida per iniziare con SolidJS"
+  },
+  {
+    "resource": "reactivity",
+    "title": "Reattività",
+    "description": "Spiegazione completa della reattività di Solid."
+  },
+  {
+    "resource": "rendering",
+    "title": "Rendering",
+    "description": "Spiega le diverse opzioni di creazione di modelli e rendering in Solid."
+  },
+  {
+    "resource": "server",
+    "title": "Server",
+    "description": "Una spiegazione delle capacità lato server di Solid."
+  },
+  {
+    "resource": "comparison",
+    "title": "Confronti",
+    "description": "Confronti di Solid con altri framework."
+  },
+  {
+    "resource": "faq",
+    "title": "Domande Frequenti",
+    "description": "Domande frequenti dalla community."
+  }
+]
