@@ -185,7 +185,6 @@ to remember the last computed value. For example:
 createEffect((prev) => {
   const sum = a() + b();
   if (sum !== prev) console.log("sum changed to", sum);
-  return sum;
 }, 0);
 ```
 
