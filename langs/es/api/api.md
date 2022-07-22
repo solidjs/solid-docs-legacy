@@ -1,9 +1,3 @@
----
-title: API
-description: Resumen de todas las APIs de Solid.
-sort: 0
----
-
 # Reactividad Básica
 
 ## `createSignal`

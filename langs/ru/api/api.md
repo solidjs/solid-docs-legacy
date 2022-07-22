@@ -1,9 +1,3 @@
----
-title: API
-description: Solid API
-sort: 0
----
-
 # Базовая реактивность
 
 ## `createSignal`

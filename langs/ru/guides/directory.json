@@ -1,0 +1,32 @@
+[
+  {
+    "resource": "getting-started",
+    "title": "Начало работы",
+    "description": "Руководство по началу работы с Solid."
+  },
+  {
+    "resource": "reactivity",
+    "title": "Реактивность",
+    "description": "Обзор реактивности Solid."
+  },
+  {
+    "resource": "rendering",
+    "title": "Рендеринг",
+    "description": "Различные варианты создания шаблонов и рендеринга в Solid."
+  },
+  {
+    "resource": "server",
+    "title": "Сервер",
+    "description": "Серверные возможности Solid"
+  },
+  {
+    "resource": "comparison",
+    "title": "Сравнение с другими библиотеками",
+    "description": "Сравнение Solid с другими библиотеками."
+  },
+  {
+    "resource": "faq",
+    "title": "Часто задаваемые вопросы",
+    "description": "Ответы на часто задаваемые вопросы"
+  }
+]

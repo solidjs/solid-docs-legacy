@@ -1,9 +1,3 @@
----
-title: Rendering
-description: Spiega le diverse opzioni di creazione di modelli e rendering in Solid.
-sort: 2
----
-
 # Rendering
 
 Solid supporta 3 tipi di template: JSX, Tagged Template Literals e la variante HyperScript di Solid. JSX è la forma predominante. Perché? JSX è un ottimo DSL creato per la compilazione. Ha una sintassi chiara, supporta TypeScript, funziona con Babel e supporta altri strumenti come l'evidenziazione della sintassi del codice e più carino. Era solo pragmatico usare uno strumento che fondamentalmente ti dà tutto gratuitamente. Come soluzione compilata fornisce un ottimo DX. Abbiamo scelto di non lottare con le sintassi DSL personalizzate e di usarne una ampiamente supportata.

@@ -1,9 +1,3 @@
----
-title: Servidor
-description: Una explicación de las capacidades del lado del servidor en Solid.
-sort: 3
----
-
 # Server Side Rendering
 
 Solid maneja el renderizado en servidor compilando los templates JSX a un código ultra eficiente de anexado de strings. Esto puede ser logrado mediante el plugin de babel o un preset añadiendo `generate: "ssr"`. Para ambos, cliente y servidor necesitas añadirle `hydratable: true` para generar el código compatible con la hidratación.

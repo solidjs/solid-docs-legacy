@@ -1,9 +1,3 @@
----
-title: Getting Started
-description: A guide for how to get started with Solid.
-sort: 0
----
-
 # Getting Started
 
 **We're working on new docs.** You can check out our new beginner tutorial [here](https://docs.solidjs.com/tutorials/getting-started-with-solid/), and join our efforts on [Discord!](http://discord.com/invite/solidjs)

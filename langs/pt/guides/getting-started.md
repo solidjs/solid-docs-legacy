@@ -1,9 +1,3 @@
----
-title: Começando
-description: Um guia para começar a usar o Solid.
-sort: 0
----
-
 # Começando
 
 ## Experimente Solid

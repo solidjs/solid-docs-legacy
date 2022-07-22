@@ -1,9 +1,3 @@
----
-title: Iniziare
-description: Una guida per iniziare con SolidJS
-sort: 0
----
-
 # Iniziare
 
 ## Prova Solid

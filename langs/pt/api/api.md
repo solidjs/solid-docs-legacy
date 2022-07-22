@@ -1,9 +1,3 @@
----
-title: API
-description: Esboço de todas as APIs Solid.
-sort: 0
----
-
 # Reatividade Básica
 
 ## `createSignal`

@@ -1,9 +1,3 @@
----
-title: FAQ
-description: Foire aux questions de la communauté.
-sort: 5
----
-
 # FAQ
 
 ### 1. JSX sans VDOM ? Est-ce que cela n’est pas juste un concept ? J’ai entendu des personnalités comme des auteurs d’autres frameworks dire que c’était impossible.

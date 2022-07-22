@@ -1,9 +1,3 @@
----
-title: API
-description: Solid 전체 API 설명
-sort: 0
----
-
 # Basic Reactivity
 
 반응성에 대한 Solid의 전반적인 접근 방식은 모든 리액티브 계산을 함수로 래핑하고 디펜던시가 업데이트될 때 해당 함수를 다시 실행하는 것입니다.

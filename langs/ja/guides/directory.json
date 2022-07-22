@@ -1,0 +1,37 @@
+[
+  {
+    "resource": "getting-started",
+    "title": "はじめに",
+    "description": "Solid を使い始めるためのガイド"
+  },
+  {
+    "resource": "reactivity",
+    "title": "リアクティビティ",
+    "description": "Solid のリアクティビティの完全な要約"
+  },
+  {
+    "resource": "rendering",
+    "title": "レンダリング",
+    "description": "Solid の様々なテンプレートとレンダリングオプションについての説明"
+  },
+  {
+    "resource": "server",
+    "title": "サーバー",
+    "description": "Solid のサーバーサイド機能についての説明"
+  },
+  {
+    "resource": "testing",
+    "title": "Solid のテスト",
+    "description": "Solid アプリのテスト方法"
+  },
+  {
+    "resource": "comparison",
+    "title": "比較",
+    "description": "Solid と他のフレームワークとの比較"
+  },
+  {
+    "resource": "faq",
+    "title": "FAQ",
+    "description": "コミュニティからのよくある質問"
+  }
+]

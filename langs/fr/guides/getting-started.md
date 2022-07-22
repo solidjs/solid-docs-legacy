@@ -1,9 +1,3 @@
----
-title: Pour commencer
-description: Un guide sur comment débuter sur Solid.
-sort: 0
----
-
 # Pour commencer
 
 ## Essayer Solid

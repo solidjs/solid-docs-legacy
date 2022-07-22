@@ -1,9 +1,3 @@
----
-title: API
-description: 全 Solid API の概要
-sort: 0
----
-
 # 基本のリアクティビティ
 
 ## `createSignal`

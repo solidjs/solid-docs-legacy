@@ -1,9 +1,3 @@
----
-title: Servidor
-description: Uma explicação dos recursos do lado do servidor do Solid.
-sort: 3
----
-
 # Renderização do Lado do Servidor (SSR)
 
 O Solid lida com a renderização do servidor compilando modelos JSX para um código de acréscimo de string ultra eficiente. Isso pode ser feito através do plugin ou preset do babel passando `generate: "ssr"`. Para cliente e servidor, você precisa passar `hydratable: true` para gerar o código compatível de hidratação.

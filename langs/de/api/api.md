@@ -1,9 +1,3 @@
----
-title: API
-description: Alle Solid APIs im Überblick.
-sort: 0
----
-
 # Grundlegende Reaktivität
 
 ## `createSignal`

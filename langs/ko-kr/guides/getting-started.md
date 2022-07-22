@@ -1,8 +1,3 @@
----
-title: 시작하기
-description: Solid 시작 가이드
-sort: 0
----
 # 시작하기
 ## Solid 사용하기
 

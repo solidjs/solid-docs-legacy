@@ -1,0 +1,37 @@
+[
+  {
+    "resource": "getting-started",
+    "title": "Empezando",
+    "description": "Una guía sobre cómo empezar con Solid."
+  },
+  {
+    "resource": "reactivity",
+    "title": "Reactividad",
+    "description": "Resumen completo de la reactividad de Solid."
+  },
+  {
+    "resource": "rendering",
+    "title": "Renderizado",
+    "description": "Habla de las diferentes opciones de templating y renderizado en Solid."
+  },
+  {
+    "resource": "server",
+    "title": "Servidor",
+    "description": "Una explicación de las capacidades del lado del servidor en Solid."
+  },
+  {
+    "resource": "testing",
+    "title": "Testeando Solid",
+    "description": "Como realizar pruebas a tu app Solid"
+  },
+  {
+    "resource": "comparison",
+    "title": "Comparaciones",
+    "description": "Comparaciones de Solid contra otros frameworks."
+  },
+  {
+    "resource": "faq",
+    "title": "FAQ",
+    "description": "Preguntas frecuentes de la comunidad."
+  }
+]

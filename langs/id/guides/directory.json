@@ -1,0 +1,32 @@
+[
+  {
+    "resource": "getting-started",
+    "title": "Pendahuluan",
+    "description": "Panduan untuk cara memulai menggunakan Solid."
+  },
+  {
+    "resource": "reactivity",
+    "title": "Reaktifitas",
+    "description": "Penjelasan lengkap tentang reaktifitas Solid."
+  },
+  {
+    "resource": "rendering",
+    "title": "Rendering",
+    "description": "Mendiskusikan perbedaan dari pilihan-pilihan templating dan rendering di Solid."
+  },
+  {
+    "resource": "server",
+    "title": "Server",
+    "description": "Penjelasan tentang kemampuan sisi-server Solid."
+  },
+  {
+    "resource": "comparison",
+    "title": "Perbandingan",
+    "description": "Perbandingan Solid dengan framework-framework lainnya."
+  },
+  {
+    "resource": "faq",
+    "title": "FAQ",
+    "description": "Pertanyaan-pertanyaan yang sering ditanyakan di komunitas."
+  }
+]

@@ -1,8 +1,3 @@
----
-title: TypeScript
-description: Tips for using Solid with TypeScript 
-sort: 3
----
 # TypeScript
 
 Solid is designed to be easy to use with TypeScript:

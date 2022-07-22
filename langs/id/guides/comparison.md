@@ -1,9 +1,3 @@
----
-title: Perbandingan
-description: Perbandingan Solid dengan framework-framework lainnya.
-sort: 4
----
-
 # Perbandingan dengan Library lainnya
 
 Bagian ini tidak dapat lepas dari beberapa bias tetapi saya pikir penting untuk memahami di mana solusi Solid berada dibandingkan dengan library lain. Ini bukan tentang performa. Untuk melihat yang lebih definitif pada performa silahkan lihat ke [JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark).

@@ -1,95 +1,62 @@
-import {getSupported, getAllResourcePaths} from "../src";
-import {readdir, writeFile} from "fs/promises";
-import {join, resolve} from "path";
-import {promisify} from "util";
-import {exec} from "child_process";
-import gitlog from "gitlog"
-
+import { readdir, writeFile } from "fs/promises";
+import { readdirSync } from "fs";
+import { join, resolve } from "path";
+import gitlog from "gitlog";
 import markdownMagic from "markdown-magic";
 import tablemark from "tablemark";
-
-
-const asyncExec = promisify(exec);
-
+import { parse } from "path";
 const langsDir = resolve(__dirname, "../langs");
 
-async function getFilePaths(resourcePath: string, lang: string): Promise<string[]> {
-  if (resourcePath.startsWith("tutorials")) {
-    const dir = join(langsDir, lang, resourcePath);
-    try {
-      const files = await readdir(dir);
-      return files.map(file => join("langs", lang, resourcePath, file));
-    } catch (e){
-      return [];
+function* walkSync(dir: string): Generator<string, void, void> {
+  const files = readdirSync(dir, { withFileTypes: true });
+  for (const file of files) {
+    if (file.isDirectory()) {
+      yield* walkSync(join(dir, file.name));
+    } else {
+      yield join(dir, file.name);
     }
   }
-  const file = join("langs", lang, `${resourcePath}.md`);
-  return [file]
 }
 
-
-let fileMap: {
-  [file: string]: {
-    [lang: string]: string
-  }
-} | undefined = undefined;
-async function getFileMap() {
-  if (fileMap) return fileMap;
-  fileMap = {}
-  for (const resourcePath of getAllResourcePaths("en")) {
-    const supported = getSupported(resourcePath);
-    if (Array.isArray(supported)) {
-      for (const lang of supported) {
-        const filePaths = (await getFilePaths(resourcePath, lang));
-        for (const filePath of filePaths) {
-          if (!fileMap[filePath]) {
-            fileMap[filePath] = {};
-          }
-          fileMap[filePath] = {
-            lang,
-            resource: resourcePath
-          }
-        }
-      }
-    }
-  }
-  return fileMap;
-}
-function getCommitInfo(file: string) {
-  const [latestCommit] = gitlog({
+function getCommitInfo(file: string, lang: string) {
+  const commits = gitlog({
     repo: process.cwd(),
     file,
-    number: 1,
-    fields: ["hash", "authorDate"]
-  })
+    number: 2,
+    includeMergeCommitFiles: true,
+    fields: ["hash", "authorDate", "subject"],
+  });
 
-  const date = Date.parse(latestCommit.authorDate.split(" ").slice(0, -1).join(" "));
-  return {
-    file: file.split(langsDir).slice(-1)[0],
-    hash: latestCommit.hash,
-    date
+  let latestCommit = commits.shift()!;
+  if (latestCommit.subject.startsWith("refactor")) {
+    latestCommit = commits.shift()!;
   }
-}
 
+  const date = Date.parse(
+    latestCommit.authorDate.split(" ").slice(0, -1).join(" ")
+  );
+  return {
+    file: file.slice(join(langsDir, lang).length + 1),
+    hash: latestCommit.hash,
+    date,
+  };
+}
 
 type UpdateData = {
-  resource: string,
-  fileLang: string,
-  fileEn: string,
-  hashLang: string,
-  hashEn: string,
-  dateLang: number
-  dateEn: number
-}
+  file: string;
+  hashLang: string;
+  hashEn: string;
+  dateLang: number;
+  dateEn: number;
+};
 
-type Updates = { [lang: string]: UpdateData[]}
+type Updates = { [lang: string]: UpdateData[] };
 
 type CreatedData = {
-  resource: string,
-  fileEn: string,
-}
+  file: string;
+};
 
-type Created = { [lang: string]: CreatedData[]}
+type Created = { [lang: string]: CreatedData[] };
 
 async function makeMarkdownMagic(updates: Updates, created: Created) {
   // const readmePath = join(__dirname, "../README.md");
@@ -114,83 +81,98 @@ These files haven't been created yet for this language.
   }
 
   const link = (text: string, href: string) => `[${text}](${href})`;
-  const fileLink = (path: string) => link(path, `https://github.com/solidjs/solid-docs/tree/main/${path}`)
-  const commitLink = (date: number, hash: string) => link(new Date(date).toLocaleDateString("en-US"), `https://github.com/solidjs/solid-docs/commit/${hash}`)
+  const fileLink = (lang: string, path: string) =>
+    link(
+      path,
+      `https://github.com/solidjs/solid-docs/tree/main/langs/${lang}/${path}`
+    );
+  const commitLink = (date: number, hash: string) =>
+    link(
+      new Date(date).toLocaleDateString("en-US"),
+      `https://github.com/solidjs/solid-docs/commit/${hash}`
+    );
 
   const config = {
     matchWord: "MM",
     transforms: {
       UPDATED(content, options) {
         const langUpdates = updates[options.lang];
-        const rows = langUpdates.map(data => ({
-          fileLang: fileLink(data.fileLang),
-          fileEn: fileLink(data.fileEn),
+        const rows = langUpdates.map((data) => ({
+          fileLang: fileLink(options.lang, data.file),
+          fileEn: fileLink("en", data.file),
           updatedEn: commitLink(data.dateEn, data.hashEn),
           updatedLang: commitLink(data.dateLang, data.hashLang),
-        }))
-        return tablemark(rows, { columns: ["File", "English File", "Last Updated (EN)", `Last Updated (${options.lang.toUpperCase()})`] });
+        }));
+        if (rows.length === 0) return "";
+        return tablemark(rows, {
+          columns: [
+            "File",
+            "English File",
+            "Last Updated (EN)",
+            `Last Updated (${options.lang.toUpperCase()})`,
+          ],
+        });
       },
       CREATED(content, options) {
         const langCreated = created[options.lang];
         const byResource: { [resource: string]: CreatedData[] } = {};
         for (const data of langCreated) {
-          if (!byResource[data.resource]) {
-            byResource[data.resource] = [];
+          const dir = parse(data.file).dir;
+          if (!byResource[dir]) {
+            byResource[dir] = [];
           }
-          byResource[data.resource].push(data);
+          byResource[dir].push(data);
         }
         const rows = Object.entries(byResource).map(([resource, data]) => ({
           resource,
-          files: data.map(d => fileLink(d.fileEn)).join(", ")
-        }))
+          files: data.map((d) => fileLink(options.lang, d.file)).join(", "),
+        }));
+        if (rows.length === 0) return "";
         return tablemark(rows, { columns: ["Resource Name", "English Files"] });
-      }
-    }
-  }
+      },
+    },
+  };
   markdownMagic(join(langsDir, "*", "README.md"), config);
 }
 
-
 async function initializeTodoData() {
-  const langs: string[] = (await readdir(langsDir)).filter((lang: string) => lang !== "en");
+  const langs: string[] = (await readdir(langsDir)).filter(
+    (lang: string) => lang !== "en"
+  );
 
-  const updates: Updates = {}
+  const updates: Updates = {};
 
-  const created: Created = {}
+  const created: Created = {};
 
-  langs.forEach(lang => {
+  langs.forEach((lang) => {
     updates[lang] = [];
     created[lang] = [];
-  })
+  });
 
-  for (const resourcePath of getAllResourcePaths("en")) {
-    const enFiles = await getFilePaths(resourcePath, "en");
-    const enLatest = enFiles.map(getCommitInfo);
+  const enFiles = [...walkSync(join(langsDir, "en"))].map((file) =>
+    getCommitInfo(file, "en")
+  );
 
-    for (const lang of langs) {
-      const isSupported = getSupported(resourcePath, lang);
-      if (isSupported) {
-        const langFiles = await getFilePaths(resourcePath, lang);
-        const langLatest = langFiles.map(getCommitInfo);
-        for (let i = 0; i < enFiles.length; i++) {
-          if ( enLatest[i].date > langLatest[i].date) {
-            updates[lang].push({
-              resource: resourcePath,
-              fileLang: langFiles[i],
-              fileEn: enFiles[i],
-              hashLang: langLatest[i].hash,
-              hashEn: enLatest[i].hash,
-              dateLang: langLatest[i].date,
-              dateEn: enLatest[i].date
-            })
-          }
+  for (const lang of langs) {
+    const langFiles = [...walkSync(join(langsDir, lang))].map((file) =>
+      getCommitInfo(file, lang)
+    );
+    for (const enFile of enFiles) {
+      const langFile = langFiles.find((f) => f.file == enFile.file);
+      if (langFile) {
+        if (enFile.date > langFile.date) {
+          updates[lang].push({
+            file: langFile.file,
+            hashLang: langFile.hash,
+            hashEn: enFile.hash,
+            dateLang: langFile.date,
+            dateEn: enFile.date,
+          });
         }
       } else {
-        const enFiles = await getFilePaths(resourcePath, "en");
-        created[lang].push(...enFiles.map(file => ({
-          resource: resourcePath,
-          fileEn: file
-        })));
+        created[lang].push({
+          file: enFile.file,
+        });
       }
     }
   }
@@ -198,14 +180,4 @@ async function initializeTodoData() {
   await makeMarkdownMagic(updates, created);
 }
 
-async function updateTodoData(sinceHash?: string) {
-  const {stdout, stderr} = await asyncExec(`git diff --name-only ${sinceHash}`);
-  const map = await getFileMap();
-  const touchedFiles = stdout.split("\n").filter(file => file in map);
-  for (const file of touchedFiles) {
-    console.log(map[file]);
-  }
-}
-
 initializeTodoData();
-

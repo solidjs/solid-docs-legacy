@@ -1,9 +1,3 @@
----
-title: FAQ
-description: Pertanyaan-pertanyaan yang sering ditanyakan di komunitas.
-sort: 6
----
-
 # FAQ
 
 ### 1. JSX tanpa VDOM? Apa ini vaporware? Saya pernah mendengar penulis framework-framework lainnya mengatakan ini tidak mungkin bisa dilakukan.

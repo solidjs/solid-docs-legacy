@@ -1,9 +1,3 @@
----
-title: Empezando
-description: Una guía sobre cómo empezar con Solid.
-sort: 0
----
-
 # Empezando
 
 **Estamos trabajando en una nueva documentación. Puedes echar un vistazo a nuestro nuevo tutorial para principiantes [aquí](https://docs.solidjs.com/guides/getting-started-with-solid/welcome), y unete a nuestros esfuerzos en [Discord!](http://discord.com/invite/solidjs)

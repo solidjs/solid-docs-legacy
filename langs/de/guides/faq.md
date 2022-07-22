@@ -1,9 +1,3 @@
----
-title: FAQ
-description: Häufig gestellte Fragen aus der Gemeinschaft.
-sort: 5
----
-
 # FAQ
 
 ### 1. JSX ohne ein VDOM? Ist das Vapourware? Ich habe prominente Stimmen wie die der Autoren anderer Frameworks sagen gehört, dies sei nicht möglich.

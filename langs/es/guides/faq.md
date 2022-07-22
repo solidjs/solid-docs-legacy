@@ -1,9 +1,3 @@
----
-title: FAQ
-description: Preguntas frecuentes de la comunidad.
-sort: 6
----
-
 # FAQ
 
 ### ¿JSX sin un DOM virtual? ¿Es esto un vaporware? He escuchado voces prominentes decir que esto no es posible.

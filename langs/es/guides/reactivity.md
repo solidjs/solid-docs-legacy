@@ -1,9 +1,3 @@
----
-title: Reactividad
-description: Resumen completo de la reactividad de Solid.
-sort: 1
----
-
 # Reactividad
 
 El manejo de datos de Solid está construido con un set de reactivos primitivos flexibles que son responsables de todas las actualizaciones. Toma un acercamiento muy similar al de MobX o Vue excepto que no sacrifica su granularidad por un DOM Virtual. Las dependencias son rastreadas automáticamente cuando accedes a tus valores reactivos en los Effects y código de Vistas JSX.
