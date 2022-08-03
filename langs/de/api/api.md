@@ -9,7 +9,7 @@ export function createSignal<T>(
 ): [get: () => T, set: (v: T) => T];
 ```
 
-Dies ist die grundsätzlichste Anweisung, um auf einen einzelnen Wert zu reagieren, der sich über die Zeit verändert. Die create-Funktion gibt ein Paar von get- und set-Funktionen zurück, um das Signal auszulesen und zu aktualisieren.
+Dies ist die einfachste Art und Weise, um auf einen einzelnen Wert zu reagieren, der sich über die Zeit verändert. Die create-Funktion gibt ein Paar von get- und set-Funktionen zurück, um das Signal auszulesen und zu aktualisieren.
 
 ```js
 const [getValue, setValue] = createSignal(initialValue);
@@ -24,9 +24,9 @@ setValue(nextValue);
 setValue((prev) => prev + next);
 ```
 
-Um auf Aktualisierungen zu reagieren, müssen diese Signale in einem überwachten Scopes verwendet werden. Überwachte Scopes sind Funktionen, die als Parameter von `createEffect` oder JSX-Properties verwendet werden.
+Um auf Aktualisierungen zu reagieren, müssen diese Signale in einem überwachten Scope verwendet werden. Überwachte Scopes sind Funktionen, die als Parameter von `createEffect` oder JSX-Properties verwendet werden.
 
-> Um eine Funktion in einem Signal zu speichern, muss sie in eine weitere Funktion gekapselt werden:
+> Um eine Funktion in einem Signal zu speichern, muss sie in einer weiteren Funktion gekapselt werden:
 >
 > ```js
 > setValue(() => myFunction);
@@ -113,7 +113,7 @@ export function createResource<T, U>(
 ): ResourceReturn<T>;
 ```
 
-Erzeugt ein Signal, um asynchrone Anforderungen zu handhaben. Der `fetcher` ist eine asynchrone Function, die den Ausgabewert der `source`-Funktion entgegennimmt und ein Promise zurückgibt, dessen Ergebnis in der Resource gespeichert wird. Der `fetcher` ist nicht reaktiv, also muss die optionale `source`-Funktion genutzt werden, um ihn mehr als einmal zu starten. Wenn der `source` false, null oder undefined zurückgibt, wird die Resource nicht abgerufen.
+Erzeugt ein Signal, um asynchrone Anforderungen zu handhaben. Der `fetcher` ist eine asynchrone Funktion, die den Ausgabewert der `source`-Funktion entgegennimmt und ein Promise zurückgibt, dessen Ergebnis in der Resource gespeichert wird. Der `fetcher` ist nicht reaktiv, also muss die optionale `source`-Funktion genutzt werden, um ihn mehr als einmal zu starten. Wenn `source` `false`, `null` oder `undefined` zurückgibt, wird die Resource nicht abgerufen.
 
 ```js
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
@@ -273,7 +273,7 @@ export function useTransition(): [
 ];
 ```
 
-Wird verwendet, um asynchrone Aktualisierungen gemeinsamen auszuführen in einer Transaktion, die solange verzögert wird, bis alle asynchronen Prozesse ausgeführt sind. Dies hängt mit Suspense zusammen und verfolgt ausschließlich Ressourcen innerhalb der Grenzen von Suspense.
+Wird verwendet, um asynchrone Aktualisierungen gebündelt in einer Transaktion auszuführen, die solange verzögert wird, bis alle asynchronen Prozesse ausgeführt sind. Dies hängt mit Suspense zusammen und verfolgt ausschließlich Ressourcen innerhalb der Grenzen von Suspense.
 
 ```js
 const [isPending, start] = useTransition();
@@ -344,7 +344,7 @@ export function indexArray<T, U>(
 ): () => U[];
 ```
 
-Vergleichbar zu `mapArray`, außer das es über den Index iteriert. Der Wert ist ein Signal und der index ist nun eine Konstante.
+Vergleichbar zu `mapArray`, außer dass es über den Index iteriert. Der Wert ist ein Signal und der index ist nun eine Konstante.
 
 Diese Funktion unterstützt den `<Index>`-Ablauf.
 
@@ -377,7 +377,7 @@ export function createStore<T extends StoreNode>(
 ): [get: Store<T>, set: SetStoreFunction<T>];
 ```
 
-Dieser Aufruf erzeugt eine Baumstruktur von Signalen als Proxy, der es erlaubt, individuelle Werte in verschachtelten Datenstrukturen unabhängig voneinander zu tracken. Die create-Funktion gibt ein nur lesbares Proxy-Objekt zurück und eine Funktion zum Überschreiben von Werten.
+Dieser Aufruf erzeugt eine Baumstruktur von Signalen als Proxy, die es erlaubt, individuelle Werte in verschachtelten Datenstrukturen unabhängig voneinander zu tracken. Die create-Funktion gibt ein nur lesbares Proxy-Objekt zurück und eine Funktion zum Überschreiben von Werten.
 
 ```js
 const [state, setState] = createStore(initialValue);
@@ -692,7 +692,7 @@ export function lazy<T extends Component<any>>(
 ): T & { preload: () => Promise<T> };
 ```
 
-Wird benutzt, um Komponenten verzögert zu laden, damit man den Code aufteilen kann. Komponenten werden nicht geladen, bis sie gerendert werden. Verzögert geladene Komponenten können genauso genutzt werden wie ihre statisch importierten Geschwister, können props empfangen etc... Verzögert geladene Komponenten basieren auf `<Suspense>`.
+Wird benutzt, um Komponenten verzögert zu laden, damit man den Code aufteilen kann. Komponenten werden nicht geladen, bis sie gerendert werden. Verzögert geladene Komponenten können genauso genutzt werden wie statisch importierte, d.h. sie können props empfangen etc... Verzögert geladene Komponenten basieren auf `<Suspense>`.
 
 ```js
 // Verzögerter Import
@@ -702,9 +702,9 @@ const ComponentA = lazy(() => import("./ComponentA"));
 <ComponentA title={props.title} />;
 ```
 
-# Sekundäre Primitiven
+# Sekundäre Primitive
 
-Für eine erste Anwendung wird man diese vermutlich nicht brauchen, aber es nützlich, diese Werkzeuge zu haben.
+Für eine erste Anwendung wird man diese vermutlich nicht brauchen, aber es ist nützlich, diese Werkzeuge zu haben.
 
 ## `createDeferred`
 
@@ -731,7 +731,7 @@ export function createComputed<T>(
 ): void;
 ```
 
-Erzeutt eine neue Berechnung, die automatisch Abhängigkeiten verfolgt und direkt vor dem Rendern läuft. Wird verwendet, um in andere reaktive Primitiven zu schreiben. Wenn möglich, sollte stattdessen `createMemo` verwendet werden, da das Schreiben in ein Signal während einer Aktualisierung andere Berechnungen neu starten lassen kann.
+Erzeugt eine neue Berechnung, die automatisch Abhängigkeiten verfolgt und direkt vor dem Rendern läuft. Wird verwendet, um in andere reaktive Primitive zu schreiben. Wenn möglich, sollte stattdessen `createMemo` verwendet werden, da das Schreiben in ein Signal während einer Aktualisierung andere Berechnungen neu starten lassen kann.
 
 ## `createRenderEffect`
 
@@ -778,7 +778,7 @@ export function render(
 ): () => void;
 ```
 
-Das ist der Einstiegspunkt für den Browser. Man übergebe eine übergeordnete Componenten-Definition oder -Funktion und ein Element, in welches diese eingehängt wird. Es ist empfohlen, dass dieses Element leer ist, da die zurückgegebene Dispose-Funktion alle Kind-Elemente entfernt.
+Das ist der Einstiegspunkt für den Browser. Man übergibt eine übergeordnete Komponenten-Definition oder -Funktion und ein Element, in welches diese eingehängt wird. Es wird empfohlen, dass dieses Element leer ist, da die zurückgegebene Dispose-Funktion alle Kind-Elemente entfernt.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
@@ -793,7 +793,7 @@ export function hydrate(
 ): () => void;
 ```
 
-Diese Methode ist ähnlich wie `render`, außer dass es versucht, den vorhandenen Inhalt des DOMs zu rehydrieren. Für den Fall, dass im Browser eine Seite geladen ist, die bereits vom Server gerendert wurde.
+Diese Methode ist ähnlich wie `render`, außer dass es versucht, den vorhandenen Inhalt des DOMs zu rehydrieren, nur für den Fall, dass der Server bereits gerendert hat.
 
 ```js
 const dispose = hydrate(App, document.getElementById("app"));
@@ -857,7 +857,7 @@ export function pipeToNodeWritable<T>(
 ): void;
 ```
 
-Diese Methode rendert in einen Node-Stream. Sie rendert den Inhalt synchron einschließlich eller Suspense-Platzhalter und fährt danach fort, die weiteren Daten von jeder asynchronen Ressource, sobald sie vollständig ist.
+Diese Methode rendert in einen Node-Stream. Sie rendert den Inhalt synchron einschließlich eller Suspense-Platzhalter und fährt danach fort, die weiteren Daten von jeder asynchronen Ressource zu rendern, sobald sie verfügbar werden.
 
 ```js
 pipeToNodeWritable(App, res);
@@ -907,7 +907,7 @@ Die `onReady`-Option ist nützlich, um in den Stream zu schreiben, während die 
 export const isServer: boolean;
 ```
 
-Erlaubt die Unterscheidung, ob der Code gerade auf dem Server oder im Browser ausgeführt wird. Da die darunterliegenden Runtimes den Wert als bool'sche Konstante exportieren, können Bundler den darunterliegenden Code und dessen verwendeten Importe von bestimmten Bundles eliminieren.
+Erlaubt die Unterscheidung, ob der Code gerade auf dem Server oder im Browser ausgeführt wird. Da die darunterliegenden Runtimes den Wert als Boolean exportieren, können Bundler den darunterliegenden Code und dessen verwendeten Importe von bestimmten Bundles eliminieren.
 
 ```js
 if (isServer) {
@@ -975,7 +975,7 @@ Der Show-Kontrollfluss wird verwendet, um das Rendern einer Komponente von einer
 </Show>
 ```
 
-Show kann auch benutzt werden, um Inhalte an ein bestimmtes Datenmodell zu koppeln. Bspw. wird die Funktion erneut ausgeführt, wennn das User-Model ersetzt wird.
+Show kann auch benutzt werden, um Inhalte an ein bestimmtes Datenmodell zu koppeln. Bspw. wird hier die Funktion erneut ausgeführt, wennn das User-Model ersetzt wird.
 
 ```jsx
 <Show when={state.user} fallback={<div>Loading...</div>}>
@@ -1023,7 +1023,7 @@ export function Index<T, U extends JSX.Element>(props: {
 }): () => U[];
 ```
 
-Unbedingte Listen-Iteration (Reihen werden nach Index iteriert). Das ist nützlich, wenn es konzeptionell keinen Schlüssel gibt, etwa wenn die Daten aus Primitiven bestehen und der Index gleichbleibend sein soll statt die darin referenzierten Werte.
+Unbedingte Listen-Iteration (Arrays werden nach Index iteriert). Das ist nützlich, wenn es konzeptionell keinen Schlüssel gibt, etwa wenn die Daten aus Primitiven bestehen und der Index gleichbleibend sein soll statt die darin referenzierten Werte.
 
 Das Listenelement (im Beispiel item) ist ein Signal:
 
@@ -1223,7 +1223,7 @@ Ein Helfer, der `element.classList.toggle` nutzt. Er nimmt ein Objekt, dessen Sc
 
 ## `style`
 
-Der Style-Helfer von Solid funktioniert entweder mit einem String oder einem Objekt. Anders als Reacts version nutzt Solid `element.style.setProperty` unter der Haube. Somit werden CSS-Variablen unterstützt, allerdings auch die klein geschriebenen, mit Bindestrichen getrennten CSS-Attributnamen. Dies führt tatsächlich zu mehr Geschwindigkeit und Konsistenz mit der SSR-Ausgabe.
+Der Style-Helfer von Solid funktioniert entweder mit einem String oder einem Objekt. Anders als Reacts Version nutzt Solid `element.style.setProperty` unter der Haube. Somit werden CSS-Variablen unterstützt, allerdings auch die klein geschriebenen, mit Bindestrichen getrennten CSS-Attributnamen. Dies führt tatsächlich zu mehr Geschwindigkeit und Konsistenz mit der SSR-Ausgabe.
 
 ```jsx
 // string
@@ -1285,13 +1285,13 @@ Für andere Events, etwa welche mit unüblichen Namen oder welche, die nicht del
 
 ## `use:___`
 
-Das sind benutzerdefinierte Direktiven. Auf eine Art sind sie ein syntaktischer Zucker über ref, aber erlauben es, sehr einfach, multiple Direktiven an ein einzelnes Element zu binden. Eine Direktive ist einfach eine Funktion mit der folgenden Signatur:
+Das sind benutzerdefinierte Direktiven. Sie sind nicht viel mehr als eine syntaktische Erweiterung von `ref`, aber erlauben es, sehr einfach multiple Direktiven an ein einzelnes Element zu binden. Eine Direktive ist einfach eine Funktion mit der folgenden Signatur:
 
 ```ts
 function directive(element: Element, accessor: () => any): void;
 ```
 
-Directive Funktionen werden während des Renders aufgerufen, aber bevor das Element ins DOM eingebunden wird. Man kann darinnen alles machen, was man möchte, einschließlich Signale erzeugen, Effekte, Clean-Up-Funktionen registrieren, etc.
+Direktive Funktionen werden während des Renders aufgerufen, aber bevor das Element ins DOM eingebunden wird. In ihnen kann man z.B. Signale erzeugen, Effekte, Clean-Up-Funktionen registrieren, etc.
 
 ```js
 const [name, setName] = createSignal("");
@@ -1348,3 +1348,4 @@ Das funktioniert auch bei Kind-Elementen.
 ```jsx
 <MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
 ```
+
