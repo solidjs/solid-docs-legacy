@@ -144,7 +144,7 @@ refetch();
 export function onMount(fn: () => void): void;
 ```
 
-Registriert eine Methode, die aufgerufen wirde, nachdem initial gerendert wurde bzw. Elemente geladen wurden. Ideal, um `ref`s zu benutzen oder einmalige Seiteneffekte aufzurufen. Es ist equivalent zu einem `createEffect` ohne Abhängigkeiten.
+Registriert eine Methode, die aufgerufen wurde, nachdem initial gerendert wurde bzw. Elemente geladen wurden. Ideal, um `ref`s zu benutzen oder einmalige Seiteneffekte aufzurufen. Es ist equivalent zu einem `createEffect` ohne Abhängigkeiten.
 
 ## `onCleanup`
 
@@ -219,7 +219,7 @@ setA("new"); // Jetzt läuft der Effekt
 export function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-Erzeugt einen neuen nicht überwachten Kontext der nicht automatisch aufgeräumt wird. Das ist nützlich für verschachtelte reaktive Kontexte, die nicht aufgeräumt werden sollen, wenn die darüberliegende Komponente neu berechnet wird. Es ist eine mächtige Möglichkeit für Caching.
+Erzeugt einen neuen nicht überwachten Kontext, der nicht automatisch aufgeräumt wird. Das ist nützlich für verschachtelte reaktive Kontexte, die nicht aufgeräumt werden sollen, wenn die darüberliegende Komponente neu berechnet wird. Es ist eine mächtige Möglichkeit für Caching.
 
 Aller Solid-code sollte in einem solchen Kontext eingebunden werden, um sicherzustellen, dass Speicher und Berechnungen aufgeräumt werden. Normalerweise braucht man sich aber nicht darum zu kümmern, da `createRoot` bereits in alle `render`-Funktionen eingebunden ist.
 
@@ -273,7 +273,7 @@ export function useTransition(): [
 ];
 ```
 
-Wird verwendet, um asynchrone Aktualisierungen gemeinsamen auszuführen in einer Transaktion, die solange verzögert wird, bis alle asynchronen Prozesse ausgeführt sind. Dies hängt mit Suspense zusammen und verfolgt ausschließlich Ressourcen innerhalb der Grenzen von Suspense.
+Wird verwendet, um asynchrone Aktualisierungen gemeinsamen auszuführen in einer Transaktion, die so lange verzögert wird, bis alle asynchronen Prozesse ausgeführt sind. Dies hängt mit Suspense zusammen und verfolgt ausschließlich Ressourcen innerhalb der Grenzen von Suspense.
 
 ```js
 const [isPending, start] = useTransition();
@@ -433,7 +433,7 @@ const [state, setState] = createStore({
 fullName = createMemo(() => `${state.firstName} ${state.lastName}`);
 ```
 
-### Stores aktualsieren
+### Stores aktualisieren
 
 Änderungen können die Form von Funktionen annehmen, die den vorherigen Zustand übergeben bekommen und den neuen Zustand oder Wert ausgeben. Objekte werden immer nur auf der obersten Ebene zusammengeführt. Man kann Werte auf `undefined` setzen, um sie aus dem Store zu entfernen.
 
@@ -476,7 +476,7 @@ setState('list', 2, 'read', true);
 // }
 ```
 
-Der Pfad kann String-Keys, Arrays von String-Keys, Objekte mit Beschreibung einer Iteration ({from, to, by}), oder Filterfunktionen sein. Das gibt erstaundliche Ausdrucksvielfalt, Zustandsveränderungen zu beschreiben.
+Der Pfad kann String-Keys, Arrays von String-Keys, Objekte mit Beschreibung einer Iteration ({from, to, by}), oder Filterfunktionen sein. Das gibt erstaunliche Ausdrucksvielfalt, Zustandsveränderungen zu beschreiben.
 
 ```js
 const [state, setState] = createStore({
@@ -628,7 +628,7 @@ export function createContext<T>(defaultValue?: T): Context<T | undefined>;
 
 Context erlaubt eine Art Abhängigkeitsinjektion in Solid. Es wird verwendet, um zu verhindern, dass Daten als Props durch dazwischen liegende Komponenten hindurch weitergegeben werden muss.
 
-Diese Funktion erzeugt ein neues Kontext-Objekt, das mit `useContext` verwerdet werden kann und den `Provider`-Kontrollfluss enthält. Der Standardwert des Kontexts wird verwendet, wenn kein `Provider` in der Hierarchie gefunden werden kann.
+Diese Funktion erzeugt ein neues Kontext-Objekt, das mit `useContext` verwendet werden kann und den `Provider`-Kontrollfluss enthält. Der Standardwert des Kontexts wird verwendet, wenn kein `Provider` in der Hierarchie gefunden werden kann.
 
 ```js
 export const CounterContext = createContext([{ count: 0 }, {}]);
@@ -731,7 +731,7 @@ export function createComputed<T>(
 ): void;
 ```
 
-Erzeutt eine neue Berechnung, die automatisch Abhängigkeiten verfolgt und direkt vor dem Rendern läuft. Wird verwendet, um in andere reaktive Primitiven zu schreiben. Wenn möglich, sollte stattdessen `createMemo` verwendet werden, da das Schreiben in ein Signal während einer Aktualisierung andere Berechnungen neu starten lassen kann.
+Erzeugt eine neue Berechnung, die automatisch Abhängigkeiten verfolgt und direkt vor dem Rendern läuft. Wird verwendet, um in andere reaktive Primitiven zu schreiben. Wenn möglich, sollte stattdessen `createMemo` verwendet werden, da das Schreiben in ein Signal während einer Aktualisierung andere Berechnungen neu starten lassen kann.
 
 ## `createRenderEffect`
 
@@ -975,7 +975,7 @@ Der Show-Kontrollfluss wird verwendet, um das Rendern einer Komponente von einer
 </Show>
 ```
 
-Show kann auch benutzt werden, um Inhalte an ein bestimmtes Datenmodell zu koppeln. Bspw. wird die Funktion erneut ausgeführt, wennn das User-Model ersetzt wird.
+Show kann auch benutzt werden, um Inhalte an ein bestimmtes Datenmodell zu koppeln. Bsp. wird die Funktion erneut ausgeführt, wenn das User-Model ersetzt wird.
 
 ```jsx
 <Show when={state.user} fallback={<div>Loading...</div>}>
@@ -1054,7 +1054,7 @@ function ErrorBoundary(props: {
 }): () => JSX.Element;
 ```
 
-Fängt ungefangene Fehler und rendert Fallback-Inhalte.
+Fängt nicht abgefangene Fehler und rendert Fallback-Inhalte.
 
 ```jsx
 <ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
@@ -1250,7 +1250,7 @@ Die beiden funktionieren genauso wie die entsprechenden Eigenschaften. Wenn man 
 
 ## `on___`
 
-Event-Handler in Solid haben typischerweise die Form von `onclick` oder `onClick` je nach Stil. Der Event-Name ist immer klein geschrieben. Solid verwendet halb-synthetische Event-Delegation für normale UI-Events, die zusammengesetzt werden und bubbeln. Das verbessert die Geschwindigkeit dieser gewöhnlichen Events.
+Event-Handler in Solid haben typischerweise die Form von `onclick` oder `onClick` je nach Stil. Der Event-Name ist immer kleingeschrieben. Solid verwendet halb-synthetische Event-Delegation für normale UI-Events, die zusammengesetzt werden und bubbeln. Das verbessert die Geschwindigkeit dieser gewöhnlichen Events.
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
@@ -1337,7 +1337,7 @@ Erzwingt die Behandlung als Attribut statt als Eigenschaft. Nützlich für Web C
 
 Solids JSX-Compiler verwendet eine einfache Heuristik für reaktives Verpacken und verzögerte Evaluierung von JSX-Ausdrücken. Erhält er einen Funktionsaufruf, ein Zugriff auf Props, oder JSX? Falls ja, werden diese in einen getter verpackt, wenn sie an native Elemente, Komponenten oder Effekte übergeben werden.
 
-Das zu wissen, hilft uns, die unnötige Behandlung von Dingen zu vermeiden, von denen wir wissen, dass sie sich nicht ändern werden, indem wir sie außerhalb des JSX addressieren. Eine einfache Variable wird nicht verpackt. Wir können dem Compiler auch manuell mitteilen, dass er einen Wert nicht verpacken soll, indem wir ihm einen einfachen Dekorator `/* @once */` voranstellen.
+Das zu wissen, hilft uns, die unnötige Behandlung von Dingen zu vermeiden, von denen wir wissen, dass sie sich nicht ändern werden, indem wir sie außerhalb des JSX adressieren. Eine einfache Variable wird nicht verpackt. Wir können dem Compiler auch manuell mitteilen, dass er einen Wert nicht verpacken soll, indem wir ihm einen einfachen Dekorator `/* @once */` voranstellen.
 
 ```jsx
 <MyComponent static={/*@once*/ state.wontUpdate} />
