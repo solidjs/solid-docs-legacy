@@ -762,7 +762,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Questo crea un segnale condizionale che notifica agli abbonati solo quando entrano o escono dalla loro chiave che corrisponde al valore. Utile per lo stato di selezione delegata. Poiché esegue l'operazione O(2) invece di O(n).
+Questo crea un segnale condizionale che notifica agli abbonati solo quando entrano o escono dalla loro chiave che corrisponde al valore. Utile per lo stato di selezione delegata. Poiché esegue l'operazione O(1) invece di O(n).
 
 ```js
 const selezionata = createSelector(selectedId);

@@ -756,7 +756,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Créer un signal conditionnel qui va seulement notifier les abonnées quand un élément entré ou sorti correspond à la valeur de la clé. Utile pour déléguer la sélection d'états, car l'opération devient O(2) au lieu de O(n).
+Créer un signal conditionnel qui va seulement notifier les abonnées quand un élément entré ou sorti correspond à la valeur de la clé. Utile pour déléguer la sélection d'états, car l'opération devient O(1) au lieu de O(n).
 
 ```js
 const isSelected = createSelector(selectedId);

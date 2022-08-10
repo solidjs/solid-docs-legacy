@@ -757,7 +757,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-创建一个条件 signal，仅在进入或退出时键与值匹配时通知订阅者。处理委托选择状态很有用。因为它使得操作复杂度是 O(2) 而不是 O(n)。
+创建一个条件 signal，仅在进入或退出时键与值匹配时通知订阅者。处理委托选择状态很有用。因为它使得操作复杂度是 O(1) 而不是 O(n)。
 
 ```js
 const isSelected = createSelector(selectedId);

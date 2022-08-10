@@ -1373,7 +1373,7 @@ function createSelector<T, U>(
 ```
 
 값과 일치하는 키가 들어오거나 나가는 경우에만 구독자에게 알리는 조건부 시그널을 생성합니다.
-O(n) 대신 O(2) 연산을 수행하기 때문에, 위임된 선택 상태에 유용하게 사용할 수 있습니다.
+O(n) 대신 O(1) 연산을 수행하기 때문에, 위임된 선택 상태에 유용하게 사용할 수 있습니다.
 
 ```js
 const isSelected = createSelector(selectedId);

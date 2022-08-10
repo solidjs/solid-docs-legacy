@@ -755,7 +755,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Erzeugt ein bedingtes Signal, das nur dann die Verfolger aktualisieren lässt, wenn ihr Schlüssel dem Wert entspricht oder nicht mehr entspricht. Nützlich für delegierten Auswahlzustand, da es die Operation in O(2) statt O(n) ausführt.
+Erzeugt ein bedingtes Signal, das nur dann die Verfolger aktualisieren lässt, wenn ihr Schlüssel dem Wert entspricht oder nicht mehr entspricht. Nützlich für delegierten Auswahlzustand, da es die Operation in O(1) statt O(n) ausführt.
 
 ```js
 const isSelected = createSelector(selectedId);
