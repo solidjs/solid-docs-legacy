@@ -1,36 +1,131 @@
 # Réactivité basique
 
+L'approche globale de Solid en matière de réactivité consiste à envelopper tout calcul réactif dans une fonction et à réexécuter cette fonction lorsque ses dépendances sont mises à jour.
+Le compilateur JSX de Solid englobe également la plupart des expressions JSX (code entre accolades) avec une fonction, de sorte qu'elles se mettent automatiquement à jour (et déclenchent les mises à jour correspondantes dans le DOM) lorsque leurs dépendances changent.
+Plus précisément, la réexécution automatique d'une fonction se produit chaque fois que la fonction est appelée dans une _portée surveillée_ (ou _tracking scope_ en anglais), comme une expression JSX ou des appels API qui construisent des "calculs" (`createEffect`, `createMemo`, etc.).
+Par défaut, les dépendances d'une fonction sont suivies automatiquement lorsqu'elles sont appelées dans une portée surveillée, en détectant quand la fonction lit l'état réactif (par exemple, via le getter d'un Signal ou l'attribut d'un Store).
+Par conséquent, vous n'avez généralement pas besoin de vous soucier des dépendances vous-mêmes.
+(Mais si le suivi automatique des dépendances ne donne pas les résultats que vous souhaitez, vous pouvez [remplacer le suivi des dépendances](#reactive-utilities)).
+Cette approche rend la réactivité _composable_ : appeler une fonction dans une autre fonction fait généralement en sorte que la fonction appelante hérite des dépendances de la fonction appelée.
+
 ## `createSignal`
 
 ```ts
-export function createSignal<T>(
-  value: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
+import { createSignal } from "solid-js";
+
+function createSignal<T>(
+  initialValue: T,
+  options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): [get: () => T, set: (v: T) => T];
+
+// Types disponibles pour la valeur de retour de `createSignal`.
+import type { Signal, Accessor, Setter } from "solid-js";
+type Signal<T> = [get: Accessor<T>, set: Setter<T>];
+type Accessor<T> = () => T;
+type Setter<T> = (v: T | ((prev?: T) => T)) => T;
 ```
 
-C'est la primitive réactive la plus basique utilisée pour surveiller une seule valeur qui change dans le temps. La fonction de création retourne une paire de fonctions, une pour la lecture de la valeur et l'autre pour mettre à jour le signal.
+C'est la primitive réactive la plus basique utilisée pour surveiller une seule valeur (qui peut être n'importe quel objet JavaScript) qui change dans le temps.
+La valeur du Signal commence par être égale au premier argument passé `initialValue` (ou `undefined` s'il n'y a pas d'argument).
+La fonction `createSignal` retourne une paire de fonctions sous la forme d'un tableau à deux éléments : un _getter_ (ou _accessor_) et un _setter_. 
+Dans une utilisation typique, vous auriez à déstructurer ce tableau en un Signal nommé de la manière suivante:
 
 ```js
-const [getValue, setValue] = createSignal(initialValue);
-
-// lecture de la valeur
-getValue();
-
-// met à jour la valeur
-setValue(nextValue);
-
-// met à jour une valeur avec une fonction incluant la valeur précédente
-setValue((prev) => prev + next);
+const [count, setCount] = createSignal(0);
+const [ready, setReady] = createSignal(false);
 ```
 
-N'oubliez pas d'accéder aux signaux sous une portée surveillée si vous souhaitez qu'elles soient réactives à la mise à jour. Les portées surveillées sont des fonctions qui sont passées à des évaluations comme `createEffect` ou des expressions JSX.
+L'appel du getter (par exemple, `count()` ou `ready()`) renvoie la valeur actuelle du Signal.
+Crucial pour le suivi automatique des dépendances, l'appel du getter
+à l'intérieur d'une portée surveillée fait que la fonction appelante dépend de ce Signal, donc cette fonction sera réexécutée si le Signal est mis à jour.
 
-> Si vous souhaitez stocker une fonction dans un Signal, vous devez utiliser la forme suivante :
+L'appel du setter (par exemple, `setCount(nextCount)` ou `setReady(nextReady)`) définit la valeur du Signal et _met à jour_ le Signal (déclenchant la réexécution des dépendants) si la valeur a effectivement changé (voir les détails ci-dessous).
+Comme seul argument, le setter prend soit la nouvelle valeur du signal, soit une fonction qui fait correspondre la dernière valeur du signal à une nouvelle valeur.
+Le setter renvoie également la valeur du Signal mise à jour. Par exemple:
+
+```js
+// Lit la valeur actuelle du Signal, et
+// depend de s'il est dans une portée surveillée
+// (mais non réactif en dehors d'une portée surveillée):
+const currentCount = count();
+
+// Ou envelopper tout calcul avec une fonction,
+// et cette fonction peut être utilisée dans une portée surveillée:
+const doubledCount = () => 2 * count();
+
+// Ou construire une portée surveillée et dépendre du signal:
+const countDisplay = <div>{count()}</div>;
+
+// Mettre à jour la valeur d'un Signal en donnant une nouvelle valeur:
+setReady(true);
+
+// Mettre à jour la valeur d'un Signal en donnant une fonction incluant la valeur précédente:
+const newCount = setCount((prev) => prev + 1);
+```
+
+> Si vous souhaitez stocker une fonction dans un Signal, vous devez utiliser la forme suivante:
 >
 > ```js
 > setValue(() => myFunction);
 > ```
+>
+> Cependant, les fonctions ne sont pas traitées spécialement comme l'argument `initialValue` de `createSignal`,
+> donc vous devez passer la valeur initiale d'une fonction telle quelle:
+>
+> ```js
+> const [func, setFunc] = createSignal(myFunction);
+> ```
+
+À moins que vous ne soyez dans un [batch](#batch), un [effect](#createEffect) ou une [transition](#use-transition), les signaux sont mis à jour immédiatement lorsque vous les définissez.
+Par exemple:
+
+```js
+setReady(false);
+console.assert(ready() === false);
+setReady(true);
+console.assert(ready() === true);
+```
+
+Si vous n'êtes pas sûr que votre code sera exécuté dans un `batch` ou une `transition` (par exemple, un code de bibliothèque), vous devez éviter de faire cette supposition.
+
+##### Options
+
+Plusieurs primitives de Solid prennent un objet "options" comme dernier argument facultatif.
+L'objet "options" de `createSignal` vous permet de fournir une option `equals`. Par exemple:
+
+```js
+const [getValue, setValue] = createSignal(initialValue, { equals: false });
+```
+
+Par défaut, lors de l'appel du setter d'un Signal, le Signal n'est mis à jour (et n'oblige les les dépendants à réexécuter) que si la nouvelle valeur est réellement différente de l'ancienne, conformément à l'opérateur `===` de JavaScript.
+
+Vous pouvez également définir `equals` sur `false` pour que les dépendances soient toujours réexécutées après l'appel du setter, ou vous pouvez passer votre propre fonction pour tester l'égalité.
+Quelques exemples:
+
+```js
+// Utilisation de `{ equals: false }` pour permettre de modifier l'objet en place;
+// normalement, cela ne serait pas vu comme une mise à jour car
+// l'objet a la même identité avant et après le changement.
+const [object, setObject] = createSignal({ count: 0 }, { equals: false });
+setObject((current) => {
+  current.count += 1;
+  current.updated = new Date();
+  return current;
+});
+
+// Utilisation d'un Signal `{ equals: false }` en tant que déclencheur sans valeur initiale:
+const [depend, rerun] = createSignal(undefined, { equals: false });
+// Maintenant, un appel à `depend()` dans une portée surveillée
+// fait que cette portée est réexécutée à chaque fois que `rerun()` est appelé.
+
+// Définir l'égalité en fonction de la longueur de la chaîne:
+const [myString, setMyString] = createSignal("string", {
+  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+});
+
+setMyString("strung"); // Considéré comme égal à la dernière valeur et ne provoquera pas de mises à jour
+setMyString("stranger"); // Considéré comme différent et provoquera des mises à jour
+```
 
 ## `createEffect`
 
