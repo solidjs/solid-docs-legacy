@@ -76,7 +76,7 @@ const newCount = setCount((prev) => prev + 1);
 > const [func, setFunc] = createSignal(myFunction);
 > ```
 
-À moins que vous ne soyez dans un [batch](#batch), un [effect](#createEffect) ou une [transition](#use-transition), les signaux sont mis à jour immédiatement lorsque vous les définissez.
+À moins que vous ne soyez dans un [batch](#batch), un [effet](#createEffect) ou une [transition](#use-transition), les signaux sont mis à jour immédiatement lorsque vous les définissez.
 Par exemple:
 
 ```js
@@ -130,14 +130,14 @@ setMyString("stranger"); // Considéré comme différent et provoquera des mises
 ## `createEffect`
 
 ```ts
-export function createEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
+import { createEffect } from "solid-js";
+
+function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Créer un nouveau calcul qui va automatiquement surveiller ses dépendances et s'exécuter après chaque rendu où les dépendances ont été changées. Ceci est idéal pour l'utilisation de `ref`s et la gestion d'autres effets secondaires.
+Les effets sont un moyen général de faire en sorte que du code arbitraire ("effets secondaires") s'exécute à chaque fois que les dépendances changent, par exemple, pour modifier le DOM manuellement.
+`createEffect` crée un nouveau calcul qui exécute la fonction donnée dans une portée surveillée, ce qui permet de suivre automatiquement ses dépendances, et réexécute automatiquement la fonction chaque fois que les dépendances sont mises à jour.
+Par exemple:
 
 ```js
 const [a, setA] = createSignal(initialValue);
@@ -151,9 +151,71 @@ La fonction effet est appelée avec la valeur retournée par la dernière exécu
 ```js
 createEffect((prev) => {
   const sum = a() + b();
-  if (sum !== prev) console.log(sum);
+  if (sum !== prev) console.log("Valeur de 'sum' changé en", sum);
   return sum;
 }, 0);
+```
+
+Les effets sont principalement destinés aux effets secondaires qui lisent mais n'écrivent pas au système réactif:
+il est préférable d'éviter de modifier des signaux dans les effets, ce qui sans précaution peut provoquer des rendus supplémentaires ou même des boucles d'effets infinies.
+A la place, préférez l'utilisation de [`createMemo`](#creatememo) pour calculer de nouvelles valeurs qui dépendent d'autres valeurs réactives, de sorte que le système réactif sache ce qui dépend de quoi, et puisse l'optimiser en conséquence.
+Si vous modifiez des signaux dans un effet, la fonction d'effet est automatiquement enveloppée dans [`batch`](#batch), ce qui signifie que tous les changements de signaux à l'intérieur de l'effet ne se propagent qu'après que l'effet se termine.
+Cela permet à plusieurs mises à jour de signaux de ne déclencher une seule mise à jour et évite que des effets secondaires non désirés ne se produisent au milieu de vos effets secondaires.
+En fait, si plusieurs effets se déclenchent tous en même temps, ils sont collectivement regroupés en un seul `batch`.
+
+La _première_ exécution de la fonction d'effet n'est pas immédiate ; elle est programmée pour être exécutée après la phase de rendu en cours (par exemple, après avoir appelé la fonction passée à [`render`](#render), [`createRoot`](#createroot), ou [`runWithOwner`](#runwithowner)).
+Si vous voulez attendre que la première exécution ait lieu, utilisez [`queueMicrotask`](https://developer.mozilla.org/fr/docs/Web/API/queueMicrotask) (qui s'exécute avant que le navigateur ne rende le DOM) ou `await Promise.resolve()` ou `setTimeout(..., 0)` (qui s'exécutent après le rendu du navigateur).
+Après cette première exécution, les effets s'exécutent généralement immédiatement lorsque leurs dépendances sont mises à jour (sauf si vous êtes dans un [batch](#batch) ou une [transition](#use-transition)). Par exemple:
+
+```js
+// Supposez que ce code est dans une fonction de composant, donc fait partie d'une phase de rendu
+const [count, setCount] = createSignal(0);
+
+// Cet effet imprime le compte au début et quand il change
+createEffect(() => console.log("count =", count()));
+// L'effet ne se produit pas encore
+console.log("coucou");
+setCount(1); // L'effet ne se produit toujours pas encore
+setCount(2); // L'effet ne se produit toujours pas encore
+
+queueMicrotask(() => {
+  // now `count = 2` will print
+  console.log("microtask");
+  setCount(3); // immediately prints `count = 3`
+  console.log("au revoir");
+});
+
+// --- overall output: ---
+// coucou
+// count = 2
+// microtask
+// count = 3
+// au revoir
+```
+
+Le délai dans la première exécution est utile car il signifie qu'un effet défini dans la portée d'un composant s'exécute après que le JSX retourné par le composant ait été ajouté au DOM.
+En particulier, les [`ref`](#ref)s seront déjà définis.
+Ainsi, vous pouvez utiliser un effet pour manipuler le DOM manuellement,
+appeler des bibliothèques JS vanilla, ou d'autres effets secondaires.
+
+Notez que la première exécution de l'effet s'exécute toujours avant que le navigateur ne rende le DOM à l'écran (similaire à `useLayoutEffect` de React).
+Si vous avez besoin d'attendre jusqu'après le rendu (par exemple, pour mesurer le rendu), vous pouvez utiliser `await Promise.resolve()` (ou `Promise.resolve().then(...)`), mais notez que l'utilisation ultérieure de l'état réactif (comme les signaux) ne déclenchera pas la réexécution de l'effet, car le suivi n'est pas possible après qu'une fonction `async` utilise `await`.
+Ainsi, vous devriez utiliser toutes les dépendances avant la promesse.
+
+Si vous préférez qu'un effet soit exécuté immédiatement, même pour sa première exécution, utilisez [`createRenderEffect`](#createrendereffect) ou [`createComputed`](#createcomputed).
+
+Vous pouvez nettoyer vos effets secondaires entre les exécutions de la fonction d'effet en appelant [`onCleanup`](#oncleanup) _à l'intérieur_ de la fonction d'effet.
+Une telle fonction de nettoyage est appelée à la fois entre les exécutions de l'effet et lorsque l'effet est éliminé (par exemple, lorsque le composant contenant l'effet est démonté).
+Par exemple:
+
+```js
+// Écouter un événement donné dynamiquement par le signal `eventName`
+createEffect(() => {
+  const event = eventName();
+  const callback = (e) => console.log(e);
+  ref.addEventListener(event, callback);
+  onCleanup(() => ref.removeEventListener(event, callback));
+});
 ```
 
 ## `createMemo`
