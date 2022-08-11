@@ -221,27 +221,65 @@ createEffect(() => {
 ## `createMemo`
 
 ```ts
-export function createMemo<T>(
+import { createMemo } from "solid-js";
+
+function createMemo<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
+  options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): () => T;
 ```
-
-Créer une valeur dérivée d'un signal qui ne peut pas être modifié directement, elle recalcule sa valeur lorsque les dépendances du code sont mise à jour.
+Les mémos vous permettent d'utiliser efficacement une valeur dérivée dans de nombreux calculs réactifs.
+`createMemo` crée une valeur réactive en lecture seule égale à la valeur de retour de la fonction donnée et s'assure que cette fonction n'est exécutée que lorsque ses dépendances changent.
 
 ```js
-const getValue = createMemo(() => computeExpensiveValue(a(), b()));
+const value = createMemo(() => computeExpensiveValue(a(), b()));
 
-// lecture de la valeur
-getValue();
+// Lecture de la valeur.
+value();
 ```
 
-La fonction mémo est appelée avec une valeur retournée depuis la dernière exécution de la fonction mémo. Cette valeur peut être initialisée optionnellement en tant que 2ème argument. Cela est utile pour réduire le nombre de calculs.
+Dans Solid, vous n'avez souvent pas besoin d'envelopper les fonctions dans des mémos ;
+vous pouvez aussi simplement définir et appeler une fonction ordinaire
+pour obtenir un comportement réactif similaire.
+La principale différence réside dans le fait que vous appelez la fonction dans plusieurs configurations réactives.
+Dans ce cas, lorsque les dépendances de la fonction sont mises à jour, la fonction sera appelée plusieurs fois, sauf si elle est enveloppée dans un mémo.
+fonction sera appelée plusieurs fois, sauf si elle est enveloppée dans `createMemo`. Par exemple:
 
 ```js
+const user = createMemo(() => searchForUser(username()));
+// Comparaison avec: const user = () => searchForUser(username());
+return (
+  <ul>
+    <li>Votre name est "{user()?.name}"</li>
+    <li>
+      Votre email est <code>{user()?.email}</code>
+    </li>
+  </ul>
+);
+```
+
+Lorsque le Signal `username` est mis à jour, `searchForUser` sera appelé qu'une seule fois.
+Si l'utilisateur (`user`) retourné a effectivement changé, le mémo `user` se met à jour, et alors les deux éléments de la liste seront mis à jour automatiquement.
+
+Si nous avions plutôt défini `user` comme une simple fonction
+`() => searchForUser(username())`, alors `searchForUser` aurait été
+appelé deux fois, une fois lors de la mise à jour de chaque élément de la liste.
+
+Une autre différence clé est qu'un memo peut empêcher les dépendances de se mettre à jour lorsque les dépendances du mémo changent mais pas la valeur du mémo résultant.
+Tout comme [`createSignal`](#createsignal), le sSgnal dérivé créé par `createMemo` se _met à jour_ (et déclenche la ré-exécution des dépendants) uniquement lorsque la valeur renvoyée par la fonction mémo change réellement par rapport à la valeur précédente, selon l'opérateur `===` de JavaScript.
+Alternativement, vous pouvez passer un objet options avec `equals` réglé sur `false` pour toujours mettre à jour le mémo lorsque ses dépendances changent,
+ou vous pouvez passer votre propre fonction `equals` pour tester l'égalité.
+
+La fonction mémo est appelée avec une valeur retournée depuis la dernière exécution de la fonction mémo. Cette valeur peut être initialisée optionnellement en tant que 2ème argument. Cela est utile pour réduire le nombre de calculs, par exemple:
+
+```js
+// Suivre la somme de toutes les valeurs prises par input()
 const sum = createMemo((prev) => input() + prev, 0);
 ```
+
+La fonction mémo ne doit pas modifier d'autres signaux en appelant des setters (elle doit être "pure").
+Cela permet à Solid d'optimiser l'ordre d'exécution des mises à jour des mémos en fonction de leur graphe de dépendance, de sorte que tous les mémos peuvent se mettre à jour au maximum une fois en réponse à un changement de dépendance.
 
 ## `createResource`
 
