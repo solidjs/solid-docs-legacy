@@ -318,13 +318,10 @@ function createResource<T, U>(
 ): ResourceReturn<T>;
 ```
 
-Créer un signal qui peut gérer des requêtes asynchrones. `fetcher` est une fonction asynchrone qui accepte une valeur retournée par la `source` si elle est fournie et qu'elle retourne une Promesse dont la valeur renvoyée est stockée dans la ressource. La fonction de récupération (fetcher) n'est pas réactive, donc utilisez le premier argument optionnel si vous voulez l'exécuter plus d'une fois. Si la source retourne une valeur `false`, `null` ou `undefined` alors elle ne sera pas récupérée.
-
-Creates a signal that reflects the result of an async request.
-
-`createResource` takes an asynchronous fetcher function and returns a signal that is updated with the resulting data when the fetcher completes.
-
-There are two ways to use `createResource`: you can pass the fetcher function as the sole argument, or you can additionally pass a source signal as the first argument. The source signal will retrigger the fetcher whenever it changes, and its value will be passed to the fetcher.
+Crée un signal qui reflète le résultat d'une requête asynchrone.
+`createResource` prend une fonction de récupération asynchrone (`fetcher`) et retourne un Signal qui est mis à jour avec les données résultantes lorsque la récupération (`fetcher`) est terminée.
+Il y a deux façons d'utiliser `createResource` : vous pouvez passer la fonction de récupération (`fetcher`) comme seul argument, ou vous pouvez en plus passer un Signal `source` comme premier argument.
+Le Signal `source` redéclenchera le `fetcher` à chaque fois qu'il changera, et sa valeur sera passée au `fetcher`.
 
 ```js
 const [data, { mutate, refetch }] = createResource(fetchData);
@@ -334,31 +331,34 @@ const [data, { mutate, refetch }] = createResource(fetchData);
 const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 ```
 
-In these snippets, the fetcher is the function `fetchData`, and `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately.
-In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`.
-It will be called again whenever the value of `sourceSignal` changes, and that value will always be passed to `fetchData` as its first argument.
+Dans ces extraits, la fonction de récupération (`fetcher`) est `fetchData`, et `data()` est indéfini jusqu'à ce que `fetchData` termine.
+Dans le premier cas, `fetchData` sera appelée immédiatement.
+Dans le second, `fetchData` sera appelé dès que `sourceSignal` aura une valeur autre que `false`, `null`, ou `undefined`.
+Elle sera appelée à nouveau chaque fois que la valeur de `sourceSignal` change, et cette valeur sera toujours passée à `fetchData` comme premier argument.
 
-You can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
+Vous pouvez appeler `mutate` pour mettre à jour directement le signal `data` (il fonctionne comme tout autre signal setter). Vous pouvez aussi appeler `refetch` pour relancer directement la fonction de récupération (`fetcher`), et passer un argument optionnel pour fournir des informations supplémentaires au fetcher, par exemple `refetch(info)`.
 
-`data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`.
-But it also has extra reactive properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#<errorboundary>).)
+`data` fonctionne comme le getter d'un Signal normal : utilisez `data()` pour lire la dernière valeur retournée par `fetchData`.
+Mais il a aussi des propriétés réactives supplémentaires : `data.loading` vous indique si le fetcher a été appelé mais n'a pas été retourné, et `data.error` vous indique si la requête a échoué ; si c'est le cas, il contient l'erreur lancée par le fetcher. (Note : si vous anticipez des erreurs, vous pouvez vouloir envelopper `createResource` dans un [ErrorBoundary](#<errorboundary>).)
 
-As of **1.4.0**, `data.latest` will return the last returned value and won't trigger [Suspense](#<suspense>) and [transitions](#usetransition); if no value has been returned yet, `data.latest` acts the same as `data()`. This can be useful if you want to show the out-of-date data while the new data is loading.
+À partir de la **1.4.0**, `data.latest` retournera la dernière valeur retournée et ne déclenchera pas de [Suspense](#<suspense>) et de [transitions](#usetransition) ; si aucune valeur n'a encore été retournée, `data.latest` agit de la même manière que `data()`.
+Cela peut être utile si vous voulez afficher les données périmées pendant le chargement des nouvelles données.
 
-`loading`, `error`, and `latest` are reactive getters and can be tracked.
+`loading`, `error`, et `latest` sont des getters réactifs et peuvent être suivis.
 
-The `fetcher` is the async function that you provide to `createResource` to actually fetch the data.
-It is passed two arguments: the value of the source signal (if provided), and an info object with two properties: `value` and `refetching`. `value` tells you the previously fetched value.
-`refetching` is `true` if the fetcher was triggered using the `refetch` function and `false` otherwise.
-If the `refetch` function was called with an argument (`refetch(info)`), `refetching` is set to that argument.
+Le `fetcher` est la fonction asynchrone que vous fournissez à `createResource` pour récupérer réellement les données.
+Elle reçoit deux arguments : la valeur du Signal source (si elle est fournie), et un objet info avec deux propriétés : `value` et `refetching`.
+`value` vous indique la valeur précédemment récupérée.
+`refetching` est `true` si le fetcher a été déclenché en utilisant la fonction `refetch`, sinon `false`.
+Si la fonction `refetch` a été appelée avec un argument (`refetch(info)`), on assigne `refetching` à cet argument.
 
 ```js
 async function fetchData(source, { value, refetching }) {
-  // Fetch the data and return a value.
-  //`source` tells you the current value of the source signal;
-  //`value` tells you the last returned value of the fetcher;
-  //`refetching` is true when the fetcher is triggered by calling `refetch()`,
-  // or equal to the optional data passed: `refetch(info)`
+  // Récupère les données et retourne une valeur.
+  // `source` indique la valeur actuelle du Signal source;
+  // `value` indique la dernière valeur qu'à retourné cette fonction;
+  // `refetching` est sur `true` quand cette fonction a été appelée en utilisant `refetch()`,
+  // OU elle est égale au paramètre optionnel : `refetch(info)`
 }
 
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
@@ -381,15 +381,15 @@ refetch();
 
 `loading` et `error` sont des propriétés réactives qui peuvent être surveillées.
 
-**Nouveau depuis la v1.4.0**
+**Nouveau depuis la 1.4.0**
 
 Si vous utilisez `renderToStream`, vous pouvez dire à Solid d'attendre une ressource avant de vider le flux en utilisant l'option `deferStream`:
 
 ```js
-// récupère un utilisateur et diffuse le contenu dès que possible
+// Récupère un utilisateur et diffuse le contenu dès que possible
 const [user] = createResource(() => params.id, fetchUser);
 
-// récupère un utilisateur mais ne diffuse le contenu qu'après le chargement de cette ressource
+// Récupère un utilisateur mais ne diffuse le contenu qu'après le chargement de cette ressource
 const [user] = createResource(() => params.id, fetchUser, {
   deferStream: true,
 });
