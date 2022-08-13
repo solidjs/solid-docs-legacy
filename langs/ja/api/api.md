@@ -922,7 +922,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-値と一致するキーが入った、または出たときにのみサブスクライバに通知する条件付き Signal を作成します。委任された選択状態に便利です。演算が O(n) ではなく O(2) になるため。
+値と一致するキーが入った、または出たときにのみサブスクライバに通知する条件付き Signal を作成します。委任された選択状態に便利です。演算が O(n) ではなく O(1) になるため。
 
 ```js
 const isSelected = createSelector(selectedId);

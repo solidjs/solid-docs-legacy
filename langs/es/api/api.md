@@ -942,7 +942,7 @@ export function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Crea una signal condicional que unicamente notifica a los subscriptores cuando ingresan o salen al valor de dicha clave. Útil para selección de estado delegada. Ya que hace la operación O(2) en lugar de O(n).
+Crea una signal condicional que unicamente notifica a los subscriptores cuando ingresan o salen al valor de dicha clave. Útil para selección de estado delegada. Ya que hace la operación O(1) en lugar de O(n).
 
 ```js
 const isSelected = createSelector(selectedId);

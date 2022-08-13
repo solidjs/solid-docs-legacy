@@ -1627,7 +1627,7 @@ function createSelector<T, U>(
 ): (k: U) => boolean;
 ```
 
-Creates a conditional signal that only notifies subscribers when entering or exiting their key matching the value. Useful for delegated selection state. As it makes the operation O(2) instead of O(n).
+Creates a conditional signal that only notifies subscribers when entering or exiting their key matching the value. Useful for delegated selection state. As it makes the operation O(1) instead of O(n).
 
 ```js
 const isSelected = createSelector(selectedId);
