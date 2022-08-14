@@ -434,7 +434,9 @@ Ce sont des fonctions d'aide qui permettent de mieux gérer la planification des
 ## `untrack`
 
 ```ts
-export function untrack<T>(fn: () => T): T;
+import { untrack } from "solid-js";
+
+function untrack<T>(fn: () => T): T;
 ```
 
 Ignore le suivi des dépendances dans le bloc de code exécuté et retourne la valeur.
@@ -442,15 +444,19 @@ Ignore le suivi des dépendances dans le bloc de code exécuté et retourne la v
 ## `batch`
 
 ```ts
-export function batch<T>(fn: () => T): T;
+import { batch } from "solid-js";
+
+function batch<T>(fn: () => T): T;
 ```
 
-Groupe les mises à jour dans le bloc jusqu'à la fin pour éviter des calculs inutiles. Cela veut dire que la lecture des valeurs dans les lignes suivantes ne seront pas à jour. Les [Stores de Solid](https://www.solidjs.com/docs/latest/api#createstore) utilise cette méthode pour affecter des valeurs et les Effets enrobent automatiquement leur code dans un `batch`.
+Groupe les mises à jour dans le bloc jusqu'à la fin pour éviter des calculs inutiles. Cela veut dire que la lecture des valeurs dans les lignes suivantes ne seront pas à jour. La méthode set des [Stores de Solid](#createstore), les méthodes de tableau de [Mutable Store](#createmutable) et les Effets enveloppent automatiquement leur code dans un `batch`.
 
 ## `on`
 
 ```ts
-export function on<T extends Array<() => any> | (() => any), U>(
+import { on } from "solid-js";
+
+function on<T extends Array<() => any> | (() => any), U>(
   deps: T,
   fn: (input: T, prevInput: T, prevValue?: U) => U,
   options: { defer?: boolean } = {}
@@ -469,29 +475,121 @@ createEffect(() => {
 });
 ```
 
-Vous pouvez aussi ne pas exécuter le calcul immédiatement et à la place choisir de l'exécuter au changement en passant l'option de `defer: true`
+Vous pouvez aussi ne pas exécuter le calcul immédiatement et à la place choisir de l'exécuter au changement en passant l'option `defer: true`
 
 ```js
-// Ne s'exécute pas immédiatement
+// Ne s'exécute pas immédiatement.
 createEffect(on(a, (v) => console.log(v), { defer: true }));
 
-setA("new"); // Maintenant elle s'exécute
+setA("new"); // Maintenant elle s'exécute.
 ```
+
+Veuillez noter que pour les `stores` et `mutable`, l'ajout ou la suppression d'une propriété de l'objet parent déclenchera un effet. Voir [`createMutable`](#createMutable)
 
 ## `createRoot`
 
 ```ts
-export function createRoot<T>(fn: (dispose: () => void) => T): T;
+import { createRoot } from "solid-js";
+
+function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-Créer un nouveau contexte qui ne sera pas surveillé et qui ne se détruira pas automatiquement. C'est utile pour les contextes réactifs imbriqués que vous ne voulez pas détruire lorsque le parent se réévalue. C'est un pattern puissant pour mettre en cache des données.
+Créer un nouveau contexte qui ne sera pas surveillé et qui ne se détruira pas automatiquement. C'est utile pour les contextes réactifs imbriqués que vous ne voulez pas détruire lorsque le parent se réévalue.
 
-Tous les projets Solid devraient être enrobés de cette fonction à haut niveau pour s'assurer que toute la mémoire/calcul soit libérée. Normalement, vous n'avez à vous soucier de ceci, car `createRoot` est embarqué dans la fonction d'entrée `render`.
+Tous les projets Solid devraient être enrobés de cette fonction à haut niveau pour s'assurer que toute la mémoire/calcul soit libérée. Normalement, vous n'avez pas à vous soucier de ceci, car `createRoot` est embarqué dans la fonction d'entrée `render`.
+
+## `getOwner`
+
+```ts
+import { getOwner } from "solid-js";
+
+function getOwner(): Owner;
+```
+
+Gets the reactive scope that owns the currently running code, e.g.,
+for passing into a later call to `runWithOwner` outside of the current scope.
+
+Internally, computations (effects, memos, etc.) create owners which are
+children of their owner, all the way up to the root owner created by
+`createRoot` or `render`. In particular, this ownership tree lets Solid
+automatically clean up a disposed computation by traversing its subtree
+and calling all [`onCleanup`](#oncleanup) callbacks.
+For example, when a `createEffect`'s dependencies change, the effect calls
+all descendant `onCleanup` callbacks before running the effect function again.
+Calling `getOwner` returns the current owner node that is responsible
+for disposal of the current execution block.
+
+Components are not computations, so do not create an owner node, but they are
+typically rendered from a `createEffect` which does, so the result is similar:
+when a component gets unmounted, all descendant `onCleanup` callbacks get
+called. Calling `getOwner` from a component scope returns the owner that is
+responsible for rendering and unmounting that component.
+
+Note that the owning reactive scope isn't necessarily _tracking_.
+For example, [`untrack`](#untrack) turns off tracking for the duration
+of a function (without creating a new reactive scope), as do
+components created via JSX (`<Component ...>`).
+
+## `runWithOwner`
+
+```ts
+import { runWithOwner } from 'solid-js';
+
+function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
+```
+
+Executes the given function under the provided owner,
+instead of (and without affecting) the owner of the outer scope.
+By default, computations created by `createEffect`, `createMemo`, etc.
+are owned by the owner of the currently executing code (the return value of
+`getOwner`), so in particular will get disposed when their owner does.
+Calling `runWithOwner` provides a way to override this default to a manually
+specified owner (typically, the return value from a previous call to
+`getOwner`), enabling more precise control of when computations get disposed.
+
+Having a (correct) owner is important for two reasons:
+
+- Computations without an owner cannot be cleaned up. For example, if you call
+  `createEffect` without an owner (e.g., in the global scope), the effect will
+  continue running forever, instead of being disposed when its owner gets
+  disposed.
+- [`useContext`](#usecontext) obtains context by walking up the owner tree
+  to find the nearest ancestor providing the desired context.
+  So without an owner you cannot look up any provided context
+  (and with the wrong owner, you might obtain the wrong context).
+
+Manually setting the owner is especially helpful when doing reactivity outside
+of any owner scope. In particular, asynchronous computation
+(via either `async` functions or callbacks like `setTimeout`)
+lose the automatically set owner, so remembering the original owner via
+`getOwner` and restoring it via `runWithOwner` is necessary in these cases.
+For example:
+
+```js
+const owner = getOwner();
+setTimeout(() => {
+  // This callback gets run without owner.
+  // Restore owner via runWithOwner:
+  runWithOwner(owner, () => {
+    const foo = useContext(FooContext);
+    createEffect(() => {
+      console.log(foo);
+    });
+  });
+}, 1000);
+```
+
+Note that owners are not what determines dependency tracking,
+so `runWithOwner` does not help with tracking in asynchronous functions;
+use of reactive state in the asynchronous part (e.g. after the first `await`)
+will not be tracked as a dependency.
 
 ## `mergeProps`
 
 ```ts
-export function mergeProps(...sources: any): any;
+import { mergeProps } from "solid-js";
+
+function mergeProps(...sources: any): any;
 ```
 
 Une méthode `merge` qui va fusionner des objets réactifs. C'est utile pour associer des valeurs par défaut aux props de composants dans le cas où le parent ne les fournit pas. Ou cloner l'objet props en incluant des propriétés réactives.
@@ -499,20 +597,22 @@ Une méthode `merge` qui va fusionner des objets réactifs. C'est utile pour ass
 Cette méthode fonctionne en utilisant les proxies et associant les propriétés dans l'ordre inverse. Cela permet de dynamiquement surveiller les propriétés qui ne sont pas présentes quand l'objet prop est fusionné la première fois.
 
 ```js
-// props par défault
+// Props par défault.
 props = mergeProps({ name: "Smith" }, props);
 
-// cloner l'objet props
+// Cloner l'objet `props`.
 newProps = mergeProps(props);
 
-// fusionner l'objet props
+// Fusionner l'objet `props`
 props = mergeProps(props, otherProps);
 ```
 
 ## `splitProps`
 
 ```ts
-export function splitProps<T>(
+import { splitProps } from "solid-js";
+
+function splitProps<T>(
   props: T,
   ...keys: Array<(keyof T)[]>
 ): [...parts: Partial<T>];
@@ -529,12 +629,54 @@ const [local, others] = splitProps(props, ["children"]);
 </>
 ```
 
+Splits a reactive object by keys.
+
+It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
+
+This can be useful if you want to consume a subset of props and pass the rest to a child.
+
+```js
+function MyComponent(props) {
+  const [local, others] = splitProps(props, ["children"]);
+
+  return (
+    <>
+      <div>{local.children}</div>
+      <Child {...others} />
+    </>
+  );
+}
+```
+
+Because `splitProps` takes any number of arrays, we can split a props object
+as much as we wish (if, for example, we had multiple child components that
+each required a subset of the props).
+
+Let's say a component was passed six props:
+
+```js
+<MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar" />;
+function MyComponent(props) {
+  console.log(props); // {a: 1, b: 2, c: 3, d: 4, e: 5, foo: "bar"}
+  const [vowels, consonants, leftovers] = splitProps(
+    props,
+    ["a", "e"],
+    ["b", "c", "d"]
+  );
+  console.log(vowels); // {a: 1, e: 5}
+  console.log(consonants); // {b: 2, c: 3, d: 4}
+  console.log(leftovers.foo); // bar
+}
+```
+
 ## `useTransition`
 
 ```ts
-export function useTransition(): [
-  () => boolean,
-  (fn: () => void, cb?: () => void) => void
+import { useTransition } from "solid-js";
+
+function useTransition(): [
+  pending: () => boolean,
+  startTransition: (fn: () => void) => Promise<void>
 ];
 ```
 
@@ -546,19 +688,36 @@ const [isPending, start] = useTransition();
 // Vérifie si entrain de transitionner.
 isPending();
 
-// Enrobe dans une transition
-start(() => setSignal(newValue), () => /* la transition est terminée */)
+// Enrobe dans une transition.
+start(() => setSignal(newValue), () => /* La transition est terminée. */)
 ```
+
+## `startTransition`
+
+**New in v1.1.0**
+
+```ts
+import { startTransition } from 'solid-js';
+
+function startTransition: (fn: () => void) => Promise<void>;
+```
+
+Similar to `useTransition` except there is no associated pending state. This one can just be used directly to start the Transition.
+
 
 ## `observable`
 
 ```ts
-export function observable<T>(input: () => T): Observable<T>;
+import { observable } from "solid-js";
+
+function observable<T>(input: () => T): Observable<T>;
 ```
 
 Cette méthode prend un signal et produit un simple objet Observable. Vous pouvez l'utiliser avec une librairie Observable de votre choix typiquement avec l'opérateur `from`.
 
 ```js
+// Intégrer rxjs avec un Signal Solid
+import { observable } from "solid-js";
 import { from } from "rxjs";
 
 const [s, set] = createSignal(0);
@@ -568,10 +727,49 @@ const obsv$ = from(observable(s));
 obsv$.subscribe((v) => console.log(v));
 ```
 
+Vous pouvez également utiliser `from` sans `rxjs` ; voir ci-dessous.
+
+## `from`
+
+**New in v1.1.0**
+
+```ts
+import { from } from "solid-js";
+
+function from<T>(
+  producer:
+    | ((setter: (v: T) => T) => () => void)
+    | {
+        subscribe: (
+          fn: (v: T) => void
+        ) => (() => void) | { unsubscribe: () => void };
+      }
+): () => T;
+```
+
+A helper to make it easier to interop with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
+
+```js
+const signal = from(obsv$);
+```
+
+It can also take a custom producer function where the function is passed a setter function returns a unsubscribe function:
+
+```js
+const clock = from((set) => {
+  const t = setInterval(() => set(1), 1000);
+  return () => clearInterval(t);
+});
+```
+
+> Note: Signals created by `from` have equality checks turned off to interface better with external streams and sources.
+
 ## `mapArray`
 
 ```ts
-export function mapArray<T, U>(
+import { mapArray } from "solid-js";
+
+function mapArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: T, i: () => number) => U
 ): () => U[];
@@ -603,7 +801,9 @@ const mapped = mapArray(source, (model) => {
 ## `indexArray`
 
 ```ts
-export function indexArray<T, U>(
+import { indexArray } from "solid-js";
+
+function indexArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: () => T, i: number) => U
 ): () => U[];
