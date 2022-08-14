@@ -400,7 +400,9 @@ const [user] = createResource(() => params.id, fetchUser, {
 ## `onMount`
 
 ```ts
-export function onMount(fn: () => void): void;
+import { onMount } from "solid-js";
+
+function onMount(fn: () => void): void;
 ```
 
 Programme une méthode qui va s'exécuter après le rendu initial et que les éléments soient monté. C'est idéal pour utiliser des `ref`s et gérer d'autres effets secondaires qui ne doivent s'exécuter qu'une seule fois. C'est l'équivalent de `createEffect` sans dépendances.
@@ -408,7 +410,9 @@ Programme une méthode qui va s'exécuter après le rendu initial et que les él
 ## `onCleanup`
 
 ```ts
-export function onCleanup(fn: () => void): void;
+import { onCleanup } from "solid-js";
+
+function onCleanup(fn: () => void): void;
 ```
 
 Programme une méthode de nettoyage qui s'exécute à la destruction ou recalcule de la portée réactive actuelle. Peut être utilisé dans n'importe quel Composant ou Effet.
@@ -416,7 +420,9 @@ Programme une méthode de nettoyage qui s'exécute à la destruction ou recalcul
 ## `onError`
 
 ```ts
-export function onError(fn: (err: any) => void): void;
+import { onError } from "solid-js";
+
+function onError(fn: (err: any) => void): void;
 ```
 
 Programme une méthode de gestion d'erreur qui va s'exécuter lorsque la portée enfant lève une erreur. Seulement la portée la plus proche de l'erreur va exécuter sa fonction de gestion d'erreur. Si une erreur se reproduit, la fonction se réexécute.
