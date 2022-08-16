@@ -64,6 +64,6 @@ La reattività di Solid alla fine è un ibrido tra S e MobX. Ciò gli conferisce
 
 RxJS è una libreria reattiva. Sebbene Solid abbia un'idea simile dei dati osservabili, utilizza un'applicazione molto diversa del modello dell'osservatore. I segnali sono come una semplice versione di un osservabile (solo il prossimo). Il modello di rilevamento della dipendenza automatica supera il centinaio di operatori RxJS. Solid avrebbe potuto adottare questo approccio, ma nella maggior parte dei casi è più semplice scrivere la propria logica di trasformazione in un calcolo. Laddove gli Observable sono avviabili a freddo, unicast e basati su push, molti problemi sul client si prestano all'avvio a caldo e al multicast che è il comportamento predefinito di Solid.
 
-## Others
+## Altri
 
 Angular e alcune altre librerie popolari mancano in particolare da questo confronto. La mancanza di esperienza con loro impedisce di fare confronti adeguati. In generale, Solid ha poco in comune con i framework più grandi ed è molto più difficile confrontarli frontalmente.
