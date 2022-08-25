@@ -356,7 +356,7 @@ export type ResourceOptions<T, S = unknown> = {
   initialValue?: T;
   name?: string;
   deferStream?: boolean;
-  ssrValue?: "initial" | "server";
+  ssrLoadFrom?: "initial" | "server";
   storage?: (init: T | undefined) => [Accessor<T | undefined>, Setter<T | undefined>];
   onHydrated?: (k: S | undefined, info: { value: T | undefined }) => void;
 };
@@ -466,7 +466,7 @@ We've added a new `state` field which covers a more detailed view of the Resourc
 
 **New in v1.5.0**
 
-When server rendering resources especially when fetching when embedding Solid in other system that fetch before render, you might want to initiate the resource with this prefetched value instead of fetching again and having the resource serialize it isn't own state. You can use the new `ssrValue` option for this. Instead of using the default `"server"` value, you can pass `"initial"` and the resource will use `initialValue` as if it were the result of the first fetch for both SSR and hydration.
+When server rendering resources especially when fetching when embedding Solid in other system that fetch before render, you might want to initiate the resource with this prefetched value instead of fetching again and having the resource serialize it isn't own state. You can use the new `ssrLoadFrom` option for this. Instead of using the default `"server"` value, you can pass `"initial"` and the resource will use `initialValue` as if it were the result of the first fetch for both SSR and hydration.
 
 **New in 1.5.0** *Experimental*
 
