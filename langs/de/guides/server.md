@@ -38,7 +38,7 @@ const { readable, writable } = new TransformStream();
 pipeToWritable(() => <App />, writable);
 ```
 
-Bequemerweise exportiert `solid-js/web` ein `isServer`-Flag. Das ist nützlich, da viele JS-Bündler in der Lage sind, unbenutzten Code innerhalb von Abfragen dieses Flags mit Tree Shaking zu entfernen und imports, die nur von diesem Code genutzt werden, aus dem Client-Code herauszulassen.
+Bequemer weise exportiert `solid-js/web` ein `isServer`-Flag. Das ist nützlich, da viele JS-Bundler in der Lage sind, unbenutzten Code innerhalb von Abfragen dieses Flags mit Tree Shaking zu entfernen und imports, die nur von diesem Code genutzt werden, aus dem Client-Code herauszulassen.
 
 ```jsx
 import { isServer } from "solid-js/web";
@@ -92,7 +92,7 @@ const App = () => {
 };
 ```
 
-Wenn man vom document aus hydriert, kann das Einfügen von Ressourcen, die noch nicht verfübbar sind, Dinge durcheinander bringen. Solid hat dafür eine `<NoHydration>`-Komponente, deren Kinder ganz normal auf dem Server funktionieren, aber nicht im Browser hydriert werden.
+Wenn man vom document aus hydriert, kann das Einfügen von Ressourcen, die noch nicht verfügbar sind, Dinge durcheinander bringen. Solid hat dafür eine `<NoHydration>`-Komponente, deren Kinder ganz normal auf dem Server funktionieren, aber nicht im Browser hydriert werden.
 
 ```jsx
 <NoHydration>
@@ -132,4 +132,4 @@ Zwischenzeitlich hat die Arbeit an einem neuen Starter begonnen, [SolidStart](ht
 
 ## Den Anfang mit statischer Seitengenerierung machen
 
-[solid-ssr](https://github.com/solidjs/solid/blob/main/packages/solid-ssr) hat auch ein Werkzeugt, um statische oder vorgerenderte Seiten zu erzeugen. In der README-Daten finden sich weitere Informationen dazu.
+[solid-ssr](https://github.com/solidjs/solid/blob/main/packages/solid-ssr) hat auch ein Werkzeug, um statische oder vorgerenderte Seiten zu erzeugen. In der README-Daten finden sich weitere Informationen dazu.
