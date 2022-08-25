@@ -1,5 +1,14 @@
 # Iniziare
 
+## Guarda solid
+
+Per video veloci sui concetti di solid, puoi guardare:
+
+* [Solid in 100 secondi](https://youtu.be/hw3Bx5vxKl0)
+* [Reattività di solid](https://youtu.be/J70HXl1KhWE)
+
+(I video sono in inglese)
+
 ## Prova Solid
 
 Il modo migliore per imparare Solid è provarlo online. Il nostro REPL su https://playground.solidjs.com è il modo perfetto per sperimentare i concetti fondamentali. Così come https://codesandbox.io/ dove puoi modificare uno qualsiasi dei [nostri esempi](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md).
@@ -57,7 +66,7 @@ Il design di Solid contiene diverse opinioni su quali principi e valori ci aiuta
 
 ### 1. Dati dichiarativi
 
-Declarative data combines the description of data’s behavior to its declaration. This allows for easy composition by packaging all aspects of data’s behavior in a single place.
+I dati dichiarativi combinano la descrizione del comportamento dei dati alla sua dichiarazione. Questo permette una composizione facile, mettendo tutti gli aspetti del comportamento dei dati in un posto singolo.
 
 ### 2. Componenti a scomparsa
 
@@ -65,7 +74,7 @@ Declarative data combines the description of data’s behavior to its declaratio
 
 ### 3. Lettura/scrittura
 
-Precise control and predictability make for better systems. We don't need true immutability to enforce unidirectional flow, only the ability to make the conscious decision which consumers may write and which may not.
+Il controllo preciso e la prevedibilità fanno per un sistema migliore. Non abbiamo bisognino per vera immutabilità per imporre il flusso unidirezionale, solo l'abilita di fare decisione conscie con il quale gli user scriveranno o no.
 
 ### 4. Semplice è meglio che facile
 
