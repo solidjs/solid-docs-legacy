@@ -95,20 +95,6 @@ const newCount = setCount((prev) => prev + 1);
 > const [func, setFunc] = createSignal(myFunction);
 > ```
 
-Unless you're in a [batch](#batch), [effect](#createEffect), or
-[transition](#use-transition), signals update immediately when you set them.
-For example:
-
-```js
-setReady(false);
-console.assert(ready() === false);
-setReady(true);
-console.assert(ready() === true);
-```
-
-If you're not sure whether your code will be run in a batch or transition
-(e.g., library code), you should avoid making this assumption.
-
 ##### Options
 
 Several primitives in Solid take an "options" object
@@ -196,14 +182,6 @@ can cause additional rendering or even infinite effect loops.
 Instead, prefer using [`createMemo`](#creatememo) to compute new values
 that depend on other reactive values, so the reactive system knows what
 depends on what, and can optimize accordingly.
-If you do set signals in an effect,
-the effect function is automatically wrapped in [`batch`](#batch),
-meaning that all signal changes inside the effect propagate only after the
-effect finishes. This causes several signal updates to trigger only
-one update, and avoids unwanted side effects from happening in the middle
-of your side effects.
-In fact, if multiple effects all trigger at once, they collectively
-get wrapped into a single `batch`.
 
 The _first_ execution of the effect function is not immediate;
 it's scheduled to run after the current rendering phase
@@ -214,9 +192,6 @@ If you want to wait for the first execution to occur, use
 (which runs before the browser renders the DOM) or
 `await Promise.resolve()` or `setTimeout(..., 0)`
 (which run after browser rendering).
-After this first execution, effects generally run immediately when
-their dependencies update (unless you're in a [batch](#batch) or
-[transition](#use-transition)). For example:
 
 ```js
 // assume this code is in a component function, so is part of a rendering phase
@@ -366,6 +341,7 @@ import type { ResourceReturn } from "solid-js";
 type ResourceReturn<T> = [
   {
     (): T | undefined;
+    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored"
     loading: boolean;
     error: any;
     latest: T | undefined;
@@ -376,12 +352,21 @@ type ResourceReturn<T> = [
   }
 ];
 
+export type ResourceOptions<T, S = unknown> = {
+  initialValue?: T;
+  name?: string;
+  deferStream?: boolean;
+  ssrLoadFrom?: "initial" | "server";
+  storage?: (init: T | undefined) => [Accessor<T | undefined>, Setter<T | undefined>];
+  onHydrated?: (k: S | undefined, info: { value: T | undefined }) => void;
+};
+
 function createResource<T, U = true>(
   fetcher: (
     k: U,
     info: { value: T | undefined; refetching: boolean | unknown }
   ) => T | Promise<T>,
-  options?: { initialValue?: T }
+  options?: ResourceOptions<T, U>
 ): ResourceReturn<T>;
 
 function createResource<T, U>(
@@ -390,7 +375,7 @@ function createResource<T, U>(
     k: U,
     info: { value: T | undefined; refetching: boolean | unknown }
   ) => T | Promise<T>,
-  options?: { initialValue?: T }
+  options?: ResourceOptions<T, U>
 ): ResourceReturn<T>;
 ```
 
@@ -467,6 +452,47 @@ const [user] = createResource(() => params.id, fetchUser, {
 });
 ```
 
+**New in v1.5.0**
+
+We've added a new `state` field which covers a more detailed view of the Resource state beyond `loading` and `error`. You can now check whether a Resource is `"unresolved"`, `"pending"`, `"ready"`, `"refreshing"`, or `"error"`.
+
+| state      | value resolved | loading | has error |
+| ---------- | -------------- | ------- | --------- |
+| unresolved | No             | No      | No        |
+| pending    | No             | Yes     | No        |
+| ready      | Yes            | No      | No        |
+| refreshing | Yes            | Yes     | No        |
+| errored    | No             | No      | Yes       |
+
+**New in v1.5.0**
+
+When server rendering resources especially when fetching when embedding Solid in other system that fetch before render, you might want to initiate the resource with this prefetched value instead of fetching again and having the resource serialize it isn't own state. You can use the new `ssrLoadFrom` option for this. Instead of using the default `"server"` value, you can pass `"initial"` and the resource will use `initialValue` as if it were the result of the first fetch for both SSR and hydration.
+
+**New in 1.5.0** *Experimental*
+
+Resources can be set with custom defined storage with the same signature as a Signal by using the `storage` option. For example using a custom reconciling store could be done this way:
+
+```ts
+function createDeepSignal<T>(value: T): Signal<T> {
+  const [store, setStore] = createStore({
+    value
+  });
+  return [
+    () => store.value,
+    (v: T) => {
+      const unwrapped = unwrap(store.value);
+      typeof v === "function" && (v = v(unwrapped));
+      setStore("value", reconcile(v));
+      return store.value;
+    }
+  ] as Signal<T>;
+}
+
+const [resource] = createResource(fetcher, {
+  storage: createDeepSignal
+});
+```
+
 # Lifecycles
 
 ## `onMount`
@@ -521,7 +547,7 @@ import { batch } from "solid-js";
 function batch<T>(fn: () => T): T;
 ```
 
-Holds committing updates within the block until the end to prevent unnecessary recalculation. This means that reading values on the next line will not have updated yet. [Solid Store](#createstore)'s set method, [Mutable Store](#createmutable)'s array methods, and Effects automatically wrap their code in a batch.
+Holds executing downstream computations within the block until the end to prevent unnecessary recalculation. [Solid Store](#createstore)'s set method, [Mutable Store](#createmutable)'s array methods, and Effects automatically wrap their code in a batch.
 
 ## `on`
 
@@ -1372,8 +1398,7 @@ If the given `props.children` is not an array
 then the `children` helper will not normalize it into an array.
 This is useful behavior e.g. when the intention is to pass a single function
 as a child, which can be detected via `typeof resolved() === 'function'`.
-If you want to normalize to an array, you can use
-`Array.isArray(resolved()) ? resolved() : [resolved()]`.
+If you want to normalize to an array, the returned memo has a `toArray` method(*new in 1.5*).
 
 Here is an example of automatically setting the `class` attribute of any
 child that resolves to an `Element`, in addition to rendering the children:
@@ -1382,8 +1407,7 @@ child that resolves to an `Element`, in addition to rendering the children:
 const resolved = children(() => props.children);
 
 createEffect(() => {
-  let list = resolved();
-  if (!Array.isArray(list)) list = [list];
+  let list = resolved.toArray();
   for (let child of list) child?.setAttribute?.("class", myClass());
 });
 
@@ -1579,14 +1603,12 @@ set a signal within the function.
 If it is possible to use pure functions and `createMemo`, this is likely
 more efficient, as Solid optimizes the execution order of memo updates,
 whereas updating a signal within `createComputed` will immediately trigger
-reactive updates some of which may turn out to be unnecessary
-(unless you take care by wrapping in
-[`batch`](#batch), [`untrack`](#untrack), etc.).
+reactive updates some of which may turn out to be unnecessary.
 
 Like `createRenderEffect`, `createComputed` calls its function for the first
 time immediately. But they differ in how updates are performed.
 While `createComputed` generally updates immediately, `createRenderEffect`
-updates queue to run in a single `batch` (along with `createEffect`s)
+updates queue to run (along with `createEffect`s)
 after the current render phase.
 Thus `createRenderEffect` can perform fewer overall updates,
 but is slightly less immediate.
@@ -1876,6 +1898,7 @@ import { Show } from "solid-js";
 
 function Show<T>(props: {
   when: T | undefined | null | false;
+  keyed: boolean;
   fallback?: JSX.Element;
   children: JSX.Element | ((item: T) => JSX.Element);
 }): () => JSX.Element;
@@ -1892,7 +1915,7 @@ The Show control flow is used to conditional render part of the view: it renders
 Show can also be used as a way of keying blocks to a specific data model. Ex the function is re-executed whenever the user model is replaced.
 
 ```jsx
-<Show when={state.user} fallback={<div>Loading...</div>}>
+<Show when={state.user} fallback={<div>Loading...</div>} keyed>
   {(user) => <div>{user.firstName}</div>}
 </Show>
 ```
