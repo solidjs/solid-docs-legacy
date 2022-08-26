@@ -1970,13 +1970,54 @@ function App() {
 
 ## `classList`
 
-Un attribut d'aide pour utiliser `element.classList.toggle`. Il va prendre un objet dont la clé est un nom de classes et l'assigner quand la condition sera considérée `true`
+Solid propose deux façons de définir la `class` d'un élément: les attributs `class` et `classList`.
+
+Premièrement, vous pouvez utiliser `class=...` comme n'importe quel autre attribut. Par exemple:
+
+```jsx
+// Deux classes statiques.
+<div class="active editing" />
+
+// Une classe dynamique que l'on supprime si on n'en a pas besoin.
+<div class={state.active ? 'active' : undefined} />
+
+// Deux classes dynamiques.
+<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}} />
+```
+
+(Notez que `className=...` a été déprécié depuis Solid 1.4.)
+
+Alternativement, le pseudo-attribut `classList` vous permet de spécifier un objet, où chaque clé est une classe et la valeur est traitée comme un booléen représentant si cette classe doit être incluse.
+Par exemple (correspondant au dernier exemple):
+
 
 ```jsx
 <div
   classList={{ active: state.active, editing: state.currentId === row.id }}
 />
 ```
+
+Cet exemple se compile en un [effet de rendu](#createrendereffect) qui appelle dynamiquement [`element.classList.toggle`](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle) pour activer ou désactiver chaque classe, uniquement lorsque le booléen correspondant change.
+Par exemple, lorsque `state.active` devient `true` [`false`], l'élément gagne [perd] la classe `active`.
+
+La valeur passée dans `classList` peut être n'importe quelle expression (y compris un Signal) qui est évaluée à un objet approprié. Quelques exemples:
+
+```jsx
+// Nom et valeur de la classe dynamique.
+<div classList={{ [className()]: classOn() }} />;
+
+// Liste de classes avec des Signaux.
+const [classes, setClasses] = createSignal({});
+setClasses((c) => ({ ...c, active: true }));
+<div classList={classes()} />;
+```
+
+Il est également possible, mais dangereux, de mélanger `class` et `classList`.
+La principale situation sûre est lorsque `class` est défini à une chaîne statique (ou rien), et que `classList` est réactive.
+(`class` peut aussi être défini comme une valeur statique calculée comme dans `class={baseClass()}`, mais alors il devrait apparaître avant tout pseudo-attribut `classList`).
+Si `class` et `classList` sont tous deux réactifs, vous pouvez obtenir un comportement inattendu: lorsque la valeur de `class` change, Solid définit l'attribut `class` entier, ce qui écrasera tous les basculements effectués par `classList`.
+
+Parce que `classList` est un pseudo-attribut de compilation, il ne fonctionne pas dans un prop spread comme `<div {...props} />` ou dans `<Dynamic>`.
 
 ## `style`
 
