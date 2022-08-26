@@ -1354,31 +1354,119 @@ import { createRenderEffect } from "solid-js";
 function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Crée une nouvelle fonction de calcul qui va automatiquement tracer les dépendances et s'exécuter immédiatement avant le rendu. L'utiliser pour écrire sur d'autres primitives réactives. Quand c'est possible, utiliser plutôt `createMemo` car écrire sur un signal en milieu de mise à jour peut causer d'autres fonctions à se recalculer.
+Un effet de rendu est un calcul similaire à un effet régulier (tel que créé par [`createEffect`](#createeffect)), mais diffère par le moment où Solid programme la première exécution de la fonction d'effet.
+Alors que `createEffect` attend que la phase de rendu en cours soit terminée, `createRenderEffect` appelle immédiatement la fonction.
+Ainsi, l'effet s'exécute pendant que les éléments du DOM sont créés et mis à jour, mais possiblement avant que les éléments spécifiques d'intérêt aient été créés, et probablement avant que ces éléments aient été connectés au document.
+En particulier, les [`ref`](#ref)s ne seront pas définis avant l'appel initial de l'effet.
+En effet, Solid utilise `createRenderEffect` pour mettre en oeuvre la phase de rendu elle-même, y compris la définition des `ref`s.
 
-## `createRenderEffect`
+Reactive updates to render effects are identical to effects: they queue up in
+response to a reactive change (e.g., a single signal update, or a `batch` of
+changes, or collective changes during an entire render phase) and run in a
+single [`batch`](#batch) afterward (together with effects).
+In particular, all signal updates within a render effect are batched.
 
-```ts
-export function createRenderEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
+Les mises à jour réactives des effets de rendu sont identiques aux effets : elles sont mises en file d'attente en réponse à un changement réactif (par exemple, une mise à jour unique d'un Signal, ou d'un `batch` de changements, ou des changements collectifs durant une phase de rendu entière) et s'exécutent dans un
+unique [`batch`](#batch) par la suite (avec les effets).
+En particulier, toutes les mises à jour de Signaux dans un effet de rendu sont groupées.
+
+Voici un exemple de ce comportement.
+(Comparez avec l'exemple dans [`createEffect`](#createeffect).)
+
+```js
+// Supposez que ce code est dans une fonction de composant, donc fait partie d'une phase de rendu.
+const [count, setCount] = createSignal(0);
+
+// Cet effet log le compte au début et quand il change.
+createRenderEffect(() => console.log("count =", count()));
+// L'effet de rendu s'exécute immédiatement, donnant `count = 0`.
+console.log("hello");
+setCount(1); // L'effet ne se produit pas encore.
+setCount(2); // L'effet ne se produit pas encore.
+
+queueMicrotask(() => {
+  // Maintenant, `count = 2` va s'afficher.
+  console.log("microtask");
+  setCount(3); // Affiche immédiatement `count = 3`.
+  console.log("goodbye");
+});
+
+// --- overall output: ---
+// count = 0   [C'est la seule ligne ajoutée par rapport à createEffect]
+// hello
+// count = 2
+// microtask
+// count = 3
+// goodbye
 ```
 
-Créer un nouveau calcul qui va automatiquement tracer ces dépendances et s'exécuter durant la phase de rendu pendant que les éléments de DOM sont créés et mis à jour, mais pas nécessairement connecté. Toutes les mises à jour du DOM interne se passent à ce moment-là.
+Tout comme `createEffect`, la fonction d'effet est appelée avec un argument égal à la valeur retournée lors de la dernière exécution de la fonction d'effet, ou lors du premier appel, égal au second argument optionnel de `createRenderEffect`.
+
+## `createComputed`
+
+```ts
+import { createComputed } from "solid-js";
+
+function createComputed<T>(fn: (v: T) => T, value?: T): void;
+```
+
+`createComputed` crée un nouveau calcul qui exécute immédiatement la fonction donnée dans une portée de suivi, ce qui permet de suivre automatiquement ses dépendances, et réexécute automatiquement la fonction dès que les dépendances changent.
+La fonction est appelée avec un argument égal à la valeur retournée lors de la dernière exécution de la fonction, ou lors du premier appel, égal au second argument optionnel de `createComputed`.
+Notez que la valeur de retour de la fonction n'est pas autrement exposée ; en particulier, `createComputed` n'a pas de valeur de retour.
+
+`createComputed` est la forme la plus immédiate de réactivité dans Solid, et est plus utile pour construire d'autres primitives réactives.
+(Par exemple, certaines autres primitives de Solid sont construites à partir de `createComputed`.)
+Mais elle doit être utilisée avec précaution, car `createComputed` peut facilement provoquer plus de mises à jour inutiles que les autres primitives réactives.
+Avant de l'utiliser, considérez les primitives étroitement liées suivantes [`createMemo`](#creatememo) et [`createRenderEffect`](#createrendereffect).
+
+Comme `createMemo`, `createComputed` appelle sa fonction immédiatement lors des mises à jour
+(sauf si vous êtes dans un [batch](#batch), un [effet](#createEffect), ou une [transition](#use-transition)).
+Cependant, alors que les fonctions `createMemo` doivent être pures (ne pas définir de Signaux), les fonctions `createComputed` peuvent définir des Signaux.
+En relation, `createMemo` offre un signal en lecture seule pour la valeur de retour de la fonction, alors que pour faire la même chose avec `createComputed`, vous devez définir un Signal dans la fonction.
+S'il est possible d'utiliser des fonctions pures et `createMemo`, c'est probablement plus efficace, car Solid optimise l'ordre d'exécution des mises à jour des mémos, tandis que la mise à jour d'un signal dans `createComputed` déclenchera immédiatement des mises à jour réactives dont certaines peuvent s'avérer inutiles (à moins que vous ne fassiez attention en enveloppant dans [`batch`](#batch), [`untrack`](#untrack), etc.).
+
+Comme `createRenderEffect`, `createComputed` appelle sa fonction pour la première fois fois immédiatement.
+Mais ils diffèrent dans la façon dont les mises à jour sont effectuées.
+Alors que `createComputed` met généralement à jour immédiatement, `createRenderEffect` met à jour la file d'attente pour s'exécuter dans un seul `batch` (avec les `createEffect`s) après la phase de rendu en cours.
+Ainsi, `createRenderEffect` peut effectuer moins de mises à jour globales, mais est légèrement moins immédiat.
+
+## `createReaction`
+
+**Nouveau depuis la v1.3.0**
+
+```ts
+import { createReaction } from "solid-js";
+
+function createReaction(onInvalidate: () => void): (fn: () => void) => void;
+```
+
+Il est parfois utile de séparer le suivi de la ré-exécution. Cette primitive enregistre un effet secondaire qui est exécuté la première fois que l'expression enveloppée par la fonction de suivi retournée est notifiée d'un changement.
+
+```js
+const [s, set] = createSignal("start");
+
+const track = createReaction(() => console.log("quelque chose"));
+
+// La prochaine fois que `s` change, exécuter la réaction.
+track(() => s());
+
+set("end"); // "quelque chose"
+
+set("final"); // Aucune opération car la réaction ne fonctionne que lors de la première mise à jour, il faut rappeler `track` à nouveau.
+```
 
 ## `createSelector`
 
 ```ts
-export function createSelector<T, U>(
+import { createSelector } from "solid-js";
+
+function createSelector<T, U>(
   source: () => T,
-  fn?: (a: U, b: T) => boolean,
-  options?: { name?: string }
+  fn?: (a: U, b: T) => boolean
 ): (k: U) => boolean;
 ```
 
-Créer un signal conditionnel qui va seulement notifier les abonnées quand un élément entré ou sorti correspond à la valeur de la clé. Utile pour déléguer la sélection d'états, car l'opération devient O(1) au lieu de O(n).
+Créé un signal conditionnel qui va seulement notifier les abonnées quand un élément entré ou sorti correspond à la valeur de la clé. Utile pour déléguer la sélection d'états, car l'opération devient O(1) au lieu de O(n).
 
 ```js
 const isSelected = createSelector(selectedId);
@@ -1387,8 +1475,6 @@ const isSelected = createSelector(selectedId);
   {(item) => <li classList={{ active: isSelected(item.id) }}>{item.name}</li>}
 </For>;
 ```
-
-# Rendering
 
 # Rendu
 
