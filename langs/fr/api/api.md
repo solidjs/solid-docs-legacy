@@ -1147,12 +1147,16 @@ modifyMutable(state.user, produce((u) => {
 ## `createContext`
 
 ```ts
+import { createContext } from "solid-js";
+import type { Context } from "solid-js";
+
 interface Context<T> {
   id: symbol;
   Provider: (props: { value: T; children: any }) => any;
   defaultValue: T;
 }
-export function createContext<T>(defaultValue?: T): Context<T | undefined>;
+
+function createContext<T>(defaultValue?: T): Context<T | undefined>;
 ```
 
 Un Contexte permet une forme d'injection de dépendance dans Solid. Il est utilisé pour éviter de devoir passer des données en tant que props à travers plusieurs composants intermédiaires.
@@ -1189,10 +1193,12 @@ La valeur donnée au `Provider` est passée telle quelle à `useContext`. Cela s
 ## `useContext`
 
 ```ts
-export function useContext<T>(context: Context<T>): T;
+import { useContext } from "solid-js";
+
+function useContext<T>(context: Context<T>): T;
 ```
 
-Utiliser pour récupérer un contexte, et d'éviter de passer des données via les props dans chaque fonction Composant.
+Utilisé pour récupérer un contexte afin de permettre le passage de données sans avoir à les faire passer par chaque fonction Composant.
 
 ```js
 const [state, { increment, decrement }] = useContext(CounterContext);
@@ -1201,48 +1207,138 @@ const [state, { increment, decrement }] = useContext(CounterContext);
 ## `children`
 
 ```ts
-export function children(fn: () => any): () => any;
+import { children } from "solid-js";
+import type { JSX, ResolvedChildren } from "solid-js";
+
+function children(fn: () => JSX.Element): () => ResolvedChildren;
 ```
 
-Utiliser pour faciliter l'interaction avec `props.children`. Cette fonction d'aide résout n'importe quelle réactivité imbriquée et retourne un mémo. Cette approche est recommandée pour utiliser `props.children` dans autre chose que l'utiliser directement dans le JSX.
+Le helper `children` est conçu pour les interactions complexes avec `props.children`, lorsque vous ne faites pas que passer des enfants à un autre composant en utilisant `{props.children}` une fois dans le JSX.
+Normalement vous passez un getter pour `props.children` comme ça:
 
 ```js
-const list = children(() => props.children);
+const resolved = children(() => props.children);
+```
 
-// faire quelque chose avec la donnée
-createEffect(() => list());
+La valeur de retour est un [memo](#creatememo) évaluant les enfants résolus, qui est mis à jour à chaque fois que les enfants changent.
+Utiliser ce mémo au lieu d'accéder directement à `props.children` présente des avantages importants dans certains scénarios.
+Le problème sous-jacent est que, lorsque vous spécifiez des enfants de composants via JSX, Solid définit automatiquement `props.children` comme un getter de propriété, de sorte que les enfants sont créés (en particulier, DOM est créé) à chaque fois qu'on accède à `props.children`. Deux conséquences particulières:
+
+- Si vous accédez plusieurs fois à `props.children`, les enfants (et le DOM associé) seront créés plusieurs fois.
+  Ceci est utile si vous voulez que le DOM soit dupliqué (car les noeuds DOM peuvent apparaître
+  dans un seul élément parent), mais dans de nombreux cas, cela crée des noeuds DOM redondants.
+  Si vous appelez plutôt `resolved()` plusieurs fois, vous réutilisez les mêmes enfants.
+
+- Si vous accédez à `props.children` en dehors d'une portée de suivi (par exemple, dans un event handler), alors vous créez des enfants qui ne seront jamais éliminés.
+  Si vous appelez plutôt `resolved()`, vous réutilisez les enfants déjà résolus.
+  Vous garantissez également que les enfants sont suivis dans le composant actuel,
+  par opposition à une autre portée de suivi telle qu'un autre composant.
+
+De plus, le helper `children` "résout" les enfants en appelant des fonctions sans argument et en aplatissant des tableaux de tableaux en un tableau.
+Par exemple, un enfant spécifié avec un JSX comme `{signal() * 2}` sera transformé en
+une fonction getter `() => count() * 2` dans `props.children`, mais elle est évaluée
+en un nombre réel dans `resolved`, dépendant correctement d'un signal `count`.
+
+Si le `props.children` donné n'est pas un tableau (ce qui se produit lorsque la balise JSX a un seul enfant), alors le helper `children` ne le normalisera pas en un tableau.
+C'est un comportement utile, par exemple lorsque l'intention est de passer une seule fonction comme enfant, ce qui peut être détecté par `typeof resolved() === 'function'`.
+Si vous voulez normaliser en un tableau, vous pouvez utiliser `Array.isArray(resolved()) ? resolved() : [resolved()]`.
+
+Voici un exemple de l'ajout automatique de l'attribut `class` de tout enfant
+qui se résout en un `Element`, en plus du rendu des enfants:
+
+```tsx
+const resolved = children(() => props.children);
+
+createEffect(() => {
+  let list = resolved();
+  if (!Array.isArray(list)) list = [list];
+  for (let child of list) child?.setAttribute?.("class", myClass());
+});
+
+return <div>{resolved()}</div>;
+```
+
+(Notez que cette approche n'est pas particulièrement recommandée:
+il est généralement préférable de suivre une approche déclarative consistant à passer
+la classe souhaitée via les props ou le contexte aux composants enfants.)
+
+D'un autre côté, vous n'avez pas besoin (et dans certains cas, ne voulez pas) utiliser le helper `children` si vous transmettez simplement `props.children` à un autre composant ou élément via JSX:
+
+```tsx
+const Wrapper = (props) => {
+  return <div>{props.children}</div>;
+};
+```
+
+Un aspect important du helper `children` est qu'il force la création et la résolution des enfants, car il accède à `props.children` immédiatement.
+Cela peut être indésirable pour le rendu conditionnel, par exemple, lorsque vous utilisez les enfants dans un composant [`<Show>`](#<show>).
+Par exemple, le code suivant évalue toujours les enfants:
+
+```tsx
+const resolved = children(() => props.children);
+
+return <Show when={visible()}>{resolved()}</Show>;
+```
+
+Pour évaluer les enfants uniquement lorsque `<Show>` les rendra, vous pouvez
+pousser l'appel à `children` dans un composant ou une fonction de `<Show>`,
+qui n'évalue ses enfants que lorsque la condition `when` est vraie.
+Une autre solution consiste à passer `props.children` au helper `children`
+uniquement lorsque vous souhaitez réellement évaluer les enfants:
+
+```ts
+const resolved = children(() => visible() && props.children);
 ```
 
 ## `lazy`
 
 ```ts
-export function lazy<T extends Component<any>>(
+import { lazy } from "solid-js";
+
+function lazy<T extends Component<any>>(
   fn: () => Promise<{ default: T }>
 ): T & { preload: () => Promise<T> };
 ```
 
-Utiliser le chargement de composant en mode paresseux pour permettre le découpage dynamique de code. Les composants ne sont chargés qu'une fois utilisée. Les composants chargés paresseusement peuvent être utilisé de la même manière qu'un composant importé normalement, il peut recevoir des props, etc. Les composants paresseux déclenchent les `<Suspense />`
+Utilisé pour charger paresseusement les composants afin de permettre le fractionnement du code. Les composants ne sont pas chargés avant d'être rendus. Les composants chargés paresseusement peuvent être utilisés de la même manière qu'un composant importé normalement, il peut recevoir des props, etc... Les composants paresseux déclenchent `<Suspense>`.
 
 ```js
-// Enrobe l'import
+// Enrobe l'import.
 const ComponentA = lazy(() => import("./ComponentA"));
 
-// utiliser dans le JSX
+// Utilisation dans le JSX.
 <ComponentA title={props.title} />;
 ```
 
+## `createUniqueId`
+
+```ts
+import { createUniqueId } from "solid-js";
+
+function createUniqueId(): string;
+```
+
+Un générateur d'ID universel stable sur le serveur/navigateur.
+
+```js
+const id = createUniqueId();
+```
+
+> **Note**: sur le serveur, cela ne fonctionne que sous les composants hydratables.
+
 # Primitives secondaires
 
-Vous n'en aurez sûrement pas besoin pour votre première app, mais ce sont des outils utiles à avoir sous le coude.
+Vous n'en aurez sûrement pas besoin pour votre première application, mais ce sont des outils utiles à avoir sous le coude.
 
 ## `createDeferred`
 
 ```ts
-export function createDeferred<T>(
+import { createDeferred } from "solid-js";
+
+function createDeferred<T>(
   source: () => T,
   options?: {
     timeoutMs?: number;
-    name?: string;
     equals?: false | ((prev: T, next: T) => boolean);
   }
 ): () => T;
@@ -1250,14 +1346,12 @@ export function createDeferred<T>(
 
 Créer une valeur en lecture seule qui va notifier les changements en aval quand le navigateur est inactif. `timeoutMs` est le temps maximum attendu avant de forcer la mise à jour.
 
-## `createComputed`
+## `createRenderEffect`
 
 ```ts
-export function createComputed<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
+import { createRenderEffect } from "solid-js";
+
+function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
 Crée une nouvelle fonction de calcul qui va automatiquement tracer les dépendances et s'exécuter immédiatement avant le rendu. L'utiliser pour écrire sur d'autres primitives réactives. Quand c'est possible, utiliser plutôt `createMemo` car écrire sur un signal en milieu de mise à jour peut causer d'autres fonctions à se recalculer.
