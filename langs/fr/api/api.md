@@ -506,29 +506,14 @@ import { getOwner } from "solid-js";
 function getOwner(): Owner;
 ```
 
-Gets the reactive scope that owns the currently running code, e.g.,
-for passing into a later call to `runWithOwner` outside of the current scope.
+Obtient la portée réactive qui possède le code en cours d'exécution, par exemple, pour passer dans un appel ultérieur à `runWithOwner` en dehors de la portée actuelle.
 
-Internally, computations (effects, memos, etc.) create owners which are
-children of their owner, all the way up to the root owner created by
-`createRoot` or `render`. In particular, this ownership tree lets Solid
-automatically clean up a disposed computation by traversing its subtree
-and calling all [`onCleanup`](#oncleanup) callbacks.
-For example, when a `createEffect`'s dependencies change, the effect calls
-all descendant `onCleanup` callbacks before running the effect function again.
-Calling `getOwner` returns the current owner node that is responsible
-for disposal of the current execution block.
+En interne, les calculs (effets, mémos, etc.) créent des propriétaires qui sont les enfants de leur propriétaire, jusqu'au propriétaire racine créé par `createRoot` ou `render`. En particulier, cet arbre de propriété permet à Solid de nettoyer automatiquement un calcul supprimé en parcourant son sous-arbre et en appelant tous les rappels [`onCleanup`](#oncleanup).
+Par exemple, lorsque les dépendances d'un `createEffect` changent, l'effet appelle tous les rappels descendants `onCleanup` avant d'exécuter à nouveau la fonction d'effet. L'appel de `getOwner` renvoie le nœud propriétaire actuel responsable de la suppression du bloc d'exécution actuel.
 
-Components are not computations, so do not create an owner node, but they are
-typically rendered from a `createEffect` which does, so the result is similar:
-when a component gets unmounted, all descendant `onCleanup` callbacks get
-called. Calling `getOwner` from a component scope returns the owner that is
-responsible for rendering and unmounting that component.
+Les composants ne sont pas des calculs, donc ne créent pas de noeud propriétaire, mais ils sont typiquement rendus à partir d'un `createEffect` qui le fait, donc le résultat est similaire : quand un composant est démonté, tous les callbacks `onCleanup` descendants sont appelés. L'appel de `getOwner` à partir d'un composant renvoie le propriétaire qui est responsable du rendu et du démontage de ce composant.
 
-Note that the owning reactive scope isn't necessarily _tracking_.
-For example, [`untrack`](#untrack) turns off tracking for the duration
-of a function (without creating a new reactive scope), as do
-components created via JSX (`<Component ...>`).
+Notez que la portée réactive propriétaire n'est pas nécessairement _suivie_. Par exemple, [`untrack`](#untrack) désactive le suivi pendant la durée d'une fonction (sans créer une nouvelle portée réactive), tout comme les composants créés via JSX (`<Component ...>`).
 
 ## `runWithOwner`
 
@@ -538,38 +523,23 @@ import { runWithOwner } from 'solid-js';
 function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
 ```
 
-Executes the given function under the provided owner,
-instead of (and without affecting) the owner of the outer scope.
-By default, computations created by `createEffect`, `createMemo`, etc.
-are owned by the owner of the currently executing code (the return value of
-`getOwner`), so in particular will get disposed when their owner does.
-Calling `runWithOwner` provides a way to override this default to a manually
-specified owner (typically, the return value from a previous call to
-`getOwner`), enabling more precise control of when computations get disposed.
+Exécute la fonction donnée sous le propriétaire fourni,
+à la place du propriétaire de la portée externe (et sans l'affecter).
+Par défaut, les calculs créés par `createEffect`, `createMemo`, etc. appartiennent au propriétaire du code en cours d'exécution (la valeur de retour de `getOwner`), et seront donc éliminés lorsque leur propriétaire le fera. L'appel à `runWithOwner` fournit un moyen de remplacer cette valeur par défaut par un propriétaire spécifié manuellement (typiquement, la valeur de retour d'un appel précédent à `getOwner`), permettant un contrôle plus précis du moment où les calculs sont éliminés.
 
-Having a (correct) owner is important for two reasons:
+Il est important d'avoir un propriétaire (correct) pour deux raisons:
 
-- Computations without an owner cannot be cleaned up. For example, if you call
-  `createEffect` without an owner (e.g., in the global scope), the effect will
-  continue running forever, instead of being disposed when its owner gets
-  disposed.
-- [`useContext`](#usecontext) obtains context by walking up the owner tree
-  to find the nearest ancestor providing the desired context.
-  So without an owner you cannot look up any provided context
-  (and with the wrong owner, you might obtain the wrong context).
+- Les calculs sans propriétaire ne peuvent pas être éliminés. Par exemple, si vous appelez `createEffect` sans propriétaire (par exemple, dans la portée globale), l'effet continuera à fonctionner pour toujours, au lieu d'être éliminé lorsque son propriétaire sera éliminé.
+-  [`useContext`](#usecontext) obtient le contexte en remontant l'arbre des propriétaires pour trouver l'ancêtre le plus proche fournissant le contexte désiré. Donc, sans propriétaire, vous ne pouvez pas chercher un contexte fourni (et avec le mauvais propriétaire, vous pourriez obtenir le mauvais contexte).
 
-Manually setting the owner is especially helpful when doing reactivity outside
-of any owner scope. In particular, asynchronous computation
-(via either `async` functions or callbacks like `setTimeout`)
-lose the automatically set owner, so remembering the original owner via
-`getOwner` and restoring it via `runWithOwner` is necessary in these cases.
-For example:
+Définir manuellement le propriétaire est particulièrement utile lorsque l'on fait de la réactivité en dehors de toute portée de propriétaire. En particulier, les calculs asynchrones (via les fonctions `async` ou les callbacks comme `setTimeout`) perdent le propriétaire automatiquement défini, donc se souvenir du propriétaire original via `getOwner` et le restaurer via `runWithOwner` est nécessaire dans ces cas.
+Par exemple:
 
 ```js
 const owner = getOwner();
 setTimeout(() => {
-  // This callback gets run without owner.
-  // Restore owner via runWithOwner:
+  // Ce callback est exécuté sans propriétaire.
+  // Restaurer le propriétaire via runWithOwner:
   runWithOwner(owner, () => {
     const foo = useContext(FooContext);
     createEffect(() => {
@@ -579,10 +549,7 @@ setTimeout(() => {
 }, 1000);
 ```
 
-Note that owners are not what determines dependency tracking,
-so `runWithOwner` does not help with tracking in asynchronous functions;
-use of reactive state in the asynchronous part (e.g. after the first `await`)
-will not be tracked as a dependency.
+Notez que les propriétaires ne sont pas ce qui détermine le suivi des dépendances, donc `runWithOwner` n'aide pas au suivi dans les fonctions asynchrones ; l'utilisation d'un état réactif dans la partie asynchrone (par exemple, après le premier `await`) ne sera pas suivie comme une dépendance.
 
 ## `mergeProps`
 
@@ -620,20 +587,9 @@ function splitProps<T>(
 
 C'est un remplacement de la déstructuration. Elle va séparer un objet réactif par une liste de clés pour maintenir la réactivité.
 
-```js
-const [local, others] = splitProps(props, ["children"]);
+Elle prend un objet réactif et un nombre quelconque de tableaux de clés ; pour chaque tableau de clés, elle renvoie un objet réactif avec uniquement les propriétés de l'objet original. Le dernier objet réactif dans le tableau retourné aura toutes les propriétés restantes de l'objet original.
 
-<>
-  <Child {...others} />
-  <div>{local.children}<div>
-</>
-```
-
-Splits a reactive object by keys.
-
-It takes a reactive object and any number of arrays of keys; for each array of keys, it will return a reactive object with just those properties of the original object. The last reactive object in the returned array will have any leftover properties of the original object.
-
-This can be useful if you want to consume a subset of props and pass the rest to a child.
+Cela peut être utile si vous voulez consommer un sous-ensemble de props et passer le reste à un enfant.
 
 ```js
 function MyComponent(props) {
@@ -648,24 +604,22 @@ function MyComponent(props) {
 }
 ```
 
-Because `splitProps` takes any number of arrays, we can split a props object
-as much as we wish (if, for example, we had multiple child components that
-each required a subset of the props).
+Parce que `splitProps` prend n'importe quel nombre de tableaux, nous pouvons diviser un objet props autant que nous le souhaitons (si, par exemple, nous avons plusieurs composants enfants qui nécessitent chacun un sous-ensemble des props).
 
-Let's say a component was passed six props:
+Disons qu'un composant a reçu six props:
 
 ```js
 <MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar" />;
 function MyComponent(props) {
   console.log(props); // {a: 1, b: 2, c: 3, d: 4, e: 5, foo: "bar"}
-  const [vowels, consonants, leftovers] = splitProps(
+  const [voyelles, consonnes, reste] = splitProps(
     props,
     ["a", "e"],
     ["b", "c", "d"]
   );
-  console.log(vowels); // {a: 1, e: 5}
-  console.log(consonants); // {b: 2, c: 3, d: 4}
-  console.log(leftovers.foo); // bar
+  console.log(voyelles); // {a: 1, e: 5}
+  console.log(consonnes); // {b: 2, c: 3, d: 4}
+  console.log(reste.foo); // bar
 }
 ```
 
@@ -694,7 +648,7 @@ start(() => setSignal(newValue), () => /* La transition est terminée. */)
 
 ## `startTransition`
 
-**New in v1.1.0**
+**Nouveau depuis la v1.1.0**
 
 ```ts
 import { startTransition } from 'solid-js';
@@ -702,8 +656,7 @@ import { startTransition } from 'solid-js';
 function startTransition: (fn: () => void) => Promise<void>;
 ```
 
-Similar to `useTransition` except there is no associated pending state. This one can just be used directly to start the Transition.
-
+Similaire à `useTransition` sauf qu'il n'y a pas d'état en attente associé. Celui-ci peut simplement être utilisé directement pour lancer la transition.
 
 ## `observable`
 
@@ -713,7 +666,8 @@ import { observable } from "solid-js";
 function observable<T>(input: () => T): Observable<T>;
 ```
 
-Cette méthode prend un signal et produit un simple objet Observable. Vous pouvez l'utiliser avec une librairie Observable de votre choix typiquement avec l'opérateur `from`.
+Cette méthode prend un signal et produit un simple objet Observable.
+Vous pouvez l'utiliser avec une librairie Observable de votre choix typiquement avec l'opérateur `from`.
 
 ```js
 // Intégrer rxjs avec un Signal Solid
@@ -731,7 +685,7 @@ Vous pouvez également utiliser `from` sans `rxjs` ; voir ci-dessous.
 
 ## `from`
 
-**New in v1.1.0**
+**Nouveau depuis la v1.1.0**
 
 ```ts
 import { from } from "solid-js";
@@ -747,13 +701,13 @@ function from<T>(
 ): () => T;
 ```
 
-A helper to make it easier to interop with external producers like RxJS observables or with Svelte Stores. This basically turns any subscribable (object with a `subscribe` method) into a Signal and manages subscription and disposal.
+Un helper pour faciliter à opérer avec des producteurs externes comme les observables RxJS ou avec Svelte Stores. En gros, cela transforme n'importe quel objet pouvant être abonné (objet avec une méthode `subscribe`) en un Signal et gère l'abonnement et la destruction.
 
 ```js
 const signal = from(obsv$);
 ```
 
-It can also take a custom producer function where the function is passed a setter function returns a unsubscribe function:
+Il peut également prendre une fonction de producteur personnalisée où la fonction est passée à une fonction setter qui renvoie une fonction de désabonnement:
 
 ```js
 const clock = from((set) => {
@@ -762,7 +716,7 @@ const clock = from((set) => {
 });
 ```
 
-> Note: Signals created by `from` have equality checks turned off to interface better with external streams and sources.
+> Note: Les contrôles d'égalité des Signaux créés par `from` sont désactivés afin de mieux s'interfacer avec les flux et sources externes.
 
 ## `mapArray`
 
