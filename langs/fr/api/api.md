@@ -785,44 +785,77 @@ const mapped = indexArray(source, (model) => {
 
 # Stores
 
-Ces APIs sont disponibles sous `solid-js/store`.
-
 ## `createStore`
 
 ```ts
-export function createStore<T extends StoreNode>(
-  state: T | Store<T>,
-  options?: { name?: string }
+import { createStore } from "solid-js/store";
+import type { StoreNode, Store, SetStoreFunction } from "solid-js/store";
+
+function createStore<T extends StoreNode>(
+  state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
+type Store<T> = T;  // conceptuellement en lecture seule, mais pas typée comme telle.
 ```
 
-Cette fonction va créer un arbre de Signaux en tant que proxy pour permettre des valeurs individuelles dans une structure de données imbriquées d'être indépendamment surveillé. La fonction de création retourne un objet proxy en lecture seule et une fonction de mise à jour.
+La fonction create prend un état initial, l'enveloppe dans un store et renvoie un objet proxy en lecture seule et une fonction de mise à jour (setter).
 
 ```js
 const [state, setState] = createStore(initialValue);
 
-// Lis une valeur
+// Lis une valeur.
 state.someValue;
 
-// met à jour une valeur
+// Met à jour une valeur.
 setState({ merge: "thisValue" });
 
 setState("path", "to", "value", newValue);
 ```
 
-Les objets Store sont des proxies qui sont surveillés seulement sur l'accès aux propriétés. Et à l'accès, les Stores produisent récursivement des objets Store imbriqués sur les données imbriquées. Cependant, ça ne peut enrober que des tableaux et de simples objets. Les classes ne sont pas enrobées. Donc les `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` ne sont pas réactifs. De plus, les objets de haut niveau ne peuvent pas être surveillés sans accéder à une de leurs propriétés. Donc il ne convient pas de les utiliser pour des éléments sur lesquels on va itérer, car l'ajout de nouvelles clés ou d'index ne va pas engendrer une mise à jour. Donc mettez vos listes dans une clé de votre état au lieu d'essayer d'utiliser l'objet état directement.
+En tant que proxies, les objets Store ne suivent que lorsqu'une propriété est accédée.
+
+En cas d'accès à des objets imbriqués, les Stores produisent des objets Store imbriqués, et ce, tout au long de l'arbre. Toutefois, cela ne s'applique qu'aux tableaux et aux objets ordinaires. Les classes ne sont pas envelopées donc les `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` ne sont pas réactifs.
+
+#### Tableaux dans les Stores
+
+Depuis la version **1.4.0**, l'objet d'état de niveau supérieur peut être un tableau. Dans les versions précédentes, il fallait créer un objet pour envelopper le tableau:
+
+```jsx
+// Après Solid 1.4.0
+const [todos, setTodos] = createStore([
+  { id: 1, title: "Chose que je dois faire", done: false },
+  { id: 2, title: "Apprendre un nouveau Framework", done: false },
+]);
+...
+<For each={todos}>{todo => <Todo todo={todo} />}</For>;
+```
+
+```jsx
+// Avant Solid 1.4.0
+const [state, setState] = createStore({
+  todos: [
+    { id: 1, title: "Chose que je dois faire", done: false },
+    { id: 2, title: "Apprendre un nouveau Framework", done: false },
+  ],
+});
+<For each={state.todos}>{(todo) => <Todo todo={todo} />}<For>;
+```
+
+Notez que la modification d'un tableau dans un Store ne déclenchera pas les calculs qui s'abonnent directement au tableau. Par exemple:
 
 ```js
-// mettez la liste dans une clé sur l'objet store
-const [state, setState] = createStore({ list: [] });
+createEffect(() => {
+  console.log(state.todos);
+});
 
-// accéder à la propriété `list` sur l'objet état
-<For each={state.list}>{item => /*...*/}</For>
+// Cela ne déclenchera pas l'effet:
+setState(todos, state.todos.length, { id: 3 });
+// Cela va déclencher l'effet, parce que la référence du tableau change:
+setState("todos", (prev) => [...prev, { id: 3 }]);
 ```
 
 ### Getters
 
-Les objets Store supportent l'utilisation d'accesseur pour calculer des valeurs.
+Les objets Store supportent l'utilisation d'accesseur (getters) pour calculer des valeurs.
 
 ```js
 const [state, setState] = createStore({
@@ -836,7 +869,7 @@ const [state, setState] = createStore({
 });
 ```
 
-Ce sont de simples accesseurs, donc vous avez besoin d'utiliser Mémo si vous souhaitez garder en cache la valeur ;
+Ce sont de simples accesseurs qui s'exécutent à nouveau lorsqu'on y accède, donc vous avez toujours besoin d'utiliser un mémo si vous souhaitez garder en cache la valeur ;
 
 ```js
 let fullName;
@@ -852,7 +885,7 @@ const [state, setState] = createStore({
 fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 ```
 
-### Updating Stores
+### Mise à jour des Stores
 
 Les changements peuvent prendre la forme de fonction qui passe en paramètre la valeur de l'état précédent et retourne un nouvel état ou une valeur. Les objets sont toujours superficiellement fusionnés. Affecter une valeur `undefined` pour les supprimer du Store.
 
@@ -900,53 +933,57 @@ Le chemin peut être des clés en chaîne de caractère, des clés de tableau, d
 ```js
 const [state, setState] = createStore({
   todos: [
-    { task: 'Finish work', completed: false }
-    { task: 'Go grocery shopping', completed: false }
-    { task: 'Make dinner', completed: false }
+    { task: 'Finir le travail', completed: false }
+    { task: 'Faire les courses', completed: false }
+    { task: 'Faire le dinner', completed: false }
   ]
 });
 
 setState('todos', [0, 2], 'completed', true);
 // {
 //   todos: [
-//     { task: 'Finish work', completed: true }
-//     { task: 'Go grocery shopping', completed: false }
-//     { task: 'Make dinner', completed: true }
+//     { task: 'Finir le travail', completed: true }
+//     { task: 'Faire les courses', completed: false }
+//     { task: 'Faire le dinner', completed: true }
 //   ]
 // }
 
 setState('todos', { from: 0, to: 1 }, 'completed', c => !c);
 // {
 //   todos: [
-//     { task: 'Finish work', completed: false }
-//     { task: 'Go grocery shopping', completed: true }
-//     { task: 'Make dinner', completed: true }
+//     { task: 'Finir le travail', completed: false }
+//     { task: 'Faire les courses', completed: true }
+//     { task: 'Faire le dinner', completed: true }
 //   ]
 // }
 
 setState('todos', todo => todo.completed, 'task', t => t + '!')
 // {
 //   todos: [
-//     { task: 'Finish work', completed: false }
-//     { task: 'Go grocery shopping!', completed: true }
-//     { task: 'Make dinner!', completed: true }
+//     { task: 'Finir le travail', completed: false }
+//     { task: 'Faire les courses!', completed: true }
+//     { task: 'Faire le dinner!', completed: true }
 //   ]
 // }
 
 setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 // {
 //   todos: [
-//     { task: 'Finish work', completed: true, marked: true }
-//     { task: 'Go grocery shopping!', completed: false, marked: true }
-//     { task: 'Make dinner!', completed: false, marked: true }
+//     { task: 'Finir le travail', completed: true, marked: true }
+//     { task: 'Faire les courses!', completed: false, marked: true }
+//     { task: 'Faire le dinner!', completed: false, marked: true }
 //   ]
 // }
 ```
 
-## `produce`
+## Utilitaires de Store
+
+### `produce`
 
 ```ts
-export function produce<T>(
+import { produce } from "solid-js/store";
+
+function produce<T>(
   fn: (state: T) => void
 ): (
   state: T extends NotWrappable ? T : Store<T>
@@ -964,10 +1001,12 @@ setState(
 );
 ```
 
-## `reconcile`
+### `reconcile`
 
 ```ts
-export function reconcile<T>(
+import { reconcile } from "solid-js/store";
+
+function reconcile<T>(
   value: T | Store<T>,
   options?: {
     key?: string | null;
@@ -983,20 +1022,31 @@ La comparaison de données n'est pas appliquée lorsque l'on ne peut pas appliqu
 La clé est utilisée quand les éléments associés sont disponibles. Par défaut `merge: false` fais une vérification de référence quand c'est possible pour déterminer l'égalité et replace lorsque la référence n'est pas égale. `merge: true` pousse toutes les comparaisons aux feuilles de l'arbre de données et remplace la donnée précédente par la nouvelle valeur de manière efficace.
 
 ```js
-// s'abonner à un observable
+// S'abonner à un observable.
 const unsubscribe = store.subscribe(({ todos }) => (
   setState('todos', reconcile(todos)));
 );
 onCleanup(() => unsubscribe());
 ```
 
-## `createMutable`
+### `unwrap`
 
 ```ts
-export function createMutable<T extends StoreNode>(
+import { unwrap } from "solid-js/store";
+
+function unwrap(store: Store<T>): T;
+```
+
+Retourne les données sous-jacentes dans le Store sans proxy.
+
+### `createMutable`
+
+```ts
+import { createMutable } from 'solid-js/store';
+
+function createMutable<T extends StoreNode>(
   state: T | Store<T>,
-  options?: { name?: string }
-): Store<T> {
+): Store<T>;
 ```
 
 Créer un nouvel objet Store mutable. Les stores se mettent à jour seulement quand les valeurs changent. Le traçage est fait par l'interception de l'accès de propriété et automatiquement tracé dans des imbrications profondes en utilisant un proxy.
@@ -1008,10 +1058,10 @@ Utile pour l'intégration de système externe ou en tant que couche de compatibi
 ```js
 const state = createMutable(initialValue);
 
-// lecture de la valeur
+// Lecture de la valeur.
 state.someValue;
 
-// affectation d'une valeur
+// Affectation d'une valeur.
 state.someValue = 5;
 
 state.list.push(anotherValue);
@@ -1030,6 +1080,66 @@ const user = createMutable({
     [this.firstName, this.lastName] = value.split(" ");
   },
 });
+```
+
+### `modifyMutable`
+
+**Nouveau depuis la v1.4.0**
+
+```ts
+import { modifyMutable } from 'solid-js/store';
+
+function modifyMutable<T>(mutable: T, modifier: (state: T) => T): void;
+```
+
+Ce helper simplifie la modification multiple d'un Store mutable (tel que retourné par [`createMutable`](#createmutable)) en un seul [`batch`](#batch), de sorte que les calculs dépendants ne soient mis à jour qu'une seule fois au lieu d'une fois par mise à jour.
+Le premier argument est le Store mutable à modifier, et le second argument est un modificateur de Store tel que ceux renvoyés par [`reconcile`](#reconcile) ou [`produce`](#produce).
+(Si vous passez votre propre fonction modificatrice, faites attention que son argument est
+une version non enveloppée du magasin.)
+
+Par exemple, supposons que nous ayons une interface utilisateur dépendant de plusieurs champs d'un mutable:
+
+```tsx
+const state = createMutable({
+  user: {
+    firstName: "John",
+    lastName: "Smith",
+  },
+});
+
+<h1>Bienvenue {state.user.firstName + ' ' + state.user.lastName}</h1>
+```
+
+En modifiant *n* champs en séquence, l'interface utilisateur sera mise à jour *n* fois:
+
+```ts
+state.user.firstName = "Jake";  // Déclenche mise à jour.
+state.user.lastName = "Johnson";  // Déclenche une autre mise à jour.
+```
+
+Pour déclencher une seule mise à jour, nous pourrions modifier les champs dans un `batch`:
+
+```ts
+batch(() => {
+  state.user.firstName = "Jake";
+  state.user.lastName = "Johnson";
+});
+```
+
+`modifyMutable` combiné avec `reconcile` ou `produce` fournit deux façons alternatives de faire des choses similaires:
+
+```ts
+// Remplace state.user avec l'objet spécifié (suprimant tout autre champs)
+modifyMutable(state.user, reconcile({
+  firstName: "Jake",
+  lastName: "Johnson",
+}));
+
+// Modifie les deux champs dans un `batch`, déclenchant une seule mise à jour.
+modifyMutable(state.user, produce((u) => {
+  u.firstName = "Jake";
+  u.lastName = "Johnson";
+}));
 ```
 
 # APIs de Composant
