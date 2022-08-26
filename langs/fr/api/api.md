@@ -1661,14 +1661,16 @@ Solid utilise les composants pour le contrôle de flux. Pour que la réactivité
 
 Enrober ces composants est un moyen pratique pour réduire le templating et permettre aux utilisateurs de composer et construire leurs propres contrôles de flux.
 
-Ces composants de contrôle de flux sont automatiquement importés. Tous à l'exception de `Portal` et `Dynamic` sont importés depuis `solid-js`. Ces deux-là son spécifique au DOM et sont exportés par `solid-js/web`.
+Ces composants de contrôle de flux sont automatiquement importés. Tous à l'exception de `Portal` et `Dynamic` qui sont exportés par `solid-js` et `solid-js/web`. Ces deux-là sont spécifique au DOM et sont exportés par `solid-js/web`.
 
-> Note : Toutes fonctions enfants au contrôle de flux sont non tracées. Cela permet d'imbriquer des créations d'états, et mieux isoler les réactions.
+> Note: Toutes fonctions enfants au contrôle de flux ne seront pas tracées. Cela permet d'imbriquer des créations d'états, et mieux isoler les réactions.
 
 ## `<For>`
 
 ```ts
-export function For<T, U extends JSX.Element>(props: {
+import { For } from "solid-js";
+
+function For<T, U extends JSX.Element>(props: {
   each: readonly T[];
   fallback?: JSX.Element;
   children: (item: T, index: () => number) => U;
@@ -1683,7 +1685,7 @@ Simple référencement de contrôle de flux par boucle.
 </For>
 ```
 
-Le second argument optionnel est un signal index :
+Le second argument optionnel est un Signal index:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -1698,6 +1700,8 @@ Le second argument optionnel est un signal index :
 ## `<Show>`
 
 ```ts
+import { Show } from "solid-js";
+
 function Show<T>(props: {
   when: T | undefined | null | false;
   fallback?: JSX.Element;
@@ -1724,7 +1728,10 @@ Le contrôle de flux `Show` est utilisée pour afficher conditionnellement une p
 ## `<Switch>`/`<Match>`
 
 ```ts
-export function Switch(props: {
+import { Switch, Match } from "solid-js";
+import type { MatchProps } from "solid-js";
+
+function Switch(props: {
   fallback?: JSX.Element;
   children: JSX.Element;
 }): () => JSX.Element;
@@ -1733,7 +1740,7 @@ type MatchProps<T> = {
   when: T | undefined | null | false;
   children: JSX.Element | ((item: T) => JSX.Element);
 };
-export function Match<T>(props: MatchProps<T>);
+function Match<T>(props: MatchProps<T>);
 ```
 
 Utile quand il y a plus de 2 conditions mutuelles exclusives. Peut-être utiliser pour faire un système de routage simple par exemple.
@@ -1754,7 +1761,9 @@ Utile quand il y a plus de 2 conditions mutuelles exclusives. Peut-être utilise
 ## `<Index>`
 
 ```ts
-export function Index<T, U extends JSX.Element>(props: {
+import { Index } from "solid-js";
+
+function Index<T, U extends JSX.Element>(props: {
   each: readonly T[];
   fallback?: JSX.Element;
   children: (item: () => T, index: number) => U;
@@ -1763,7 +1772,7 @@ export function Index<T, U extends JSX.Element>(props: {
 
 Une fonction d'itération sur des listes sans clé (les lignes sont associées à un index au lieu d'une clé). Ceci est utile quand il n'y a pas de clé conceptuelle, par exemple si la donnée est composée de primitives et c'est l'index qui est fixe au lieu de la valeur.
 
-L'élément est un signal :
+L'élément est un Signal:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1771,7 +1780,7 @@ L'élément est un signal :
 </Index>
 ```
 
-Le second argument optionnel est un index de type `number` :
+Le second argument optionnel est un index de type `number`:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1786,6 +1795,8 @@ Le second argument optionnel est un index de type `number` :
 ## `<ErrorBoundary>`
 
 ```ts
+import { ErrorBoundary } from "solid-js";
+
 function ErrorBoundary(props: {
   fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element);
   children: JSX.Element;
@@ -1795,7 +1806,7 @@ function ErrorBoundary(props: {
 Intercepte les erreurs qui ne sont pas traitées et affiche un contenu de repli.
 
 ```jsx
-<ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
+<ErrorBoundary fallback={<div>Quelque chose a terriblement mal tourné</div>}>
   <MyComp />
 </ErrorBoundary>
 ```
@@ -1804,7 +1815,7 @@ Il est aussi possible de passer une fonction qui va recevoir l'erreur ainsi qu'u
 
 ```jsx
 <ErrorBoundary
-  fallback={(err, reset) => <div onClick={reset}>Error: {err.toString()}</div>}
+  fallback={(err, reset) => <div onClick={reset}>Erreur: {err.toString()}</div>}
 >
   <MyComp />
 </ErrorBoundary>
@@ -1813,7 +1824,9 @@ Il est aussi possible de passer une fonction qui va recevoir l'erreur ainsi qu'u
 ## `<Suspense>`
 
 ```ts
-export function Suspense(props: {
+import { Suspense } from "solid-js";
+
+function Suspense(props: {
   fallback?: JSX.Element;
   children: JSX.Element;
 }): JSX.Element;
@@ -1830,6 +1843,8 @@ Un composant qui garde une trace de toutes les ressources lues dans sa portée e
 ## `<SuspenseList>` (Expérimental)
 
 ```ts
+import { SuspenseList } from "solid-js";
+
 function SuspenseList(props: {
   children: JSX.Element;
   revealOrder: "forwards" | "backwards" | "together";
@@ -1856,6 +1871,8 @@ function SuspenseList(props: {
 ## `<Dynamic>`
 
 ```ts
+import { Dynamic } from "solid-js/web";
+
 function Dynamic<T>(
   props: T & {
     children?: any;
@@ -1873,7 +1890,9 @@ Ce composant vous laisse insérer un composant ou une balise arbitraire avec des
 ## `<Portal>`
 
 ```ts
-export function Portal(props: {
+import { Portal } from "solid-js/web";
+
+function Portal(props: {
   mount?: Node;
   useShadow?: boolean;
   isSVG?: boolean;
