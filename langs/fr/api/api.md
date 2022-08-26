@@ -1483,25 +1483,30 @@ Ces imports sont exposés depuis `solid-js/web`.
 ## `render`
 
 ```ts
-export function render(
-  code: () => JSX.Element,
-  element: MountableElement
-): () => void;
+import { render } from "solid-js/web";
+import type { JSX, MountableElement } from "solid-js/web";
+
+function render(code: () => JSX.Element, element: MountableElement): () => void;
 ```
 
-Le point d'entrée de l'application côté navigateur. Il faut fournir une définition de composant de haut niveau ou une fonction et un élément sur lequel monter l'application. Il est recommandé que cet élément soit vide, car la fonction de disposition va effacer tous les enfants.
+Le point d'entrée de l'application côté navigateur. Il faut fournir une définition de composant de haut niveau ou une fonction et un élément sur lequel monter l'application. Il est recommandé que cet élément soit vide, car la fonction de disposition (ici, `dispose`) va effacer tous les enfants.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
+// ou
+const dispose = render(() => <App />, document.getElementById("app"));
 ```
+
+Il est important que le premier argument soit une fonction: ne pas passer directement le JSX
+(comme dans `render(<App />, ...)`), parce que cela appellera `App` avant que `render` puisse
+mettre en place une racine pour suivre les dépendances de signal dans `App`.
 
 ## `hydrate`
 
 ```ts
-export function hydrate(
-  fn: () => JSX.Element,
-  node: MountableElement
-): () => void;
+import { hydrate } from "solid-js/web";
+
+function hydrate(fn: () => JSX.Element, node: MountableElement): () => void;
 ```
 
 Cette méthode est similaire à `render` sauf qu'elle essaye d'hydrater ce qui est déjà rendu dans le DOM. Quand elle est initialisée dans le navigateur, une page a déjà été rendue côté serveur.
@@ -1513,16 +1518,20 @@ const dispose = hydrate(App, document.getElementById("app"));
 ## `renderToString`
 
 ```ts
-export function renderToString<T>(
+import { renderToString } from "solid-js/web";
+
+function renderToString<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
     nonce?: string;
+    renderId?: string;
   }
 ): string;
 ```
 
-Effectue un rendu en tant que chaîne de caractères de manière synchrone. La fonction génère aussi une balise script pour l'hydratation progressive. Les options incluses `eventNames` pour écouter des évènements avant que la page ne se charge et à l'exécution de l'hydrations et annoncer l'ajout de la balise tag.
+Effectue un rendu en tant que chaîne de caractères de manière synchrone. La fonction génère aussi une balise script pour l'hydratation progressive. Les options incluent `eventNames` pour écouter des évènements avant que la page ne se charge et à l'exécution de l'hydrations et annoncer l'ajout de la balise tag.
+
+`renderId` est utilisé pour nommer les rendus lorsqu'ils ont plusieurs racines de haut niveau.
 
 ```js
 const html = renderToString(App);
@@ -1531,102 +1540,120 @@ const html = renderToString(App);
 ## `renderToStringAsync`
 
 ```ts
-export function renderToStringAsync<T>(
+import { renderToStringAsync } from "solid-js/web";
+
+function renderToStringAsync<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
     timeoutMs?: number;
+    renderId?: string;
     nonce?: string;
   }
 ): Promise<string>;
 ```
 
-Similaire à `renderToString` sauf qu'elle va attendre que toutes les limites de `<Suspense/>` soit résolues avant de retourner le résultat. Les données des ressources sont automatiquement sérialisées dans une balise script et seront hydratées au chargement du client.
+Similaire à `renderToString` sauf qu'elle va attendre que toutes les limites de `<Suspense>` soit résolues avant de retourner le résultat. Les données des ressources sont automatiquement sérialisées dans une balise script et seront hydratées au chargement du client.
 
 ```js
 const html = await renderToStringAsync(App);
 ```
 
-## `pipeToNodeWritable`
+## `renderToStream`
+
+**Nouveau depuis la v1.3.0**
 
 ```ts
-export type PipeToWritableResults = {
-  startWriting: () => void;
-  write: (v: string) => void;
-  abort: () => void;
-};
-export function pipeToNodeWritable<T>(
+import { renderToStream } from "solid-js/web";
+
+function renderToStream<T>(
   fn: () => T,
-  writable: { write: (v: string) => void },
   options?: {
-    eventNames?: string[];
     nonce?: string;
-    noScript?: boolean;
-    onReady?: (r: PipeToWritableResults) => void;
-    onComplete?: (r: PipeToWritableResults) => void | Promise<void>;
+    renderId?: string;
+    onCompleteShell?: () => void;
+    onCompleteAll?: () => void;
   }
-): void;
+): {
+  pipe: (writable: { write: (v: string) => void }) => void;
+  pipeTo: (writable: WritableStream) => void;
+};
 ```
 
-Cette méthode traduit en flux Node. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continus vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
+Cette méthode effectue le rendu dans un flux (stream). Elle effectue le rendu du contenu de manière synchrone, y compris les éventuels espaces de repli de `Suspense`, puis continue à diffuser les données et le HTML à partir de toute ressource asynchrone au fur et à mesure de sa réalisation.
 
 ```js
-pipeToNodeWritable(App, res);
-```
+// Mode
+renderToStream(App).pipe(res);
 
-L'option `onReady` est utile pour écrire dans le flux autour du noyau du rendu de l'application. Si vous utilisez `onReady`, vous devez appeler manuellement `startWriting`
-
-## `pipeToWritable`
-
-```ts
-export type PipeToWritableResults = {
-  write: (v: string) => void;
-  abort: () => void;
-  script: string;
-};
-export function pipeToWritable<T>(
-  fn: () => T,
-  writable: WritableStream,
-  options?: {
-    eventNames?: string[];
-    nonce?: string;
-    noScript?: boolean;
-    onReady?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-    onComplete?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-  }
-): void;
-```
-
-Cette méthode traduit en flux web. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continus vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
-
-```js
+// Web Stream
 const { readable, writable } = new TransformStream();
-pipeToWritable(App, writable);
+renderToStream(App).pipeTo(writable);
 ```
 
-L'option `onReady` est utile pour écrire dans le flux autour du noyau du rendu de l'application. Si vous utilisez `onReady`, vous devez appeler manuellement `startWriting`
+`onCompleteShell` se déclenche lorsque le rendu synchrone est terminé avant d'écrire le premier flush du flux vers le navigateur. `onCompleteAll` est appelé lorsque toutes les limites de `Suspense` du serveur ont été réglées. `renderId` est utilisé pour nommer les rendus lorsqu'ils ont plusieurs racines de haut niveau.
+
+> Note: Cette API remplace les API précédents `pipeToWritable` et `pipeToNodeWritable`.
 
 ## `isServer`
 
 ```ts
-export const isServer: boolean;
+import { isServer } from "solid-js/web";
+
+const isServer: boolean;
 ```
 
 Cela indique si le code est exécuté côté serveur ou côté navigateur. Comme le système d'exécution exporte ceci en tant que constante booléenne, cela permet aux bundlers d'éliminer le code et leurs imports de leurs bundle respectifs.
 
 ```js
 if (isServer) {
-  // Je ne serais jamais dans le bundle du navigateur
+  // Je ne serais jamais dans le bundle du navigateur.
 } else {
-  // Je ne serais jamais côté serveur
+  // Je ne serais jamais côté serveur.
 }
 ```
+
+## `DEV`
+
+```ts
+import { DEV } from "solid-js";
+
+const DEV: object | undefined;
+```
+
+Sur le client, Solid fournit (via [exportations conditionnelles](https://nodejs.org/api/packages.html#conditional-exports)) différents builds selon que la condition `development` est activée ou non.
+Le mode développement fournit quelques vérifications supplémentaires - par exemple la détection de l'utilisation accidentelle de plusieurs instances de Solid - qui sont supprimées dans les builds de production.
+
+Si vous voulez que le code ne s'exécute qu'en mode développement (le plus utile dans les bibliothèques), vous pouvez vérifier si l'exportation `DEV` est définie.
+Notez qu'elle est toujours définie sur le serveur, vous pouvez donc la combiner avec [`isServer`](#isserver):
+
+```ts
+import { DEV } from "solid-js";
+import { isServer } from "solid-js/web";
+
+if (DEV && !isServer) {
+  console.log(...);
+}
+```
+
+## `HydrationScript`
+
+```ts
+import { generateHydrationScript, HydrationScript } from "solid-js/web";
+
+function generateHydrationScript(options: {
+  nonce?: string;
+  eventNames?: string[];
+}): string;
+
+function HydrationScript(props: {
+  nonce?: string;
+  eventNames?: string[];
+}): JSX.Element;
+```
+
+Hydration Script est un script spécial qui doit être placé une fois sur la page pour amorcer l'hydratation avant que le runtime de Solid ne soit chargé. Il se présente à la fois comme une fonction qui peut être appelée et insérée dans une chaîne HTML, ou comme un Composant si vous rendez le JSX à partir de la balise `<html>`.
+
+Les options sont le `nonce` à mettre sur la balise de script et tout nom d'événement pour lequel Solid devrait capturer avant que les scripts aient été chargés et rejouer pendant l'hydratation. Ces événements sont limités à ceux que Solid délègue, ce qui inclut la plupart des événements de l'interface utilisateur qui sont composés et des bulles. Par défaut, il s'agit uniquement des événements `click` et `input`.
 
 # Control Flow
 
