@@ -4,7 +4,7 @@ Die Datenverwaltung in Solid baut auf einer Reihe von flexiblen reaktiven Primit
 
 Solids Primitiven kommen in der Form von `create`-Aufrufen, die häufig Tupel zurückgeben, deren erstes Element generell den Lese- und das zweite den Schreibzugriff ermöglicht. Normalerweise benennt man den lesbaren Teil beim Namen der Primitive.
 
-Hier ist ein einfacher automatisch hochlaufender Zähler, der durch das Schreiben des `count`-Signals aktualisiert wird.
+Hier ist ein einfacher automatisch hoch laufender Zähler, der durch das Schreiben des `count`-Signals aktualisiert wird.
 
 ```jsx
 import { createSignal, onCleanup } from "solid-js";
@@ -37,7 +37,7 @@ Effekte sind Funktionen, in die Lesezugriffe auf Signale verpackt werden und die
 createEffect(() => console.log("The latest count is", count()));
 ```
 
-Memos sind zwischengespeicherte von Signalen abgeleitete Werte. Sie haben die Eigenschaften sowohl von Signalen als auch von Effekten. Sie verfolgen die Signale, auf denen sie basieren und werden neu ausgeführt wenn sich deren Werte ändern und sind selbst verfolgbare Signale.
+Memos sind zwischengespeicherte von Signalen abgeleitete Werte. Sie haben die Eigenschaften sowohl von Signalen als auch von Effekten. Sie verfolgen die Signale, auf denen sie basieren und werden neu ausgeführt, wenn sich deren Werte ändern und sind selbst verfolgbare Signale.
 
 ```js
 const fullName = createMemo(() => `${firstName()} ${lastName()}`);
@@ -74,7 +74,7 @@ function createSignal(value) {
 
 Jetzt wissen wir bei jeder Aktualisierung, welche Effekte neu aufgerufen werden müssen. Einfach, aber effektiv. Die tatsächliche Implementierung ist wesentlich komplizierter, aber das ist die Quintessenz dessen, was passiert.
 
-Für ein detailiierteres Verständnis, wie Reaktivität funktioniert, gibt es diese nützlichen Artikel:
+Für ein detaillierteres Verständnis, wie Reaktivität funktioniert, gibt es diese nützlichen Artikel:
 
 [A Hands-on Introduction to Fine-Grained Reactivity](https://dev.to/ryansolid/a-hands-on-introduction-to-fine-grained-reactivity-3ndf)
 
