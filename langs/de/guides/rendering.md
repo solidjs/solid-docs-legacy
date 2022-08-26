@@ -4,11 +4,11 @@ Solid unterstützt Templating in 3 Formen: JSX, Tagged Template Literals und Sol
 
 ## JSX kompilieren
 
-Rendering beinhaltet das Vorkomplieren von JSX-Templates zu optimiertem nativen JS-Code. Der JSX-Code erzeugt:
+Rendering beinhaltet das Vorkompilieren von JSX-Templates zu optimiertem nativen JS-Code. Der JSX-Code erzeugt:
 
 - DOM Templates, die bei der Erstellung der Instanz geklont werden
 - Eine Reihe von Referenzdeklarationen die nur firstChild und nextSibling verwenden
-- Feingranulare Berechnngen, um die so erzeugten Elemente zu aktualisieren.
+- Feingranulare Berechnungen, um die so erzeugten Elemente zu aktualisieren.
 
 Diese Herangehensweise ist einerseits performanter und erzeugt andererseits auch weniger Code als jedes Element einzeln eins nach dem anderen mit document.createElement zu erzeugen.
 
@@ -43,7 +43,7 @@ render(() => <App />, document.getElementById("main"));
 
 ## Komponenten
 
-Komponenten sind in Solid einfach Pascal-case-benannte (am Anfang groß geschrieben) Funktionen. Ihr erster Parameter ist ein props-Objekt und sie geben echte DOM-Nodes aus.
+Komponenten sind in Solid einfach Pascal-case-benannte (am Anfang großgeschrieben) Funktionen. Ihr erster Parameter ist ein props-Objekt und sie geben echte DOM-Nodes aus.
 
 ```jsx
 const Parent = () => (
@@ -207,7 +207,7 @@ const BasicComponent = (props) => {
 };
 ```
 
-Solids Komponenten machen einen wesentlicher Teil von dessen Performance aus. Solids Herangehensweise, Komponenten "verschwinden" zu lassen wird durch verzögerte Prop-Berechnung möglich. Statt sofort alle Prop-Ausdrücke zu berechnen und die Werte weiterzugeben, wird die Ausführung verzögert, bis auf die Prop im Kind-Element zugegriffen wird. Damit wird die Ausführung bis zum letzten möglichen Moment verzögert, typischerweise direkt bei den DOM-Einbindungen, was die Performance maximiert. Das sorgt für flache Hierarchien und entfernt die Notwendigkeit, einen Komponenten-Baum zu behandeln.
+Solids Komponenten machen einen wesentlichen Teil von dessen Performance aus. Solids Herangehensweise, Komponenten "verschwinden" zu lassen wird durch verzögerte Prop-Berechnung möglich. Statt sofort alle Prop-Ausdrücke zu berechnen und die Werte weiterzugeben, wird die Ausführung verzögert, bis auf die Prop im Kind-Element zugegriffen wird. Damit wird die Ausführung bis zum letzten möglichen Moment verzögert, typischerweise direkt bei den DOM-Einbindungen, was die Performance maximiert. Das sorgt für flache Hierarchien und entfernt die Notwendigkeit, einen Komponenten-Baum zu behandeln.
 
 ```jsx
 <Component prop1="static" prop2={state.dynamic} />;

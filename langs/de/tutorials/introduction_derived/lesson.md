@@ -1,6 +1,6 @@
 Wir haben gesehen, dass jedes Mal, wenn wir ein Signal in JSX auslesen, es automatisch die Oberfläche aktualisiert, wenn sich das Signal verändert. Aber die Komponenten-Funktionen selbst laufen nur ein Mal.
 
-Wir können neue Ausdrücke erzeugen, die auf anderen Signalen basieren, indem wir sie in eine Funktion schachteln. Eine Funktion, die ein Signal aufruft, wird damit effektiv selbst ein Signal: wenn die darin enthaltenen Signale aktualsiert werden, wird es von dessen Nutzern aktualisiert.
+Wir können neue Ausdrücke erzeugen, die auf anderen Signalen basieren, indem wir sie in eine Funktion schachteln. Eine Funktion, die ein Signal aufruft, wird damit effektiv selbst ein Signal: wenn die darin enthaltenen Signale aktualisiert werden, wird es von dessen Nutzern aktualisiert.
 
 Lass uns unseren Counter aktualisieren, in dem wir eine `doubleCount`-Funktion hinzufügen:
 
