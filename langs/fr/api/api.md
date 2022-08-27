@@ -1948,6 +1948,7 @@ let myDiv;
 
 // utilisation de `onMount` ou `createEffect` pour lire après la connexion au DOM
 onMount(() => console.log(myDiv));
+
 <div ref={myDiv} />
 
 // Ou utilisation d'une fonction (appelé avant la connexion au DOM)
@@ -2021,7 +2022,23 @@ Parce que `classList` est un pseudo-attribut de compilation, il ne fonctionne pa
 
 ## `style`
 
-L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec un objet. À la différence de React, Solid utilise `element.style.setProperty` en coulisse. Cela signifie que les variables CSS sont supportées, mais aussi que nous devons utiliser la version dash-case des propriétés. Cela donne de meilleures performances et une meilleure cohésion avec le résultat du rendu côté serveur.
+L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec un objet. 
+
+```jsx
+// chaine de caractère
+<div style={`color: green; height: ${state.height}px`} />
+
+// objet
+<div style={{
+  color: "green",
+  height: state.height + "px" }}
+/>
+
+// variable css
+<div style={{ "--my-custom-color": state.themeColor }} />
+```
+
+À la différence de [l'attribut `style` de React](https://fr.reactjs.org/docs/dom-elements.html#style), Solid utilise `element.style.setProperty` en coulisse. Cela signifie que nous devons utiliser la version dash-case des propriétés. Cela donne de meilleures performances et une meilleure cohésion avec le résultat du rendu côté serveur.
 
 ```jsx
 // chaine de caractère
@@ -2033,8 +2050,12 @@ L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec 
   "background-color": state.color,
   height: state.height + "px" }}
 />
+```
 
-// variable css
+Cela signifie aussi que les variables CSS sont supportées! Par exemple:
+
+```jsx
+// Attribuer une variable CSS.
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
 
@@ -2048,7 +2069,9 @@ Ils fonctionnent de la même manière que la propriété. Passez une chaîne de 
 
 ## `on___`
 
-Les gestionnaires d'évènement dans Solid prennent typiquement la forme de `onclick` ou `onClick` en fonction du style du code. Le nom de l'évènement est en minuscule. Solid utilise une délégation d'évènement semi-synthétique pour les évènements communs à l'interface utilisateur qui ne sont pas composés et remontés. Cela améliore les performances pour les évènements communs.
+Les gestionnaires d'évènement dans Solid prennent typiquement la forme de `onclick` ou `onClick` en fonction du style du code. Le nom de l'évènement est en minuscule.
+
+Solid utilise une délégation d'évènement semi-synthétique pour les évènements communs à l'interface utilisateur qui ne sont pas composés et remontés. Cela améliore les performances pour les évènements communs.
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
@@ -2072,6 +2095,8 @@ Les évènements ne peuvent pas rebondir et l'association n'est pas réactive, c
 // si défini, l'appeler, sinon ne rien faire.
 <div onClick={() => props.handleClick?.()} />
 ```
+
+Notez que `onChange` et `onInput` fonctionnent selon leur comportement natif. `onInput` se déclenchera immédiatement après que la valeur ait changé ; pour les champs `<input>`, `onChange` ne se déclenchera qu'après que le champ ait perdu le focus.
 
 ## `on:___`/`oncapture:___`
 
