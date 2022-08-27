@@ -1991,7 +1991,6 @@ Premièrement, vous pouvez utiliser `class=...` comme n'importe quel autre attri
 Alternativement, le pseudo-attribut `classList` vous permet de spécifier un objet, où chaque clé est une classe et la valeur est traitée comme un booléen représentant si cette classe doit être incluse.
 Par exemple (correspondant au dernier exemple):
 
-
 ```jsx
 <div
   classList={{ active: state.active, editing: state.currentId === row.id }}
