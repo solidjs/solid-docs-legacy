@@ -76,18 +76,6 @@ const newCount = setCount((prev) => prev + 1);
 > const [func, setFunc] = createSignal(myFunction);
 > ```
 
-À moins que vous ne soyez dans un [batch](#batch), un [effet](#createEffect) ou une [transition](#use-transition), les signaux sont mis à jour immédiatement lorsque vous les définissez.
-Par exemple:
-
-```js
-setReady(false);
-console.assert(ready() === false);
-setReady(true);
-console.assert(ready() === true);
-```
-
-Si vous n'êtes pas sûr que votre code sera exécuté dans un `batch` ou une `transition` (par exemple, un code de bibliothèque), vous devez éviter de faire cette supposition.
-
 ##### Options
 
 Plusieurs primitives de Solid prennent un objet "options" comme dernier argument facultatif.
@@ -159,13 +147,9 @@ createEffect((prev) => {
 Les effets sont principalement destinés aux effets secondaires qui lisent mais n'écrivent pas au système réactif:
 il est préférable d'éviter de modifier des signaux dans les effets, ce qui sans précaution peut provoquer des rendus supplémentaires ou même des boucles d'effets infinies.
 A la place, préférez l'utilisation de [`createMemo`](#creatememo) pour calculer de nouvelles valeurs qui dépendent d'autres valeurs réactives, de sorte que le système réactif sache ce qui dépend de quoi, et puisse l'optimiser en conséquence.
-Si vous modifiez des signaux dans un effet, la fonction d'effet est automatiquement enveloppée dans [`batch`](#batch), ce qui signifie que tous les changements de signaux à l'intérieur de l'effet ne se propagent qu'après que l'effet se termine.
-Cela permet à plusieurs mises à jour de signaux de ne déclencher une seule mise à jour et évite que des effets secondaires non désirés ne se produisent au milieu de vos effets secondaires.
-En fait, si plusieurs effets se déclenchent tous en même temps, ils sont collectivement regroupés en un seul `batch`.
 
 La _première_ exécution de la fonction d'effet n'est pas immédiate ; elle est programmée pour être exécutée après la phase de rendu en cours (par exemple, après avoir appelé la fonction passée à [`render`](#render), [`createRoot`](#createroot), ou [`runWithOwner`](#runwithowner)).
 Si vous voulez attendre que la première exécution ait lieu, utilisez [`queueMicrotask`](https://developer.mozilla.org/fr/docs/Web/API/queueMicrotask) (qui s'exécute avant que le navigateur ne rende le DOM) ou `await Promise.resolve()` ou `setTimeout(..., 0)` (qui s'exécutent après le rendu du navigateur).
-Après cette première exécution, les effets s'exécutent généralement immédiatement lorsque leurs dépendances sont mises à jour (sauf si vous êtes dans un [batch](#batch) ou une [transition](#use-transition)). Par exemple:
 
 ```js
 // Supposez que ce code est dans une fonction de composant, donc fait partie d'une phase de rendu
@@ -290,6 +274,7 @@ import type { ResourceReturn } from "solid-js";
 type ResourceReturn<T> = [
   {
     (): T | undefined;
+    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored"
     loading: boolean;
     error: any;
     latest: T | undefined;
@@ -300,12 +285,21 @@ type ResourceReturn<T> = [
   }
 ];
 
+export type ResourceOptions<T, S = unknown> = {
+  initialValue?: T;
+  name?: string;
+  deferStream?: boolean;
+  ssrLoadFrom?: "initial" | "server";
+  storage?: (init: T | undefined) => [Accessor<T | undefined>, Setter<T | undefined>];
+  onHydrated?: (k: S | undefined, info: { value: T | undefined }) => void;
+};
+
 function createResource<T, U = true>(
   fetcher: (
     k: U,
     info: { value: T | undefined; refetching: boolean | unknown }
   ) => T | Promise<T>,
-  options?: { initialValue?: T }
+  options?: ResourceOptions<T, U>
 ): ResourceReturn<T>;
 
 function createResource<T, U>(
@@ -314,7 +308,7 @@ function createResource<T, U>(
     k: U,
     info: { value: T | undefined; refetching: boolean | unknown }
   ) => T | Promise<T>,
-  options?: { initialValue?: T }
+  options?: ResourceOptions<T, U>
 ): ResourceReturn<T>;
 ```
 
@@ -395,6 +389,47 @@ const [user] = createResource(() => params.id, fetchUser, {
 });
 ```
 
+**Nouveau depuis la v1.5.0**
+
+Nous avons ajouté un nouveau champ `state` qui couvre une vue plus détaillée de l'état de la ressource au-delà de `loading` et `error`. Vous pouvez maintenant vérifier si une ressource est `"unresolved"`, `"pending"`, `"ready"`, `"refreshing"` ou `"error"`.
+
+| état       | valeur résolue | loading | contient error |
+| ---------- | -------------- | ------- | -------------- |
+| unresolved | Non            | Non     | Non            |
+| pending    | Non            | Oui     | Non            |
+| ready      | Oui            | Non     | Non            |
+| refreshing | Oui            | Oui     | Non            |
+| errored    | Non            | Non     | Oui            |
+
+**Nouveau depuis la v1.5.0**
+
+Lors du rendu de ressources par le serveur, en particulier lors de l'intégration de Solid dans d'autres systèmes qui récupèrent avant le rendu, vous pouvez vouloir initier la ressource avec cette valeur récupérée à l'avance au lieu de récupérer à nouveau et d'avoir la ressource qui sérialise son propre état. Vous pouvez utiliser la nouvelle option `ssrLoadFrom` pour cela. Au lieu d'utiliser la valeur par défaut `"server"`, vous pouvez passer `"initial"` et la ressource utilisera `initialValue` comme si c'était le résultat de la première récupération pour l'SSR et hydratation.
+
+**Nouveau depuis la v1.5.0** *Expérimental*
+
+Les ressources peuvent être définies avec un stockage personnalisé ayant la même signature qu'un Signal en utilisant l'option `storage`. Par exemple, l'utilisation d'un Store de réconciliation personnalisé pourrait se faire de cette façon:
+
+```ts
+function createDeepSignal<T>(value: T): Signal<T> {
+  const [store, setStore] = createStore({
+    value
+  });
+  return [
+    () => store.value,
+    (v: T) => {
+      const unwrapped = unwrap(store.value);
+      typeof v === "function" && (v = v(unwrapped));
+      setStore("value", reconcile(v));
+      return store.value;
+    }
+  ] as Signal<T>;
+}
+
+const [resource] = createResource(fetcher, {
+  storage: createDeepSignal
+});
+```
+
 # Cycles de vie
 
 ## `onMount`
@@ -449,7 +484,7 @@ import { batch } from "solid-js";
 function batch<T>(fn: () => T): T;
 ```
 
-Groupe les mises à jour dans le bloc jusqu'à la fin pour éviter des calculs inutiles. Cela veut dire que la lecture des valeurs dans les lignes suivantes ne seront pas à jour. La méthode set des [Stores de Solid](#createstore), les méthodes de tableau de [Mutable Store](#createmutable) et les Effets enveloppent automatiquement leur code dans un `batch`.
+Maintient l'exécution des calculs en aval dans le bloc jusqu'à la fin pour éviter tout recalcul inutile. La méthode set des [Stores de Solid](#createstore), les méthodes de tableau de [Mutable Store](#createmutable) et les Effets enveloppent automatiquement leur code dans un `batch`.
 
 ## `on`
 
@@ -1228,7 +1263,6 @@ Le problème sous-jacent est que, lorsque vous spécifiez des enfants de composa
   Ceci est utile si vous voulez que le DOM soit dupliqué (car les noeuds DOM peuvent apparaître
   dans un seul élément parent), mais dans de nombreux cas, cela crée des noeuds DOM redondants.
   Si vous appelez plutôt `resolved()` plusieurs fois, vous réutilisez les mêmes enfants.
-
 - Si vous accédez à `props.children` en dehors d'une portée de suivi (par exemple, dans un event handler), alors vous créez des enfants qui ne seront jamais éliminés.
   Si vous appelez plutôt `resolved()`, vous réutilisez les enfants déjà résolus.
   Vous garantissez également que les enfants sont suivis dans le composant actuel,
@@ -1241,7 +1275,7 @@ en un nombre réel dans `resolved`, dépendant correctement d'un signal `count`.
 
 Si le `props.children` donné n'est pas un tableau (ce qui se produit lorsque la balise JSX a un seul enfant), alors le helper `children` ne le normalisera pas en un tableau.
 C'est un comportement utile, par exemple lorsque l'intention est de passer une seule fonction comme enfant, ce qui peut être détecté par `typeof resolved() === 'function'`.
-Si vous voulez normaliser en un tableau, vous pouvez utiliser `Array.isArray(resolved()) ? resolved() : [resolved()]`.
+Si vous souhaitez normaliser un tableau, le mémo renvoyé a une méthode `toArray` (*nouveau depuis la 1.5*).
 
 Voici un exemple de l'ajout automatique de l'attribut `class` de tout enfant
 qui se résout en un `Element`, en plus du rendu des enfants:
@@ -1250,8 +1284,7 @@ qui se résout en un `Element`, en plus du rendu des enfants:
 const resolved = children(() => props.children);
 
 createEffect(() => {
-  let list = resolved();
-  if (!Array.isArray(list)) list = [list];
+  let list = resolved.toArray();
   for (let child of list) child?.setAttribute?.("class", myClass());
 });
 
@@ -1423,11 +1456,11 @@ Comme `createMemo`, `createComputed` appelle sa fonction immédiatement lors des
 (sauf si vous êtes dans un [batch](#batch), un [effet](#createEffect), ou une [transition](#use-transition)).
 Cependant, alors que les fonctions `createMemo` doivent être pures (ne pas définir de Signaux), les fonctions `createComputed` peuvent définir des Signaux.
 En relation, `createMemo` offre un signal en lecture seule pour la valeur de retour de la fonction, alors que pour faire la même chose avec `createComputed`, vous devez définir un Signal dans la fonction.
-S'il est possible d'utiliser des fonctions pures et `createMemo`, c'est probablement plus efficace, car Solid optimise l'ordre d'exécution des mises à jour des mémos, tandis que la mise à jour d'un signal dans `createComputed` déclenchera immédiatement des mises à jour réactives dont certaines peuvent s'avérer inutiles (à moins que vous ne fassiez attention en enveloppant dans [`batch`](#batch), [`untrack`](#untrack), etc.).
+S'il est possible d'utiliser des fonctions pures et `createMemo`, c'est probablement plus efficace, car Solid optimise l'ordre d'exécution des mises à jour des mémos, tandis que la mise à jour d'un signal dans `createComputed` déclenchera immédiatement des mises à jour réactives dont certaines peuvent s'avérer inutiles.
 
 Comme `createRenderEffect`, `createComputed` appelle sa fonction pour la première fois fois immédiatement.
 Mais ils diffèrent dans la façon dont les mises à jour sont effectuées.
-Alors que `createComputed` met généralement à jour immédiatement, `createRenderEffect` met à jour la file d'attente pour s'exécuter dans un seul `batch` (avec les `createEffect`s) après la phase de rendu en cours.
+Alors que `createComputed` met généralement à jour immédiatement, `createRenderEffect` met à jour la file d'attente pour s'exécuter (avec les `createEffect`) après la phase de rendu en cours.
 Ainsi, `createRenderEffect` peut effectuer moins de mises à jour globales, mais est légèrement moins immédiat.
 
 ## `createReaction`
@@ -1704,6 +1737,7 @@ import { Show } from "solid-js";
 
 function Show<T>(props: {
   when: T | undefined | null | false;
+  keyed: boolean;
   fallback?: JSX.Element;
   children: JSX.Element | ((item: T) => JSX.Element);
 }): () => JSX.Element;
@@ -1712,7 +1746,7 @@ function Show<T>(props: {
 Le contrôle de flux `Show` est utilisée pour afficher conditionnellement une partie de la vue. Ceci est similaire à un opérateur ternaire (`a ? b : c`) mais est idéal pour le templating JSX.
 
 ```jsx
-<Show when={state.count > 0} fallback={<div>Loading...</div>}>
+<Show when={state.count > 0} fallback={<div>Chargement...</div>}>
   <div>My Content</div>
 </Show>
 ```
@@ -1720,7 +1754,7 @@ Le contrôle de flux `Show` est utilisée pour afficher conditionnellement une p
 `Show` peut aussi être utilisé comme un moyen d'associé une clé d'un modèle de données spécifique à un bloc. Par exemple, la fonction est réexécutée quand le modèle est remplacé.
 
 ```jsx
-<Show when={state.user} fallback={<div>Loading...</div>}>
+<Show when={state.user} fallback={<div>Chargement...</div>} keyed>
   {(user) => <div>{user.firstName}</div>}
 </Show>
 ```
