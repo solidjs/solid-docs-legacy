@@ -2186,7 +2186,7 @@ Force la prop à être traitée comme une propriété au lieu d'un attribut.
 Force la prop à être traitée comme un attribut au lieu d'une propriété. C'est utile pour les Web Components où vous voulez associer un attribut.
 
 ```jsx
-<my-element attr:status={props.status} />
+<mon-web-component attr:status={props.status} />
 ```
 
 ## `/* @once */`
@@ -2196,11 +2196,11 @@ Le compilateur de Solid utilise une façon heuristique pour enrober la réactivi
 En sachant ça, nous pouvons réduire la pénalisation effective pour les choses qui ne vont pas changer en y accédant depuis l'extérieur de JSX. Une simple variable ne sera jamais enrobée. Nous pouvons aussi dire au compilateur de ne pas les enrober en commençant une expression avec un commentaire décoratif `/_ @once _/`.
 
 ```jsx
-<MyComponent static={/*@once*/ state.wontUpdate} />
+<MonComposant static={/*@once*/ state.wontUpdate} />
 ```
 
 Cela fonctionne aussi sur les enfants.
 
 ```jsx
-<MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
+<MonComposant>{/*@once*/ state.wontUpdate}</MonComposant>
 ```
