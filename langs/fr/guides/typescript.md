@@ -570,9 +570,9 @@ declare module "solid-js" {
 
 ### `use:___`
 
-If you define custom directives for Solid's
-[`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
-you can type them in the `Directives` interface, like so:
+Si vous définissez des Directives personnalisées pour les
+[attributs `use:___`](https://www.solidjs.com/docs/latest/api#use%3A___) de Solid,
+vous pouvez les typer dans l'interface `Directives`, comme ceci:
 
 ```tsx
 function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
@@ -594,30 +594,27 @@ let [name, setName] = createSignal('');
 <input type="text" use:model={[name, setName]} />;
 ```
 
-If you're `import`ing a directive `d` from another module, and `d` is used only
-as a directive `use:d`, then TypeScript (or more precisely,
+Si vous `importez` une Directive `d` d'un autre module, et que `d` est utilisé uniquement
+comme une Directive `use:d`, alors TypeScript (ou plus précisément,
 [`babel-preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript))
-will by default remove the `import` of `d` (for fear that `d` is a type,
-as TypeScript doesn't understand `use:d` as a reference to `d`).
-There are two ways around this issue:
-
-1. Use
-   [`babel-preset-typescript`'s `onlyRemoveTypeImports: true`](https://babeljs.io/docs/en/babel-preset-typescript#onlyremovetypeimports)
-   configuration option,
-   which prevents it from removing any `import`s except for `import type ...`.
-   If you're using `vite-plugin-solid`, you can specify this option via
+supprimera par défaut le `import` de `d` (par crainte que `d` soit un type,
+car TypeScript ne comprend pas `use:d` comme une référence à `d`).
+Il y a deux façons de résoudre ce problème:
+   
+1. Utilisez
+   l'option de configuration [`onlyRemoveTypeImports: true` de `babel-preset-typescript`](https://babeljs.io/docs/en/babel-preset-typescript#onlyremovetypeimports)
+   qui l'empêche de supprimer tout `import`s sauf `import type ...`.
+   Si vous utilisez `vite-plugin-solid`, vous pouvez spécifier cette option via
    `solidPlugin({ typescript: { onlyRemoveTypeImports: true } })`
-   in `vite.config.ts`.
+   dans le fichier `vite.config.ts`.
 
-   Note that this option can be problematic if you don't vigilantly use
-   `export type` and `import type` throughout your codebase.
+   Notez que cette option peut être problématique si vous n'utilisez pas de manière vigilante les fonctions
+   `export type` et `import type` dans votre codebase.
 
-2. Add a fake access like `false && d;` to every module `import`ing
-   directive `d`.
-   This will stop TypeScript from removing the `import` of `d`, and assuming
-   you're tree-shaking via e.g. [Terser](https://terser.org/),
-   this code will be omitted from your final code bundle.
+2. Ajoutez un faux accès comme `false && d;` à chaque module `import`ant la directive `d`.
+   Cela empêchera TypeScript de supprimer l'import de `d`, et de supposer que vous êtes en train de secouer l'arborescence via par exemple [Terser](https://terser.org/),
+   ce code sera omis de votre bundle de code final.
 
-   The simpler fake access `d;` will also prevent the `import` from being
-   removed, but will typically not be tree-shaken away, so will end up in
-   your final code bundle.
+   Le faux accès plus simple `d;` empêchera également le `import` d'être
+   supprimé, mais ne sera généralement pas retiré de l'arbre, et finira donc dans
+   votre bundle de code final.
