@@ -1,9 +1,3 @@
----
-title: API
-description: Schema di tutte le API Solid.
-sort: 0
----
-
 # Reattività semplice
 
 ## `createSignal`

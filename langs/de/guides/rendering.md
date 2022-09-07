@@ -1,9 +1,3 @@
----
-title: Rendering
-description: Bespricht die verschiedenen Templating- und Rendering-Optionen in Solid.
-sort: 2
----
-
 # Rendering
 
 Solid unterstützt Templating in 3 Formen: JSX, Tagged Template Literals und Solids HyperScript-Variante, obwohl JSX die bevorzugte Form ist. Warum? JSX ist eine großartige DSL für Kompilation. Es hat eine klare Syntax, unterstützt TypeScript, läuft mit Babel und unterstützt andere Werkzeuge wie Syntax Highlighting und Prettier. Es war nur pragmatisch, ein Werkzeug zu verwenden, das einem all das kostenlos zur Verfügung stellt. Als kompilierte Lösung bietet es eine großartige Entwicklererfahrung. Warum soll man sich mit eigenen Syntax DSLs herumschlagen, wenn man eine verwenden kann, die so weitläufig unterstützt wird?

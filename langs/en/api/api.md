@@ -1,9 +1,3 @@
----
-title: API
-description: Description of all of Solid's API
-sort: 0
----
-
 # Basic Reactivity
 
 Solid's overall approach to reactivity is to wrap any reactive computation in
@@ -1293,7 +1287,7 @@ export const CounterContext = createContext([{ count: 0 }, {}]);
 
 export function CounterProvider(props) {
   const [state, setState] = createStore({ count: props.count || 0 });
-  const store = [
+  const counter = [
     state,
     {
       increment() {
@@ -1306,7 +1300,7 @@ export function CounterProvider(props) {
   ];
 
   return (
-    <CounterContext.Provider value={store}>
+    <CounterContext.Provider value={counter}>
       {props.children}
     </CounterContext.Provider>
   );

@@ -1,9 +1,3 @@
----
-title: 렌더링
-description: Discusses the different templating and rendering options in Solid.
-sort: 2
----
-
 # 렌더링
 
 Solid는 JSX, 태그가 지정된 템플릿 리터럴, Solid의 하이퍼스크립트 변형 이렇게 3가지 형식을 지원하며, 주로 JSX를 사용합니다. 그 이유는 JSX가 컴파일을 위해 만들어진 훌륭한 DSL이기 때문입니다. 명확한 문법을 가지며, 타입스크립트를 지원하고, Babel와 잘 작동하며, 코드 문법 하이라이팅 기능 및 prettier 등과 같은 도구를 지원합니다. 이 모든 것을 무료로 제공하는 도구들을 사용하는 것은 실용적이었습니다. 컴파일된 솔루션으로 훌륭한 DX를 제공합니다. 이렇게 널리 지원되는 것들을 사용할 수 있는데 굳이 커스텀 문법의 DSL을 사용해 어려움을 겪을 필요가 있을까요?

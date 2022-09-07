@@ -1,9 +1,3 @@
----
-title: Serveur
-description: Une explication des capacités côté serveur de Solid
-sort: 3
----
-
 # Rendu Côté Serveur
 
 Solid gère le rendu côté serveur en compilant les templates JSX pour que l'ajout de code soit ultra efficace. Cela est fait grâce au plug-in Babel ou au preset en passant `generate: "ssr"`. Pour le côté client et serveur, vous devez passer `hydratable: true` pour générer du code d'hydratation compatible.

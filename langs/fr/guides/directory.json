@@ -1,0 +1,32 @@
+[
+  {
+    "resource": "getting-started",
+    "title": "Pour commencer",
+    "description": "Un guide sur comment débuter sur Solid."
+  },
+  {
+    "resource": "reactivity",
+    "title": "Réactivité",
+    "description": "Un aperçu complet du système de réactivité de Solid."
+  },
+  {
+    "resource": "rendering",
+    "title": "Rendu",
+    "description": "Discussion entre les différentes options de template et de rendu avec Solid"
+  },
+  {
+    "resource": "server",
+    "title": "Serveur",
+    "description": "Une explication des capacités côté serveur de Solid"
+  },
+  {
+    "resource": "comparison",
+    "title": "Comparaison",
+    "description": "Comparaison de Solid avec les autres frameworks."
+  },
+  {
+    "resource": "faq",
+    "title": "FAQ",
+    "description": "Foire aux questions de la communauté."
+  }
+]

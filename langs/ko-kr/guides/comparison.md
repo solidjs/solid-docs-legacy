@@ -1,9 +1,3 @@
----
-title: 다른 라이브러리와의 비교
-description: Solid와 다른 프레임워크 비교.
-sort: 5
----
-
 # 다른 라이브러리와의 비교
 
 이 섹션은 약간의 편견을 피할 수 없지만, 다른 라이브러리와 비교하여 Solid의 솔루션이 어느 위치에 있는지 이해하는 것이 중요하다고 생각합니다. 이건 성능에 대한 이야기가 아닙니다. 성능에 대해 확실히 알고 싶다면 [JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark)를 참조하세요.

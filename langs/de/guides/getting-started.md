@@ -1,9 +1,3 @@
----
-title: Einstieg in Solid
-description: Ein Handbuch zum Einstieg in Solid.
-sort: 0
----
-
 # Einstieg in Solid
 
 ## Solid ausprobieren

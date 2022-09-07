@@ -1,9 +1,3 @@
----
-title: Renderizado
-description: Habla de las diferentes opciones de templating y renderizado en Solid.
-sort: 2
----
-
 # Renderizado
 
 Solid soporta templating en 3 formas JSX, Tagged Template Literals y la variable HyperScript de Solid, JSX es la forma predominante. Por qué? JSX es un DSL hecho para la compilación. Tiene una sintaxis clara, soporta TypeScript, funciona con Babel y soporta otras herramientas como Code Syntax Highlighting y Prettier. Era simplemente pragmático usar una herramienta que básicamente te otorga todo eso, gratis. Como una solución compilada provee una experiencia de desarrollo asombrosa. Porque luchar con sintaxis personalizados de DSL cuando puedes usar uno con tan amplio soporte?

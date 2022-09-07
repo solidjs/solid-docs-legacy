@@ -1,9 +1,3 @@
----
-title: Réactivité
-description: Un aperçu complet du système de réactivité de Solid.
-sort: 1
----
-
 # Réactivité
 
 La gestion des données avec Solid est construite avec une collection de primitives réactives flexibles qui sont responsables de toutes les mises à jour. L'approche est très similaire à MobX ou Vue sauf qu'elle ne sacrifie jamais la granularité pour un VDOM.

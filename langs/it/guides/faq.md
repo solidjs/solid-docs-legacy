@@ -1,9 +1,3 @@
----
-title: Domande Frequenti
-description: Domande frequenti dalla community.
-sort: 5
----
-
 # Domande Frequenti
 
 ### 1. JSX senza VDOM? Questo è vaporware? Ho sentito altri autori riconosciuti dire che non era possibile.

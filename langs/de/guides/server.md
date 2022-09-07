@@ -1,9 +1,3 @@
----
-title: Server
-description: Eine Erklärung von Solids serverseitigen Fähigkeiten
-sort: 3
----
-
 # Serverseitiges Rendering
 
 Solid handhabt serverseitiges Rendering, indem es JSX-Templates zu extrem effizientem String-anfügendem Code rendert. Das kann mit dem Babel-Plugin erreicht werden, oder indem man `generate: ssr` durchreicht. Sowohl für Client als auch Server muss `hydratable: true` konfiguriert sein, damit mit Hydration kompatibler Code erzeugt wird.

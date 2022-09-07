@@ -1,9 +1,3 @@
----
-title: Rendering
-description: Mendiskusikan perbedaan dari pilihan-pilihan templating dan rendering di Solid.
-sort: 2
----
-
 # Rendering
 
 Solid mendukung templating dalam 3 bentuk, JSX, Tagged Template Literals dan variasi HyperScript Solid, walaupun JSX yang paling paling dominan digunakan. Kenapa? Karena JSX adalah DSL yang dibuat untuk kompilasi. Dia memiliki syntax yang jelas, mendukung TypeScript, dapat bekerja dengan Babel dan mendukung alat-alat lain seperti Code Syntax Highlighting dan Prettier. Jadi hal yang wajar untuk menggunakan alat yang pada dasarnya memberikan semua itu secara gratis. Sebagai solusi yang dikompilasi ia memberikan DX (Developer Experience) yang baik. Jadi kenapa harus menyusahkan diri dengan custom Syntax DSLs ketika kamu bisa menggunakan pilihan yang didukung secara luas?
