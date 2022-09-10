@@ -20,22 +20,24 @@ _注意：可以从文档根节点进行渲染和注水。这允许我们在 JSX
 import {
   renderToString,
   renderToStringAsync,
-  renderToNodeStream,
-  renderToWebStream
+  renderToStream
 } from "solid-js/web";
 
-// 同步字符串渲染
+// 同步渲染字符串
 const html = renderToString(() => <App />);
 
-// 异步字符串渲染
+// 异步渲染字符串
 const html = await renderToStringAsync(() => <App />);
 
-// Node Stream API
-pipeToNodeWritable(App, res);
+// 渲染到 Stream
+const stream = renderToStream(() => <App />);
 
-// Web Stream API (适用于 Cloudflare Workers)
+// Node
+stream.pipe(res);
+
+// Web streams (for like Cloudflare Workers)
 const { readable, writable } = new TransformStream();
-pipeToWritable(() => <App />, writable);
+stream.pipeTo(writable);
 ```
 
 为方便起见，`solid-js/web` 导出了一个十分有用的 `isServer` 标志。这样大多数打包工具将能够在此标志下对任意代码进行的 treeshake 操作，或者仅在此标志下使用浏览器端之外的代码。
@@ -92,13 +94,11 @@ const App = () => {
 };
 ```
 
-当从文档中插入客户端不可用的资源来进行注水时，就会把事情搞砸。Solid 提供了一个 `<NoHydration>` 组件，其子组件可以在服务器上正常工作，但不会在浏览器中注水。
+当从文档中补水时，插入在客户端运行中不可用的资源也可能会在不在 `<head>` 标签下时搞砸。Solid 提供了一个 `<NoHydration>` 组件，其子组件将在服务器上正常工作，但不能在浏览器中进行水合。
 
 ```jsx
 <NoHydration>
-  {manifest.map(m => (
-    <link rel="modulepreload" href={m.href} />
-  ))}
+  <ImNotHydrated />
 </NoHydration>
 ```
 

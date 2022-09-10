@@ -38,7 +38,7 @@ import { render } from "solid-js/web";
 render(() => <App />, document.getElementById("main"));
 ```
 
-> **重要** 第一个参数必须是一个函数。否则 Solid 无法正确跟踪和调度响应系统。偷懒将导致你的 Effect 无法运行。
+> **重要** 第一个参数必须是一个函数。否则 Solid 无法正确跟踪和调度响应系统。省略函数包装器将导致您的 effect 无法运行。
 
 ## 组件
 
@@ -200,7 +200,7 @@ const BasicComponent = props => {
 
 // 错误示例
 const BasicComponent = props => {
-  const valueProp = prop.value;
+  const valueProp = props.value; 
   const value = createMemo(() => valueProp || "default");
   return <div>{value()}</div>;
 };
@@ -237,8 +237,8 @@ const newProps = mergeProps(props);
 props = mergeProps(props, otherProps);
 
 // 将 props 拆分为多个 props 对象
-const [local, others] = splitProps(props, ["className"])
-<div {...others} className={cx(local.className, theme.component)} />
+const [local, others] = splitProps(props, ["class"]) 
+<div {...others} class={cx(local.class, theme.component)} /> 
 ```
 
 ## Children
