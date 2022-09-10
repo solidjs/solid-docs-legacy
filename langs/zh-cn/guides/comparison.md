@@ -10,7 +10,17 @@ React 对 Solid 产生了很大的影响。React Hooks API 中的单向数据流
 
 #### 迁移建议：
 
-Solid 的更新模型完全不像 React，甚至不像 React + MobX。不要将函数组件视为 `render` 函数，而是将它们视为 `constructor`。注意解构或提前属性访问会丢失响应性。Solid 的 primitive 没有像 Hook 规则这样的限制，因此你可以根据需要自由嵌套它们。你不需要使用列表行上的显式 key 来实现具有 key 的行为。最后，没有 VDOM，所以像 `React.Children` 和 `React.cloneElement` 这样的命令式 VDOM API 毫无意义。我鼓励寻找不同的方法来解决以声明方式使用这些方法的问题。
+Solid 的更新模型与 React 完全不同，甚至与 React + MobX 完全不同。不要将函数组件视为 `render` 函数，而是将它们视为 `constructor`。
+
+在 Solid 中，props 和 store 是 [proxy objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)，它们依赖于属性访问来进行跟踪和响应式更新。注意解构或提前属性访问，这可能导致这些属性失去反应性或在错误的时间触发。
+
+Solid 的 primitive 没有像 Hook 规则这样的限制，因此您可以随意嵌套它们。
+
+你不需要使用列表行上的显式 key 来实现具有 key 的行为。
+
+在 React 中，每当修改输入字段时都会触发 `onChange`，但这不是 `onChange` [原生工作的方式](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange)。在 Solid 中，使用 `onInput` 订阅每个值的更改。
+
+最后，没有 VDOM，所以像 `React.Children` 和 `React.cloneElement` 这样的命令式 VDOM API 在 Solid 中没有等价物。与其直接创建或修改 DOM 元素，不如以声明的方式表达您的意图。
 
 ## Vue
 
@@ -34,7 +44,7 @@ Svelte 开创了 Solid 在一定程度上也采用的预编译消失型框架。
 
 ## Knockout.js
 
-这个库的存在归功于 Knockout。该项目的动机是将其用于细粒度依赖性检测的模型现代化。Knockout 于 2010 年发布，支持 Microsoft Explorer 回到 IE6，而 Solid 的大部分内容根本不支持 IE。
+这个库的存在归功于 Knockout。将其模型现代化以进行细粒度依赖检测是该项目的动机。Knockout 于 2010 年发布，支持 IE6，而 Solid 的大部分根本不支持 IE。
 
 Knockout 的绑定只是在运行时遍历的 HTML 中的字符串。它们取决于克隆上下文（$parent 等...）。而 Solid 使用 JSX 或 JavaScript API 的标签模板字面量来模板化。
 
@@ -60,7 +70,7 @@ Knockout 的绑定只是在运行时遍历的 HTML 中的字符串。它们取�
 
 ## RxJS
 
-RxJS 是一个响应式库。虽然 Solid 对 Observable 数据有类似的想法，但它有着许多观察者模式不同的应用。虽然 Signal 就像一个 Observable 的简单版本（只有 next），但自动依赖检测的模式取代了 RxJS 的一百个左右的操作符。Solid 有能力采用这种方法，事实上，该库的早期版本也包含类似的运算符，但在大多数情况下，在计算中编写自己的转换逻辑更为直接。在 Observable 是冷启动、单播和基于推送的情况下，客户端上的许多情况都是热启动和多播，这也是 Solid 的默认行为。
+RxJS 是一个响应式库。虽然 Solid 对 Observable 数据有类似的想法，但它有着许多观察者模式不同的应用。虽然 Signal 就像一个 Observable 的受限形式（只有 next），但自动依赖检测的模式取代了 RxJS 的一百个左右的操作符。Solid 有能力采用这种方法，事实上，该库的早期版本也包含类似的运算符，但在大多数情况下，在计算中编写自己的转换逻辑更为直接。在 Observable 是冷启动、单播和基于推送的情况下，客户端上的许多情况都是热启动和多播，这也是 Solid 的默认行为。
 
 ## 其他
 

@@ -12,7 +12,7 @@ This is documentation for SolidJS v1.0.0 and associated Solid packages and proje
 
 Solid's documentation is available in 10 languages:
 
-| Language           | API Documentation | Guides | Tutorials | Contibutors                                                                                                                                                                |
+| Language           | API Documentation | Guides | Tutorials | Contributors                                                                                                                                                                |
 | ------------------ | ----------------- | ------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🇫🇷 French (fr)     | 100%              | 100%   | 100%        | [xstevenyung](https://github.com/xstevenyung), [Vexcited](https://github.com/Vexcited)                                                                                                                              |
 | 🇮🇹 Italian (it)    | 100%              | 100%   | 0%        | [davedbase](https://github.com/davedbase), [Nusakan](https://github.com/GabrielMarisescu),                                                                                 |
