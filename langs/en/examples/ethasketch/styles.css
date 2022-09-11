@@ -1,0 +1,7 @@
+.cell {
+  outline: 1px solid #1f1f1f;
+}
+
+.dark .cell {
+  outline: 1px solid #efefef;
+}
