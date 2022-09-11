@@ -42,13 +42,17 @@ sourceFiles.forEach((sourceFilename) => {
     return;
   }
   console.log(`extracting ${data.files.length} files`);
+  const destPathParent = `${destFolder}/${basename(sourceFilename, '.json')}`;
+  mkdirSync(destPathParent, {recursive: true});
+  const filesOrder = [];
   data.files.forEach((file) => {
     const destFilename = `${file.name}.${file.type || 'jsx'}`;
-    const destPath = `${destFolder}/${basename(sourceFilename, '.json')}/${destFilename}`;
-    mkdirSync(dirname(destPath), {recursive: true});
+    filesOrder.push(destFilename);
+    const destPath = `${destPathParent}/${destFilename}`;
     let content = file.content;
     if (Array.isArray(content)) content = content.join('\n');
     writeFileSync(destPath, content);
     console.log(`- extracted ${destPath}`);
   });
+  writeFileSync(`${destPathParent}/.json-files`, JSON.stringify(filesOrder));
 });
