@@ -1,0 +1,5 @@
+{
+  "name": "Complex/Simple Todos Hyperscript",
+  "description": "Simple Todos using Hyper DOM Expressions",
+  "files": ["main.jsx"]
+}

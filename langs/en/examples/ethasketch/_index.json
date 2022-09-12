@@ -1,0 +1,5 @@
+{
+  "name": "Complex/Etch A Sketch",
+  "description": "Uses Index and createMemo to create a grid graphic",
+  "files": ["main.tsx","styles.css"]
+}

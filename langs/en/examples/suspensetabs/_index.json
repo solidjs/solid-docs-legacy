@@ -1,0 +1,5 @@
+{
+  "name": "Complex/Suspense Transitions",
+  "description": "Deferred loading spinners for smooth UX",
+  "files": ["main.jsx","child.jsx","styles.css"]
+}

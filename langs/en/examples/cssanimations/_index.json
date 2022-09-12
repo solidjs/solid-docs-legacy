@@ -1,0 +1,5 @@
+{
+  "name": "Basic/CSS Animations",
+  "description": "Using Solid Transition Group",
+  "files": ["main.jsx","styles.css"]
+}

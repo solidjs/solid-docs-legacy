@@ -1,0 +1,5 @@
+{
+  "name": "Basic/Context",
+  "description": "A simple color picker using Context",
+  "files": ["main.tsx","theme.tsx"]
+}
