@@ -31,7 +31,7 @@ export default {
       ],
     }),
     typescript(),
-    jsonFiles({ include: ['**/examples/**', '**/tutorials/**'] }),
+    jsonFiles(),
     json(),
     dynamicImportVars.default(),
   ],
