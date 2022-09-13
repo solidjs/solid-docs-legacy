@@ -2,46 +2,37 @@
 // single JSON file of type JsFiles. Its purpose is to join individual files, so
 // that the solid-site can keep using them.
 
-
-// This will be a rollup plugin which joins all the files of a folder into a
-// single "<folder>.json" file if the folder contains a ".json-files" file with
-// the order of the files to join as a JSON stringified array.
-
-import { createFilter } from '@rollup/pluginutils';
 import glob from 'glob';
-import { resolve, basename, dirname, parse } from 'path';
-import { readdirSync, readFileSync, writeFileSync } from 'fs';
+import { dirname, parse, basename } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
 
 export default function pack(pluginOptions) {
-  const pluginFilter = createFilter(pluginOptions?.include, pluginOptions?.exclude);
-
+  const pluginName = 'json-files';
+  if (pluginOptions) {
+    console.warn(`[${pluginName}] no plugin options are supported`);
+  }
   return {
-    name: 'json-files', // this name will show up in warnings and errors
+    name: pluginName,
     buildStart() {
-      const allPaths = glob.sync('**/.json-files', {dot: true, absolute: true});
-      const filteredPaths = allPaths.filter(pluginFilter);
-      // console.log('json-files count', filteredPaths.length);
-      filteredPaths.forEach((orderPath) => {
-        let order = [];
+      const matchers = '{**/examples/*/_index.json,**/tutorials/*/*/_index.json}';
+      const allPaths = glob.sync(matchers, {absolute: true});
+      allPaths.forEach((descriptorPath) => {
+        let descriptor = {};
         try {
-          const orderContent = readFileSync(orderPath);
-          order = JSON.parse(orderContent);
+          descriptor = JSON.parse(readFileSync(descriptorPath, 'utf8'));
         } catch (e) {
-          console.warn(`skipping ${orderPath} because ${e}`);
+          console.warn(`[${pluginName}] skipping ${descriptorPath} because ${e}`);
           return;
         }
-        if (!Array.isArray(order)) {
-          console.warn(`skipping ${orderPath} because it doesn't contain an array`);
+        if (!Array.isArray(descriptor.files) || descriptor.files.length === 0) {
+          console.warn(`[${pluginName}] skipping ${descriptorPath} because the files property is not a list or it's an empty list`);
           return;
         }
-        if (order.length === 0) {
-          console.warn(`skipping ${orderPath} because the array is empty`);
-          return;
-        }
-        const inputPath = dirname(orderPath);
-        const outputFilename = `${inputPath}.json`;
-        const files = order.map((filename) => {
-          const inputFilename = `${inputPath}/${filename}`;
+        
+        const examplePath = dirname(descriptorPath);
+        const outputFilename = `${examplePath}.json`;
+        const files = descriptor.files.map((filename) => {
+          const inputFilename = `${examplePath}/${filename}`;
           const parsedFilename = parse(filename);
           return {
             name: parsedFilename.name, 
@@ -49,7 +40,12 @@ export default function pack(pluginOptions) {
             content: readFileSync(inputFilename, 'utf8')
           };
         });
-        writeFileSync(outputFilename, JSON.stringify({files}));
+        writeFileSync(outputFilename, JSON.stringify({
+          id: basename(examplePath),
+          name: descriptor.name,
+          description: descriptor.description,
+          files
+        }));
       });
     }
   };
