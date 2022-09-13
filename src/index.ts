@@ -1,6 +1,6 @@
-import { DocFile, LessonFile, LessonLookup, ResourceMetadata } from "./types";
+import { DocFile, LessonFile, LessonLookup, ResourceMetadata, Example } from "./types";
 
-export { DocFile, LessonFile, LessonLookup, ResourceMetadata };
+export { DocFile, LessonFile, LessonLookup, ResourceMetadata, Example };
 
 function noThrow<T>(x: Promise<T>): Promise<T | undefined> {
   return x.catch(() => undefined);
@@ -49,4 +49,30 @@ export async function getTutorialDirectory(
     import(`../langs/${lang}/tutorials/directory.json`)
   );
   return directory?.default;
+}
+
+export async function getExample(
+  lang: string,
+  id: string
+): Promise<Example | undefined> {
+  const example = await noThrow(import(`../langs/${lang}/examples/${id}.json`));
+  return example?.default;
+}
+
+export async function getExamplesDirectory(
+  lang: string
+): Promise<Example[] | undefined> {
+  const ids: string[] = await noThrow(import(`../langs/${lang}/examples/_index.json`));
+  if (!ids) return undefined;
+  const result: Example[] = [];
+  for (const id of ids) {
+    const example = await getExample(lang, id);
+    if (!example) {
+      console.warn(`Example ${id} not found`);
+      continue;
+    }
+    delete example.files;
+    result.push(example);
+  }
+  return result;
 }

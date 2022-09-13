@@ -25,3 +25,10 @@ export interface LessonFile {
   solved?: any;
   markdown?: string;
 }
+
+export interface Example {
+  id: string;
+  name: string;
+  description: string;
+  files?: any;
+}
