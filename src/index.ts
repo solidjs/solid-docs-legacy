@@ -1,6 +1,6 @@
-import { DocFile, LessonFile, LessonLookup, ResourceMetadata, Example } from "./types";
+import { DocFile, LessonFile, LessonLookup, ResourceMetadata, JsonFile, Example } from "./types";
 
-export { DocFile, LessonFile, LessonLookup, ResourceMetadata, Example };
+export { DocFile, LessonFile, LessonLookup, ResourceMetadata, JsonFile, Example };
 
 function noThrow<T>(x: Promise<T>): Promise<T | undefined> {
   return x.catch(() => undefined);

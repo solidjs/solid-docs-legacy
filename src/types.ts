@@ -26,9 +26,15 @@ export interface LessonFile {
   markdown?: string;
 }
 
+export interface JsonFile {
+  name: string;
+  type: string;
+  content: string;
+}
+
 export interface Example {
   id: string;
   name: string;
   description: string;
-  files?: any;
+  files?: JsonFile[];
 }
