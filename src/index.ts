@@ -62,9 +62,9 @@ export async function getExample(
 export async function getExamplesDirectory(
   lang: string
 ): Promise<Example[] | undefined> {
-  const ids: string[] = await noThrow(import(`../langs/${lang}/examples/_index.json`));
+  const {examples: ids} = await noThrow(import(`../langs/${lang}/examples/_index.json`));
   if (!ids) return undefined;
-  const result: Example[] = [];
+  const result = [];
   for (const id of ids) {
     const example = await getExample(lang, id);
     if (!example) {
