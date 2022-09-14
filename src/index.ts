@@ -71,8 +71,13 @@ export async function getExamplesDirectory(
       console.warn(`Example ${id} not found`);
       continue;
     }
-    delete example.files;
-    result.push(example);
+    // REM clone before mutating, otherwise import() cached value will be mutated
+    const clonedExample = {...example};
+    delete clonedExample.files;
+    // FIXME building the directory on demand is very slow because every user
+    // has to download all examples data (and their files). Instead, the
+    // directory should be precomputed by the rollup plugin
+    result.push(clonedExample);
   }
   return result;
 }
