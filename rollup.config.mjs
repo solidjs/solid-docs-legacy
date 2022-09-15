@@ -7,7 +7,7 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { remarkMdxToc } from "remark-mdx-toc";
-import jsonFiles from "./src/json-files/rollup-plugin.js";
+import jsonFolders from "./src/rollup-plugins/generate-json-folders.js";
 
 export default {
   input: "src/index.ts",
@@ -31,7 +31,7 @@ export default {
       ],
     }),
     typescript(),
-    jsonFiles(),
+    jsonFolders(),
     json(),
     dynamicImportVars.default(),
   ],
