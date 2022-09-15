@@ -1,6 +1,6 @@
-import { DocFile, LessonFile, LessonLookup, ResourceMetadata, JsonFile, Example } from "./types";
+import { DocFile, LessonFile, LessonLookup, ResourceMetadata, SourceFile, Example } from "./types";
 
-export { DocFile, LessonFile, LessonLookup, ResourceMetadata, JsonFile, Example };
+export { DocFile, LessonFile, LessonLookup, ResourceMetadata, SourceFile, Example };
 
 function noThrow<T>(x: Promise<T>): Promise<T | undefined> {
   return x.catch(() => undefined);
@@ -62,22 +62,6 @@ export async function getExample(
 export async function getExamplesDirectory(
   lang: string
 ): Promise<Example[] | undefined> {
-  const {examples: ids} = await noThrow(import(`../langs/${lang}/examples/_index.json`));
-  if (!ids) return undefined;
-  const result = [];
-  for (const id of ids) {
-    const example = await getExample(lang, id);
-    if (!example) {
-      console.warn(`Example ${id} not found`);
-      continue;
-    }
-    // REM clone before mutating, otherwise import() cached value will be mutated
-    const clonedExample = {...example};
-    delete clonedExample.files;
-    // FIXME building the directory on demand is very slow because every user
-    // has to download all examples data (and their files). Instead, the
-    // directory should be precomputed by the rollup plugin
-    result.push(clonedExample);
-  }
-  return result;
+  const directory = await noThrow(import(`../langs/${lang}/examples/$descriptor.json`));
+  return directory?.default;
 }
