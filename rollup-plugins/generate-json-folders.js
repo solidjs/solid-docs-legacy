@@ -1,7 +1,3 @@
-// This script is meant to be run on each build, to join a group of files into a
-// single JSON file of type JsFiles. Its purpose is to join individual files, so
-// that the solid-site can keep using them.
-
 import glob from 'glob';
 import { dirname, parse, basename } from 'path';
 import { readFileSync, writeFileSync } from 'fs';

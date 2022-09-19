@@ -1,7 +1,3 @@
-// This script is meant to be run once per each JSON file of type JsFiles, like
-// those in a tutorial or an example. Its purpose is to extract individual
-// files, so that they can be more easily diffed in git.
-
 // input 
 //   1: source folder (eg: "<root>/../solid-site/public/examples")
 //   2: dest folder (eg: "<root>/langs/en/examples")
