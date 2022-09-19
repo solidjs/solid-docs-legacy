@@ -1,32 +1,42 @@
 [
   {
     "resource": "getting-started",
-    "title": "入门指南",
-    "description": "Solid 入门指南。"
+    "title": "入门",
+    "description": "有关如何开始使用 Solid 的指南"
   },
   {
     "resource": "reactivity",
     "title": "响应性",
-    "description": "Solid 响应性完整纲要。"
+    "description": "Solid 响应性完整概述"
   },
   {
     "resource": "rendering",
     "title": "渲染",
-    "description": "讨论 Solid 中的不同模板和渲染选项。"
+    "description": "讨论 Solid 中不同的模板和渲染选项"
   },
   {
     "resource": "server",
     "title": "服务端",
-    "description": "Solid 服务器端功能指南。"
+    "description": "Solid 的服务器端功能的说明"
+  },
+  {
+    "resource": "typescript",
+    "title": "TypeScript",
+    "description": "将 Solid 与 TypeScript 一起使用"
+  },
+  {
+    "resource": "testing",
+    "title": "测试 Solid",
+    "description": "如何测试你的 Solid 应用程序"
   },
   {
     "resource": "comparison",
     "title": "比较",
-    "description": "Solid 与其他框架比较。"
+    "description": "Solid 与其他框架的比较"
   },
   {
     "resource": "faq",
     "title": "常见问题",
-    "description": "来自社区的常见问题。"
+    "description": "来自社区的常见问题"
   }
 ]

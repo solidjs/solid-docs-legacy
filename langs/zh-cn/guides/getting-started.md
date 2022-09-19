@@ -1,10 +1,19 @@
-# 入门指南
+# Getting Started
+
+**我们正在开发新文档.** 您可以在 [此处](https://docs.solidjs.com/tutorials/getting-started-with-solid/) 查看我们的新初学者教程，并加入我们在 [Discord](http://discord.com/invite/solidjs) 的频道。
+
+## 了解 Solid
+
+有关 Solid 核心概念的快速视频概述，请查看：
+
+- [100 秒了解 Solid](https://youtu.be/hw3Bx5vxKl0)
+- [10 分钟了解 Solid 响应性](https://youtu.be/J70HXl1KhWE)
 
 ## 使用 Solid
 
-到目前为止，开始使用 Solid 的最简单方法是在线使用。在我们的 REPL(https://playground.solidjs.com) 上尝试各种想法是一种不错方式。另外你也可以在 https://codesandbox.io/ 修改我们的示例代码。
+到目前为止，开始使用 Solid 的最简单方法是在线试用。我们在 https://playground.solidjs.com 上的 REPL 是尝试想法的完美方式。与 https://codesandbox.io/ 一样，您可以在其中修改任何 [我们的示例](https://github.com/solidjs/solid/blob/main/documentation/resources/examples.md)。
 
-你也可以通过在终端中运行以下命令来创建并启动简单的 Vite 模板项目：
+或者，您可以通过在终端中运行以下命令来使用我们的 [Vite 模板](https://github.com/solidjs/templates)：
 
 ```sh
 > npx degit solidjs/templates/js my-app
@@ -13,7 +22,7 @@
 > npm run dev # or yarn or pnpm
 ```
 
-使用 TypeScript ：
+或者使用 TypeScript:
 
 ```sh
 > npx degit solidjs/templates/ts my-app
@@ -22,13 +31,34 @@
 > npm run dev # or yarn or pnpm
 ```
 
+或者您可以在自己的项目中安装依赖项。要将 Solid 与 JSX 一起使用（推荐），您需要安装 `solid-js` NPM 库和 [Solid JSX 编译器](https://github.com/ryansolid/dom-expressions/tree/main/packages/babel-plugin-jsx-dom-expressions) Babel 插件：
+
+```sh
+> npm install solid-js babel-preset-solid
+```
+
+然后将 `babel-preset-solid` 添加到你的 `.babelrc` 中，或者添加到 `webpack` 或 `rollup` 中的 Babel 配置中：
+
+```json
+"presets": ["solid"]
+```
+
+对于 TypeScript，将您的 `tsconfig.json` 设置为处理 Solid 的 JSX，如下所示（有关详细信息，请参阅 [TypeScript 指南](https://www.solidjs.com/guides/typescript)）：
+
+```json
+"compilerOptions": {
+  "jsx": "preserve",
+  "jsxImportSource": "solid-js",
+}
+```
+
 ## 学习 Solid
 
-Solid 到处都是可组合的小片段，用这些片段用来构建应用块。这些部分主要由许多浅显的顶级 API 的函数组成。幸运的是，你无需了解其中的大部分内容即可开始使用。
+Solid 到处都是可组合的小片段，用这些片段用来构建应用块。这些部分主要由许多 API 的函数组成。幸运的是，你无需了解其中的大部分内容即可开始使用。
 
-你可以使用组件和响应式 Primitives 这两种主流方式来构建区块
+您可以使用两种主要类型的构建块是：组件和响应性 API。
 
-组件是接受 props 对象并返回 JSX 元素（包括原生 DOM 元素和其他组件）的函数。它们可以用大驼峰拼写表示为 JSX 元素
+组件是接受 props 对象并返回 JSX 元素的函数，包括原生 DOM 元素和其他组件。它们可以用 PascalCase 表示为 JSX 元素：
 
 ```jsx
 function MyComponent(props) {
@@ -38,9 +68,9 @@ function MyComponent(props) {
 <MyComponent name="Solid" />;
 ```
 
-组件是轻量级的，因为它们本身没有状态，也没有实例。相反，它们充当 DOM 元素和响应式 primitives 的工厂函数
+组件是轻量级的，因为它们本身没有状态并且没有实例。相反，它们充当 DOM 元素和响应性 API 的工厂函数。
 
-Solid 的细粒度响应式建立在 3 个简单的 primitives 之上：Signals、Memos 和 Effects。它们共同构成了一个自动跟踪同步引擎，可确保你的视图保持最新。响应式计算采用了简单包装函数表达式的形式，另外他们是同步执行的
+Solid 的细粒度响应性建立在三个核心 API 之上：signal、memo 和 effect。它们共同构成了一个自动跟踪同步引擎，可确保您的视图保持最新。响应式计算采用同步执行的函数包装表达式的形式。
 
 ```js
 const [first, setFirst] = createSignal("JSON");
@@ -49,7 +79,7 @@ const [last, setLast] = createSignal("Bourne");
 createEffect(() => console.log(`${first()} ${last()}`));
 ```
 
-你可以在以下内容中了解更多 [Solid's Reactivity](#响应性) 和 [Solid's Rendering](#渲染).
+您可以了解更多关于 Solid [响应性](/guides/reactivity) 和 [渲染](/guides/rendering) 的信息。
 
 ## Solid 理念
 
@@ -83,17 +113,20 @@ Solid 拥有动态的服务器端渲染解决方案，可实现真正的同构�
 
 更多信息，请阅读 [服务端渲染指南](#ssr).
 
-## 无编译?
+## 不使用构建工具
 
-不喜欢 JSX？不介意手动包装表达式、性能更差和包大小更大吗？你可以采用另一种方案：在非编译环境中使用标记模板字面量或 HyperScript 创建 Solid 应用。
+如果您需要或喜欢在非编译环境中使用 Solid，例如纯 HTML 文件、https://codepen.io 等，您可以在普通的 JavaScript 中使用 [` html`` ` Tagged Template Literals](https://github.com/solidjs/solid/tree/main/packages/solid/html) 或 [HyperScript `h()` functions](https://github.com/solidjs/solid/tree/main/packages/solid/h)，而不是 Solid 的编译时优化的 JSX 语法。
 
-你可以直接在浏览器中运行下面代码 [Skypack](https://www.skypack.dev/):
+您可以使用 [Skypack](https://www.skypack.dev/) 直接从浏览器运行它们，例如：
 
 ```html
 <html>
   <body>
     <script type="module">
-      import { createSignal, onCleanup } from "https://cdn.skypack.dev/solid-js";
+      import {
+        createSignal,
+        onCleanup,
+      } from "https://cdn.skypack.dev/solid-js";
       import { render } from "https://cdn.skypack.dev/solid-js/web";
       import html from "https://cdn.skypack.dev/solid-js/html";
 
@@ -102,6 +135,8 @@ Solid 拥有动态的服务器端渲染解决方案，可实现真正的同构�
           timer = setInterval(() => setCount(count() + 1), 1000);
         onCleanup(() => clearInterval(timer));
         return html`<div>${count}</div>`;
+        // or
+        return h("div", {}, count);
       };
       render(App, document.body);
     </script>
@@ -109,4 +144,21 @@ Solid 拥有动态的服务器端渲染解决方案，可实现真正的同构�
 </html>
 ```
 
-请记住，你仍然需要相应的 DOM 表达式库才能配合 TypeScript 使用。你也可以搭配 [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) 使用标签模板字面量或者搭配 [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions) 使用 HyperScript。
+无构建的优势伴随着权衡：
+
+- 表达式必须始终包裹在 getter 函数中，否则它们将不会是响应式的。当 `first` 或 `last` 值更改时，以下内容不会更新，因为在模板内部创建的 effect 内没有访问这些值，因此不会跟踪依赖项：
+  ```js
+  html` <h1>Hello ${first() + " " + last()}</h1> `;
+  // or
+  h("h1", {}, "Hello ", first() + " " + last());
+  ```
+  当 `first` 或 `last` 更改时，以下内容将按预期更新，因为模板将从 effect 中的 getter 读取，并且将跟踪依赖项：
+  ```js
+  html` <h1>Hello ${() => first() + " " + last()}</h1> `;
+  // or
+  h("h1", {}, "Hello ", () => first() + " " + last());
+  ```
+  Solid 的 JSX 没有这个问题，因为它的编译时能力，像 `<h1>Hello {first() + ' ' + last()}</h1>` 这样的表达式将是响应式的。
+- 构建时优化不会像 Solid JSX 那样到位，这意味着应用程序启动速度会稍微慢一些，因为每个模板在第一次执行时都会在运行时编译，但对于许多用例来说是难以察觉的。` html`` ` 模板标签启动后的持续速度将与 JSX 相同。`h()` 调用将始终具有较慢的持续速度，因为它们无法在执行之前静态分析整个模板。
+
+您需要相应的 DOM 表达式库才能使它们与 TypeScript 一起使用。您可以将标记模板文字与 [Lit DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/lit-dom-expressions) 搭配 或 HyperScript 与 [Hyper DOM Expressions](https://github.com/ryansolid/dom-expressions/tree/main/packages/hyper-dom-expressions) 搭配。
