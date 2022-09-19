@@ -1,6 +1,9 @@
+// Use this script to refresh examples from solid-site in case they were changed
+// before merging the "split-js-files" branch in both solid-docs and solid-site.
+//
 // input 
 //   1: source folder (eg: "<root>/../solid-site/public/examples")
-//   2: dest folder (eg: "<root>/langs/en/examples")
+//   2: dest folder (eg: "<root>/langs/en/examples-src")
 // output
 //   - as many subfolders of the dest folder as files in the glob, each named after the basename of the file
 //   - as many files in each subfolder as there are packed into each file in the glob
@@ -50,5 +53,6 @@ sourceFiles.forEach((sourceFilename) => {
     writeFileSync(destPath, content);
     console.log(`- extracted ${destPath}`);
   });
-  writeFileSync(`${destPathParent}/.json-files`, JSON.stringify(filesOrder));
+  // Commented out the following write because not needed to only update examples
+  // writeFileSync(`${destPathParent}/.json-files`, JSON.stringify(filesOrder));
 });
