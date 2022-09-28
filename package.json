@@ -35,6 +35,6 @@
     "prepare": "patch-package"
   },
   "dependencies": {
-    "solid-jsx": "^0.9.0"
+    "solid-jsx": "^0.9.1"
   }
 }
