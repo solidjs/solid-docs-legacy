@@ -10,7 +10,7 @@ However, as much as Solid aligns with React's design philosophy, it works fundam
 
 #### Advice for migrating:
 
-Solid's update model is nothing like React, or even React + MobX. Instead of thinking of function components as the `render` function, think of them as a `constructor`. 
+Solid's update model is nothing like React, or even React + MobX. Instead of thinking of function components as the `render` function, think of them as a ` constructor`. 
 
 In Solid, props and stores are [proxy objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) that rely on property access for tracking and reactive updates. Watch out for destructuring or early property access, which can cause these properties to lose reactivity or trigger at the wrong time.
 
