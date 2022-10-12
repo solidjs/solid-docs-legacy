@@ -10,12 +10,12 @@ createEffect(() => {
 });
 ```
 
-Um unser `count`-Signal zu aktualisieren, hängen wir einen Klick-Handler an unseren Knopf:
+Um unser `count`-Signal zu aktualisieren, hängen wir einen Klick Handler an unseren Knopf:
 
 ```jsx
 <button onClick={() => setCount(count() + 1)}>Click Me</button>
 ```
 
-Jetzt wird beim Klick auf den Knopf in die Konsole geschrieben. Das ist ein relativ einfaches Beispiel, aber um zu verstehen, wie Solid funktioniert, stelle man sich vor, dass jeder Ausdruck in JSX ein eigener Effekt ist, der neu ausgeführt wird, sobald eine Signal-Abhängigkeit sich ändert. So funktioniert alles Rendering in Solid: aus Solids Perspektive *ist alles Rendering nur ein Seiteneffekt des reaktiven Systems*.
+Jetzt wird beim Klick auf den Knopf in die Konsole geschrieben. Das ist ein relativ einfaches Beispiel, aber um zu verstehen, wie Solid funktioniert, stelle man sich vor, dass jeder Ausdruck in JSX ein eigener Effekt ist, der neu ausgeführt wird, sobald eine Signal-Abhängigkeit sich ändert. So funktioniert alles Rendering in Solid: Aus Solids Perspektive *ist alles Rendering nur ein Seiteneffekt des reaktiven Systems*.
 
 > Effekte, die Entwickler mit `createEffect` erstellen, laufen erst, wenn das Rendering abgeschlossen ist und werden meistens verwendet, um Aktualisierungen auszuführen, die mit dem DOM interagieren. Falls man das DOM noch früher anpassen möchte, nutze man [`createRenderEffect`](https://www.solidjs.com/docs/latest/api#createrendereffect).
