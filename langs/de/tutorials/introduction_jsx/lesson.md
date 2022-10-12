@@ -2,7 +2,7 @@ JSX ist die HTML-artige Syntax, die wir in diesen Beispielen gesehen haben und d
 JSX fügt dynamische Ausdrücke hinzu, die es erlauben, Variablen und Funktionen innerhalb des HTMLs mit der `{ }`-Syntax zu referenzieren.
 In diesem Beispiel verwenden wir den String `name` in unserem HTML, indem wir `{name}` in einem div benutzen. Genauso binden wir ein HTML-Element ein, das direkt in die `svg`-Variable zugewiesen wurde.
 
-Anders als andere Frameworks, die JSX benutzen, versucht Solid, so nahe wie möglich an HTML-Standards zu bleiben, um einfaches Kopieren und Einfügen von Anworten auf Stack Overflow oder die Nutzung von Template-Buildern durch Designer zu ermöglichen.
+Anders als andere Frameworks, die JSX benutzen, versucht Solid, so nahe wie möglich an HTML-Standards zu bleiben, um einfaches Kopieren und Einfügen von Antworten auf Stack Overflow oder die Nutzung von Template-Buildern durch Designer zu ermöglichen.
 
 Es gibt 3 grundsätzliche Unterschiede zwischen JSX und HTML, die verhindern, dass es als Superset von HTML gesehen werden kann:
 1. JSX hat keine void-Elemente. Alle Elemente müssen ein schließendes Tag haben oder sich selbst schließen. Bedenke dies, wenn Du Elemente wie `<input>` oder `<br>` kopierst.
