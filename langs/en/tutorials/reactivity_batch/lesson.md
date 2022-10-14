@@ -2,7 +2,7 @@ Solid's reactivity is synchronous which means, by the next line after any change
 
 What if the changes are related? Solid's `batch` helper allows to queue up multiple changes and then apply them all at the same time before notifying their observers.
 
-In this example, we are assigning both names on a button click and this triggers our rendered update twice. You can see the logs in the console when you click the button. So let's wrap the `set` calls in a batch.
+In this example, we are assigning both names on a button click and this triggers our rendered update twice. You can see the logs in the console when you click the button. So let's wrap the `set` calls in a `batch`.
 
 ```js
  const updateNames = () => {
