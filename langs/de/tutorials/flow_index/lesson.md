@@ -1,8 +1,10 @@
-Manchmal macht es Sinn, referenzielle Vergleiche zu verwenden, um Reihen zu vergleichen. Wenn man mit einfachen Werten oder verschachtelten Arrays arbeitet, kann die Verwendung der Werte als Vergleichsschlüssel zu unnötigem Rendering führen. Wenn wir beispielsweise eine Liste von Strings zu einem input-Feld transformieren würden, das diesen Wert im Array bearbeiten kann, würde jede Änderung des Werts dazu führen, dass das Input neu gerendert wird, da es als eindeutiger Identifikator gesehen wird.
+Du weißt jetzt, wie Du Listen in Solid mit `<For>` rendern kannst, aber Solid bietet auch die Komponente `<Index>`, die in bestimmten Situationen zu weniger Rendern führt.
 
-In diesen Fällen ist konzeptuell der Array-Index der Schlüssel zu der Liste. Dafür hat Solid die `<Index>`-Komponente.
+Wenn die Liste aktualisiert wird, verwendet die `<For>`-Komponente referenzielle Gleichheit, um Elemente mit dem letzten Zustand der Liste zu vergleichen. Aber das ist nicht immer erwünscht.
 
-`<Index>` hat eine vergleichbare Funktionssignatur wie `<For>`, außer dass diesmal der Wert das Signal ist und der Index fest.
+In JavaScript werden Primitiven (wie Zeichenketten und Zahlen) immer nach Wert verglichen. Wenn wir `<For>` mit primitiven Werten oder Listen von Listen verwenden, könnten wir viel unnötiges Rendering verursachen. Wenn wir `<For>` verwenden würden, um eine Liste von Strings `<input>`-Feldern zuzuordnen, die bearbeitet werden können, würde jede Änderung an einem String dazu führen, dass das zugehörige `<input>` neu erstellt wird.
+
+Für diese Fälle steht die Komponente `<Index>` zur Verfügung. Als Faustregel gilt, wenn Du mit Primitiven arbeitest, verwende `<Index>`.
 
 ```jsx
 <Index each={cats()}>{(cat, i) =>
@@ -13,3 +15,7 @@ In diesen Fällen ist konzeptuell der Array-Index der Schlüssel zu der Liste. D
   </li>
 }</Index>
 ```
+
+Es hat eine ähnliche Signatur wie `<For>`, außer dass diesmal das Element das Signal ist und der Index fest ist. Jeder gerenderte Knoten entspricht einer Stelle in der Liste. Immer, wenn sich die Daten an dieser Stelle ändern, wird das Signal aktualisiert.
+
+`<For>` kümmert sich um die Werte in Deiner Liste, und die Position jedes Wertes innerhalb der Liste kann sich effizient ändern; `<Index>` kümmert sich um die Indices in Deiner Liste, und der Wert an jedem Index kann sich effizient ändern.

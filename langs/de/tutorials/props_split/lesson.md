@@ -1,6 +1,8 @@
-Props-Objekte zusammenzuführen ist nicht die einzige Operation, die wir machen können. Oft nutzen wir Destrukturierung, um manche der Props auf die gegenwärtige Komponente anzuwenden und andere abzuspalten, um sie an die Kind-Komponenten weiterzugeben.
+Props zusammenzuführen, ist nicht die einzige Operation auf Props, die wir machen könnten.
 
-Für diesen Zweck hat Solid `splitProps`. Diese Methode nimmt das Props-Objekt und ein oder mehr Arrays von Eigenschaftsnamen entgegen, die in ihre eigenen Props-Objekte extrahiert werden sollen. Sie gibt ein Array von Props-Objekten zurück, eines pro Array mit Eigenschaftsnamen und ein weiteres mit den übrigen Eigenschaften, ähnlich wie beim Rest-Parameter. Alle zurückgegebenen Props-Objekte bewahren die Reaktivität.
+Oft möchten wir Props in Gruppen aufsplitten, um manche der Props in der aktuellen Komponente zu verwenden und andere abzuspalten, um sie an Kind-Komponenten weiterzugeben.
+
+Für diesen Zweck hat Solid [`splitProps`](/docs/latest/api#splitprops). Diese Methode nimmt das Props-Objekt und ein oder mehrere Listen von Schlüsseln entgegen, die wir in ihre eigenen Props-Objekte extrahieren wollen. Sie gibt eine Liste von Props-Objekten zurück, eines pro Liste mit Schlüsseln, plus ein weiteres mit den verbleibenden Eigenschaften, ähnlich wie beim Rest-Parameter. Alle zurückgegebenen Props-Objekte behalten ihre Reaktivität.
 
 Unser Beispiel aktualisiert sich nicht, wenn wir den Namen ändern, da die Reaktivität durch das Destrukturieren in `greeting.tsx` verloren gegangen ist:
 ```jsx
@@ -17,4 +19,4 @@ export default function Greeting(props) {
   return <h3 {...others}>{local.greeting} {local.name}</h3>
 }
 ```
-Jetzt funktioniert der Knopf wie erwartet.
+Jetzt funktioniert der Button wie erwartet.

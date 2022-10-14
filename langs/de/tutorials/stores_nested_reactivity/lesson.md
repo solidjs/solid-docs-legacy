@@ -1,6 +1,6 @@
-Eine der Gründe für feingranulare Reaktivität in Solid ist die Fähigkeit, Aktualisierungen unabhängig voneinander zu behandeln. Man kann eine Liste von Nutzern haben und wenn ein Name geändert wird, aktualisieren wir nur eine einzige Stelle im DOM, ohne die Liste selbst abzugleichen. Wenige (selbst reaktive) UI-Frameworks können das tun.
+Einer der Gründe für feingranulare Reaktivität in Solid ist, dass es Aktualisierungen unabhängig voneinander ausführen kann. Man kann eine Liste von Nutzern haben und wenn ein Name geändert wird, aktualisieren wir nur eine einzige Stelle im DOM, ohne die Liste selbst abzugleichen. Wenige (selbst reaktive) UI-Frameworks können das tun.
 
-Aber wie schaffen wir das? In dem Beispiel haben wir eine Liste von Aufgaben in einem Signal. Um eine Aufgabe als abgeschlossen zu markieren, müssten wir diese mit einem Klon ersetzen. Das ist die Herangehensweise der meisten Frameworks, aber es ist verschwenderisch, wenn wir wieder und wieder die Liste abgleichen und erstellen die DOM-Elemente neu, wie es das `console.log` sichtbar macht.
+Aber wie schaffen wir das? In dem Beispiel haben wir eine Liste von Aufgaben in einem Signal. Um eine Aufgabe als abgeschlossen zu markieren, müssten wir sie mit einem Klon ersetzen. Das ist die Herangehensweise der meisten Frameworks, aber es ist verschwenderisch, da wir die gesamte Liste abgleichen und DOM-Elemente neu erstellen, wie es das `console.log` im Beispiel sichtbar macht.
 
 ```js
 const toggleTodo = (id) => {
@@ -10,7 +10,7 @@ const toggleTodo = (id) => {
 };
 ```
 
-Stattdessen initialisiert man in einer feingranularen Library wie Solid die Daten mit verschachtelten Signalen, etwa so:
+Stattdessen initialisieren wir in einer feingranularen Bibliothek wie Solid die Daten mit verschachtelten Signalen, etwa so:
 
 ```js
 const addTodo = (text) => {
@@ -19,7 +19,7 @@ const addTodo = (text) => {
 };
 ```
 
-Jetzt können wir den Erledigungszustand aktualisieren, indem wir `setCompleted` aufrufen, ohne dass ein zusätzlicher Abgleich nötig wäre. Das liegt daran, dass wir die Komplexität in die Daten statt in die Darstellung verschoben haben. Und wir wissen genau, wie sich die Daten ändern.
+Jetzt können wir eine Aufgabe als erledigt markieren, indem wir `setCompleted` aufrufen, ohne zusätzlichen Listenabgleich. Das liegt daran, dass wir die Komplexität in die Daten statt in die Darstellung verschoben haben. Und wir wissen genau, wie sich die Daten ändern.
 
 ```js
 const toggleTodo = (id) => {
@@ -28,6 +28,6 @@ const toggleTodo = (id) => {
   if (todo) todo.setCompleted(!todo.completed())
 }
 ```
-Wenn man nun die restlichen Referenzen zu `todo.completed` in `todo.completed()` ändert, sollte das Beispiel nur noch `console.log` aufrufen, wenn der Eintrag erzeugt wird und nicht, wenn man die Erledigung umschaltet.
+Wenn Du nun die restlichen Referenzen zu `todo.completed` in `todo.completed()` änderst, sollte das Beispiel nur noch `console.log` aufrufen, wenn die Aufgabe erzeugt wird und nicht, wenn Du sie als erledigt markierst.
 
-Das erfordert natürlich etwas manuelles Abbilden und es war einmal in der Vergangenheit die einzige Möglichkeit. Aber jetzt, dank Proxies, können wir die meiste Arbeit im Hintergrund machen, ohne manuelle Einmischung. Gehe weiter zur nächsten Anleitung, um zu sehen, wie.
+Das erfordert natürlich etwas manuelles Abbilden und es war einmal in der Vergangenheit die einzige Möglichkeit, die wir hatten. Aber jetzt, dank Proxys, können wir die Hauptarbeit im Hintergrund erledigen, ohne viel manuelle Intervention. Gehe weiter zum nächsten Tutorial, um zu sehen, wie.

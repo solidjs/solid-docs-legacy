@@ -1,8 +1,8 @@
-Solids Reaktivität ist synchron, was bedeutet, dass das DOM in der nächsten Zeile nach eine Änderung bereits aktualisiert wurde. Und meistens ist das so auch genau richtig, da Solids granulares Rendering nur eine Weiterleitung der Aktualisierungen im reaktiven System ist. Unzusammenhängende Änderungen, die jeweils etwas rendern sind nicht notwendigerweise verschwendete Mühe.
+Solids Reaktivität ist synchron, was bedeutet, dass das DOM in der nächsten Zeile nach einer Änderung bereits aktualisiert wurde. Und meistens ist das so auch genau richtig, da Solids granulares Rendering nur eine Weiterleitung der Aktualisierungen im reaktiven System ist. Unzusammenhängende Änderungen, die etwas zweimal rendern, sind nicht notwendigerweise verschwendete Arbeit.
 
-Aber was, wenn die Änderungen zusammengehören? Solids `batch`-Helfer erlaubt es uns, mehrere Änderungen einzureihen, um sie dann alle zusammen auszuführen, bevor die Beobachter benachrichtig werden. Innerhalb dieser Reihe werden aktualisierte Signale nicht weitergeleitet, bis sie fertig ist.
+Aber was, wenn die Änderungen zusammengehören? Solids `batch`-Helfer erlaubt es uns, mehrere Änderungen zu sammeln, um sie dann alle zusammen auszuführen, bevor die Beobachter benachrichtigt werden.
 
-In diesem Beispiel weisen wir beide Namen beim Klick auf den Knopf zu und das löst das aktualisierte Rendering zwei mal aus. Man kann die Log-Einträge in der Konsole sehen, wenn man den Knopf drückt. Also schachteln wir die `set`-Aufrufe in eine batch.
+In diesem Beispiel weisen wir beide Namen beim Klick auf den Button zu und das löst das aktualisierende Rendering zweimal aus. Man kann die Log-Einträge in der Konsole sehen, wenn man den Button drückt. Also packen wir die `set`-Aufrufe in ein `batch`.
 
 ```js
  const updateNames = () => {
@@ -13,4 +13,4 @@ In diesem Beispiel weisen wir beide Namen beim Klick auf den Knopf zu und das l�
     })
   }
 ```
-Und das war's schon. Jetzt aktualisieren wir nur noch einmal für beide Änderungen.
+Und das war’s schon. Jetzt aktualisieren wir nur einmal für beide Änderungen.

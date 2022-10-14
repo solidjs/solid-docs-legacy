@@ -2,7 +2,7 @@ Manchmal ist es sinnvoll, Elemente außerhalb des normalen Layouts der App einzu
 
 Solid hat eine `<Portal>`-Komponente, deren Kind-Elemente an einer beliebigen Stelle im DOM eingefügt werden. Normalerweise werden die Elemente in einem `<div>` in `document.body` gerendert.
 
-In dem Beispiel sehen wird, dass unser Popup-Dialog abgeschnitten wird. Wir können dieses Problem lösen, wenn wir das Element aus dem Fluss herausnehmen, indem wir es in ein `<Portal>` stecken:
+In dem Beispiel sehen wir, dass unser Pop-up Dialog abgeschnitten wird. Wir können dieses Problem lösen, wenn wir das Element aus dem Fluss herausnehmen, indem wir es in ein `<Portal>` stecken:
 
 ```jsx
 <Portal>
