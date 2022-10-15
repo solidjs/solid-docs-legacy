@@ -1,6 +1,6 @@
-Resources are special Signals designed specifically to handle Async loading. Their purpose is wrap async values in a way that makes them easy to interact with in Solid's distributed execution model. This is the opposite to `async`/`await` or generators which provide sequential execution models. The goal is for async to not block execution and not color our code.
+Resources are special Signals designed specifically to handle Async loading. Their purpose is to wrap async values in a way that makes them easy to interact with in Solid's distributed execution model. This is the opposite to `async`/`await` or generators which provide sequential execution models. The goal is for async to not block execution and not color our code.
 
-Resources can be driven by a source signal that provides the query to an async data fetcher function that returns a promise. The contents of the fetcher function can be anything. You can hit typical REST endpoints or GraphQL or anything that generates a promise. Resources are not opinionated on the means of loading the data, only that they are driven by promises.
+Resources can be driven by a source signal that provides the query to an async data fetcher function that returns a [promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise). The contents of the fetcher function can be anything. You can hit typical REST endpoints or GraphQL or anything that generates a promise. Resources are not opinionated on the means of loading the data, only that they are driven by promises.
 
 The resulting Resource Signal also contains reactive `loading` and `error` properties that make it easy to control our view based on the current status.
 

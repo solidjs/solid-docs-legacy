@@ -1,12 +1,12 @@
-Man kann immer die Referenz eines DOM-Elements in Solid durch Zuweisung bekommen, da das JSX echte DOM-Elemente erzeugt. Zum Beispiel:
+Man kann in Solid immer die Referenz eines DOM-Elements durch Zuweisung bekommen, da JSX echte DOM-Elemente erzeugt. Zum Beispiel:
 
 ```jsx
 const myDiv = <div>My Element</div>;
 ```
 
-Allerdings ist es nützlich, nicht alle Elemente herauszubrechen und sie stattdessen in ein einzelnes JSX-Template zu packen, da dies es Solid erlaubt, die Erzeugung besser zu optimieren.
+Allerdings ist es vorteilhaft, Elemente nicht herauszubrechen und sie stattdessen in ein einzelnes JSX-Template zu packen, da das es Solid erlaubt, die Erzeugung besser zu optimieren.
 
-Stattdessen kann man die Referenz zu einem Element in Solid mit dem `ref`-Attribut bekommen. Refs sind grundsätzlich Zuweisungen wie im obigen Beispiel, die während der Erstellung, aber vor dem Einfügen ins DOM passieren. Man kann einfach eine Variable deklarieren und sie wird zugewiesen:
+Stattdessen kann man eine Referenz zu einem Element in Solid mit dem `ref`-Attribut bekommen. Refs sind grundsätzlich Zuweisungen wie im obigen Beispiel, die während der Erstellung, aber vor dem Einfügen ins DOM passieren. Man kann einfach eine Variable deklarieren, sie dem `ref`-Attribut übergeben, und sie wird zugewiesen:
 
 ```jsx
 let myDiv;

@@ -1,6 +1,6 @@
-Solid unterstützt sowohl `class` als auch `className`, um die `className`-Eigenschaft eines Elements zu setzen. Allerdings ist es häufig bequemer, bestimmte Klassen fallweise zu setzen. Aus diesem Grund hat Solid ein eingebautes `classList`-JSX-Attribut, das ein Objekt entgegen nimmt, in dem unter den Klassennamen ein Boolean gespeichert ist. Wenn der Boolean wahr ist, wird die Klasse gesetzt, ansonsten entfernt.
+Solid verwendet `class`, um die `className`-Eigenschaft eines Elements zu setzen. Allerdings ist es häufig bequem, CSS-Klassen abhängig von Bedingungen zu setzen. Aus diesem Grund hat Solid ein eingebautes `classList`-JSX-Attribut, das ein Objekt entgegennimmt, bei dem die Schlüssel die Klassennamen und die Werte Boolesche Ausdrücke sind. Wenn ein Wert nach wahr auswertet, wird die Klasse gesetzt, ansonsten entfernt.
 
-In diesem Beispiel können wir folgendes ersetzen:
+Im Beispiel können wir folgendes:
 
 ```jsx
 <button
@@ -9,7 +9,7 @@ In diesem Beispiel können wir folgendes ersetzen:
 >foo</button>
 ```
 
-mit:
+ersetzen mit:
 
 ```jsx
 <button
@@ -18,7 +18,7 @@ mit:
 >foo</button>
 ```
 
-Hinweis: Klassennamen kann man auch dynamisch setzen, etwa aus CSS-Modulen:
+Hinweis: Klassennamen kann man auch dynamisch setzen, etwa solche importiert aus CSS-Modulen:
 
 ```jsx
 import { active } from "./style.module.css"

@@ -16,6 +16,6 @@ The `<Index>` component is provided for these cases. As a rule of thumb, when wo
 }</Index>
 ```
 
- It has a similar signature to `<For>`, except this time the item is the signal and the index is fixed. Each rendered node corresponds to a spot in the array. Whenever the data in that spot changes, the signal will update.
+It has a similar signature to `<For>`, except this time the item is the signal and the index is fixed. Each rendered node corresponds to a spot in the array. Whenever the data in that spot changes, the signal will update.
 
-`<For>` cares about each piece of data in your array, and the position of that data can change; `<Index>` cares about each index in your array, and the content at each index can change.
+`<For>` cares about each piece of data in your array, and the position of that data in the list can change efficiently; `<Index>` cares about each index in your array, and the content at each index can change efficiently.

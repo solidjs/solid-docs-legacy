@@ -19,7 +19,7 @@ const addTodo = (text) => {
 };
 ```
 
-Now we can update the completion state by calling `setCompleted` without any additional diffing. This is because we've moved the complexity to the data rather than the view. And we know exactly how the data changes.
+Now we can update the completion state by calling `setCompleted` on a single list element without having to diff the whole list. This is because we've moved the complexity to the data (the list element) rather than the view (the list). And we know exactly how the data changes.
 
 ```js
 const toggleTodo = (id) => {

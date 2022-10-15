@@ -1,10 +1,10 @@
-JSX ist die HTML-artige Syntax, die wir in diesen Beispielen gesehen haben und die Grundlage in Solid, um Komponenten zu bauen.
-JSX fügt dynamische Ausdrücke hinzu, die es erlauben, Variablen und Funktionen innerhalb des HTMLs mit der `{ }`-Syntax zu referenzieren.
-In diesem Beispiel verwenden wir den String `name` in unserem HTML, indem wir `{name}` in einem div benutzen. Genauso binden wir ein HTML-Element ein, das direkt in die `svg`-Variable zugewiesen wurde.
+JSX ist die HTML-artige Syntax, die wir in diesen Beispielen gesehen haben und die Grundlage, um Komponenten in Solid zu bauen.
+JSX fügt dynamische Ausdrücke hinzu, die es erlauben, Variablen und Funktionen innerhalb des HTML mit der `{ }`-Syntax zu referenzieren.
+In diesem Beispiel verwenden wir den String `name` in unserem HTML, indem wir `{name}` in einem div benutzen. Genauso binden wir ein HTML-Element ein, das direkt der `svg`-Variable zugewiesen wurde.
 
-Anders als andere Frameworks, die JSX benutzen, versucht Solid, so nahe wie möglich an HTML-Standards zu bleiben, um einfaches Kopieren und Einfügen von Anworten auf Stack Overflow oder die Nutzung von Template-Buildern durch Designer zu ermöglichen.
+Anders als andere Frameworks, die JSX benutzen, versucht Solid, so nahe wie möglich an HTML-Standards zu bleiben, um einfaches Kopieren und Einfügen von Antworten auf Stack Overflow oder die Nutzung von Template-Buildern durch Designer zu ermöglichen.
 
-Es gibt 3 grundsätzliche Unterschiede zwischen JSX und HTML, die verhindern, dass es als Superset von HTML gesehen werden kann:
+Es gibt 3 grundsätzliche Unterschiede zwischen JSX und HTML, die ausschließen, dass es als Obermenge von HTML angesehen werden kann:
 1. JSX hat keine void-Elemente. Alle Elemente müssen ein schließendes Tag haben oder sich selbst schließen. Bedenke dies, wenn Du Elemente wie `<input>` oder `<br>` kopierst.
 2. JSX muss ein einzelnes Element zurückgeben. Um mehrere Elemente auf oberster Ebene zu repräsentieren, benutze man ein Fragment-Element:
 
@@ -16,7 +16,7 @@ Es gibt 3 grundsätzliche Unterschiede zwischen JSX und HTML, die verhindern, da
    ```
 3. JSX unterstützt keine HTML-Kommentare `<!--... -->` oder spezielle Tags wie `<!DOCTYPE>`.
 
-Aber JSX unterstützt SVG. Probieren wir es aus, indem wir es direkt in unsere Komponente kopieren:
+Aber JSX unterstützt SVG. Versuchen wir, etwas SVG in unsere Komponente zu kopieren:
 ```jsx
 <svg height="300" width="400">
   <defs>

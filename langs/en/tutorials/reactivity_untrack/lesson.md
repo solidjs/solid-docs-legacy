@@ -1,6 +1,6 @@
 It's sometimes desirable to have Signal reads not be tracked, even inside a reactive context. Solid provides the `untrack` helper as a way to prevent the wrapping computation from tracking any reads.
 
-Let's suppose we did not want to log in our example when `b` changes. We can untrack the `b` signal by changing our effect to the following:
+Let's suppose we did not want to log in our example when `b` changes. We can untrack the `b` signal temporarily by changing our effect to the following:
 
 ```js
 createEffect(() => {

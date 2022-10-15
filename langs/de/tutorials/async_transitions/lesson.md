@@ -1,10 +1,10 @@
-`Suspense` erlaubt es uns, einen Platzhalter anzuzeigen, während Daten geladen werden. Das ist toll für das initiale Laden, aber bei folgenden Navigationen ist es meist schlechtere UX, auf einen Platzhalter-Zustand zurückzufallen.
+`Suspense` erlaubt es uns, einen Platzhalter anzuzeigen, während Daten geladen werden. Das ist toll für das anfängliche Laden, aber bei folgenden Navigationen ist es meist ein schlechtes Nutzererlebnis, auf einen Platzhalter-Zustand zurückzufallen.
 
-Wir können es vermeiden, in diesen Platzhalter-Zustand zurückzufallen, indem wir `useTransition` verwenden. Es bietet einen Wrapper und einen Lade-Indikator. Der Wrapper steckt alle darunterliegenden Aktualisierungen in eine Transaktion, die nicht ausgeführt wird, bis alle asynchronen Events vollständig sind.
+Wir können es vermeiden, in diesen Platzhalter-Zustand zurückzufallen, indem wir `useTransition` verwenden. Es bietet einen Wrapper und einen Lade-Indikator. Der Wrapper steckt alle darunterliegenden Aktualisierungen in eine Transaktion, die nicht ausgeführt wird, bis alle asynchronen Events vollständig geladen sind.
 
-Das heisst, wenn der Kontrollfluss unterbrochen ist, zeigt es weiterhin den gegenwärtigen Zweig, während der nächste außerhalb des Dokuments gerendert wird. Ressourcenzugriffe unter existierenden Boundaries werden zu der Transition hinzugefügt. Allerdings werden alle verschachtelten `Suspense`-Komponenten ihren Platzhalter anzeigen, wenn sie nicht fertig geladen waren, bevor sie gerendert wurden.
+Das heißt, wenn der Kontrollfluss unterbrochen ist, zeigt es weiterhin den gegenwärtigen Zweig, während der nächste versteckt gerendert wird. Ressourcenzugriffe innerhalb der Grenzen werden zu der Transition hinzugefügt. Allerdings werden alle neuen verschachtelten `Suspense`-Komponenten ihren Platzhalter anzeigen, wenn sie nicht fertig geladen waren, bevor sie gerendert wurden.
 
-Man achte darauf, dass beim Navigieren innerhalb des Beispiels der Inhalt mit einem Lade-Platzhalter wechselt. Fügen wir eine transition zu unserer `App`-Komponente hinzu. Zuerst ersetzen wir die `updateTab`-Funktion:
+Man achte darauf, dass beim Navigieren innerhalb des Beispiels der Inhalt mit einem Lade-Platzhalter wechselt. Fügen wir eine Transition zu unserer `App`-Komponente hinzu. Zuerst ersetzen wir die `updateTab`-Funktion:
 
 ```js
 const [pending, start] = useTransition();
