@@ -10,7 +10,7 @@ const unsubscribe = store.subscribe(
   () => setState(store.getState())
 );
 ```
-If you click around the demo adding items and checking them off it seems to work pretty well. However, what isn't obvious is that the rendering is inefficient. Notice the console.log not only on create but whenever you check the box.
+If you click around the demo adding items and checking them off it seems to work pretty well. However, what isn't obvious is that the rendering is inefficient. Notice the `console.log` not only on create but whenever you check the box.
 
 The reason is that Solid doesn't diff by default. It assumes the new item is new and replaces it. If your data changes granularly, you don't need to diff. But what if you do?
 
