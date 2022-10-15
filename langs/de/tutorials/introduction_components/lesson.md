@@ -1,4 +1,4 @@
-Wenn Du Deine Anwendungen baust, wirst Du Deinen Code aufteilen, damit dieser modularer und besser wiederverwendbar ist. In Solid ist der hauptsächliche Weg, dies zu tun, Komponenten zu erstellen.
+Wenn Du Deine Anwendungen baust, wirst Du Deinen Code aufteilen, damit dieser modularer und besser wiederverwendbar ist. In Solid ist der hauptsächliche Weg, das zu tun, Komponenten zu erstellen.
 
 Komponenten sind einfache Funktionen wie die bereits gezeigte `HelloWorld()`. Was sie besonders macht, ist, dass sie typischerweise JSX zurückgeben und durch JSX in anderen Komponenten aufgerufen werden können.
 

@@ -1,6 +1,6 @@
 Ressourcen sind spezielle Signale, die speziell für asynchrones Laden gedacht sind. Ihr Sinn besteht darin, asynchrone Werte so zu kapseln, dass man innerhalb von Solids verteiltem Ausführungsmodell einfach damit arbeiten kann. Das ist das Gegenteil zu `async`/`await` oder Generatoren, die sequentielle Ausführungsmodelle bieten. Das Ziel ist, dass Asynchronität nicht die Ausführung blockiert und nicht auf den Code abfärbt.
 
-Ressourcen können in ein spezielles Signal gekapselt werden, das eine asynchrone Datenabfrage-Funktion entgegennimmt, welche ein Promise zurückgibt. Der Inhalt der Abfrage-Funktion kann alles Mögliche sein. Man kann typische REST-Endpunkte abfragen oder GraphQL oder irgendwas, das ein Promise zurückgibt. Ressourcen sind nicht auf bestimmte Wege festgelegt, Daten zu holen, nur darauf, sie in Promises zu bekommen.
+Ressourcen können in ein spezielles Signal gekapselt werden, das eine asynchrone Datenabfrage-Funktion entgegennimmt, welche ein [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) zurückgibt. Der Inhalt der Abfrage-Funktion kann alles Mögliche sein. Man kann typische REST-Endpunkte abfragen oder GraphQL oder irgendwas, das ein Promise zurückgibt. Ressourcen sind nicht auf bestimmte Wege festgelegt, Daten zu holen, nur darauf, sie in Promises zu bekommen.
 
 Das resultierende Ressourcen-Signal enthält außerdem die reaktiven Eigenschaften `loading` und `error`, die es einfach machen, unseren View je nach Status zu kontrollieren.
 

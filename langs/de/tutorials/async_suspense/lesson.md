@@ -1,4 +1,4 @@
-Während `lazy` und `createResource` auch allein benutzt werden können, bringt Solid einen Mechanismus mit, um die Anzeige von mehreren asynchronen Ereignissen zu koordinieren. `Suspense` dient als Begrenzung, die ein Fallback anstelle eines teilweise geladenen Inhalts anzeigt, bis alle asynchronen Anfragen darin aufgelöst sind.
+Während `lazy` und `createResource` auch allein genutzt werden können, bringt Solid einen Mechanismus mit, um die Anzeige von mehreren asynchronen Ereignissen zu koordinieren. `Suspense` dient als Begrenzung, die ein Fallback anstelle eines teilweise geladenen Inhalts anzeigt, bis alle asynchronen Anfragen darin aufgelöst sind.
 
 Das kann die Nutzererfahrung verbessern, indem visuelles Stottern, das durch zu viele partielle Ladezustände ausgelöst wird, entfernt wird. `Suspense` erkennt automatisch alle inneren asynchronen Lesevorgänge und handelt entsprechend. Man kann so viele `Suspense`-Komponenten schachteln, wie man möchte und nur der nächste Vorfahre wird zu `fallback` transformiert, wenn der `loading`-Zustand besteht.
 

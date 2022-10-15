@@ -1,4 +1,4 @@
-Solid verwendet `class`, um die `className`-Eigenschaft eines Elements zu setzen. Allerdings ist es häufig bequem, Klassen abhängig von Bedingungen zu setzen. Aus diesem Grund hat Solid ein eingebautes `classList`-JSX-Attribut, das ein Objekt entgegennimmt, bei dem die Schlüssel die Klassennamen und die Werte Boolesche Ausdrücke sind. Wenn ein Wert nach wahr auswertet, wird die Klasse gesetzt, ansonsten entfernt.
+Solid verwendet `class`, um die `className`-Eigenschaft eines Elements zu setzen. Allerdings ist es häufig bequem, CSS-Klassen abhängig von Bedingungen zu setzen. Aus diesem Grund hat Solid ein eingebautes `classList`-JSX-Attribut, das ein Objekt entgegennimmt, bei dem die Schlüssel die Klassennamen und die Werte Boolesche Ausdrücke sind. Wenn ein Wert nach wahr auswertet, wird die Klasse gesetzt, ansonsten entfernt.
 
 Im Beispiel können wir folgendes:
 

@@ -1,4 +1,4 @@
-Die meisten Bundler (wie Webpack, Rollup, Parcel, Vite) splitten den Code automatisch, wenn ein dynamischer Import verwendet wird. Solids `lazy`-Methode erlaubt es uns, verzögert nachzuladende Komponenten zu kennzeichnen. Eine solche Komponente kann ganz normal im JSX verwendet werden, außer dass sie intern den unterliegenden Code erst lädt, wenn er zum ersten Mal gerendert wird. Das Rendern wird unterbrochen, bis der Code verfügbar ist.
+Die meisten Bundler (wie Webpack, Rollup, Parcel, Vite) splitten den Code automatisch, wenn ein dynamischer Import verwendet wird. Solids `lazy`-Methode erlaubt es uns, den dynamischen Import einer Komponente als verzögert nachladend zu kennzeichnen. Eine solche Komponente kann ganz normal im JSX verwendet werden, außer dass sie intern den unterliegenden Code erst lädt, wenn er zum ersten Mal gerendert wird. Das Rendern wird unterbrochen, bis der Code verfügbar ist.
 
 Um `lazy` zu nutzen, ersetze man die Import-Anweisung:
 ```js

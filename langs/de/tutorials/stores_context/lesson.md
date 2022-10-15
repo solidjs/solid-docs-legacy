@@ -1,4 +1,4 @@
-Solid bringt eine Kontext-API mit, um Daten herumzureichen, ohne sie durch Props zu leiten. Das ist nützlich, um Signale und Stores zu teilen. Einen Kontext zu benutzen hat den Vorteil, dass dieser als Teil des reaktiven Systems erzeugt und von diesem verfolgt wird.
+Solid bringt eine Kontext-API mit, um Daten herumzureichen, ohne sie durch Props-Attribute zu leiten. Das ist nützlich, um Signale und Stores zu teilen. Einen Kontext zu benutzen hat den Vorteil, dass dieser als Teil des reaktiven Systems erzeugt und von diesem verfolgt wird.
 
 Für den Anfang erzeugen wir ein Context-Objekt. Dieses Objekt enthält eine `Provider`-Komponente, die verwendet wird, um unsere Daten einzubringen. Allerdings ist es gängige Praxis, die `Provider`-Komponente und deren `useContext`-Konsumenten in eine andere Komponente zu schachteln, die bereits für den spezifischen Kontext konfiguriert ist.
 

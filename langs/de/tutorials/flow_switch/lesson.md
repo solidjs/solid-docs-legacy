@@ -1,6 +1,6 @@
 Manchmal muss man mit Bedingungen mit mehr als zwei einander ausschließenden Ergebnissen umgehen. Für diesen Fall haben wir die `<Switch>`- und `<Match>`-Komponenten, die ähnlich wie JavaScripts `switch`/`case` funktionieren.
 
-Es wird versucht, die Bedingungen in ihrer Reihenfolge zu prüfen, um den Inhalt des ersten Statements mit einer zutreffenden Bedingung zu rendern. Falls alle Bedingungen fehlschlagen, wird das Fallback gerendert.
+Die `when`-Bedingungen werden in ihrer Reihenfolge geprüft, und der Inhalt der ersten `<Match>`-Komponente mit einer zutreffenden Bedingung wird gerendert. Falls alle Bedingungen fehlschlagen, wird `fallback` gerendert.
 
 In unserem Beispiel können wir die verschachtelten `<Show>`-Komponenten wie folgt ersetzen:
 

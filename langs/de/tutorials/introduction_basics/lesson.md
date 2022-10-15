@@ -1,6 +1,6 @@
 # Einleitung
 
-Diese interaktive Anleitung führt Dich durch die Hauptfunktionen von Solid. Du kannst Dir die API und die Leitfäden ansehen, um mehr über die Funktionsweise von Solid zu erfahren.
+Diese interaktive Anleitung führt Dich durch die Hauptfunktionen von Solid. Du kannst auch die API und Anleitung verwenden, um mehr über Solids Funktionsweise zu erfahren.
 
 Schau auch mal in unserem neuen Einsteiger-Tutorial (in Arbeit!) [hier](https://docs.solidjs.com/tutorials/getting-started-with-solid/) vorbei.
 
@@ -12,7 +12,7 @@ Solid bietet die Werkzeuge, um Deine Komponenten mit _Reaktivität_ zu versehen:
 
 # Anatomie einer Solid-Anwendung
 
-Eine Solid-Anwendung besteht aus Funktionen, die wir Komponenten nennen. Schauen Sie sich die `HelloWorld`-Funktion auf der rechten Seite an: sie gibt direkt ein `div` zurück! Dieser Mix von HTML und JavaScript nennt sich JSX. Solid bringt einen Compiler mit, der diese Tags später in DOM-Knoten umwandelt.
+Eine Solid-Anwendung besteht aus Funktionen, die wir Komponenten nennen. Schau Dir die `HelloWorld`-Funktion auf der rechten Seite an: sie gibt direkt ein `div` zurück! Dieser Mix von HTML und JavaScript nennt sich JSX. Solid bringt einen Compiler mit, der diese Tags später in DOM-Knoten umwandelt.
 
 JSX erlaubt es Dir, die meisten HTML-Elemente in Deiner Anwendung zu verwenden, aber es lässt Dich auch neue Elemente erstellen. Sobald wir unsere `HelloWorld`-Funktion deklariert haben, können wir sie als `<HelloWorld>`-Tag überall in unserer Anwendung benutzen.
 

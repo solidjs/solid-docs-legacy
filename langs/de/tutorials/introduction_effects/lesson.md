@@ -10,7 +10,7 @@ createEffect(() => {
 });
 ```
 
-Um unser `count`-Signal zu aktualisieren, hängen wir einen Klick Handler an unseren Knopf:
+Um unser `count`-Signal zu aktualisieren, hängen wir einen Klick-Handler an unseren Knopf:
 
 ```jsx
 <button onClick={() => setCount(count() + 1)}>Click Me</button>

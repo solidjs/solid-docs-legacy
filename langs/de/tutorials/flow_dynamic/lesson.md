@@ -1,4 +1,4 @@
-Das `<Dynamic>`-Tag ist nützlich, wenn man von Daten abhängig rendert. Es lässt einen entweder einen String für ein natives Element oder eine Komponenten-Funktion übergeben und rendert dieses mit dem Rest der übergebenen Props.
+Das `<Dynamic>`-Tag ist nützlich, wenn man aus Daten rendert. Es lässt einen entweder einen String für ein natives Element oder eine Komponenten-Funktion übergeben und rendert dieses mit dem Rest der übergebenen Props.
 
 Das ist häufig kompakter als eine Menge an `<Show>`- oder `<Switch>`-Komponenten.
 

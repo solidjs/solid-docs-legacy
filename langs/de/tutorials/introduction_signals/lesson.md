@@ -15,14 +15,14 @@ In dieser Lektion werden wir JavaScripts `setInterval`-Funktion benutzen, um ein
 setInterval(() => setCount(count() + 1), 1000);
 ```
 
-Jeden Tick lesen wir den vorherigen Zählerstand, addieren 1 und setzen den neuen Wert.
+Bei jedem Intervall-Schritt lesen wir den vorherigen Zählerstand, addieren 1 und setzen den neuen Wert.
 
 > Solids Signale akzeptieren auch die Funktions-Form, bei der man den vorherigen Wert erhält und den nächsten zurückgibt.
 > ```jsx
 > setCount(c => c + 1);
 > ```
 
-Zu guter Letzt müssen wir das Signal in unserem JSX lesen:
+Zu guter Letzt lesen wir das Signal in unserem JSX aus:
 
 ```jsx
 return <div>Count: {count()}</div>;
