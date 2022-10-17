@@ -1,13 +1,13 @@
-Most of the time, composing derived signals is sufficient. However, it is sometimes beneficial to cache values in order to reduce duplicated work. We can use memos to evaluate a function and store the result until its dependencies change. This is great for caching calculations for effects that have other dependencies and mitigating the work required for expensive operations like DOM node creation.
+Genellikle, türetilmiş sinyaller (derived signal) oluşturmak yeterli olsa bile, bazen tekrarlanan işleri azaltmak için değerleri önbelleğe almak faydalı olabilir. Bir fonksiyonu değerlendirmek ve bağımlılıkları değişene kadar sonucu saklamak için memo'lar kullanılabilir. Bu sayede, başka bağımlılıklara sahip efektler için hesaplamaları önbelleğe almak veya DOM node'u oluşturmak gibi maliyetli işlemlerde, yükü azaltmak için yerinde bir çözüme ulaşılabilir.
 
-Memos are both an observer, like an effect, and a read-only signal. Since they are aware of both their dependencies and their observers, they can ensure that they run only once for any change. This makes them preferable to registering effects that write to signals. Generally, what can be derived, should be derived.
+Memo'lar hem gözlemci - bir effect gibi -, hem de salt okunur bir sinyaldir. Hem bağımlılıkların hem de gözlemcilerinin farkındadırlar ve bu sayede herhangi bir değişiklik için yalnızca bir kez çalıştırılması sağlanır. Bu durum da onları sinyalleri değiştiren efektleri kaydederken tercih edilebilir kılar. Genel olarak, bir şey türetilebiliyorsa, türetilmelidir.
 
-Creating a Memo is as simple as passing a function to `createMemo`, imported from `solid-js`. In the example, recalculating the value gets increasingly more expensive with each click. If we wrap it in `createMemo`, it recalculates only once per click:
+Memo `solid-js`'ten import edeceğimiz `createMemo`'ya fonksiyonu aktararak basit bir şekilde oluşturulabilir. Örnekte, sonucu tekrar hesaplamak her tıklamada daha maliyetli hale gelmekte. Fakat fonksiyonu `createMemo` ile sardığımızda her tıklamada gerekli hesaplama sadece bir kere gerçekleşecektir:
 
 ```jsx
 const fib = createMemo(() => fibonacci(count()));
 ```
-Place a `console.log` inside the `fib` function to confirm how often it runs:
+`fib` fonksiyonunun içerisine `console.log` koyarak ne sıklıkla çalıştığını gözlemleyebiliriz:
 ```jsx
 const fib = createMemo(() => {
   console.log("Calculating Fibonacci");
