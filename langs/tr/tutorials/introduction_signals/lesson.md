@@ -1,28 +1,28 @@
-_Signals_ are the cornerstone of reactivity in Solid. They contain values that change over time; when you change a signal's value, it automatically updates anything that uses it.
+_Sinyaller_ Solid'te reaktivitenin ana unsurudur. Zaman içinde değişen/değişebilen değerlerden oluşurlar; bir sinyalin değeri değiştiğinde, otomatik olarak o sinyali kullanan diğer her şey de güncellenecektir.
 
-To create a signal, let's import `createSignal` from `solid-js` and call it from our Counter component like this:
+Sinyal oluşturmak için `createSignal` fonksiyonunu `solid-js`'den import edelim ve Counter bileşenimizde aşağıdaki gibi çağıralım:
 ```jsx
 const [count, setCount] = createSignal(0);
 ```
 
-The argument passed to the create call is the initial value, and the return value is an array with two functions, a getter and a setter. By [destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment), we can name these functions whatever we like. In this case, we name the getter `count` and the setter `setCount`.
+Create fonksiyonu bir argüman almaktadır ki bu da başlangıç değeridir, sonrasında getter ve setter olmak üzere iki fonksiyondan oluşan bir array döndürür. [destructuring](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment) ile bu fonksiyonları dilediğimiz gibi isimlendirebiliriz. Bizim durumumuzda getter'i `count` setter'i ise `setCount` olarak isimlendirelim.
 
-It is important to notice that the first returned value is a getter (a function returning the current value) and not the value itself. This is because the framework needs to keep track of where that signal is read so it can update things accordingly.
+İlk döndürülen değerin bir getter (mevcut değeri döndüren bir fonksiyon) olduğunu, yani değerin kendisi olmadığına dikkat ediniz. Bunun sebebi framework'ün bu sinyalin nereden okunduğunu takip edebilmesi ve buna göre de güncellemeleri kontrol etmesidir.
 
-In this lesson, we'll use JavaScript's `setInterval` function to create a periodically incrementing counter. We can update our `count` signal every second by adding this code to our Counter component:
+Bu derste Javascript'in `setInterval` fonksiyonu ile periyodik olarak artan bir sayaç oluşturacağız. Aşağıdaki kodu Counter bileşenimize ekleyerek `count` sinyalimizi saniyede bir güncelleyebiliriz.
 
 ```jsx
 setInterval(() => setCount(count() + 1), 1000);
 ```
 
-Each tick, we read the previous count, add 1, and set the new value.
+Her tikte count'un bir önceki değerini okuyup, 1 ekleyip, yeni değer olarak atıyoruz.
 
-> Solid's signals also accept a function form where you can use the previous value to set the next value.
+> Solid'de sinyaller parametre olarak fonksiyon da kabul etmektedirler, dolayısıyla bir önceki değeri, yeni değer atamak için kullanabiliriz.
 > ```jsx
 > setCount(c => c + 1);
 > ```
 
-Finally, we need to read the signal in our JSX code:
+Son olarak sinyali JSX içerisinde okumamız gerekiyor:
 
 ```jsx
 return <div>Count: {count()}</div>;
