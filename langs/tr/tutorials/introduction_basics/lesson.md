@@ -1,29 +1,29 @@
-# Introduction
+# Giriş
 
-This interactive guide will walk you through Solid's main features. You can also refer to the API and guides to learn more about how Solid works.
+Bu interaktif rehber Solid'in ana özelliklerini anlamanızda size yol gösterecektir. Solid'in nasıl çalıştığı hakkında daha fazla bilgi edinmek için API ve rehberlere da başvurabilirsiniz.
 
-You can also check out our new beginner tutorial (work-in-progress!) [here](https://docs.solidjs.com/tutorials/getting-started-with-solid/).
+Ayrıca yeni başlangıç rehberimize de [buradan](https://docs.solidjs.com/tutorials/getting-started-with-solid/) göz atabilirsiniz.(hazırlık aşamasında!) 
 
-# What is Solid?
+# Solid Nedir
 
-Solid is a JavaScript framework for making interactive web applications.
-With Solid, you can use your existing HTML and JavaScript knowledge to build components that can be reused throughout your app.
-Solid provides the tools to enhance your components with _reactivity_: declarative JavaScript code that links the user interface with the data that it uses and creates.
+Solid interaktif web uygulamaları üretmeye yönelik bir Javascript framework'üdür.
+Solid ile mevcut HTML ve Javascript bilginizi kullanarak uygulamalarınızda yeniden kullanılabilir bileşenler (component) üretebilirsiniz.
+Solid, bileşenleri _reaktivite_ özelliklerine sahip bir şekilde geliştirmek için araçlar sunar: bu sayede deklaratif Javascript kodu ile, kullanıcı arayüzü ve kullanıcı arayüzünü oluşturan, kullanan verinin birlikte çalışmasını sağlar.
 
-# Anatomy of a Solid App
+# Solid Uygulamasının Anatomisi
 
-A Solid App is composed of functions that we call components. Take a look at the `HelloWorld` function on the right: it directly returns a `div`! This mix of HTML and JavaScript is called JSX. Solid ships with a compiler that turns these tags into DOM nodes later on.
+Solid uygulaması bileşen (component) olarak adlandırdığımız fonksiyonlardan oluşur. Sağdaki `HelloWorld` fonksiyonuna baktığımızda doğrudan `dıv` döndüğünü görüyoruz! Bu HTML ve Javascript karışımı JSX olarak adlandırılmaktadır. Solid bu etiketleri daha sonra DOM nodelarına dönüştüren bir derleyici içermektedir.
 
-JSX allows you to use most HTML elements in our app, but it also lets you create new elements. Once we've declared our `HelloWorld` function, we can use it as a `<HelloWorld>` tag throughout our app.
+JSX, uygulamanızdaki çoğu HTML elementlerini kullanmanıza izin verir, ancak aynı zamanda yeni ögeler üretmenize de olanak tanır. `HelloWorld` fonksiyonumuzu bir kez oluşturduktan sonra uygulamamızın tamamında `<HelloWorld>` tag'ı ile kullanabiliriz.
 
-The entry point for any Solid App is the `render` function. It takes 2 arguments, a function wrapping our application code and an existing element in the HTML to mount to:
+Solid Uygulamasının giriş noktası `render` fonksiyonudur. Bu fonksiyon 2 argüman alır: birincisi uygulamamızın kodunu saran bir fonksiyon, ikincisi ise HTML de mevcut, uygulamanın bağlanacağı elemandır.
 
 ```jsx
 render(() => <HelloWorld />, document.getElementById("app"));
 ```
 
-# Leveraging this Tutorial
+# Rehberden Yararlanmak
 
-Each lesson in the tutorial presents a Solid feature and a scenario to try it out. At any point you can click the solve button to see the solution or click reset to start over. The code editor itself has a console and an output tab where you can see the compiled output generated from your code. Look at it if you are curious to see how Solid generates code.
+Eğitimdeki her bir ders bir Solid özelliğine eş düşmektedir ve bunu denemek için sizlere bir senaryo sunmaktadır. Herhangi bir noktada çözümü görmek için Çöz düğmesine tıklayabilir veya baştan başlamak için sıfırla düğmesine tıklayabilirsiniz. Kod düzenleyicisinin kendisinde bir konsol ve kodunuzdan oluşturulan derlenmiş çıktıyı görebileceğiniz bir output sekmesi vardır. Solid'in nasıl kod ürettiğini merak ediyorsanız bakabilirsiniz.
 
-Have fun!
+İyi eğlenceler!
