@@ -1,12 +1,12 @@
-JSX is the HTML-like syntax we've seen inside these examples and is core to building components in Solid. 
-JSX adds dynamic expressions that allow you to reference variables and functions within your HTML by using the `{ } ` syntax.
-In this example, we include the string `name` in our HTML using `{name}` inside a div. In the same way, we include an HTML element that was directly assigned to the `svg` variable.
+JSX örneklerde gördüğümüz üzere HTML benzeri bir syntax'a sahiptir ve Solid ile bileşen oluşturmanın temelini oluşturmaktadır.
+JSX `{ } ` syntax'ını kullanarak HTML üzerinde değişken ve fonksiyonları kullanabilmemize olanak sağlayan dinamik yapılar sunar.
+Bu örnekte, `name` değişkenini HTML'de `{name}` şeklinde bir div'in içerisinde kullandık. Aynı şekilde, bir HTML elemanını doğrudan `svg` değişkenine atanacak şekilde ürettik.
 
-Unlike some other frameworks that use JSX, Solid attempts to stay as close to HTML standards as possible, allowing copy and paste from answers on Stack Overflow or from template builders from your designers.
+JSX kullanan diğer frameworklerin aksine Solid, HTML standartlarına mümkün olduğunca yakın kalmaya çalışır dolayısıyla Stack Overflow'daki yanıtlardan veya tasarımcıların şablon oluşturucularından kopyalayıp yapıştırma konusunda kolaylık sağlar.
 
-There are 3 main differences between JSX and HTML that prevent JSX from being seen as a superset of HTML:
-1. JSX does not have void elements. This means that all elements must have a closing tag or self-close. Keep this in mind when copying over elements like `<input>` or `<br>`.
-2. JSX must return a single Element. To represent multiple top level elements, use a Fragment element:
+JSX'in HTML'i kapsayan bir superset olarak tanımlanmasını engelleyen üç ana farklılık vardır:
+1. JSX'te void elemanlar yoktur. Tüm elemanların kapanış etiketine sahip olması veya kendini kapatması gerekir. Bunu `<input>` veya `<br>` gibi yapılar kullanırken göz önünde bulundurmalısınız.
+2. JSX sadece bir eleman dönmelidir. Birden çok üst seviye elemana sahip bir yapı istendiği takdirde Fragment elemanı kullanılır.
 
    ```jsx
    <>
@@ -14,9 +14,9 @@ There are 3 main differences between JSX and HTML that prevent JSX from being se
      <p>Some Text</p>
    </>
    ```
-3. JSX doesn't support HTML Comments `<!--...-->` or special tags like `<!DOCTYPE>`.
+3. JSX HTML yorumlarını `<!--...-->` veya özel etiketleri `<!DOCTYPE>` desteklemez.
 
-But JSX does support SVG. Let's try copying some SVG right into our component:
+Fakat JSX, SVG desteklemektedir. Hadi bileşenimize doğrudan bir SVG yapıştıralım:
 ```jsx
 <svg height="300" width="400">
   <defs>
