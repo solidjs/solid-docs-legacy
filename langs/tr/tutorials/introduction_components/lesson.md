@@ -1,14 +1,14 @@
-As you build your applications, you will want to break apart your code for better modularity and reusability. In Solid, the main way of doing that is by creating components.
+Uygulamalarınızı oluştururken kodunuzu parçalara bölmek isteyebilirsiniz, bu tekrar kullanılabilirlik ve modülerlik konularında yararlı olacaktır. Solid'te bunu yapmanın ana yolu bileşen (component) oluşturmaktır.
 
-Components are just functions like the `HelloWorld()` one we've been using so far. What makes them special is that they typically return JSX and can be called by JSX in other components.
+Bileşenler temelde `HelloWorld()` - şimdiye kadar kullanmakta olduğumuz - gibi birer fonksiyondur. Bileşenleri özel yapan şey, genellikle JSX döndürmeleri ve diğer bileşenlerde JSX tarafından çağırılabilmeleridir.
 
-In this example, let's add our `Nested` component to our app. We've defined it in another file, though you can put multiple components in the same file. First we must import it:
+Hadi örneğimizde `Nested` bileşenimizi uygulamamıza ekleyelim. Bileşeni başka bir dosyada tanımladık, ancak aynı dosyada birden fazla bileşen de barınabilir. Öncelikle aşağıdaki kodu ekleyelim.
 
 ```js
 import Nested from "./nested";
 ```
 
-Then we need to add the component to our JSX. Like before, we now have multiple elements we want to return, so we wrap them in a Fragment:
+Sonra bileşenimizi JSX'e ekleyelim. Daha önce bahsedildiği gibi, döndürmek istediğimiz birden fazla elemanımız var, dolayısıyla bu elemanları Fragment ile sarmalıyız.
 
 ```jsx
 function App() {
@@ -21,4 +21,4 @@ function App() {
 }
 ```
 
-When the parent component first renders, it will execute the `Nested()` function and won't call it ever again. All updates are applied by Solid’s reactivity system which we will cover in the next couple of lessons.
+Ana bileşen ilk kez oluştuğunda `Nested()` fonksiyonunu çalıştıracaktır ve bir daha asla çağırmayacaktır. Sonrasındaki tüm değişiklikler Solid'in önümüzdeki derslerde göreceğimiz reaktivite sistemi tarafından gerçekleştirilecektir.
