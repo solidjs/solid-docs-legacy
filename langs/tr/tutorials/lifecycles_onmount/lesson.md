@@ -1,11 +1,11 @@
-There are only a few Lifecycle functions in Solid as everything lives and dies by the reactive system. The reactive system is created and updates synchronously, so the only scheduling comes down to Effects which are pushed to the end of the update.
+Solid'de az sayıda Lifecycle (Yaşam Döngüsü) fonksiyonu vardır, çünkü her şey reaktif sistem içerisinde yaşar ve son bulur. Reaktif sistem senkronize şekilde oluşur ve güncellenir, bu nedenle de sadece zamanlama (scheduling) güncellemenin sonuna eklenen efektlere gelir.
 
-We've found that developers doing basic tasks don't often think this way, so to make things a
-little easier we've made an alias, `onMount`. `onMount` is just a `createEffect` call that is
-non-tracking, which means it never re-runs. It is just an Effect call but you can use it with confidence
-that it will run only once for your component, once all initial rendering is done.
+Temel görevleri yerine getiren geliştiricilerin genellikle bu şekilde düşünmediğini fark ettik ve bu yüzden
+işleri kolaylaştırmak için `onMount` adında bir alias oluşturduk. `onMount` aslında, sadece takip edilmeyen (non-tracking) bir `createEffect`
+çağrısıdır ve asla tekrar çağrılmaz.
+Yani `onMount` initial rendering tamamlandıktan hemen sonra sadece bir kere çalışacağından emin olabileceğiniz bir effect çağrısıdır.
 
-Let's use the `onMount` hook to fetch some photos:
+`onMount` hook'unu fetch ile beraber resimleri getirmek için kullanalım:
 ```js
 onMount(async () => {
   const res = await fetch(`https://jsonplaceholder.typicode.com/photos?_limit=20`);
@@ -13,4 +13,4 @@ onMount(async () => {
 });
 ```
 
-Lifecycles are only run in the browser, so putting code in `onMount` has the benefit of not running on the server during SSR. Even though we are doing data fetching in this example, usually we use Solid's resources for true server/browser coordination.
+Yaşam döngüleri sadece tarayıcıda çalışır, dolaysıyla `onMount` içerisine kod yazmak SSR sırasında sunucuda çalışmama avantajını sağlar. Bu örnekte veri getirme (fetching) işlemi kullanmış olsak da, genellikle gerçek sunucu/tarayıcı koordinasyonu için Solid'in resource'larını kullanırız.
