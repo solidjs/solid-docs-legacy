@@ -1,10 +1,10 @@
-You now know how to render lists in Solid with `<For>`, but Solid also provides the `<Index>` component, which will cause less rerenders in certain situations. 
+Artık Solid'de `<For>` ile bir listeyi nasıl oluşturacağınızı biliyorsunuz, ancak Solid belirli durumlarda daha az re-render üretecek `<Index>` bileşeni de sağlamaktadır.
 
-When the array updates, the `<For>` component uses referential equality to compare elements to the last state of the array. But this isn't always desired. 
+Array güncellendiğinde `<For>` bileşeni elemanları array'in son durumu ile karşılaştırmak için referans eşitliğini kullanır fakat bu her zaman arzulanan bir durum olmayabilir.
 
-In JavaScript, primitives (like strings and numbers) are always compared by value. When using `<For>` with primitive values or arrays of arrays, we could cause a lot of unnecessary rendering. If we used `<For>` to map a list of strings to `<input>` fields that could edit each, every change to that value would cause the `<input>` to be recreated. 
+JavaScript'te primitifler (string veya number gibi) her zaman değerlerine göre karşılaştırılır. `<For>` bileşenini primitif değerlerle veya array'lerden oluşan array'ler ile kullanmak gereksiz render'lara sebep olabilir. Örneğin, bir string listesini her biri düzenlenebilen `<input>` alanlarına eşlemek için `<For>` kullansaydık, bu değerdeki her değişiklik `<input>`'un yeniden oluşturulmasına neden olurdu.
 
-The `<Index>` component is provided for these cases. As a rule of thumb, when working with primitives use `<Index>`. 
+Bu durumlar için `<Index>` bileşeni sağlanmıştır. Genel bir kural olarak, primitif ögelerle çalışırken `<Index>` bileşenini kullanın. 
 
 ```jsx
 <Index each={cats()}>{(cat, i) =>
@@ -16,6 +16,6 @@ The `<Index>` component is provided for these cases. As a rule of thumb, when wo
 }</Index>
 ```
 
- It has a similar signature to `<For>`, except this time the item is the signal and the index is fixed. Each rendered node corresponds to a spot in the array. Whenever the data in that spot changes, the signal will update.
+`<Index>`, `<For>` ile benzer bir imzaya sahiptir, ancak bu kez öge sinyaldir ve index sabittir. Oluşturulan her node array'deki bir noktaya karşılık gelir ve bu noktadaki veri her değiştiğinde, sinyal güncellenir.
 
-`<For>` cares about each piece of data in your array, and the position of that data can change; `<Index>` cares about each index in your array, and the content at each index can change.
+`<For>` array'deki her bir veri parçasıyla ilgilenir ve bu verilerin konumu değişebilir; `<Index>` ise array'deki her bir index'le ilgilenir ve her index'in içeriği değişebilir.

@@ -1,8 +1,8 @@
-Sometimes you need to deal with conditionals with more than 2 mutual exclusive outcomes. For this case, we have the `<Switch>` and `<Match>` components modeled roughly after JavaScript's `switch`/`case`.
+Bazen ikiden fazla durumu kapsayan koşullu ifadeler kullanmanız gerekebilir. Bu durum için, kabaca JavaScript'in `switch`/`case` özelliğine karşılık olarak tasarlanan Solid'in `<Switch>` ve `<Match>` bileşenlerini kullanabiliriz.
 
-It will try in order to match each condition, stopping to render the first that evaluates to true. Failing all of them, it will render the the fallback.
+Switch, ilk eşleşen koşulu işlemek (render) için sırası ile deneyecek ve eşleşen koşul işlendiğinde duracaktır. Bütün koşullar başarısız olduğu takdirde ise fallback'i işleyecektir.
 
-In the example, we can replace our nested `<Show>` components with this:
+Örneğimizde, iç içe geçmiş `<Show>` bileşenimizi aşağıdaki kullanım ile değiştirebiliriz:
 
 ```jsx
 <Switch fallback={<p>{x()} is between 5 and 10</p>}>

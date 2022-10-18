@@ -1,4 +1,4 @@
-The `<For>` component is the best way to loop over an array of objects. As the array changes, `<For>` updates or moves items in the DOM rather than recreating them. Let's look at an example. 
+`<For>` bileşeni objelerden oluşan bir array üzerinde döngü oluşturmanın en iyi yoludur. Array değiştiği takdirde `<For>` ögelerin yeniden oluşturulması yerine DOM üzerinde güncellenmesi veya taşınmasını sağlar. Gelin örneğe bir bakalım.
 
 ```jsx
 <For each={cats()}>{(cat, i) =>
@@ -10,10 +10,10 @@ The `<For>` component is the best way to loop over an array of objects. As the a
 }</For>
 ```
 
-There is one prop on the `<For>` component: `each`, where you pass the array to loop over.
+`<For>` bileşeni için sadece bir prop vardır: `each`. Döngü oluşturacağınız array `each`'a aktarılır.
 
-Then, instead of writing nodes directly between `<For>` and `</For>`, you pass a _callback_. This is a function similar to JavaScript's [`map` callback](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map#parameters). For each element in the array, the callback is called with the element as the first argument and the index as the second. (`cat` and `i` in this example.) You can then make use of those in the callback, which should return a node to be rendered.
+Sonrasında, `<For>` ve `</For>` arasına doğrudan node'ları yazmak yerine _callback_ fonksiyonu aktarılır. Bu fonksiyon JavaScript'in [`map` callback](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map#parameters) fonksiyonuna benzemektedir. Array'deki her eleman için, eleman ilk argüman olarak ve index ikinci argüman olarak geri çağrılır. (Bu örnekte `cat` ve `i`.) Daha sonra, işlenecek bir node döndürmesi gereken callback'te bu değerleri kullanabilirsiniz.
 
-Note that the index is a _signal_, not a constant number. This is because `<For>` is "keyed by reference": each node that it renders is coupled to an element in the array. In other words, if an element changes placement in the array, rather than being destroyed and recreated, the corresponding node will move too and its index will change.
+Dikkat edilmesi gereken bir diğer konu da index'in sabit bir sayı değil bir _sinyal_ oluşudur. Bunun nedeni `<For>` un referansla anahtarlanmış (keyed by reference) olmasıdır: işlenilen her bir node array'deki bir elemana bağlıdır. Başka bir deyişle, bir ögenin array'deki yeri değiştirildiğinde yok edilip yeniden oluşturulmak yerine, ilgili node da hareket edecek ve index'i değiştirecektir.
 
-The `each` prop expects an array, but you can turn other iterable objects into arrays with utilities like [`Array.from`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from), [`Object.keys`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys), or [`spread syntax`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax).
+`each` prop'u bir array beklemektedir ancak [`Array.from`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/from), [`Object.keys`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys), veya [`spread syntax`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) gibi yardımcılarla diğer yinelenebilir nesneleri array'lere dönüştürebilirsiniz.

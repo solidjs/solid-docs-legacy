@@ -1,8 +1,8 @@
-Sometimes it's beneficial to insert elements outside the normal flow of the app. Z-indexes are sometimes insufficient to deal with render contexts for floating elements like Modals.
+Bazen ögeleri uygulamanın normal akışının dışına çıkarmak faydalı olabilir. Z-indeksleri de bazen modal'lar gibi floating (kayan) ögelerin render bağlamları ile uyumunda yetersiz kalabilir.
 
-Solid has a `<Portal>` component whose child content will be inserted at the location of your choosing. By default, its elements will be rendered in a `<div>` in the `document.body`.
+Solid bu probleme cevap olarak `<Portal>` bileşenini sunar, işlevi child (alt, içerdiği, sardığı) içeriğini belirlenen konuma eklemektir. Varsayılan olarak sardığı ögeler `document.body` içerisinde bir `<div>` içinde render edilir.
 
-In the example, we see our information popup get cut off. We can solve this by pulling it out of the flow by wrapping the element in a `<Portal>`:
+Örneğimizde, bilgi popup'ının kesildiğini görüyoruz. Bu sorunu, ögeyi bir `<Portal>` içerisine alarak, dolayısıyla akıştan çıkararak çözebiliriz.
 
 ```jsx
 <Portal>

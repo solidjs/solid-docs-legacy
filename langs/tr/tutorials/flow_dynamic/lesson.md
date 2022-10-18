@@ -1,8 +1,8 @@
-The `<Dynamic>` tag is useful when you render from data. It lets you pass either a string for a native element or a component function and it will render that with the rest of the provided props.
+`<Dynamic>` etiketi verilerden render yapacağınız durumlarda kullanışlıdır. İçerisine native elemanlar için string veya bileşen fonksiyonu iletilebilir ve sonuçta sağlanan diğer prop'lar ile beraber ilettiğiniz eleman render edilir.
 
-This is often more compact than writing a number of `<Show>` or `<Switch>` components.
+`<Dynamic>` bileşeni genellikle ard arda yazılmış `<Show>` veya `<Switch>` ile karşılaştırıldığında daha kısa ve etkili bir kullanım sağlar. 
 
-In the example, we can replace the `<Switch>` statement:
+Örneğimizdeki `<Switch>` ifadesini:
 
 ```jsx
 <Switch fallback={<BlueThing />}>
@@ -11,7 +11,7 @@ In the example, we can replace the `<Switch>` statement:
 </Switch>
 ```
 
-with:
+aşağıdaki kullanım ile değiştirebiliriz:
 
 ```jsx
 <Dynamic component={options[selected()]} />
