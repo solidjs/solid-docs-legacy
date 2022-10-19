@@ -12,11 +12,11 @@ MyComp({
   get children() { return Child() }
 });
 ```
-Bunun anlamı props'ların lazy olarak değerlendirilmesidir (evaluate) görüyorsunuz. Erişimleri kullanılacakları ana kadar gerçekleşmez. Bu sayede, ek wrapper veya senkronizasyon olmaksızın reaktivite korunur. Ancak bu, tekrarlı erişimin, alt bileşenlerin veya elemanların yeniden oluşturulmasına yol açabileceği anlamına gelir.
+Yani props lazy olarak değerlendirilir (lazily evaluate edilir). Yani kullanılacakları ana kadar bir erişim gerçekleşmez. Bu sayede, ek wrapper veya senkronizasyon olmaksızın reaktivite korunur. Ancak bu durum; tekrarlı erişimin, alt bileşenlerin veya elemanların yeniden oluşturulmasına yol açabileceği anlamına gelir.
 
 Genellikle JSX'e sadece prop'lar ekleneceği için sorun oluşmamaktadır ancak, child (alt) elemanlarla çalışırken, elemanları defalarca tekrar oluşturmaktan kaçınmak için dikkatli olmanız gerekir.
 
-Bu sebeple, Solid `children` helper'ını sunar. Bu metot hem `children` prop etrafında bir memo oluşturur hem de iç içe geçmiş child reactive referanslarını çözer, böylece child'lar ile doğrudan etkileşime girilebilir.
+Bu sebeple, Solid `children` helper'ını sunar. Bu metot hem `children` prop'u etrafında bir memo oluşturur hem de iç içe geçmiş child reactive referanslarını çözer, böylece child'lar ile doğrudan etkileşime girilebilir.
 
 Örneğimizde, dinamik bir listemiz var ve elemanların `color` style property'sini ayarlamak ayarlamak istiyoruz. Doğrudan `props.children` ile etkileşime girersek, yalnızca node'ları defalarca oluşturmakla kalmaz, aynı zamanda da `props.children`'i `<For>`'dan döndürülen memo gibi bir fonksiyon olarak bulurduk.
 
