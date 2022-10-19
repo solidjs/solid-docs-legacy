@@ -1,10 +1,10 @@
-Props are what we call the object that is passed to our component function on execution that represents all the attributes bound to its JSX. Props objects are readonly and have reactive properties which are wrapped in Object getters. This allows them to have a consistent form regardless of whether the caller used signals, signal expressions, or static values. You access them by `props.propName`.
+Props, bileşen fonksiyonumuza aktarılabilen, JSX'e bağlı tüm attribute'ları temsil eden objeye verdiğimiz isimdir. Props objeleri salt okunurdur ve Object getter'larına sarılmış reaktif özelliklere sahiplerdir.  sayede, çağıranın sinyal, sinyal ifadesi veya statik değer kullanmasına bağlı olmadan tutarlı bir biçimde olmalarını sağlanır. Ulaşmak için `props.propName` kullanılır.
 
-For this reason it is also very important to not just destructure props objects, as that would lose reactivity if not done within a tracking scope. In general accessing properties on the props object outside of Solid's primitives or JSX can lose reactivity. This applies not just to destructuring, but also to spreads and functions like `Object.assign`.
+Bu nedenle props objelerini yalnızca destructure ederek kullanmamak önemlidir, çünkü, bu bir izlenme kapsamı içerisinde yapılmazsa reaktivite kaybolacaktır. Genel olarak, props objesi üzerindeki property'lere özellikle Solid'in primitifleri veya JSX dışında erişmek reaktiviteyi kaybetmekle sonuçlanabilir. Bu sadece destructing için değil, aynı zamanda `Object.assign` gibi spread ve fonksiyonlar için de geçerlidir.
 
-Solid has a few utilities to help us when working with props. The first is `mergeProps`, which merges potentially reactive objects together (like a nondestructive `Object.assign`) without losing reactivity. The most common case is when setting default props for our components.
+Solid, props ile çalışırken bize yardımcı olacak bazı utility'lere sahiptir. Bunlardan birincisi, potansiyel olarak reaktif objeleri reaktiviteyi kaybetmeden birleştiren `mergeProps`tur. (`Object.assign` benzeri). En yaygın kullanımı bileşenlerimiz için varsayılan prop'ları atamaktır.
 
-In the example, in `greetings.tsx`, we inlined the defaults in the template, but we could also use `mergeProps` to keep reactive updates even when setting defaults:
+Örneğimizde, `greetings.tsx` dosyasında varsayılanları satır içinde kullandık, ek olarak `mergeProps`'u da kullanarak, reaktiviteyi koruyabilir ve güncellemelerin işlenmesini sağlayabiliriz.
 
 ```jsx
 const merged = mergeProps({ greeting: "Hi", name: "John" }, props);

@@ -1,33 +1,33 @@
-Part of what makes Solid so performant is that our components are basically just function calls. The way we propagate updates is that the compiler wraps potentially reactive expressions in object getters. You can picture the compiler to output:
+Solid'i bu kadar performanslı yapan şeylerden birisi de bileşenlerin temelde sadece fonksiyon çağrısı olmasıdır. Solid'te güncellemelerin yayılması, derleyicinin potansiyel olarak reaktif ifadeleri obje getter'larına sarması ile olur. Derleyicinin çıktısını aşağıdaki gibi düşünebilirsiniz:
 
 ```jsx
-// this JSX
+// aşağıdaki JSX
 <MyComp dynamic={mySignal()}>
   <Child />
 </MyComp>
 
-// to become
+// buna dönüşmekte
 MyComp({
   get dynamic() { return mySignal() },
   get children() { return Child() }
 });
 ```
-This means that these props are evaluated lazily. Their access is deferred until where they are used. This retains reactivity without introducing extraneous wrappers or synchronization. However, it means that repeat access can lead to recreating child components or elements.
+Bunun anlamı props'ların lazy olarak değerlendirilmesidir (evaluate) görüyorsunuz. Erişimleri kullanılacakları ana kadar gerçekleşmez. Bu sayede, ek wrapper veya senkronizasyon olmaksızın reaktivite korunur. Ancak bu, tekrarlı erişimin, alt bileşenlerin veya elemanların yeniden oluşturulmasına yol açabileceği anlamına gelir.
 
-The vast majority of the time you will just be inserting props into the JSX so there is no problem. However, when you work with children, you need to be careful to avoid creating the children multiple times.
+Genellikle JSX'e sadece prop'lar ekleneceği için sorun oluşmamaktadır ancak, child (alt) elemanlarla çalışırken, elemanları defalarca tekrar oluşturmaktan kaçınmak için dikkatli olmanız gerekir.
 
-For that reason, Solid has the `children` helper. This method both creates a memo around the `children` prop and resolves any nested child reactive references so that you can interact with the children directly.
+Bu sebeple, Solid `children` helper'ını sunar. Bu metot hem `children` prop etrafında bir memo oluşturur hem de iç içe geçmiş child reactive referanslarını çözer, böylece child'lar ile doğrudan etkileşime girilebilir.
 
-In the example, we have a dynamic list and we want to set the items' `color` style property. If we interacted with `props.children` directly, not only would we create the nodes multiple times, but we'd find `props.children` to be a function, the Memo returned from `<For>`.
+Örneğimizde, dinamik bir listemiz var ve elemanların `color` style property'sini ayarlamak ayarlamak istiyoruz. Doğrudan `props.children` ile etkileşime girersek, yalnızca node'ları defalarca oluşturmakla kalmaz, aynı zamanda da `props.children`'i `<For>`'dan döndürülen memo gibi bir fonksiyon olarak bulurduk.
 
-Instead let's use the `children` helper inside `colored-list.tsx`:
+Bunun yerine `children` helper'ını `colored-list.tsx` içerisinde kullanalım:
 ```jsx
 export default function ColoredList(props) {
   const c = children(() => props.children);
   return <>{c()}</>
 }
 ```
-Now to update our elements, let's create an Effect:
+Şimdi de elemanlarımızı güncelleyecek bir Effect oluşturalım:
 ```jsx
 createEffect(() => c().forEach(item => item.style.color = props.color));
 ```

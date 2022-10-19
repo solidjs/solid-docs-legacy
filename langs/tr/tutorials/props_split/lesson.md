@@ -1,14 +1,11 @@
-Merging props isn't the only props operation we might want to do.
+Props için birleştirme işlemi haricinde de yapmak istediğimiz işlemler olacaktır.
 
-Often, we want to split props into groups, so that we can use some of them on 
-the current component but split off others to pass through to child components.
+Genellikle, props gruplara ayrılır ki
+gerekenler mevcut bileşende kullanılsın ve diğerleri de alt bileşenlere aktarılsın.
 
-For this purpose, Solid has [`splitProps`](/docs/latest/api#splitprops). It 
-takes the props object 
-and 
-one or more arrays of keys that we want to extract into their own props objects. It returns an array of props objects, one per array of specified keys, plus one props object with any remaining keys. All returned objects preserve reactivity.
+Bu kullanım için Solid [`splitProps`](/docs/latest/api#splitprops) fonksiyonuna sahiptir. Argüman olarak props objesini ve kendi props objesine çıkarmak istediğimiz bir veya daha fazla anahtar array'leri alır. Belirtilen anahtarlardaki her bir array için bir tane olmak üzere props objelerinden oluşan bir array, ve kalan anahtarlar ile de bir props objesi döner. Döndürülen bütün objeler reaktivitiyi korumaktadır.
 
-Our example doesn't update when we set the name because of lost reactivity when we destructure in `greeting.tsx`:
+Örneğimiz isim belirlesek de güncellenmiyor, çünkü reaktivite `greeting.tsx` i destructure ederken kaybedilmiş:
 ```jsx
 export default function Greeting(props) {
   const { greeting, name, ...others } = props;
@@ -16,11 +13,11 @@ export default function Greeting(props) {
 }
 ```
 
-Instead, we can maintain reactivity with `splitProps`:
+Bunun yerine `splitProps` ile reaktiviteyi bu şekilde koruyabiliriz:
 ```jsx
 export default function Greeting(props) {
   const [local, others] = splitProps(props, ["greeting", "name"]);
   return <h3 {...others}>{local.greeting} {local.name}</h3>
 }
 ```
-Now the button works as expected.
+Artık buton beklediğimiz gibi çalışıyor.
