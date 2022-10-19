@@ -1,10 +1,10 @@
-Solid supports custom directives through the `use:` namespace. This is just a syntactic sugar over `ref`, but is useful in that it resembles typical bindings and there can be multiple bindings on the same element without conflict. This makes it a better tool for reusable DOM element behavior.
+Solid özel direktifleri `use:` namespace'i aracılığı ile destekler. Bu aslında sadece `ref` üzerinde bir syntactic sugar'dır ancak tipik binding'lere benzemesi ve aynı eleman üzerinde çakışma olmadan birden fazla binding olabilmesi açısından kullanışlıdır. 
 
-A custom directive is a function taking arguments `(element, valueAccesor)`, where `element` is the DOM element with the `use:` attribute, and `valueAccessor` is a getter function for the value assigned to the attribute. As long as the function is imported in scope, you can use it with `use:`.
+Özel direktif `(element, valueAccessor)` argümanlarını alan bir fonksiyondur, `element`, `use` attribute'una sahip bir DOM elemanına ve `valueAccessor` da bu attribute'a atanmış değerin getter fonksiyonuna eş düşer. Fonksiyon kapsam (scope) içerisinde aktarıldığı sürece `use:` ile kullanılabilir.
 
-> Important: `use:` is detected by the compiler to be transformed, and the function is required to be in scope, so it cannot be part of spreads or applied to a component.
+> Önemli: derleyici `use:`'u dönüştürülmesi gerektiği şeklinde algılar, dolayısıyla fonksiyonun kapsam içerisinde olması gerekir. Bu nedenle spread ile kullanılamaz veya bir bileşene uygulanamaz.
 
-In the example, we are going to make a wrapper for basic click-outside behavior to close a popup or modal. First we need to import and use our `clickOutside` directive on our element:
+Örneğimizde, bir popup veya modal'ı dışarı tıklandığında kapanacak şekilde bir wrapper üreteceğiz. Öncelikle `clickOutside` direktifini import etmemiz ve elemanın üzerinde kullanmamız gerekiyor:
 
 ```jsx
 <div class="modal" use:clickOutside={() => setShow(false)}>
@@ -12,7 +12,7 @@ In the example, we are going to make a wrapper for basic click-outside behavior 
 </div>
 ```
 
-Open `click-outside.tsx`, where we will be defining our custom directive. This directive defines a click handler that we bind to the body and cleanup when it is time:
+Özel direktifimizi tanımlayacağımız `click-outside.tsx` doyasını açalım. Bu direktif, body'e bağlayacağımız ve zamanı geldiğinde temizleyeceğimiz bir click handler tanımlamakta:
 
 ```jsx
 export default function clickOutside(el, accessor) {
@@ -23,4 +23,4 @@ export default function clickOutside(el, accessor) {
 }
 ```
 
-Now you should be able to go back and forth between opening and closing the modal.
+Artık modal istenildiği şekilde açılıp kapanma özelliklerine sahip.

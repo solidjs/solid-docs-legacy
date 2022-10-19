@@ -1,14 +1,14 @@
-The `style` attribute in Solid accepts either style strings or objects.
-However the object form differs from `Element.prototype.style` and instead is a wrapper for calling `style.setProperty`. This means that keys take the dash-case form, like "background-color" rather than "backgroundColor", and that any units must be explicitly provided (e.g., `width: 500px` rather than `width: 500`). 
+Solid'deki style attribute'u style string'leri veya objeleri kabul eder.
+Ancak nesne formu `Element.prototype.style`'dan farklıdır, aslında `style.setProperty`'yi çağıran bir sarıcıdır (wrapper). Sonuç olarak anahtarlar (key) dash-case yazılır, örneğin "backgroundColor" yerine "background-color" kullanılmalıdır. Ayrıca herhangi bir birim açıkça belirtilmelidir (`width: 500` geçersiz olacaktır, doğru kullanım ise: `width: 500px` şeklindedir) 
 
 
-This also means that we have the ability to set CSS variables:
+Bu aynı zamanda CSS değişkenleri atayabileceğimiz anlamına da gelir:
 
 ```js
 <div style={{ "--my-custom-color": themeColor() }} />
 ```
 
-Let's animate our div with a few inline styles:
+Div'imizi bir kaç satır içi (inline) style ile hareketli hale getirelim: 
 ```jsx
 <div style={{
   color: `rgb(${num()}, 180, ${num()})`,

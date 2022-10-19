@@ -1,8 +1,8 @@
-Sometimes your components and elements accept a variable number of attributes and it makes sense to pass them down as an object instead of individually. This is especially true when wrapping a DOM element in a component, a common practice when making design systems.
+Bazen bileşen veya elemanların kabul ettiği attribute sayıları değişebilir, bu durumda da attribute'ları teker teker aktarmaktansa obje halinde aktarmak daha mantıklı olabilir. Bu durum özellikle tasarım sistemleri oluştururken yaygınca kullanılan, bir DOM elemanını bileşen içerisine sararken geçerlidir.
 
-For this we use the spread operator `...`.
+Bunun için spread operatör'ü kullanırız `...`.
 
-We can pass an object with a variable number of properties:
+Bu sayede objedeki bütün property'leri aktarabiliriz:
 
 ```jsx
 <Info {...pkg} />

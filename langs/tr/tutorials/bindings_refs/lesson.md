@@ -1,12 +1,12 @@
-You can always get a reference to a DOM element in Solid through assignment, since JSX creates actual DOM elements. For example:
+JSX gerçek DOM elemanları oluşturduğu için Solid'de atama yoluyla her zaman bir DOM elemanına referans alabilirsiniz. Örneğin:
 
 ```jsx
 const myDiv = <div>My Element</div>;
 ```
 
-However, there is benefit to not breaking your elements out and instead putting them in a single contiguous JSX template, as it allows Solid to better optimize their creation.
+Ancak Solid'in eleman oluşturma optimizasyonu açısından, elemanları ayırmamanın ve tek bir bitişik JSX şablonu şeklinde kullanmanın yararı vardır.
 
-Instead you can get a reference to an element in Solid using the `ref` attribute. Refs are basically assignments like the example above, which happen at creation time before they are attached to the document DOM. Just declare a variable, pass it in as a `ref` attribute, and the variable will be assigned to:
+Bu durumda `ref` attribute'u ile Solid'deki bir elemanı referans alabilirsiniz. Ref'ler temel olarak yukarıdaki örnekte olduğu gibi birer atamadır, oluşturulma aşamasında yani belge DOM'a eklenmeden önce atanırlar. Bir değişken tanımlayın, `ref` attribute'una atayın ve değişken atanacaktır:
 
 ```jsx
 let myDiv;
@@ -14,13 +14,13 @@ let myDiv;
 <div ref={myDiv}>My Element</div>
 ```
 
-So let's get a reference to our canvas element and animate it:
+Örneğimizde canvas elemanına referans alalım ve animasyon ekleyelim:
 
 ```jsx
 <canvas ref={canvas} width="256" height="256" />
 ```
 
-Refs can also take the form of a callback function. This can be convenient for encapsulating logic, especially when you don't need to wait until the elements are attached. For example:
+Ref'ler ayrıca bir callback fonksiyonu biçiminde de kullanılabilir. Böylece, mantığı encapsulate etmek için, özellikle de elemanlar eklenene kadar beklemeniz gerekmediğinde, kullanışlı olabilirler. Örneğin:
 
 ```jsx
 <div ref={el => /* do something with el... */}>My Element</div>

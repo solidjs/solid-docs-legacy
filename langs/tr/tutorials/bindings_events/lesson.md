@@ -1,6 +1,6 @@
-Events in Solid are attributes prefixed with `on`. They are treated specially in a few ways. First, they do not follow the normal heuristics for wrapping. In many cases, it is difficult to determine the difference between a Signal and an event handler. And so, since events are called and don't require reactivity to update, they are only bound initially. You can always just have your handler run different code based on the current state of your app.
+Solid'deki event'ler `on` ön adına sahip niteliklerdir (attribute) ve birkaç yönden özel olarak ele alınırlar. Öncelikle wrapping konusunda normal buluşsallığı (heuristic) takip etmezler; çoğu durumda, bir sinyal ile bir event handler arasındaki farkı saptamak zordur. Bu nedenle, event'ler çağrıldıklarından ve de güncelleme işlemi için reaktivite gerektirmediklerinden yalnızca başlangıçta bağlanırlar. Handler'ın uygulamanın mevcut durumuna göre farklı kod çalıştırması sağlanılabilir.
 
-Common UI events (that bubble and are composed) are automatically delegated to the document. To improve delegated performance, Solid supports an array syntax to call the handler with data (as the first argument) without creating additional closures:
+Ortak UI event'leri (bubble oluşturan, oluşturulan) otomatik olarak belgede temsil edilir. Bu bağlamda performansı iyileştirmek için Solid, ek closure'lar oluşturmadan handler'ı verilerle (ilk argüman olarak) çağırmak için bir dizi syntax'ı destekler. 
 
 ```jsx
 const handler = (data, event) => /*...*/
@@ -8,14 +8,14 @@ const handler = (data, event) => /*...*/
 <button onClick={[handler, data]}>Click Me</button>
 ```
 
-In the example, let's attach the handler to the `mousemove` event:
+Örneğimizde, handler'ı `mousemove` event'ine bağlayalım:
 ```jsx
 <div onMouseMove={handleMouseMove}>
   The mouse position is {pos().x} x {pos().y}
 </div>
 ```
 
-All `on` bindings are case insensitive which means that event names need to be in lowercase. For example, `onMouseMove` monitors the event name `mousemove`. If you need to support other casings or not use event delegation, you can use `on:` namespace to match event handlers that follows the colon:
+Tüm `on` bind'ları (bağ) büyük/küçük harf farkına duyarlı değildir, bu da event adlarının küçük harfle yazılması gerektiği anlamına gelir. Örneğin: `onMouseMove`, `mousemove` event adını izler. Büyük/küçük harf kullanımını desteklemek veya event temsilini (event delegation) kullanmamak istediğiniz durumlarda `on:` namespace'ini iki noktadan sonra gelecek event handler ile eşleşecek şekilde kullanabilirsiniz:
 
 ```jsx
 <button on:DOMContentLoaded={() => /* Do something */} >Click Me</button>

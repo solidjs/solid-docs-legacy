@@ -1,6 +1,6 @@
-Solid uses `class` to set the `className` property on an element. However it is often convenient to conditionally set classes. For that reason, Solid has a built-in `classList` JSX attribute that takes an object where the key is the class name(s) and the value is a boolean expression. When true, the class is applied, and when false, it is removed.
+Solid bir öğe üzerinde `className` property'sini ayarlamak için `class` kelimesini kullanır. Ancak class'lara koşul eklemek istediğiniz durumlar olabilir. Bu nedenle Solid, anahtarların class isimleri ve değerin boolean bir ifade olduğu bir obje alan yerleşik bir `classList` JSX attribute'una sahiptir. Boolean karşılığına göre sınıflar uygulanır veya kaldırılır.
 
-In the example, we can replace:
+Örneğimizde aşağıdaki kodu:
 
 ```jsx
 <button
@@ -9,7 +9,7 @@ In the example, we can replace:
 >foo</button>
 ```
 
-with:
+classList kullanacak şekilde değiştirebiliriz:
 
 ```jsx
 <button
@@ -18,7 +18,7 @@ with:
 >foo</button>
 ```
 
-Remember that you can apply names dynamically like what you'd receive in CSS modules as well:
+CSS modules'tan aldığınız sınıfları dinamik olarak da uygulayabileceğinizi unutmayın:
 
 ```jsx
 import { active } from "./style.module.css"

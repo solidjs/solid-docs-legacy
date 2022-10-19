@@ -1,8 +1,8 @@
-On many occassions, you might want to expose a ref from inside a component to a parent. The way we do this is still by using the `ref` attribute. From the outside, using `ref` on a component works very similar to using `ref` on a native element. You can pass it a variable to be assigned or a callback function.
+Birçok durumda, bir bileşenin içinden bir üst bileşene ref göndermek isteyebilirsiniz. Bunu yapmanın yolu yine `ref` attribute'unu kullanmaktır. Dışarıdan bakıldığında, bir bileşen üzerinde `ref` kullanmak, yerel bir öğe üzerinde ref kullanmaya çok benzer. Dolayısıyla atanacak bir değişken veya bir callback fonksiyonu iletebilir. 
 
-However, it is the component author's responsibility to connect that `ref` to an internal element to forward it back up. To do so, we leverage `props.ref`. This is a callback form of `ref` if either type of `ref` is given, but this detail is mostly hidden from you as you will more than likely just be assigning it directly to the `ref` attribute of one of the elements or components in this component's JSX.
+Ancak, geliştiricinin bu `ref`'i geri iletilmek üzere, bileşen içerisinde bir elemana bağlaması gerekir. Bunun için `props.ref` kullanımından yararlanırız. Bu her iki `ref` türü de verildiği takdirde, `ref`' in callback formudur, fakat genelde siz bunu JSX elemanlarından birine veya bir bileşene `ref` attribute'u olarak doğrudan atayacağınız için çoğunlukla bu detay sizden gizlenir.
 
-To get the logo animating again, we need to forward the ref from `canvas.tsx`:
+Logoyu tekrar hareket ettirmek için ref'i `canvas.tsx`'ten iletmemiz gerekmekte:
 
 ```jsx
 <canvas ref={props.ref} width="256" height="256" />
