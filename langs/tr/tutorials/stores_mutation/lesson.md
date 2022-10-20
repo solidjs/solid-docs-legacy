@@ -1,8 +1,8 @@
-Solid strongly recommends the use of shallow immutable patterns for updating state. By separating reads and writes we maintain better control over the reactivity of our system without the risk of losing track of changes to our proxy when passed through layers of components. This is much more amplified with Stores compared to Signals.
+Solid şiddetle shallow immutable modellerin kullanmasını tavsiye eder. Okumaları ve yazmaları ayırarak, bileşen katmanlarından geçerken proxy'mizdeki değişkenlerin izini kaybetme riski olmadan sistemimizin reaktivitesi üzerinde daha iyi kontrol sağlarız. Sinyallere kıyasla Store'larda bu kullanımın getirisi çok daha yüksek olacaktır.
 
-Sometimes, however, mutation is just easier to reason about. That's why Solid provides an Immer inspired `produce` store modifier that allows you to mutate a writable proxy version of your Store object inside your `setStore` calls.
+Ancak bazen mutation'ları kullanmak, daha doğrusu mutation'lar kullanıyormuş gibi mantık yürütmek daha kolaydır. Bu nedenle Solid, `setStore` çağrıları içinde Store objesinin yazılabilir bir proxy sürümünü mutate edebilmenize olanak tanıyan Immer'den ilham alan bir `produce` store değiştiricisi sunar.
 
-This is a nice tool to have to allow small zones of mutation without relinquishing control. Let's use `produce` on our Todos example by replacing our event handler code with:
+`produce`, kontrolü elden bırakmadan küçük mutate alanlarına izin vermek için güzel bir araçtır. Event handler'ı şu şekilde değiştirerek `produce`'u Todo örneğimizde kullanalım:
 
 ```jsx
 const addTodo = (text) => {
@@ -20,4 +20,4 @@ const toggleTodo = (id) => {
 };
 ```
 
-While `produce` with Stores probably handles the vast majority of cases, Solid also has a mutable Store object that is available from `createMutable`. While not the recommended approach for internal APIs, it is sometimes useful for interop or compatibility with 3rd party systems.
+Store ve `produce` kullanımların bir çoğu için yeterli olacaktır, Solid ayrıca `createMutable` ile kullanılabilen bir mutable Store objesine sahiptir. Internal API'lar için önerilen bir yaklaşım olmasa da bazen interop veya 3. parti sistemlerle uyumluluk için kullanışlı olacaktır.

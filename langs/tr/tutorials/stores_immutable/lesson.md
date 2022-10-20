@@ -1,8 +1,8 @@
-Stores are most often created in Solid using Solid's Store proxies. Sometimes we wish to interface with immutable libraries like Redux, Apollo, or XState and need to perform granular updates against these.
+Store'lar çoğunlukla Solid'in Store proxy'leri kullanılarak oluşturulur. Bazen Redux, Apollo veya XState gibi immutable kütüphaneler ile interface'ler oluşturmak isteyebilirsiniz ve bunlar için parçalı (granular) güncellemeler yapmanız gerekir.
 
-In the example, we have a basic wrapper around Redux. You can see the implementation in `useRedux.tsx`. The definition of the store and the actions are in the remaining files.
+Örneğimizde `useRedux.tsx` dosyasında görebileceğiniz temel bir Redux wrapper'ımız var. Store tanımı ve action'lar da diğer dosyalarda yer almakta.
 
-The core behavior is that we created a Store object and subscribe to the Redux store to update state on update.
+Temel kullanım, bir store objesi oluşturmamız ve güncelleme sırasında durumu güncellemek için Redux Store'una subscribe olmamızdır.
 
 ```js
 const [state, setState] = createStore(store.getState());
@@ -10,11 +10,11 @@ const unsubscribe = store.subscribe(
   () => setState(store.getState())
 );
 ```
-If you click around the demo adding items and checking them off it seems to work pretty well. However, what isn't obvious is that the rendering is inefficient. Notice the console.log not only on create but whenever you check the box.
+Demo'da ögelerin eklenmesi veya işaretlenmesi iyi çalışır gibi görünüyor. Ancak, verimsiz render'lar yok sayılmamalıdır. Dikkat ederseniz console.log sadece öge eklendiğinde değil ögeler işaretlendiğinde de oluşmakta.
 
-The reason is that Solid doesn't diff by default. It assumes the new item is new and replaces it. If your data changes granularly, you don't need to diff. But what if you do?
+Bunun nedeni Solid'in varsayılan olarak farklılaşmıyor (diff) oluşudur. Yeni ögenin yeni olduğunu varsayar ve değiştirir. Veriler parçalı değişiyorsa farklılaştırmaya gerek olmaz. Ama ya gerekirse?
 
-Solid provides a diffing method `reconcile` that enhances the `setStore` call and lets us diff the data from these immutable sources, only notifying the granular updates.
+Solid, `setStore` çağrısını geliştiren ve bu immutable kaynaklardan gelen verileri yalnızca parçalı güncellemeleri bildirerek farklılaştırmamızı sağlayan bir yöntem olarak `reconcile` fonksiyonunu sağlar.
 
 Let's update that code to:
 ```js
@@ -23,11 +23,11 @@ const unsubscribe = store.subscribe(
   () => setState(reconcile(store.getState()))
 );
 ```
-Now the example works as you'd expect, only running the create code on create.
+Şimdi örneğimizde beklediğimiz gibi Create sadece öğe eklenirken konsol'da yazdırılıyor.
 
-This isn't the only way to solve this and you've seen some frameworks have a `key` property on their template loop flows. The problem is that by making that a default part of the templating, you always need to run list reconciliation and always have to diff all the children for potential changes, even in compiled frameworks. A data-centric approach not only makes this applicable outside of templating but makes it opt in. When you consider that internal state management doesn't need this, it means we default to having the best performance.
+Tek çözüm elbette bu değil, bazı framework'lerde `key` property'sinin döngü içerisindeki elemanlarda kullanıldığını görmüşsünüzdür. Sorun şu ki, bu davranışı varsayılan hale getirdiğinizde, her zaman liste hesaplaması yapmanız ve derlenmiş framework'lerde bile, olası değişiklikler için tüm alt elemanları her zaman farklılaştırmanız gerekir. Veri merkezli bir yaklaşım, bunu yalnızca template dışı uygulanabilir hale getirmez aynı zamanda da daha tercih edilebilir hale getirir. Internal state yönetiminin buna ihtiyaç duymadığını da göz önünde bulundurduğumuzda, Solid'in en performanslı yolu varsayılan olarak sunduğunu unutmayalım.
 
-Of course, there's no problem using `reconcile` when you need it. Sometimes a simple reducer makes for a great way to organize data updates. `reconcile` shines here, making your own `useReducer` primitive:
+Elbette, ihtiyaç duyulduğunda `reconcile` kullanmakta bir sorun yoktur. Bazen basit bir reducer, veri güncellemelerini organize etmek için harika bir yöntem sağlayabilir. `reconcile` kendini burada gösterir ve kendi `useReducer` primitiflerinizi oluşturur.
 
 ```js
 const useReducer = (reducer, state) => {
@@ -40,4 +40,4 @@ const useReducer = (reducer, state) => {
 };
 ```
 
-The behavior of `reconcile` is configurable. A custom `key` can be set and there is a `merge` option which ignores structural cloning and only diffs the leaves.
+`Reconcile`'ın davranışı yapılandırılabilir. Özel bir key ayarlanabilir, ayrıca yapısal klonlamayı yok sayan ve yalnızca alt parçaları (leaves) farklılaştıran bir birleştirme seçeneği de vardır.

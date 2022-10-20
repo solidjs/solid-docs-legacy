@@ -1,14 +1,15 @@
-Stores are Solid's answer to nested reactivity. They are proxy objects whose properties can be tracked and can contain other objects which automatically become wrapped in proxies themselves, and so on.
+Store'lar Sold'in iç içe geçmiş reaktiviteye cevabıdır. Property'leri takip edilebilen proxy objelerdir ve başka objeler içerebilirler. İçerdiği objeler de otomatik olarak proxy ile sarılır.
 
-To keep things light, Solid creates underlying Signals only for properties that are accessed under tracking scopes. And so, all Signals in Stores are created lazily as requested.
+İşleri hafif tutmak için Solid, yalnızca izleme kapsamları altında erişilen property'ler için temel sinyaller oluşturur. Bu sayede Store'lardaki tüm sinyaller istenildiği gibi lazy şekilde oluşturulur.
 
-The `createStore` call takes the initial value and returns a read/write tuple similar to Signals. The first element is the store proxy which is readonly, and the second is a setter function.
+`createStore` fonksiyonu, başlangıç değeri alır ve sinyallere benzer bir okuma/yazma tuple'ı döndürür. İlk eleman salt okunur store proxy'sidir, ikinci ise bir setter fonksiyonudur.
 
-The setter function in its most basic form takes an object whose properties will be merged with the current state. It also supports path syntax so that we can do nested updates. In this way we can still maintain control of our reactivity but do pinpoint updates.
+Setter fonksiyonu en temel haliyle, property'leri mevcut durumla birleşecek olan bir obje alır. Ayrıca iç içe güncellemeler yapabilmemiz için bir path syntax'ı da destekler. Bu sayede hem reaktivitenin kontrolünü koruyabilir, hem de nokta atışı güncellemeler yapabiliriz.
 
-> Solid's path syntax has many forms and includes some powerful syntax to do iteration and ranges. Refer to the API documentation for a full reference.
+> Sold'in path syntax'ının bir çok formu vardır ve yineleme ve aralıklar yapmak için bazı güçlü syntax'lar içerir. Tüm kapsamını görmek için API dokümantasyonuna bakın.
 
 Let's look at how much easier it is to achieve nested reactivity with a Store. We can replace the initialization of our component with this:
+Gelin Store ile iç içe geçmiş reaktifliğin ne kadar kolay oluşturulduğuna bakalım. Bileşenimizdeki ilgili kısmı değiştirelim:
 
 ```js
 const [todos, setTodos] = createStore([]);
@@ -24,6 +25,6 @@ const toggleTodo = (id) => {
 };
 ```
 
-We make use of the Store's path syntax with function setters that allow us to take the previous state and return the new state on nested values.
+Store'un path syntax'ını önceki state'i almamıza ve iç içe geçmiş değerlerde yeni state'i döndürmemizi olanak tanıyan fonksiyon setter'lar ile kullanıyoruz.
 
-And that's it. The rest of the template will already react granularly (check the Console on clicking the checkbox).
+Ve hepsi bu kadar, şablonun geri kalanı da tepki verecektir (onay kutusunu tıklandığında Konsolu kontrol edin)

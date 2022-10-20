@@ -1,7 +1,7 @@
-One of the reasons for fine-grained reactivity in Solid is that it can handle nested updates independently. You can have a list of users and when we update one name we only update a single location in the DOM without diffing the list itself. Very few (even reactive) UI frameworks can do this.
+İç içe güncellemeleri bağımsız olarak işlenebilir olması, Solid'deki incelikli reaktivitenin nedenlerinden biridir. Bir kullanıcı listesine sahip olabilirsiniz, bunun içerisindeki bir ismi güncellediğimizde listenin kendisini değiştirilmeden sadece DOM'daki tek bir konum güncellenir. Bunu çok az framework (reaktif olsalar bile) başarabilmiştir.
 
-But how do we accomplish this? In the example we have a list of todos in a signal. In order to mark a todo as complete, we would need to replace the todo with a clone. This is how most frameworks work, but it's wasteful as we rerun the list diffing and we recreate the DOM elements as illustrated in the `console.log`.
-
+Peki bunu nasıl başarıyoruz? Örnekte bir sinyal içerisinde todo listemiz var. Bir todo'yu tamamlandı olarak işaretlemek için, todo bir klon ile değiştirilmelidir. Çoğu framework bu şekilde çalışır, ancak listeyi farklılaştırarak yeniden çalıştırdığımız ve bunun sonucunda - `console.log` ile gösterildiği gibi - DOM elemanları yeniden oluşturulduğu için bu gereksiz bir yük oluşturur.
+ 
 ```js
 const toggleTodo = (id) => {
   setTodos(
@@ -10,7 +10,7 @@ const toggleTodo = (id) => {
 };
 ```
 
-Instead, in a fine-grained library like Solid, we initialize the data with nested Signals like this:
+Bunun yerine, Solid ile biz veriyi iç içe geçmiş sinyaller ile oluşturabiliriz:
 
 ```js
 const addTodo = (text) => {
@@ -19,7 +19,7 @@ const addTodo = (text) => {
 };
 ```
 
-Now we can update the completion state by calling `setCompleted` without any additional diffing. This is because we've moved the complexity to the data rather than the view. And we know exactly how the data changes.
+Artık `setCompleted` fonksiyonunu çağırarak herhangi bir ek farklılaştırma oluşturmadan state'i güncelleyebiliriz. Bunun nedeni, karmaşıklığı view'dan alıp veriye taşımış olmamızdır ve verinin nasıl değiştiğini tam olarak bilmekteyiz.
 
 ```js
 const toggleTodo = (id) => {
@@ -27,6 +27,6 @@ const toggleTodo = (id) => {
   if (todo) todo.setCompleted(!todo.completed())
 }
 ```
-If you change the remaining references of `todo.completed` to `todo.completed()`, the example should now only run the `console.log` on creation and not when you toggle a todo.
+Kalan `todo.completed` referanslarını `todo.completed()` ile değiştirirseniz, örnek artık bir todo'yu değiştirdiğinizde değil, yalnızca oluşturduğunuzda `console.log`'u çalıştırmaktadır.
 
-This of course requires some manual mapping and it was the only choice available to us in the past. But now, thanks to proxies, we can do most of this work in the background without manual intervention. Continue to the next tutorials to see how.
+Bu elbette bazı manuel eşlemeler gerektir ve geçmişte bizim için mevcut olan tek seçenekti. Ancak artık, proxy'ler ile bu işin çoğunu manuel müdahale olmaksızın arka planda yapabiliriz. Nasıl yapıldığını görmek için sonraki eğitimlerle devam edin.
