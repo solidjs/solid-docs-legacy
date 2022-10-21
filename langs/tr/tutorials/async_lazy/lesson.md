@@ -1,15 +1,15 @@
-Most bundlers (like Webpack, Rollup, Parcel, Vite) automatically handle code splitting when you use a dynamic import. Solid's `lazy` method allows us to wrap the component's dynamic import for deferred lazy loading. The output is a Component that can be used as normal in our JSX template with the exception that internally it dynamically loads the underlying imported code when it is rendered the first time, halting that branch of rendering until the code is available.
+Bütün bundler'lar (Webpack, Rollup, Parcel, Vite) dinamik import'lar kullandığından kod bölme (code splitting) işlemini otomatik olarak gerçekleştirir. Solid'in lazy metodu, ertelenmiş lazy yükleme için bileşenin dinamik import'unu wrap etmenizi sağlar. Çıktı, JSX'te normal bir şekilde kullanılabilen bileşendir ve tek fark ilk kez render edilişinde import ettiği kodu dinamik olarak yüklemesi ve kod elde edilene kadar render branch'ını durdurmasıdır.
 
-To use `lazy`, replace the import statement:
+`lazy` kullanmak için aşağıdaki satırı:
 ```js
 import Greeting from "./greeting";
 ```
-with:
+Aşağıdaki ile değiştirelim:
 ```js
 const Greeting = lazy(() => import("./greeting"));
 ```
 
-This will likely still load too quickly to see. But you add a fake delay if you wish to make the loading more visible.
+Büyük olasılıkla hala gözle fark edilemeyecek kadar hızlı olacaktır, fakat yüklenmeyi görmek isterseniz bir miktar sahte gecikme ekleyebilirsiniz.
 
 ```js
 const Greeting = lazy(async () => {

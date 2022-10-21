@@ -1,22 +1,22 @@
-`Suspense` allows us to show fallback content when data is loading. This is great for initial loading, but on subsequent navigation it is often worse UX to fallback to the skeleton state.
+`Suspense`, veriler yüklenirken fallback içeriği görmemizi sağlar. Bu durum ilk yükleme için harika olsa da devamındaki gezinmeler için iskelet durumuna geri dönmek genellikle daha kötü bir kullanıcı deneyimi yaşatır.
 
-We can avoid going back to the fallback state by leveraging `useTransition`. It provides a wrapper and a pending indicator. The wrapper puts all downstream updates in a transaction that doesn't commit until all async events complete.
+Bu durumlar için `useTransition` kullanabiliriz ve fallback durumuna geri dönmeyi engelleyebiliriz. `useTransition` bir wrapper ve bir pending indicator sağlar. Wrapper, bütün downstream güncellemeleri bütün asenkron event'ler tamamlanana kadar bekleyen bir transaction'a koyar.
 
-This means that when control flow is suspended, it continues to show the current branch while rendering the next off-screen. Resource reads under existing boundaries add it to the transition. However, any new nested `Suspense` components will show "fallback" if they have not completed loading before coming into view.
+Bunun anlamı, `useTransition`, kontrol akışı suspend edildiğinde, bir sonraki işlem ekran dışında işlenirken, mevcut durumu görüntülemeye devam eder. Mevcut sınırların içindeki Resource okumaları da transition'a eklenir. Ancak, yeni iç içe geçmiş `Suspense` bileşenleri, görünüme gelmeden önce yüklemeyi tamamlamışlarsa "fallback" göstereceklerdir. 
 
-Notice when you navigate in the example, we keep seeing the content disappear back to a loading placeholder. Let's add a transition in our `App` component. First, let's replace the `updateTab` function:
+Örnekte gezinirken, içeriğin loading placeholder'ına geri döndüğüne dikkat edin. `App` bileşenimiz için bir transition ekleyelim. İlk olarak `updateTab` fonksiyonunu değiştirelim:
 
 ```js
 const [pending, start] = useTransition();
 const updateTab = (index) => () => start(() => setTab(index));
 ```
 
-`useTransition` returns a pending signal indicator and a method to start the transition, which we will wrap around our update.
+`useTransition` bir bekleyen sinyal göstergesi (pending signal indicator) ve güncellememizin etrafını saracağımız geçişi başlatmak üzere bir metot döndürür.
 
-We should use that pending signal to give an indicator in our UI. We can add a pending class to our tab container div:
+Bu bekleyen sinyali kullanıcı arayüzünde bir bilgilendirme oluşturacak şekilde kullanmalıyız. `tab` container `div`'ine bir pending sınıfı ekleyebiliriz:
 
 ```js
 <div class="tab" classList={{ pending: pending() }}>
 ```
 
-And with that our tab switching should be much smoother.
+Bu şekilde sekme geçişlerimiz çok daha akıcı olacaktır.

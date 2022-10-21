@@ -1,19 +1,19 @@
-Resources are special Signals designed specifically to handle Async loading. Their purpose is wrap async values in a way that makes them easy to interact with in Solid's distributed execution model. This is the opposite to `async`/`await` or generators which provide sequential execution models. The goal is for async to not block execution and not color our code.
+Resource'lar özellikle Async yüklemeyi işlemek için tasarlanmış özel Sinyallerdir. Amaçları, asenkron değerleri Sold'in dağıtık yürütme modelinde etkileşime girmelerini kolaylaştıracak şekilde sarmaktır. Bu sıralı modeller sağlayan async/await veya generator'ların tam tersidir. Amacı async'in akışı engellemesinin önüne geçmektir.
 
-Resources can be driven by a source signal that provides the query to an async data fetcher function that returns a promise. The contents of the fetcher function can be anything. You can hit typical REST endpoints or GraphQL or anything that generates a promise. Resources are not opinionated on the means of loading the data, only that they are driven by promises.
+Resource'lar, bir promise döndüren async data fetcher fonksiyonuna sorgu sağlayan bir kaynak sinyali tarafından yönlendirilebilir. Fetcher fonksiyonun ne olduğu önemli değildir, yani tipik REST endpoint'ine veya GraphQL'e ya da bir promise üreten herhangi bir şeye ulaşmakta kullanılabilir. Resource'lar verilerin yüklenmesi konusunda bilgi sahibi değillerdir yani promise'e bağlı çalışır ve onun tarafından yönlendirilirler.
 
-The resulting Resource Signal also contains reactive `loading` and `error` properties that make it easy to control our view based on the current status.
+Ortaya çıkan Resource sinyali, mevcut duruma göre görüntüyü kontrol etmemizi sağlayan reaktif `loading` ve `error` property'lerini de içerir.
 
-So let's replace our user signal with a resource:
+Örneğimizde user sinyalini Resource ile değiştirelim:
 ```js
 const [user] = createResource(userId, fetchUser);
 ```
-It is driven by the `userId` Signal and calls our fetch method on change. Not much else to it.
+Ürettiğimiz user, `userId` sinyali tarafından yönetilir ve değişiklik olduğu zaman fetch metodunu çalıştırır, bu kadar.
 
-The second value that comes back from `createResource` contains a `mutate` method for directly updating the internal Signal and a `refetch` method to reload the current query even if the source hasn't changed.
+`createResource`'tan dönen ikinci değer, içerideki Signal'i doğrudan güncellemek için bir `mutate` metodu ve kaynak değişmemiş olsa bile mevcut sorguyu yeniden yüklemek için bir `refetch` metodu içerir.
 
 ```js
 const [user, { mutate, refetch }] = createResource(userId, fetchUser);
 ```
 
-`lazy` uses `createResource` internally to manage its dynamic imports.
+`lazy` içeride `createResource` kullanarak dinamik import'ları yönetir.
