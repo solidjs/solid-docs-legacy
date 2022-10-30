@@ -11,6 +11,7 @@ import { remarkMdxToc } from "remark-mdx-toc";
 export default {
   input: "src/index.ts",
   output: {
+    sourcemap: true,
     dir: "dist",
   },
   plugins: [
@@ -33,4 +34,5 @@ export default {
     json(),
     dynamicImportVars.default(),
   ],
+  external: ["solid-jsx/jsx-runtime"]
 };
