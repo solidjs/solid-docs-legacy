@@ -2,15 +2,12 @@
 
 与其他一些使用 JSX 的框架不同，Solid 尝试尽可能对齐 HTML 标准，甚至允许简单的复制粘贴 Stack Overflow 上的答案或者设计师使用模板构建器生成的代码。
 
-There are 3 main differences between JSX and HTML that prevent JSX from being seen as a superset of HTML.
-
 JSX 和 HTML 之间有 3 个主要区别，这也是 JSX 不能被视为 HTML 的超集的原因。
 
-1. JSX does not have void elements. This means that all elements must have a closing tag or self close. Keep this in mind when copying over things like `<input>` or `<br>`.
 
 1. JSX 没有 void 元素。这意味着所有元素都必须有一个结束标签或自关闭。在复制 `<input>` 或 `<br>` 之类的内容时，请注意这一点。
 
-1. JSX 必须返回单个 Element。要表示多个顶级元素，请使用 Fragment 元素。
+2. JSX 必须返回单个 Element。要表示多个顶级元素，请使用 Fragment 元素。
 
 ```jsx
 <>
