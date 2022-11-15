@@ -221,7 +221,7 @@ queueMicrotask(() => {
 
 This delay in first execution is useful because it means
 an effect defined in a component scope runs after
-the JSX returned by the component gets added the DOM.
+the JSX returned by the component gets added to the DOM.
 In particular, [`ref`](#ref)s will already be set.
 Thus you can use an effect to manipulate the DOM manually,
 call vanilla JS libraries, or other side effects.
