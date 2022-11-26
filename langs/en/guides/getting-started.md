@@ -1,6 +1,6 @@
 # Getting Started
 
-**We're working on new docs.** You can check out our new beginner tutorial [here](https://docs.solidjs.com/tutorials/getting-started-with-solid/), and join our efforts on [Discord!](http://discord.com/invite/solidjs)
+**We're working on new docs.** You can check out our new beginner tutorial [here](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/), and join our efforts on [Discord!](http://discord.com/invite/solidjs)
 
 ## See Solid
 
