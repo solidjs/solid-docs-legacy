@@ -2,7 +2,7 @@
 
 This interactive guide will walk you through Solid's main features. You can also refer to the API and guides to learn more about how Solid works.
 
-You can also check out our new beginner tutorial (work-in-progress!) [here](https://docs.solidjs.com/tutorials/getting-started-with-solid/).
+You can also check out our new beginner tutorial (work-in-progress!) [here](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/).
 
 # What is Solid?
 
