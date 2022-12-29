@@ -141,7 +141,9 @@ refetch()
 ## `onMount`
 
 ```ts
-export function onMount(fn: () => void): void;
+import { onMount } from "solid-js";
+
+function onMount(fn: () => void): void;
 ```
 
 Регистрирует метод, который запускается после начальной визуализации и монтирования элементов. Идеально подходит для использования `ref` и управления другими одноразовыми побочными эффектами. Это эквивалентно `createEffect` без зависимостей.
@@ -149,7 +151,9 @@ export function onMount(fn: () => void): void;
 ## `onCleanup`
 
 ```ts
-export function onCleanup(fn: () => void): void;
+import { onCleanup } from "solid-js";
+
+function onCleanup(fn: () => void): void;
 ```
 
 Регистрирует метод очистки, который выполняется при удалении или пересчете текущей реактивной области. Работает в любом компоненте или эффекте.
@@ -157,7 +161,9 @@ export function onCleanup(fn: () => void): void;
 ## `onError`
 
 ```ts
-export function onError(fn: (err: any) => void): void;
+import { onError } from "solid-js";
+
+function onError(fn: (err: any) => void): void;
 ```
 
 Регистрирует метод обработчика ошибок, который выполняется при ошибках дочерней области. Работает только в ближайшей области видимости. Можете даже вызывать его сколько угодно, чтобы обрабатывать ошибки на разных уровнях.
@@ -169,7 +175,9 @@ export function onError(fn: (err: any) => void): void;
 ## `untrack`
 
 ```ts
-export function untrack<T>(fn: () => T): T
+import { untrack } from "solid-js";
+
+function untrack<T>(fn: () => T): T;
 ```
 
 Игнорирует отслеживание любых зависимостей в блоке исполняемого кода и возвращает значение.
@@ -177,7 +185,9 @@ export function untrack<T>(fn: () => T): T
 ## `batch`
 
 ```ts
-export function batch<T>(fn: () => T): T;
+import { batch } from "solid-js";
+
+function batch<T>(fn: () => T): T;
 ```
 
 Создает транзакцию обновлений в блоке, чтобы предотвратить ненужный пересчет. Это означает, что значения геттеров в следующей строке еще не будут обновлены.
@@ -187,7 +197,9 @@ export function batch<T>(fn: () => T): T;
 ## `on`
 
 ```ts
-export function on<T extends Array<() => any> | (() => any), U>(
+import { on } from "solid-js";
+
+function on<T extends Array<() => any> | (() => any), U>(
   deps: T,
   fn: (input: T, prevInput: T, prevValue?: U) => U,
   options: { defer?: boolean } = {}
@@ -219,7 +231,9 @@ setA('new');
 ## `createRoot`
 
 ```ts
-export function createRoot<T>(fn: (dispose: () => void) => T): T;
+import { createRoot } from "solid-js";
+
+function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
 Создает новый неотслеживаемый контекст, который не удаляется автоматически. Это полезно для вложенных реактивных контекстов, которые вы не хотите трогать при повторной оценке родителя. Это мощный шаблон для кэширования.
@@ -231,7 +245,9 @@ export function createRoot<T>(fn: (dispose: () => void) => T): T;
 ## `mergeProps`
 
 ```ts
-export function mergeProps(...sources: any): any;
+import { mergeProps } from "solid-js";
+
+function mergeProps(...sources: any): any;
 ```
 
 Данный метод позволяет нам объединять `пропсы`. Полезно для добавления значений по умолчанию. Или же для клонирования `пропсов`, включая реактивные свойства.
@@ -252,7 +268,9 @@ props = mergeProps(props, otherProps);
 ## `splitProps`
 
 ```ts
-export function splitProps<T>(
+import { splitProps } from "solid-js";
+
+function splitProps<T>(
   props: T,
   ...keys: Array<(keyof T)[]>
 ): [...parts: Partial<T>];
@@ -260,21 +278,53 @@ export function splitProps<T>(
 
 Это замена деструктуризации. `splitProps` делит реактивный объект на ключи, сохраняя при этом его реактивность.
 
-```js
-const [local, others] = splitProps(props, ["children"]);
+Функция принимает реактивный объект и любое количество массивов ключей; для каждого массива ключей функция вернёт реактивный объект
+с соответствующими полями оригинального объекта (поля будут выбраны при помощи массива ключей). Последний реактивный объект
+в возвращаемом списке объектов будет содержать оставшиеся поля оригинального объекта.
 
-<>
-  <Child {...others} />
-  <div>{local.children}<div>
-</>
+Это может быть полезно, если вы хотите использовать только часть пропсов и передать оставшуюся часть дочернему компоненту.
+
+```js
+function MyComponent(props) {
+  const [local, others] = splitProps(props, ["children"]);
+
+  return (
+    <>
+      <div>{local.children}</div>
+      <Child {...others} />
+    </>
+  );
+}
+```
+Поскольку `splitProps` принимает любое количество списков, мы можем разделить
+объект пропсов как захочется (если, например, у нас есть несколько дочерних компонентов,
+каждому из которых необходим определённый набор пропсов).
+
+Допустим, в компонент передали 6 пропсов:
+
+```js
+<MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar" />;
+function MyComponent(props) {
+  console.log(props); // {a: 1, b: 2, c: 3, d: 4, e: 5, foo: "bar"}
+  const [vowels, consonants, leftovers] = splitProps(
+    props,
+    ["a", "e"],
+    ["b", "c", "d"]
+  );
+  console.log(vowels); // {a: 1, e: 5}
+  console.log(consonants); // {b: 2, c: 3, d: 4}
+  console.log(leftovers.foo); // bar
+}
 ```
 
 ## `useTransition`
 
 ```ts
-export function useTransition(): [
-  () => boolean,
-  (fn: () => void, cb?: () => void) => void
+import { useTransition } from "solid-js";
+
+function useTransition(): [
+  pending: () => boolean,
+  startTransition: (fn: () => void) => Promise<void>
 ];
 ```
 
@@ -290,10 +340,24 @@ isPending();
 start(() => setSignal(newValue), () => /* переход завершен */);
 ```
 
+## `startTransition`
+
+**Новое в v1.1.0**
+
+```ts
+import { startTransition } from 'solid-js';
+
+function startTransition: (fn: () => void) => Promise<void>;
+```
+Практически то же самое, что и `useTransition`, но в данном случае нет ассоциированного состояния ожидания (см. выше `isPending`).
+Эта функция может быть использована для того, чтобы напрямую запустить переход (transition).
+
 ## `observable`
 
 ```ts
-export function observable<T>(input: () => T): Observable<T>;
+import { observable } from "solid-js";
+
+function observable<T>(input: () => T): Observable<T>;
 ```
 
 Этот метод принимает Сигнал и производит `Observable`.
@@ -301,6 +365,7 @@ export function observable<T>(input: () => T): Observable<T>;
 Пользуйтесь любой `Observable-библиотекой` на вкус. Библиотека, как правило, будет иметь функцию `from()`.
 
 ```js
+import { observable } from "solid-js";
 import { from } from "rxjs";
 
 const [s, set] = createSignal(0);
@@ -310,10 +375,48 @@ const obsv$ = from(observable(s));
 obsv$.subscribe((v) => console.log(v));
 ```
 
+Вы также можете использовать `from` без `rxjs`; см. ниже
+
+## `from`
+
+**Новое в v1.1.0**
+
+```ts
+import { from } from "solid-js";
+
+function from<T>(
+  producer:
+    | ((setter: (v: T) => T) => () => void)
+    | {
+        subscribe: (
+          fn: (v: T) => void
+        ) => (() => void) | { unsubscribe: () => void };
+      }
+): () => T;
+```
+Функция, которая облегчает совместимость с внешними реактивными источниками (например, observables RxJS или Svelte stores).
+Она оборачивает объект, который реализует `subscribe` метод, в Сигнал и управляет подпиской на изменение и освобождением памяти.
+
+```js
+const signal = from(obsv$);
+```
+Эта функция также может принимать пользовательскую функцию-producer, которая в свою очередь принимает сеттер и возвращает функцию-отписки:
+
+```js
+const clock = from((set) => {
+  const t = setInterval(() => set(1), 1000);
+  return () => clearInterval(t);
+});
+```
+
+> Замечание: Сигналы, созданные с помощью `from`, не выполняют проверки на равенство значений, чтобы лучше взаимодействовать с внешними потоками и источниками.
+
 ## `mapArray`
 
 ```ts
-export function mapArray<T, U>(
+import { mapArray } from "solid-js";
+
+function mapArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: T, i: () => number) => U
 ): () => U[];
@@ -335,17 +438,19 @@ const mapped = mapArray(source, (model) => {
     },
     get description() {
       return description();
-    }
+    },
     setName,
-    setDescription
-  }
+    setDescription,
+  };
 });
 ```
 
 ## `indexArray`
 
 ```ts
-export function indexArray<T, U>(
+import { indexArray } from "solid-js";
+
+function indexArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: () => T, i: number) => U
 ): () => U[];
