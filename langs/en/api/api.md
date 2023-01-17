@@ -1026,7 +1026,7 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 
 ### Updating Stores
 
-Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store. In Typescript, you can delete a value by using a non-null assertion, like `undefined!`.
+Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store. In TypeScript, you can delete a value by using a non-null assertion, like `undefined!`.
 
 ```js
 const [state, setState] = createStore({
