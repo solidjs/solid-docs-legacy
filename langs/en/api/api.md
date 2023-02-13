@@ -2180,7 +2180,7 @@ First, you can set `class=...` like any other attribute. For example:
 <div class={state.active ? 'active' : undefined} />
 
 // Two dynamic classes
-<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}} />
+<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}`} />
 ```
 
 (Note that `className=...` was deprecated in Solid 1.4.)
