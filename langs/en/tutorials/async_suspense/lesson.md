@@ -22,7 +22,7 @@ It's important to note that it's the read of an async derived value that trigger
 ```jsx
 function Deferred(props) {
   const [resume, setResume] = createSignal(false);
-  setTimeout(() => setResume(true), 0);
+  setTimeout(() => setResume(true), 1000);
 
   return <Show when={resume()}>{props.children}</Show>;
 }
