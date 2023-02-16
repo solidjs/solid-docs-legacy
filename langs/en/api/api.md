@@ -1122,11 +1122,7 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ```ts
 import { produce } from "solid-js/store";
 
-function produce<T>(
-  fn: (state: T) => void
-): (
-  state: T extends NotWrappable ? T : Store<T>
-) => T extends NotWrappable ? T : Store<T>;
+function produce<T>(fn: (state: T) => void): (state: T) => T;
 ```
 
 Immer inspired API for Solid's Store objects that allows for localized mutation.
