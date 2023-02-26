@@ -14,7 +14,7 @@ const [count, setCount] = counter;
 
 Solid's reactivity is a universal concept. It doesn't matter if it is inside or outside components. There is no separate concept for global vs local state. It is all the same thing.
 
-The only restriction is that all computations (Effects/Memos) need to be created under a reactive root (`createRoot`). Solid's `render` does this automatically.
+The only restriction is that all computations (Effects/Memos) need to be created under a reactive root (`createRoot`). Solid's `render` does this automatically. So when using your own more complicated global stores that contain computations, it's usually best to use Context.
 
 In this tutorial `counter.tsx` is such a global store. We can use it by modifying our component in `main.tsx` to:
 
@@ -28,4 +28,4 @@ return (
 );
 ```
 
-So when using your own more complicated global stores that contain computations, be sure to create a root. Or better yet, do yourself a favor and just use Context.
+> It is possible to create your own root to hold the global store, instead of using Context, but Context is generally a simpler solution. Additionally, it is important not to use global state if you are using an SSR (server side rendering) solution, such as Solid Start, because then the global state may be shared globally across sessions!
