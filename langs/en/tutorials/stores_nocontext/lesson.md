@@ -12,7 +12,7 @@ import counter from './counter';
 const [count, setCount] = counter;
 ```
 
-Solid's reactivity is a universal concept. It doesn't matter if it is inside or outside components. However, computations (Effects/Memos) created in the global scope are rootless, and will exist for the lifetime of the app/tab (rather than being disposed). There is no separate concept for global vs local state. It is all the same thing.
+Solid's reactivity is a universal concept. It doesn't matter if it is inside or outside components. There is no separate concept for global vs local state.  However, computations (Effects/Memos) created in the global scope are rootless, and will exist for the lifetime of the app/tab (rather than being disposed).
 
 
 However, sometimes you have state which exists across multiple components, but isn't truly global. Alternatively, you may wish to "override" your state in a certains part of the component tree. We use Context to solve these cases.
