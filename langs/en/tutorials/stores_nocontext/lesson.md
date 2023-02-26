@@ -12,7 +12,8 @@ import counter from './counter';
 const [count, setCount] = counter;
 ```
 
-Solid's reactivity is a universal concept. It doesn't matter if it is inside or outside components. There is no separate concept for global vs local state. It is all the same thing.
+Solid's reactivity is a universal concept. It doesn't matter if it is inside or outside components. However, computations (Effects/Memos) created in the global scope are rootless, and will exist for the lifetime of the app/tab (rather than being disposed). There is no separate concept for global vs local state. It is all the same thing.
+
 
 However, sometimes you have state which exists across multiple components, but isn't truly global. Alternatively, you may wish to "override" your state in a certains part of the component tree. We use Context to solve these cases.
 
@@ -28,6 +29,6 @@ return (
 );
 ```
 
-> It is possible to create your own root to hold the global store, instead of using Context, but Context is generally a simpler solution. Additionally, it is important not to use global state if you are using an SSR (server side rendering) solution, such as Solid Start, because then the global state may be shared globally across sessions!
+> It is possible to create your own root to hold the global store, instead of using Context, but Context is generally a simpler solution. Additionally, it is important to note that global state should not be used in SSR (server side rendering) solutions, such as Solid Start. On the server, global state is shared across requests, and the lack of data isolation can (and will) lead to bugs, memory leaks and has security implications. It is recommended that application state should always be provided via context instead of relying on global.
 
 > It should be noted that Context is a form of dependency injection, it _is not_ a reactive primitive.
