@@ -20,6 +20,11 @@
     "description": "Solid のサーバーサイド機能についての説明"
   },
   {
+    "resource": "typescript",
+    "title": "TypeScript",
+    "description": "Solid を TypeScript で使用するためのヒント"
+  },
+  {
     "resource": "testing",
     "title": "Solid のテスト",
     "description": "Solid アプリのテスト方法"
