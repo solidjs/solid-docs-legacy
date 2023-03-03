@@ -22,8 +22,6 @@ Sin embargo, los elementos personalizados (con la excepción de los incorporados
 
 Sin embargo es posible controlar este comportamiento directamente con directivas de namespace. Puedes forzar un atributo con `attr:` o forzar prop `prop`:
 
-However, it is possible to control this behavior directly with namespace directives. You can force an attribute with `attr:` or force prop `prop:`
-
 ```jsx
 <mi-elemento prop:AccUnico={state.valor} attr:titulo={state.titulo} />
 ```
