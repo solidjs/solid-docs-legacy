@@ -1,8 +1,3 @@
----
-title: TypeScript
-description: Solid を TypeScript で使用するためのヒント 
-sort: 3
----
 # TypeScript
 
 Solid は、TypeScript で簡単に使用できるよう設計されています。
