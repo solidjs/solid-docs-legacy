@@ -1,6 +1,6 @@
 # Getting Started
 
-**我们正在开发新文档.** 您可以在 [此处](https://docs.solidjs.com/tutorials/getting-started-with-solid/) 查看我们的新初学者教程，并加入我们在 [Discord](http://discord.com/invite/solidjs) 的频道。
+**我们正在开发新文档.** 您可以在 [此处](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/welcome) 查看我们的新初学者教程，并加入我们在 [Discord](http://discord.com/invite/solidjs) 的频道。
 
 ## 了解 Solid
 

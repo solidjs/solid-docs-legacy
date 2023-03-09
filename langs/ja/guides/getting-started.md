@@ -1,6 +1,6 @@
 # はじめに
 
-**私たちは新しいドキュメントに取り組んでいます。** 新しい初心者向けチュートリアルは[こちら](https://docs.solidjs.com/tutorials/getting-started-with-solid/)チェックできます。また、[Discord](http://discord.com/invite/solidjs) で私たちの活動に参加してください！
+**私たちは新しいドキュメントに取り組んでいます。** 新しい初心者向けチュートリアルは[こちら](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/welcome)チェックできます。また、[Discord](http://discord.com/invite/solidjs) で私たちの活動に参加してください！
 
 ## Solid を見る
 
