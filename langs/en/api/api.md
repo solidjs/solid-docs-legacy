@@ -395,7 +395,7 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 
 In these snippets, the fetcher is the function `fetchData`, and `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately.
 In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`.
-It will be called again whenever the value of `sourceSignal` changes, and that value will always be passed to `fetchData` as its first argument.
+It will be called again whenever the value of `sourceSignal` changes, and that value will always be passed to `fetchData` as its first argument. To use a property on a store as the `sourceSignal`, you must wrap the property access in a function.
 
 You can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
