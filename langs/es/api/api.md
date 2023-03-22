@@ -18,7 +18,7 @@ El setter actualiza la señal. Como único argumento, toma el nuevo valor de la 
 ```js
 const [getValor, setValor] = createSignal(valorInicial);
 
-// leet el valor
+// leer el valor
 getValor();
 
 // asignar el valor
@@ -180,10 +180,10 @@ const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
 // leer valor
 data();
 
-// checa si esta cargando
+// comprueba si esta cargando
 data.loading;
 
-// checa si hubo error
+// comprueba si hubo error
 data.error;
 
 // establece el valor directamente sin devolver una prom
@@ -261,7 +261,7 @@ createEffect(() => {
 });
 ```
 
-También puedes no ejecutar el calculo de inmediato y en su lugar, optar porque se ejecute cuando cambie configurando la opción defer a true.
+También puedes no ejecutar el cálculo de inmediato y en su lugar, optar porque se ejecute cuando cambie configurando la opción defer a true.
 
 ```js
 // no se ejecuta de inmediato
@@ -380,7 +380,7 @@ Se utiliza para procesar por lotes actualizaciones asíncronas dentro de una tra
 ```js
 const [isPending, start] = useTransition();
 
-// checkar si está en transición
+// comprobar si está en transición
 isPending();
 
 // envuelto en transición
@@ -435,7 +435,7 @@ Un auxiliar simple para facilitar la interoperabilidad con productores externos 
 const signal = from(obsv$);
 ```
 
-Tambien puede tener una funcion productora personalizada donde la función es pasada una funcion setter, retorna una funcion que cancela la suscripción.
+También puede tener una función productora personalizada donde a la función es pasada una función setter, retorna una funcion que cancela la suscripción.
 
 ```js
 const clock = from((set) => {
@@ -543,11 +543,9 @@ Cuando se accede a los objetos anidados, los almacenes producirán objetos de al
 El objeto de estado de nivel superior no se puede rastrear, por lo tanto, coloque las listas en una clave de estado en lugar de usar el objeto de estado en sí.
 
 ```js
-// put the list as a key on the state object
-// pon la lista como una clave en objeto del estado
+// pon la lista como una clave en el objeto del estado
 const [estado, setEstado] = createStore({ lista: [] });
 
-// access the `list` property on the state object
 // accede a la propiedad 'lista' en el objeto del estado
 <For each={estado.lista}>{item => /*...*/}</For>
 ```
@@ -738,7 +736,7 @@ export function createMutable<T extends StoreNode>(
 ): Store<T> {
 ```
 
-Crea un nuevo objeto proxy de Store mutable. Las tiendas solo activan actualizaciones cuando los valores cambian. El seguimiento se realiza interceptando el acceso a la propiedad y rastrea automáticamente la anidación profunda a través de un proxy.
+Crea un nuevo objeto proxy de Store mutable. La Store solo activa actualizaciones cuando los valores cambian. El seguimiento se realiza interceptando el acceso a la propiedad y rastrea automáticamente la anidación profunda a través de un proxy.
 
 Útil para integrar sistemas externos o como capa de compatibilidad con MobX/Vue.
 
@@ -747,11 +745,9 @@ Crea un nuevo objeto proxy de Store mutable. Las tiendas solo activan actualizac
 ```js
 const state = createMutable(valorInicial);
 
-// read value
 // leer valor
 state.algunValor;
 
-// set value
 // establecer valor
 state.algunValor = 5;
 
@@ -811,7 +807,7 @@ export function ProveedorContador(props) {
 }
 ```
 
-El valor pasado al proveedor se pasa a `useContext` tal cual. Eso significa que envolver como una expresión reactiva no funcionará. Debe pasar Signals y Stores directamente en lugar de acceder a ellos en el JSX.
+El valor pasado al Provider se pasa a `useContext` tal cual. Eso significa que envolver como una expresión reactiva no funcionará. Debe pasar Signals y Stores directamente en lugar de acceder a ellos en el JSX.
 
 ## `useContext`
 
@@ -836,7 +832,6 @@ Usado para facilitar la interacción con `props.children`. Este auxiliar resuelv
 ```js
 const lista = children(() => props.children);
 
-// do something with them
 // haz algo con ellos
 createEffect(() => lista());
 ```
@@ -852,12 +847,10 @@ export function lazy<T extends Component<any>>(
 Se utiliza para cargar componentes de forma diferida para permitir la división de código. Los componentes no se cargan hasta que se renderizan. Los componentes cargados de forma diferida se pueden usar de la misma manera que su contraparte importada estáticamente, recibiendo props, etc. Los componentes perezosos o lazy activan `<Suspense>`
 
 ```js
-// wrap import
-// envuelve import
+// Envuelve import
 const ComponenteA = lazy(() => import("./ComponenteA"));
 
-// use in JSX
-// usalo en JSX
+// Úsalo en JSX
 <ComponenteA title={props.title} />;
 ```
 
@@ -924,7 +917,7 @@ const [s, set] = createSignal("inicio");
 
 const track = createReaction(() => console.log("algo"));
 
-// next time s changes run the reaction
+
 // la próxima ocasión que s cambia ejecuta la reacción
 track(() => s());
 
@@ -974,7 +967,7 @@ const dispose = render(App, document.getElementById("app"));
 export function hydrate(fn: () => JSX.Element, node: MountableElement): () => void;
 ```
 
-Este metodo es similar a `render`excepto que intenta rehidratar lo que ya ha sido renderizado en el DOM. Cuando se está inicializando el el navegador una página ya ha sido renderizada en el servidor.
+Este método es similar a `render`excepto que intenta rehidratar lo que ya ha sido renderizado en el DOM. Cuando se está inicializando el navegador una página ya ha sido renderizada en el servidor.
 
 ```js
 const dispose = hydrate(App, document.getElementById("app"));
@@ -994,7 +987,7 @@ export function renderToString<T>(
 
 Renderiza en forma de string sincrónicamente. La función además genera una equieta script para hidratación progresiva. Las opciones incluyen eventNames que pueden ser escuchados antes de que la pagina cargue y reproducirse al hidratarse, y una vez para poner en la etiqueta script.
 
-`renderId` is used to namespace renders when having multiple top level roots.
+`renderId` se usa para renderizar espacios de nombres cuando se tienen varias raíces de nivel superior
 
 ```js
 const html = renderToString(App);
@@ -1040,7 +1033,7 @@ export function renderToStream<T>(
 };
 ```
 
-Este metodo renderiza una transmisión. Renderiza el contenido sincrónicamente incluyendo cualquier placeholder de respaldo en los Suspense, despúes continua transmitiendo los datos y el HTML de cualquier recurso asincrono conforme estos estén completos.
+Este método renderiza una transmisión. Renderiza el contenido sincrónicamente incluyendo cualquier placeholder de respaldo en los Suspense, despúes continua transmitiendo los datos y el HTML de cualquier recurso asincrono conforme estos estén completos.
 
 ```js
 // node
@@ -1177,7 +1170,7 @@ export function Match<T>(props: MatchProps<T>);
 </Switch>
 ```
 
-Match tambien soporta la función children para servir como flujo codificado.
+Match también admite la función children para servir como flujo codificado.
 
 ## `<Index>`
 
@@ -1228,7 +1221,7 @@ Captura errores no detectados y presenta contenido alternativo.
 </ErrorBoundary>
 ```
 
-Tambien soporta la forma de callback que pasa un error y una función reset.
+También admite la forma de callback que pasa un error y una función reset.
 
 ```jsx
 <ErrorBoundary fallback={(err, reset) => <div onClick={reset}>Error: {err.toString()}</div>}>
@@ -1347,17 +1340,14 @@ declare module "solid-js" {
 Las refs son una forma de obtener acceso a los elementos DOM subyacentes en nuestro JSX. Si bien es cierto que uno podría simplemente asignar un elemento a una variable, es más óptimo dejar los componentes en el flujo de JSX. Las refs se asignan en el momento del renderizado, pero antes de que los elementos se conecten al DOM. Vienen en 2 sabores.
 
 ```js
-// simple assignment
 // asignación simple
 let miDiv;
 
-// use onMount or createEffect to read after connected to DOM
 // use onMount o createEffect para leer después de conectarse al DOM
 onMount(() => console.log(miDiv));
 <div ref={miDiv} />
 
-// Or, callback function (called before connected to DOM)
-// O función de devolución de llamada (llamada antes de conectarse al DOM)
+// O función callback (llamada antes de conectarse al DOM)
 <div ref={el => console.log(el)} />
 ```
 
@@ -1388,11 +1378,10 @@ Un auxiliar que aprovecha `element.classList.toggle`. Toma un objeto cuyas clave
 El asistente de estilo de Solid funciona con una cadena o con un objeto. A diferencia de la versión de React, Solid usa `element.style.setProperty` bajo el capó. Esto significa soporte para CSS vars, pero también significa que usamos la versión de propiedades en minúsculas y con guión. En realidad, esto conduce a un mejor rendimiento y consistencia con la salida del SSR.
 
 ```jsx
+
 // string
-// cadena
 <div style={`color: green; background-color: ${state.color}; height: ${state.altura}px`} />
 
-// object
 // objeto
 <div style={{
   color: "green",
@@ -1400,7 +1389,6 @@ El asistente de estilo de Solid funciona con una cadena o con un objeto. A difer
   height: state.altura + "px" }}
 />
 
-// css vars
 // variables css
 <div style={{ "--mi-color-personalizado": state.temaColor }} />
 ```
@@ -1439,7 +1427,6 @@ Los eventos nunca se vuelven a vincular y los enlaces no son reactivos, ya que e
 Dado que los controladores de eventos se llaman como cualquier otra función cada vez que se activa un evento, no hay necesidad de reactividad; simplemente abre un atajo a tu controlador si lo deseas.
 
 ```jsx
-// if defined call it, otherwised don't.
 // si está definido, llámelo, de lo contrario, no lo haga.
 <div onClick={() => props.handleClick?.()} />
 ```
