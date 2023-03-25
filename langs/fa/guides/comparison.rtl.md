@@ -4,9 +4,9 @@
 [JS Framework Benchmark](https://github.com/krausest/js-framework-benchmark)
 نگاه کنید.
 
-## React
+## ری اکت (React)
 
-React has had a big influence on Solid. Its unidirectional flow and explicit segregation of read and write in its Hooks API informed Solid's API. More so than the objective of being just a "Render Library" rather than a framework. Solid has strong opinions on how to approach managing data in application development but doesn't seek to constrain its execution.
+ری اکت (React) تأثیر زیادی روی Solid داشته است. سالید ایده (Solid) جریان یک طرفه ارسال داده ها و تفکیک صریح خواندن و نوشتن در Hooks ها را از React الهام گرفته است. Solid ایده ها و نظرات قوی و جذابی در مورد چگونگی رویکرد مدیریت داده در توسعه برنامه دارد، اما به دنبال محدود کردن اجرای آن نیست.
 
 However, as much as Solid aligns with React's design philosophy, it works fundamentally differently. React uses a Virtual DOM and Solid does not. React's abstraction is top down component partition where render methods are called repeatedly and diffed. Solid, instead, renders each Template once in its entirety, constructing its reactive graph and only then executes instructions related to fine-grained changes.
 
