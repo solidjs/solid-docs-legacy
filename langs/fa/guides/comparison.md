@@ -10,7 +10,11 @@
 
 با این حال، به همان اندازه که Solid با فلسفه طراحی React مطابقت دارد، اساساً متفاوت عمل می کند. React از Virtual DOM استفاده می کند و Solid از آن استفاده نمی کند. اجزا React از بالا به پایین چیده می شود که در آن متدهای رندر (render) و Diff به طور مکرر فراخوانی می شوند. در عوض Solid هر جز برنامه را را یکبار به طور کامل رندر (render) می‌کند، گراف آن را می سازد و فقط دستور العمل هایی که منجر به تغییر ان جز می شود را اجرا میکند.
 
-#### Advice for migrating:
+## توصیه برای تغییر پروژه های فعلی به Solid
+
+مدل به روز رسانی Solid هیچ شباهتی به React یا حتی React + MobX ندارد. به جای اینکه اجزای تابع را به عنوان تابع `رندر` `(render)` در نظر بگیرید، آنها را به عنوان `سازنده` `(constructor)` در نظر بگیرید.
+
+## Advice for migrating:
 
 Solid's update model is nothing like React, or even React + MobX. Instead of thinking of function components as the `render` function, think of them as a `constructor`.
 
