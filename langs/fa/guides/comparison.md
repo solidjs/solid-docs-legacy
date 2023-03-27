@@ -20,7 +20,7 @@
 مقادیر نوع Premitive در سالید همانند هوک ها در React هیچ محدودیتی ندارند.
 بنابراین میتوانید به آزادی از ان ها استفاده کنید و هر جا که نیاز شد ، ان ها را شاخه بدهید.
 
-You don't need explicit keys on list rows to have "keyed" behavior.
+در سالید ، شما نیازی به اضافه کردن شناسه واحد برای هر آیتم لیست یا جدول یا هر لیست تکرار شونده همانند ری اکت نیستید.
 
 In React, `onChange` fires whenever an input field is modified, but this isn't how `onChange` [works natively](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange). In Solid, use `onInput` to subscribe to each value change.
 
