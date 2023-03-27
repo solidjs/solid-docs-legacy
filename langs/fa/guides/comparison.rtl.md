@@ -8,7 +8,7 @@
 
 ری اکت (React) تأثیر زیادی روی Solid داشته است. سالید ایده (Solid) جریان یک طرفه ارسال داده ها و تفکیک صریح خواندن و نوشتن در Hooks ها را از React الهام گرفته است. Solid ایده ها و نظرات قوی و جذابی در مورد چگونگی رویکرد مدیریت داده در توسعه برنامه دارد، اما به دنبال محدود کردن اجرای آن نیست.
 
-However, as much as Solid aligns with React's design philosophy, it works fundamentally differently. React uses a Virtual DOM and Solid does not. React's abstraction is top down component partition where render methods are called repeatedly and diffed. Solid, instead, renders each Template once in its entirety, constructing its reactive graph and only then executes instructions related to fine-grained changes.
+با این حال، به همان اندازه که Solid با فلسفه طراحی React مطابقت دارد، اساساً متفاوت عمل می کند. React از Virtual DOM استفاده می کند و Solid از آن استفاده نمی کند. اجزا React از بالا به پایین چیده می شود که در آن متدهای رندر (render) و Diff به طور مکرر فراخوانی می شوند. در عوض Solid هر جز برنامه را را یکبار به طور کامل رندر (render) می‌کند، گراف آن را می سازد و فقط دستور العمل هایی که منجر به تغییر ان جز می شود را اجرا میکند.
 
 #### Advice for migrating:
 
