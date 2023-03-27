@@ -17,7 +17,8 @@
 در Solid، پراپز (Props) و حافظه ها (stores) [پراکسی](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) هستند که برای ردیابی و به‌روزرسانی‌ها به دسترسی به مقادیر پراکسی ها تکیه میکنند .
 مراقب دسترسی به متغیرهای props یا دسترسی اولیه به props باشید، که می تواند باعث شود props و store ها واکنش پذیری خود را از دست بدهند یا در زمان نامناسبی صدا زده شوند.
 
-Solid's primitives have no restrictions like the Hook Rules so you are free to nest them as you see fit.
+مقادیر نوع Premitive در سالید همانند هوک ها در React هیچ محدودیتی ندارند.
+بنابراین میتوانید به آزادی از ان ها استفاده کنید و هر جا که نیاز شد ، ان ها را شاخه بدهید.
 
 You don't need explicit keys on list rows to have "keyed" behavior.
 
