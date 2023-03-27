@@ -14,11 +14,8 @@
 
 مدل به روز رسانی Solid هیچ شباهتی به React یا حتی React + MobX ندارد. به جای اینکه اجزای تابع را به عنوان تابع `رندر` `(render)` در نظر بگیرید، آنها را به عنوان `سازنده` `(constructor)` در نظر بگیرید.
 
-## Advice for migrating:
-
-Solid's update model is nothing like React, or even React + MobX. Instead of thinking of function components as the `render` function, think of them as a `constructor`.
-
-In Solid, props and stores are [proxy objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) that rely on property access for tracking and reactive updates. Watch out for destructuring or early property access, which can cause these properties to lose reactivity or trigger at the wrong time.
+در Solid، پراپز (Props) و حافظه ها (stores) [پراکسی](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) هستند که برای ردیابی و به‌روزرسانی‌ها به دسترسی به مقادیر پراکسی ها تکیه میکنند .
+مراقب دسترسی به متغیرهای props یا دسترسی اولیه به props باشید، که می تواند باعث شود props و store ها واکنش پذیری خود را از دست بدهند یا در زمان نامناسبی صدا زده شوند.
 
 Solid's primitives have no restrictions like the Hook Rules so you are free to nest them as you see fit.
 
