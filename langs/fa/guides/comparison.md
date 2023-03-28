@@ -22,7 +22,7 @@
 
 در سالید ، شما نیازی به اضافه کردن شناسه واحد برای هر آیتم لیست یا جدول یا هر لیست تکرار شونده همانند ری اکت نیستید.
 
-In React, `onChange` fires whenever an input field is modified, but this isn't how `onChange` [works natively](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange). In Solid, use `onInput` to subscribe to each value change.
+در ری اکت وقتی یک ورودی یا اصطلاحا input داشته باشیم ، با استفاده از تابع onChange میتوانیم تغییرات ورودی را مشاهده کنیم. ولی این رفتار [پیش فرض](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange) تابع onChange نیست. در سالید ، با استفاده از onInput ، میتوانید تغییرات یک ورودی را مشاهده نمایید.
 
 Finally, there is no VDOM so imperative VDOM APIs like `React.Children` and `React.cloneElement` have no equivalent in Solid. Instead of creating or modifying DOM elements directly, express your intentions declaratively.
 
