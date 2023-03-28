@@ -24,7 +24,7 @@
 
 در ری اکت وقتی یک ورودی یا اصطلاحا input داشته باشیم ، با استفاده از تابع onChange میتوانیم تغییرات ورودی را مشاهده کنیم. ولی این رفتار [پیش فرض](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onchange) تابع onChange نیست. در سالید ، با استفاده از onInput ، میتوانید تغییرات یک ورودی را مشاهده نمایید.
 
-Finally, there is no VDOM so imperative VDOM APIs like `React.Children` and `React.cloneElement` have no equivalent in Solid. Instead of creating or modifying DOM elements directly, express your intentions declaratively.
+در نهایت، هیچ Virtual DOM در سالید وجود ندارد، بنابراین APIهای ضروری VDOM مانند «React.Children» و «React.cloneElement» در Solid معادلی ندارند. به جای ایجاد یا تغییر مستقیم عناصر DOM، مقاصد خود را به صورت شفاف بیان کنید.
 
 ## Vue
 
