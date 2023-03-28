@@ -26,4 +26,6 @@ const toggleTodo = (id) => {
 
 We make use of the Store's path syntax with function setters that allow us to take the previous state and return the new state on nested values.
 
+Make sure you change the `todos()` reference to `todos` in the `<For>` component.
+
 And that's it. The rest of the template will already react granularly (check the Console on clicking the checkbox).

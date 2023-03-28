@@ -1,6 +1,6 @@
 # 시작하기
 
-**새 문서를 작성 중입니다.** 새로운 초보자용 튜토리얼은 [여기](https://docs.solidjs.com/tutorials/getting-started-with-solid/)에서 확인할 수 있으며, [Discord](http://discord.com/invite/solidjs)에서 참여할 수 있습니다!
+**새 문서를 작성 중입니다.** 새로운 초보자용 튜토리얼은 [여기](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/welcome)에서 확인할 수 있으며, [Discord](http://discord.com/invite/solidjs)에서 참여할 수 있습니다!
 
 ## Solid 살펴보기
 

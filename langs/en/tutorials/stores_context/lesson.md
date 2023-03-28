@@ -1,4 +1,4 @@
-Solid provides a Context API to pass data around without relying on passing through props. This is useful for sharing Signals and Stores. Using Context has the benefit of being created as part of the reactive system and managed by it.
+Solid provides a Context API to pass data around without relying on passing through props. This is useful for sharing Signals and Stores. Using Context has the benefit of being created as part of the reactive system and managed by it. Context is also useful when have a need to "override" your state in a certains part of the component tree.
 
 To get started we create a Context object. This object contains a `Provider` component used to inject our data. However, it is common practice to wrap the `Provider` components and `useContext` consumers with versions already configured for the specific Context.
 
@@ -26,3 +26,5 @@ return (
   </>
 );
 ```
+
+> It should be noted that Context is a form of dependency injection, it _is not_ a reactive primitive.
