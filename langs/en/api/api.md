@@ -515,16 +515,6 @@ function onCleanup(fn: () => void): void;
 
 Registers a cleanup method that executes on disposal or recalculation of the current reactive scope. Can be used in any Component or Effect.
 
-## `onError`
-
-```ts
-import { onError } from "solid-js";
-
-function onError(fn: (err: any) => void): void;
-```
-
-Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
-
 # Reactive Utilities
 
 These helpers provide the ability to better schedule updates and control how reactivity is tracked.
@@ -583,6 +573,28 @@ setA("new"); // now it runs
 ```
 
 Please note that on `stores` and `mutable`, adding or removing a property from the parent object will trigger an effect. See [`createMutable`](#createMutable)
+
+## `catchError`
+**New in v1.7.0**
+
+```ts
+import { catchError } from "solid-js";
+
+function catchError<T>(tryFn: () => T, onError: (err: any) => void): T;
+```
+
+Wraps a `tryFn` with an error handler that fires if an error occurs below that point. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
+
+## `onError`
+**Deprecated for catchError in v1.7**
+
+```ts
+import { onError } from "solid-js";
+
+function onError(fn: (err: any) => void): void;
+```
+
+Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
 
 ## `createRoot`
 
@@ -1896,8 +1908,8 @@ function Show<T>(props: {
   when: T | undefined | null | false;
   keyed: boolean;
   fallback?: JSX.Element;
-  children: JSX.Element | ((item: T) => JSX.Element);
-}): () => JSX.Element;
+  children: JSX.Element | ((item: () => T) => JSX.Element) | ((item: T) => JSX.Element);
+}): JSX.Element;
 ```
 
 The Show control flow is used to conditional render part of the view: it renders `children` when the `when` is truthy, an `fallback` otherwise. It is similar to the ternary operator (`when ? children : fallback`) but is ideal for templating JSX.
@@ -1905,6 +1917,14 @@ The Show control flow is used to conditional render part of the view: it renders
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
   <div>My Content</div>
+</Show>
+```
+
+Show can also be used with a callback that returns a null asserted accessor. Remember to only use this accessor when the condition is true or it will throw.
+
+```jsx
+<Show when={state.user} fallback={<div>Loading...</div>}>
+  {(user) => <div>{user().firstName}</div>}
 </Show>
 ```
 
