@@ -967,11 +967,7 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ```ts
 import { produce } from "solid-js/store";
 
-function produce<T>(
-  fn: (state: T) => void
-): (
-  state: T extends NotWrappable ? T : Store<T>
-) => T extends NotWrappable ? T : Store<T>;
+function produce<T>(fn: (state: T) => void): (state: T) => T;
 ```
 
 Solid Store 对象的 API 受 Immer 启发，允许使用下面的代码修改数据
