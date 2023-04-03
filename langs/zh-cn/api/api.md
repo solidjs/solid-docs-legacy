@@ -1914,7 +1914,7 @@ Solid 提供了 `class` 和 `classList` 两个属性来设置元素的 class。
 <div class={state.active ? 'active' : undefined} />
 
 // 两个动态的 class
-<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}} />
+<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}`} />
 ```
 
 （注意 `className=...` 在 Solid 1.4 中已弃用。）
