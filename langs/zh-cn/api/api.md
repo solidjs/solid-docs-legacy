@@ -871,7 +871,7 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 
 ### 修改 Store
 
-可以采用传递先前状态并返回新状态或值的函数的形式。对象总是浅合并。将值设置为 `undefined` 可以把它们从 store 中删除。
+可以采用传递先前状态并返回新状态或值的函数的形式。对象总是浅合并。将值设置为 `undefined` 可以把它们从 store 中删除。在 `TypeScript`，你可以使用非 `null` 断言来删除值，例如`undefined!`。
 
 ```js
 const [state, setState] = createStore({
