@@ -285,7 +285,7 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 
 在第二种情况下，一旦 `sourceSignal` 具有除 `false`、`null` 或 `undefined` 之外的任何值，`fetchData` 将被调用。
 
-每当 `sourceSignal` 的值发生变化时，都会再次调用它，并且该值将始终作为第一个参数传递给 `fetchData`。
+每当 `sourceSignal` 的值发生变化时，都会再次调用它，并且该值将始终作为第一个参数传递给 `fetchData`。要在 `store` 中的一个属性当作 `sourceSignal`使用，您必须用一个函数封装起来。
 
 您可以调用 `mutate` 来直接更新 `data` signal（它的工作方式与任何其他 signal setter 一样）。您还可以调用 `refetch` 直接重新运行 fetcher，并传递一个可选参数以向 fetcher 提供附加信息：`refetch(info)`。
 
