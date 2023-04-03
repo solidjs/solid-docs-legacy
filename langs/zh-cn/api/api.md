@@ -401,16 +401,6 @@ function onCleanup(fn: () => void): void;
 
 注册一个清理方法，该方法在当前反应范围的清除或重新计算时执行。可以在任何组件或 Effect 中使用。
 
-## `onError`
-
-```ts
-import { onError } from "solid-js";
-
-function onError(fn: (err: any) => void): void;
-```
-
-注册在子作用域出错时执行的错误处理程序方法。仅执行最近的作用域错误处理程序。重新抛出可以向上触发。
-
 # 响应性工具类
 
 这些工具类提供了更好地安排更新和控制如何跟踪响应性的能力。
@@ -469,6 +459,29 @@ setA("new"); // 现在会运行了
 ```
 
 请注意，在 `stores` 和 `mutable` 上，从父对象中添加或删除属性会触发 effect。参见[`createMutable`](#createMutable)
+
+## `catchError`
+
+**v1.7.0 新特性**
+
+```ts
+import { catchError } from "solid-js";
+function catchError<T>(tryFn: () => T, onError: (err: any) => void): T;
+```
+
+将 `tryFn` 用错误处理程序进行包装，如果在该层级以下发生错误，则会触发错误处理程序。仅最近的作用域错误处理程序会执行。重新抛出以触发上一层级。
+
+## `onError`
+
+**因 catchError，在 v1.7.0 弃用**
+
+```ts
+import { onError } from "solid-js";
+
+function onError(fn: (err: any) => void): void;
+```
+
+注册在子作用域出错时执行的错误处理程序方法。仅执行最近的作用域错误处理程序。重新抛出可以向上触发。
 
 ## `createRoot`
 
