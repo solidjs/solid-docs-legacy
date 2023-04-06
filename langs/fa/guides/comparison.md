@@ -28,7 +28,7 @@
 
 ## Vue
 
-Solid is not particularly influenced by Vue design-wise, but they are comparable in approach. They both use Proxies in their Reactive system with read based auto-tracking. But that is where the similarities end. Vue's fine-grained dependency detection just feeds into a less fine-grained Virtual DOM and Component system whereas Solid keeps its granularity right down to its direct DOM updates.
+طراحی Solid به ویژه از نظر طراحی از Vue الهام نمی گیرد، اما از نظر روش پیاده سازی قابل مقایسه هستند. هر دوی آنها از پراکسی ها (Proxy) در سیستم تعاملی خود با ردیابی خودکار مبتنی بر خواندن استفاده می کنند. اما این همان جایی است که شباهت ها به پایان می رسد. سیستم تشخیص وابستگی در Vue فقط DOM و Component مجازی خود را تغذیه می کند، در حالی که Solid سیستم خود را تا رسیدن به DOM به صورت جز جز نگه می دارد.
 
 Vue values easiness where Solid values transparency. Although Vue's new direction with Vue 3 aligns more with the approach Solid takes. These libraries might align more over time depending on how they continue to evolve.
 
