@@ -1,22 +1,31 @@
-# Basic Reactivity
+# அடிப்படை Reactivity (வினைத்திறன்)
 
-Solid's overall approach to reactivity is to wrap any reactive computation in
+- EN - Solid's overall approach to reactivity is to wrap any reactive computation in
 a function, and rerun that function when its dependencies update.
-The Solid JSX compiler also wraps most JSX expressions (code in braces) with a
+
+- TA - Solid (சாலிட்டு) இன் வினைத்திறனுக்கான ஒட்டுமொத்த அணுகுமுறையானது, வினை மற்றும் அதன் எதிர்வினையின் கணக்கீட்டை ஒரு function (செயல்பாடு) குள் அடக்க வேண்டும், மற்றும் அதன் சார்புகள் ஒவ்வொரு முறை புதுப்பிக்கப்படும் போதும் அந்த function ஐ மீண்டும் இயக்க வேண்டும்.
+---
+- EN - The Solid JSX compiler also wraps most JSX expressions (code in braces) with a
 function, so they automatically update (and trigger corresponding DOM updates)
 when their dependencies change.
-More precisely, automatic rerunning of a function happens whenever the function
+
+- TA - Solid JSX (ஜே-எஸ்-எக்ஸ்) compiler (கம்பைலர்,தொகுக்குப்புக்கான செயலி) கூடவும் பெரும்பாலான JSX expressions (வெளிப்பாடுகள்) அதிலும் குறிப்பாக வளை குறியீடுகுள் அடக்கபடும் குறியீடுகளை மேலும்  ஒரு function (செயல்பாடு) குள் அடக்குகிறது, இதன் விலைவாக அதன் சார்புகள் ஒவ்வொரு முறை புதுப்பிக்கப்படும் போதும் அவை தானாகவே புதுப்பிக்கப்படும் மற்றும் தொடர்புடைய DOM (டொம்)புதுப்பிப்புகளைத் தூண்டும்.
+---
+- EN - More precisely, automatic rerunning of a function happens whenever the function
 gets called in a _tracking scope_, such as a JSX expression
 or API calls that build "computations" (`createEffect`, `createMemo`, etc.).
-By default, the dependencies of a function get tracked automatically
+---
+- EN - By default, the dependencies of a function get tracked automatically
 when they're called in a tracking scope, by detecting when the function reads
 reactive state (e.g., via a Signal getter or Store attribute).
-As a result, you generally don't need to worry about dependencies yourselves.
+---
+- EN - As a result, you generally don't need to worry about dependencies yourselves.
 (But if automatic dependency tracking ever doesn't produce the results you
 want, you can [override dependency tracking](#reactive-utilities).)
 This approach makes reactivity _composable_: calling one function
 within another function generally causes the calling function
 to inherit the dependencies of the called function.
+---
 
 ## `createSignal`
 
