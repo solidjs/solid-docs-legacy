@@ -439,21 +439,21 @@ const [stato, assegnareStato] = createStore({
 nomeECognome = createMemo(() => `${state.user.nome} ${state.user.cognome}`);
 ```
 
-### Aggiornamento dei negozi Store
+### Aggiornamento degli Store
 
 Le modifiche possono assumere la forma di funzioni che forniscono lo stato precedente e restituiscono un nuovo stato o un valore. Gli oggetti sono sempre uniti in modo superficiale. Imposta i valori su "non definito" per eliminarli dallo Store.
 
 ```js
 const [stato, assegnareStato] = createStore({
-  nome: "John",
-  cognome: "Azzuro",
+  nome: "Davide",
+  cognome: "Bianchi",
 });
 
-assegnareStato({ nome: "Davide", middleName: "Paolo" });
-// ({ nome: 'Davide', middleName: 'Paolo', cognome: 'Italiano' })
+assegnareStato({ nome: "Davide", secondoNome: "Paolo" });
+// ({ nome: 'Davide', secondoNome: 'Paolo', cognome: 'Bianchi' })
 
-assegnareStato((stato) => ({ nomePreferito: state.nome, cognome: "Azzuro" }));
-// ({ nome: 'Davide', nomePreferito: 'Davide', middleName: 'Paolo', cognome: 'Azzuro' })
+assegnareStato((stato) => ({ nomePreferito: state.nome, cognome: "Rossi" }));
+// ({ nome: 'Davide', nomePreferito: 'Davide', secondoNome: 'Paolo', cognome: 'Rossi' })
 ```
 
 Store supporta percorsi inclusi array di chiavi, intervalli di oggetti e funzioni di filtro.
@@ -471,13 +471,13 @@ const [stato, assegnareStato] = createStore({
 
 assegnareStato('counter', c => c + 1);
 assegnareStato('elenco', l => [...l, { id: 43, titolo: 'Marsupiali' }]);
-assegnareStato('elenco', 2, 'legerre', true);
+assegnareStato('elenco', 2, 'letto', true);
 // {
 //   counter: 3,
 //   elenco: [
 //     { id: 23, titolo: 'Uccelli' }
 //     { id: 27, titolo: 'Pesce' }
-//     { id: 43, titolo: 'Marsupiali', read: true }
+//     { id: 43, titolo: 'Marsupiali', letto: true }
 //   ]
 // }
 ```
@@ -493,42 +493,42 @@ const [stato, assegnareStato] = createStore({
   ]
 });
 
-assegnareStato('todos', [0, 2], 'completato', true);
+assegnareStato('compiti', [0, 2], 'fatto', true);
 
 // {
 //   compiti: [
-//     { compito: 'Finito di lavorare', fatta: true }
-//     { compito: 'Andare a fare la spesa', fatta: false }
-//     { compito: 'Preparare la cena', fatta: true }
+//     { compito: 'Finito di lavorare', fatto: true }
+//     { compito: 'Andare a fare la spesa', fatto: false }
+//     { compito: 'Preparare la cena', fatto: true }
 //   ]
 // }
 
-assegnareStato('todos', { from: 0, to: 1 }, 'fatta', c => !c);
+assegnareStato('compiti', { from: 0, to: 1 }, 'fatto', c => !c);
 
 // {
 //   compiti: [
-//     { compito: 'Finito di lavorare', fatta: false }
-//     { compito: 'Andare a fare la spesa', fatta: false }
-//     { compito: 'Preparare la cena', fatta: true }
+//     { compito: 'Finito di lavorare', fatto: false }
+//     { compito: 'Andare a fare la spesa', fatto: true }
+//     { compito: 'Preparare la cena', fatto: true }
 //   ]
 // }
 
-assegnareStato('compiti', compiti => compiti.fatta, 'compito', t => t + '!')
+assegnareStato('compiti', compiti => compiti.fatto, 'compito', t => t + '!')
 
 // {
 //   compiti: [
-//     { compito: 'Finito di lavorare', fatta: false }
-//     { compito: 'Andare a fare la spesa', fatta: true }
-//     { compito: 'Preparare la cena', fatta: true }
+//     { compito: 'Finito di lavorare', fatto: false }
+//     { compito: 'Andare a fare la spesa!', fatto: true }
+//     { compito: 'Preparare la cena!', fatto: true }
 //   ]
 // }
 
-assegnareStato('compiti', {}, compiti => ({ marked: true, fatta: !todo.fatta }))
+assegnareStato('compiti', {}, compiti => ({ contrassegnato: true, fatto: !todo.fatto }))
 // {
 //   compiti: [
-//     { compito: 'Finish work', fatta: true, marked: true }
-//     { compito: 'Go grocery shopping!', fatta: false, marked: true }
-//     { compito: 'Make dinner!', fatta: false, marked: true }
+//     { compito: 'Finito di lavorare', fatto: true, contrassegnato: true }
+//     { compito: 'Andare a fare la spesa', fatto: false, contrassegnato: true }
+//     { compito: 'Preparare la cena', fatto: false, contrassegnato: true }
 //   ]
 // }
 ```
