@@ -462,7 +462,7 @@ createEffect(() => {
 你也可以不用立即执行计算，而是通过将 defer 选项设置为 true 来选择仅在更改时运行计算。
 
 ```js
-// 现在会运行了
+// 不会立即运行
 createEffect(on(a, (v) => console.log(v), { defer: true }));
 
 setA("new"); // 现在会运行了
