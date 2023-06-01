@@ -2402,3 +2402,15 @@ This also works on children.
 ```jsx
 <MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
 ```
+
+[`style`](#style) and [`classList`](#classlist) attributes are special
+in that `/*@once*/` applies to each object property value separately,
+and (currently) cannot be applied to the entire attribute. For example:
+
+```jsx
+<div style={{
+  width: /*@once*/ props.width,   // not reactive
+  height: /*@once*/ props.height, // not reactive
+  color: props.color,             // reactive
+}} />
+```
