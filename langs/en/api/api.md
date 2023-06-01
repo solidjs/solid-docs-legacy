@@ -348,7 +348,7 @@ type ResourceReturn<T> = [
   },
   {
     mutate: (v: T | undefined) => T | undefined;
-    refetch: (info: unknown) => Promise<T> | T;
+    refetch: (info?: unknown) => Promise<T> | T;
   }
 ];
 
