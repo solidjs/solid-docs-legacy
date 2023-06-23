@@ -7,7 +7,6 @@
 For quick video overviews of Solid's core concepts, check out:
 
 - [Solid in 100 seconds](https://youtu.be/hw3Bx5vxKl0)
-- [Solid reactivity in 10 minutes](https://youtu.be/J70HXl1KhWE)
 
 ## Try Solid
 
