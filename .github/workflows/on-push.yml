@@ -2,21 +2,24 @@ name: on-push
 on:
   push:
     branches:
-      - 'main'
+      - "main"
 jobs:
   run-todos:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with: 
+        with:
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      - run: yarn --frozen-lockfile
-      - run: yarn run build
-      - run: yarn run todos
+          node-version: 18
+      - uses: pnpm/action-setup@v2
+        with:
+          run_install: |
+            - args: [--frozen-lockfile]
+      - run: pnpm build
+      - run: pnpm todos
       - uses: EndBug/add-and-commit@v7
         with:
-          add: 'langs/*/README.md'
-          message: 'bot: update language todos'
+          add: "langs/*/README.md"
+          message: "bot: update language todos"
