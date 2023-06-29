@@ -1,48 +1,131 @@
 # Réactivité basique
 
+L'approche globale de Solid en matière de réactivité consiste à envelopper tout calcul réactif dans une fonction et à réexécuter cette fonction lorsque ses dépendances sont mises à jour.
+Le compilateur JSX de Solid englobe également la plupart des expressions JSX (code entre accolades) avec une fonction, de sorte qu'elles se mettent automatiquement à jour (et déclenchent les mises à jour correspondantes dans le DOM) lorsque leurs dépendances changent.
+Plus précisément, la réexécution automatique d'une fonction se produit chaque fois que la fonction est appelée dans une _portée surveillée_ (ou _tracking scope_ en anglais), comme une expression JSX ou des appels API qui construisent des "calculs" (`createEffect`, `createMemo`, etc.).
+Par défaut, les dépendances d'une fonction sont suivies automatiquement lorsqu'elles sont appelées dans une portée surveillée, en détectant quand la fonction lit l'état réactif (par exemple, via le getter d'un Signal ou l'attribut d'un Store).
+Par conséquent, vous n'avez généralement pas besoin de vous soucier des dépendances vous-mêmes.
+(Mais si le suivi automatique des dépendances ne donne pas les résultats que vous souhaitez, vous pouvez [remplacer le suivi des dépendances](#reactive-utilities)).
+Cette approche rend la réactivité _composable_ : appeler une fonction dans une autre fonction fait généralement en sorte que la fonction appelante hérite des dépendances de la fonction appelée.
+
 ## `createSignal`
 
 ```ts
-export function createSignal<T>(
-  value: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
+import { createSignal } from "solid-js";
+
+function createSignal<T>(
+  initialValue: T,
+  options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): [get: () => T, set: (v: T) => T];
+
+// Types disponibles pour la valeur de retour de `createSignal`.
+import type { Signal, Accessor, Setter } from "solid-js";
+type Signal<T> = [get: Accessor<T>, set: Setter<T>];
+type Accessor<T> = () => T;
+type Setter<T> = (v: T | ((prev?: T) => T)) => T;
 ```
 
-C'est la primitive réactive la plus basique utilisée pour surveiller une seule valeur qui change dans le temps. La fonction de création retourne une paire de fonctions, une pour la lecture de la valeur et l'autre pour mettre à jour le signal.
+C'est la primitive réactive la plus basique utilisée pour surveiller une seule valeur (qui peut être n'importe quel objet JavaScript) qui change dans le temps.
+La valeur du Signal commence par être égale au premier argument passé `initialValue` (ou `undefined` s'il n'y a pas d'argument).
+La fonction `createSignal` retourne une paire de fonctions sous la forme d'un tableau à deux éléments : un _getter_ (ou _accessor_) et un _setter_. 
+Dans une utilisation typique, vous auriez à déstructurer ce tableau en un Signal nommé de la manière suivante:
 
 ```js
-const [getValue, setValue] = createSignal(initialValue);
-
-// lecture de la valeur
-getValue();
-
-// met à jour la valeur
-setValue(nextValue);
-
-// met à jour une valeur avec une fonction incluant la valeur précédente
-setValue((prev) => prev + next);
+const [count, setCount] = createSignal(0);
+const [ready, setReady] = createSignal(false);
 ```
 
-N'oubliez pas d'accéder aux signaux sous une portée surveillée si vous souhaitez qu'elles soient réactives à la mise à jour. Les portées surveillées sont des fonctions qui sont passées à des évaluations comme `createEffect` ou des expressions JSX.
+L'appel du getter (par exemple, `count()` ou `ready()`) renvoie la valeur actuelle du Signal.
+Crucial pour le suivi automatique des dépendances, l'appel du getter
+à l'intérieur d'une portée surveillée fait que la fonction appelante dépend de ce Signal, donc cette fonction sera réexécutée si le Signal est mis à jour.
 
-> Si vous souhaitez stocker une fonction dans un Signal, vous devez utiliser la forme suivante :
+L'appel du setter (par exemple, `setCount(nextCount)` ou `setReady(nextReady)`) définit la valeur du Signal et _met à jour_ le Signal (déclenchant la réexécution des dépendants) si la valeur a effectivement changé (voir les détails ci-dessous).
+Comme seul argument, le setter prend soit la nouvelle valeur du signal, soit une fonction qui fait correspondre la dernière valeur du signal à une nouvelle valeur.
+Le setter renvoie également la valeur du Signal mise à jour. Par exemple:
+
+```js
+// Lit la valeur actuelle du Signal, et
+// depend de s'il est dans une portée surveillée
+// (mais non réactif en dehors d'une portée surveillée):
+const currentCount = count();
+
+// Ou envelopper tout calcul avec une fonction,
+// et cette fonction peut être utilisée dans une portée surveillée:
+const doubledCount = () => 2 * count();
+
+// Ou construire une portée surveillée et dépendre du signal:
+const countDisplay = <div>{count()}</div>;
+
+// Mettre à jour la valeur d'un Signal en donnant une nouvelle valeur:
+setReady(true);
+
+// Mettre à jour la valeur d'un Signal en donnant une fonction incluant la valeur précédente:
+const newCount = setCount((prev) => prev + 1);
+```
+
+> Si vous souhaitez stocker une fonction dans un Signal, vous devez utiliser la forme suivante:
 >
 > ```js
 > setValue(() => myFunction);
 > ```
+>
+> Cependant, les fonctions ne sont pas traitées spécialement comme l'argument `initialValue` de `createSignal`,
+> donc vous devez passer la valeur initiale d'une fonction telle quelle:
+>
+> ```js
+> const [func, setFunc] = createSignal(myFunction);
+> ```
+
+##### Options
+
+Plusieurs primitives de Solid prennent un objet "options" comme dernier argument facultatif.
+L'objet "options" de `createSignal` vous permet de fournir une option `equals`. Par exemple:
+
+```js
+const [getValue, setValue] = createSignal(initialValue, { equals: false });
+```
+
+Par défaut, lors de l'appel du setter d'un Signal, le Signal n'est mis à jour (et n'oblige les les dépendants à réexécuter) que si la nouvelle valeur est réellement différente de l'ancienne, conformément à l'opérateur `===` de JavaScript.
+
+Vous pouvez également définir `equals` sur `false` pour que les dépendances soient toujours réexécutées après l'appel du setter, ou vous pouvez passer votre propre fonction pour tester l'égalité.
+Quelques exemples:
+
+```js
+// Utilisation de `{ equals: false }` pour permettre de modifier l'objet en place;
+// normalement, cela ne serait pas vu comme une mise à jour car
+// l'objet a la même identité avant et après le changement.
+const [object, setObject] = createSignal({ count: 0 }, { equals: false });
+setObject((current) => {
+  current.count += 1;
+  current.updated = new Date();
+  return current;
+});
+
+// Utilisation d'un Signal `{ equals: false }` en tant que déclencheur sans valeur initiale:
+const [depend, rerun] = createSignal(undefined, { equals: false });
+// Maintenant, un appel à `depend()` dans une portée surveillée
+// fait que cette portée est réexécutée à chaque fois que `rerun()` est appelé.
+
+// Définir l'égalité en fonction de la longueur de la chaîne:
+const [myString, setMyString] = createSignal("string", {
+  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+});
+
+setMyString("strung"); // Considéré comme égal à la dernière valeur et ne provoquera pas de mises à jour
+setMyString("stranger"); // Considéré comme différent et provoquera des mises à jour
+```
 
 ## `createEffect`
 
 ```ts
-export function createEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
+import { createEffect } from "solid-js";
+
+function createEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Créer un nouveau calcul qui va automatiquement surveiller ses dépendances et s'exécuter après chaque rendu où les dépendances ont été changées. Ceci est idéal pour l'utilisation de `ref`s et la gestion d'autres effets secondaires.
+Les effets sont un moyen général de faire en sorte que du code arbitraire ("effets secondaires") s'exécute à chaque fois que les dépendances changent, par exemple, pour modifier le DOM manuellement.
+`createEffect` crée un nouveau calcul qui exécute la fonction donnée dans une portée surveillée, ce qui permet de suivre automatiquement ses dépendances, et réexécute automatiquement la fonction chaque fois que les dépendances sont mises à jour.
+Par exemple:
 
 ```js
 const [a, setA] = createSignal(initialValue);
@@ -56,93 +139,305 @@ La fonction effet est appelée avec la valeur retournée par la dernière exécu
 ```js
 createEffect((prev) => {
   const sum = a() + b();
-  if (sum !== prev) console.log(sum);
+  if (sum !== prev) console.log("Valeur de 'sum' changé en", sum);
   return sum;
 }, 0);
+```
+
+Les effets sont principalement destinés aux effets secondaires qui lisent mais n'écrivent pas au système réactif:
+il est préférable d'éviter de modifier des signaux dans les effets, ce qui sans précaution peut provoquer des rendus supplémentaires ou même des boucles d'effets infinies.
+A la place, préférez l'utilisation de [`createMemo`](#creatememo) pour calculer de nouvelles valeurs qui dépendent d'autres valeurs réactives, de sorte que le système réactif sache ce qui dépend de quoi, et puisse l'optimiser en conséquence.
+
+La _première_ exécution de la fonction d'effet n'est pas immédiate ; elle est programmée pour être exécutée après la phase de rendu en cours (par exemple, après avoir appelé la fonction passée à [`render`](#render), [`createRoot`](#createroot), ou [`runWithOwner`](#runwithowner)).
+Si vous voulez attendre que la première exécution ait lieu, utilisez [`queueMicrotask`](https://developer.mozilla.org/fr/docs/Web/API/queueMicrotask) (qui s'exécute avant que le navigateur ne rende le DOM) ou `await Promise.resolve()` ou `setTimeout(..., 0)` (qui s'exécutent après le rendu du navigateur).
+
+```js
+// Supposez que ce code est dans une fonction de composant, donc fait partie d'une phase de rendu
+const [count, setCount] = createSignal(0);
+
+// Cet effet imprime le compte au début et quand il change
+createEffect(() => console.log("count =", count()));
+// L'effet ne se produit pas encore
+console.log("coucou");
+setCount(1); // L'effet ne se produit toujours pas encore
+setCount(2); // L'effet ne se produit toujours pas encore
+
+queueMicrotask(() => {
+  // now `count = 2` will print
+  console.log("microtask");
+  setCount(3); // immediately prints `count = 3`
+  console.log("au revoir");
+});
+
+// --- overall output: ---
+// coucou
+// count = 2
+// microtask
+// count = 3
+// au revoir
+```
+
+Le délai dans la première exécution est utile car il signifie qu'un effet défini dans la portée d'un composant s'exécute après que le JSX retourné par le composant ait été ajouté au DOM.
+En particulier, les [`ref`](#ref)s seront déjà définis.
+Ainsi, vous pouvez utiliser un effet pour manipuler le DOM manuellement,
+appeler des bibliothèques JS vanilla, ou d'autres effets secondaires.
+
+Notez que la première exécution de l'effet s'exécute toujours avant que le navigateur ne rende le DOM à l'écran (similaire à `useLayoutEffect` de React).
+Si vous avez besoin d'attendre jusqu'après le rendu (par exemple, pour mesurer le rendu), vous pouvez utiliser `await Promise.resolve()` (ou `Promise.resolve().then(...)`), mais notez que l'utilisation ultérieure de l'état réactif (comme les signaux) ne déclenchera pas la réexécution de l'effet, car le suivi n'est pas possible après qu'une fonction `async` utilise `await`.
+Ainsi, vous devriez utiliser toutes les dépendances avant la promesse.
+
+Si vous préférez qu'un effet soit exécuté immédiatement, même pour sa première exécution, utilisez [`createRenderEffect`](#createrendereffect) ou [`createComputed`](#createcomputed).
+
+Vous pouvez nettoyer vos effets secondaires entre les exécutions de la fonction d'effet en appelant [`onCleanup`](#oncleanup) _à l'intérieur_ de la fonction d'effet.
+Une telle fonction de nettoyage est appelée à la fois entre les exécutions de l'effet et lorsque l'effet est éliminé (par exemple, lorsque le composant contenant l'effet est démonté).
+Par exemple:
+
+```js
+// Écouter un événement donné dynamiquement par le signal `eventName`
+createEffect(() => {
+  const event = eventName();
+  const callback = (e) => console.log(e);
+  ref.addEventListener(event, callback);
+  onCleanup(() => ref.removeEventListener(event, callback));
+});
 ```
 
 ## `createMemo`
 
 ```ts
-export function createMemo<T>(
+import { createMemo } from "solid-js";
+
+function createMemo<T>(
   fn: (v: T) => T,
   value?: T,
-  options?: { name?: string; equals?: false | ((prev: T, next: T) => boolean) }
+  options?: { equals?: false | ((prev: T, next: T) => boolean) }
 ): () => T;
 ```
-
-Créer une valeur dérivée d'un signal qui ne peut pas être modifié directement, elle recalcule sa valeur lorsque les dépendances du code sont mise à jour.
+Les mémos vous permettent d'utiliser efficacement une valeur dérivée dans de nombreux calculs réactifs.
+`createMemo` crée une valeur réactive en lecture seule égale à la valeur de retour de la fonction donnée et s'assure que cette fonction n'est exécutée que lorsque ses dépendances changent.
 
 ```js
-const getValue = createMemo(() => computeExpensiveValue(a(), b()));
+const value = createMemo(() => computeExpensiveValue(a(), b()));
 
-// lecture de la valeur
-getValue();
+// Lecture de la valeur.
+value();
 ```
 
-La fonction mémo est appelée avec une valeur retournée depuis la dernière exécution de la fonction mémo. Cette valeur peut être initialisée optionnellement en tant que 2ème argument. Cela est utile pour réduire le nombre de calculs.
+Dans Solid, vous n'avez souvent pas besoin d'envelopper les fonctions dans des mémos ;
+vous pouvez aussi simplement définir et appeler une fonction ordinaire
+pour obtenir un comportement réactif similaire.
+La principale différence réside dans le fait que vous appelez la fonction dans plusieurs configurations réactives.
+Dans ce cas, lorsque les dépendances de la fonction sont mises à jour, la fonction sera appelée plusieurs fois, sauf si elle est enveloppée dans un mémo.
+fonction sera appelée plusieurs fois, sauf si elle est enveloppée dans `createMemo`. Par exemple:
 
 ```js
+const user = createMemo(() => searchForUser(username()));
+// Comparaison avec: const user = () => searchForUser(username());
+return (
+  <ul>
+    <li>Votre name est "{user()?.name}"</li>
+    <li>
+      Votre email est <code>{user()?.email}</code>
+    </li>
+  </ul>
+);
+```
+
+Lorsque le Signal `username` est mis à jour, `searchForUser` sera appelé qu'une seule fois.
+Si l'utilisateur (`user`) retourné a effectivement changé, le mémo `user` se met à jour, et alors les deux éléments de la liste seront mis à jour automatiquement.
+
+Si nous avions plutôt défini `user` comme une simple fonction
+`() => searchForUser(username())`, alors `searchForUser` aurait été
+appelé deux fois, une fois lors de la mise à jour de chaque élément de la liste.
+
+Une autre différence clé est qu'un memo peut empêcher les dépendances de se mettre à jour lorsque les dépendances du mémo changent mais pas la valeur du mémo résultant.
+Tout comme [`createSignal`](#createsignal), le sSgnal dérivé créé par `createMemo` se _met à jour_ (et déclenche la ré-exécution des dépendants) uniquement lorsque la valeur renvoyée par la fonction mémo change réellement par rapport à la valeur précédente, selon l'opérateur `===` de JavaScript.
+Alternativement, vous pouvez passer un objet options avec `equals` réglé sur `false` pour toujours mettre à jour le mémo lorsque ses dépendances changent,
+ou vous pouvez passer votre propre fonction `equals` pour tester l'égalité.
+
+La fonction mémo est appelée avec une valeur retournée depuis la dernière exécution de la fonction mémo. Cette valeur peut être initialisée optionnellement en tant que 2ème argument. Cela est utile pour réduire le nombre de calculs, par exemple:
+
+```js
+// Suivre la somme de toutes les valeurs prises par input()
 const sum = createMemo((prev) => input() + prev, 0);
 ```
+
+La fonction mémo ne doit pas modifier d'autres signaux en appelant des setters (elle doit être "pure").
+Cela permet à Solid d'optimiser l'ordre d'exécution des mises à jour des mémos en fonction de leur graphe de dépendance, de sorte que tous les mémos peuvent se mettre à jour au maximum une fois en réponse à un changement de dépendance.
 
 ## `createResource`
 
 ```ts
+import { createResource } from "solid-js";
+import type { ResourceReturn } from "solid-js";
+
 type ResourceReturn<T> = [
   {
     (): T | undefined;
+    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored"
     loading: boolean;
     error: any;
+    latest: T | undefined;
   },
   {
     mutate: (v: T | undefined) => T | undefined;
-    refetch: () => void;
+    refetch: (info: unknown) => Promise<T> | T;
   }
 ];
 
-export function createResource<T, U = true>(
-  fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; name?: string }
+export type ResourceOptions<T, S = unknown> = {
+  initialValue?: T;
+  name?: string;
+  deferStream?: boolean;
+  ssrLoadFrom?: "initial" | "server";
+  storage?: (init: T | undefined) => [Accessor<T | undefined>, Setter<T | undefined>];
+  onHydrated?: (k: S | undefined, info: { value: T | undefined }) => void;
+};
+
+function createResource<T, U = true>(
+  fetcher: (
+    k: U,
+    info: { value: T | undefined; refetching: boolean | unknown }
+  ) => T | Promise<T>,
+  options?: ResourceOptions<T, U>
 ): ResourceReturn<T>;
 
-export function createResource<T, U>(
+function createResource<T, U>(
   source: U | false | null | (() => U | false | null),
-  fetcher: (k: U, getPrev: () => T | undefined) => T | Promise<T>,
-  options?: { initialValue?: T; name?: string }
+  fetcher: (
+    k: U,
+    info: { value: T | undefined; refetching: boolean | unknown }
+  ) => T | Promise<T>,
+  options?: ResourceOptions<T, U>
 ): ResourceReturn<T>;
 ```
 
-Créer un signal qui peut gérer des requêtes asynchrones. `fetcher` est une fonction asynchrone qui accepte une valeur retournée par la `source` si elle est fournie et qu'elle retourne une Promesse dont la valeur renvoyée est stockée dans la ressource. La fonction de récupération (fetcher) n'est pas réactive, donc utilisez le premier argument optionnel si vous voulez l'exécuter plus d'une fois. Si la source retourne une valeur `false`, `null` ou `undefined` alors elle ne sera pas récupérée.
+Crée un signal qui reflète le résultat d'une requête asynchrone.
+`createResource` prend une fonction de récupération asynchrone (`fetcher`) et retourne un Signal qui est mis à jour avec les données résultantes lorsque la récupération (`fetcher`) est terminée.
+Il y a deux façons d'utiliser `createResource` : vous pouvez passer la fonction de récupération (`fetcher`) comme seul argument, ou vous pouvez en plus passer un Signal `source` comme premier argument.
+Le Signal `source` redéclenchera le `fetcher` à chaque fois qu'il changera, et sa valeur sera passée au `fetcher`.
 
 ```js
+const [data, { mutate, refetch }] = createResource(fetchData);
+```
+
+```js
+const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
+```
+
+Dans ces extraits, la fonction de récupération (`fetcher`) est `fetchData`, et `data()` est indéfini jusqu'à ce que `fetchData` termine.
+Dans le premier cas, `fetchData` sera appelée immédiatement.
+Dans le second, `fetchData` sera appelé dès que `sourceSignal` aura une valeur autre que `false`, `null`, ou `undefined`.
+Elle sera appelée à nouveau chaque fois que la valeur de `sourceSignal` change, et cette valeur sera toujours passée à `fetchData` comme premier argument.
+
+Vous pouvez appeler `mutate` pour mettre à jour directement le signal `data` (il fonctionne comme tout autre signal setter). Vous pouvez aussi appeler `refetch` pour relancer directement la fonction de récupération (`fetcher`), et passer un argument optionnel pour fournir des informations supplémentaires au fetcher, par exemple `refetch(info)`.
+
+`data` fonctionne comme le getter d'un Signal normal : utilisez `data()` pour lire la dernière valeur retournée par `fetchData`.
+Mais il a aussi des propriétés réactives supplémentaires : `data.loading` vous indique si le fetcher a été appelé mais n'a pas été retourné, et `data.error` vous indique si la requête a échoué ; si c'est le cas, il contient l'erreur lancée par le fetcher. (Note : si vous anticipez des erreurs, vous pouvez vouloir envelopper `createResource` dans un [ErrorBoundary](#<errorboundary>).)
+
+À partir de la **1.4.0**, `data.latest` retournera la dernière valeur retournée et ne déclenchera pas de [Suspense](#<suspense>) et de [transitions](#usetransition) ; si aucune valeur n'a encore été retournée, `data.latest` agit de la même manière que `data()`.
+Cela peut être utile si vous voulez afficher les données périmées pendant le chargement des nouvelles données.
+
+`loading`, `error`, et `latest` sont des getters réactifs et peuvent être suivis.
+
+Le `fetcher` est la fonction asynchrone que vous fournissez à `createResource` pour récupérer réellement les données.
+Elle reçoit deux arguments : la valeur du Signal source (si elle est fournie), et un objet info avec deux propriétés : `value` et `refetching`.
+`value` vous indique la valeur précédemment récupérée.
+`refetching` est `true` si le fetcher a été déclenché en utilisant la fonction `refetch`, sinon `false`.
+Si la fonction `refetch` a été appelée avec un argument (`refetch(info)`), on assigne `refetching` à cet argument.
+
+```js
+async function fetchData(source, { value, refetching }) {
+  // Récupère les données et retourne une valeur.
+  // `source` indique la valeur actuelle du Signal source;
+  // `value` indique la dernière valeur qu'à retourné cette fonction;
+  // `refetching` est sur `true` quand cette fonction a été appelée en utilisant `refetch()`,
+  // OU elle est égale au paramètre optionnel : `refetch(info)`
+}
+
 const [data, { mutate, refetch }] = createResource(getQuery, fetchData);
 
-// lire la valeur
+// Lire la valeur.
 data();
 
-// vérifier si la valeur est en chargement
+// Vérifier si la valeur est en chargement.
 data.loading;
 
-// vérifier si des erreurs sont apparues lors de la récupération
+// Vérifier si des erreurs sont apparues lors de la récupération.
 data.error;
 
-// directly set value without creating promise
-// met à jour la valeur sans créer de promesse
+// Met à jour la valeur sans créer de promesse.
 mutate(optimisticValue);
 
-// réexécute la requête pour certain cas
+// Réexécute la requête pour certain cas.
 refetch();
 ```
 
 `loading` et `error` sont des propriétés réactives qui peuvent être surveillées.
+
+**Nouveau depuis la 1.4.0**
+
+Si vous utilisez `renderToStream`, vous pouvez dire à Solid d'attendre une ressource avant de vider le flux en utilisant l'option `deferStream`:
+
+```js
+// Récupère un utilisateur et diffuse le contenu dès que possible
+const [user] = createResource(() => params.id, fetchUser);
+
+// Récupère un utilisateur mais ne diffuse le contenu qu'après le chargement de cette ressource
+const [user] = createResource(() => params.id, fetchUser, {
+  deferStream: true,
+});
+```
+
+**Nouveau depuis la v1.5.0**
+
+Nous avons ajouté un nouveau champ `state` qui couvre une vue plus détaillée de l'état de la ressource au-delà de `loading` et `error`. Vous pouvez maintenant vérifier si une ressource est `"unresolved"`, `"pending"`, `"ready"`, `"refreshing"` ou `"error"`.
+
+| état       | valeur résolue | loading | contient error |
+| ---------- | -------------- | ------- | -------------- |
+| unresolved | Non            | Non     | Non            |
+| pending    | Non            | Oui     | Non            |
+| ready      | Oui            | Non     | Non            |
+| refreshing | Oui            | Oui     | Non            |
+| errored    | Non            | Non     | Oui            |
+
+**Nouveau depuis la v1.5.0**
+
+Lors du rendu de ressources par le serveur, en particulier lors de l'intégration de Solid dans d'autres systèmes qui récupèrent avant le rendu, vous pouvez vouloir initier la ressource avec cette valeur récupérée à l'avance au lieu de récupérer à nouveau et d'avoir la ressource qui sérialise son propre état. Vous pouvez utiliser la nouvelle option `ssrLoadFrom` pour cela. Au lieu d'utiliser la valeur par défaut `"server"`, vous pouvez passer `"initial"` et la ressource utilisera `initialValue` comme si c'était le résultat de la première récupération pour l'SSR et hydratation.
+
+**Nouveau depuis la v1.5.0** *Expérimental*
+
+Les ressources peuvent être définies avec un stockage personnalisé ayant la même signature qu'un Signal en utilisant l'option `storage`. Par exemple, l'utilisation d'un Store de réconciliation personnalisé pourrait se faire de cette façon:
+
+```ts
+function createDeepSignal<T>(value: T): Signal<T> {
+  const [store, setStore] = createStore({
+    value
+  });
+  return [
+    () => store.value,
+    (v: T) => {
+      const unwrapped = unwrap(store.value);
+      typeof v === "function" && (v = v(unwrapped));
+      setStore("value", reconcile(v));
+      return store.value;
+    }
+  ] as Signal<T>;
+}
+
+const [resource] = createResource(fetcher, {
+  storage: createDeepSignal
+});
+```
 
 # Cycles de vie
 
 ## `onMount`
 
 ```ts
-export function onMount(fn: () => void): void;
+import { onMount } from "solid-js";
+
+function onMount(fn: () => void): void;
 ```
 
 Programme une méthode qui va s'exécuter après le rendu initial et que les éléments soient monté. C'est idéal pour utiliser des `ref`s et gérer d'autres effets secondaires qui ne doivent s'exécuter qu'une seule fois. C'est l'équivalent de `createEffect` sans dépendances.
@@ -150,7 +445,9 @@ Programme une méthode qui va s'exécuter après le rendu initial et que les él
 ## `onCleanup`
 
 ```ts
-export function onCleanup(fn: () => void): void;
+import { onCleanup } from "solid-js";
+
+function onCleanup(fn: () => void): void;
 ```
 
 Programme une méthode de nettoyage qui s'exécute à la destruction ou recalcule de la portée réactive actuelle. Peut être utilisé dans n'importe quel Composant ou Effet.
@@ -158,7 +455,9 @@ Programme une méthode de nettoyage qui s'exécute à la destruction ou recalcul
 ## `onError`
 
 ```ts
-export function onError(fn: (err: any) => void): void;
+import { onError } from "solid-js";
+
+function onError(fn: (err: any) => void): void;
 ```
 
 Programme une méthode de gestion d'erreur qui va s'exécuter lorsque la portée enfant lève une erreur. Seulement la portée la plus proche de l'erreur va exécuter sa fonction de gestion d'erreur. Si une erreur se reproduit, la fonction se réexécute.
@@ -170,7 +469,9 @@ Ce sont des fonctions d'aide qui permettent de mieux gérer la planification des
 ## `untrack`
 
 ```ts
-export function untrack<T>(fn: () => T): T;
+import { untrack } from "solid-js";
+
+function untrack<T>(fn: () => T): T;
 ```
 
 Ignore le suivi des dépendances dans le bloc de code exécuté et retourne la valeur.
@@ -178,15 +479,19 @@ Ignore le suivi des dépendances dans le bloc de code exécuté et retourne la v
 ## `batch`
 
 ```ts
-export function batch<T>(fn: () => T): T;
+import { batch } from "solid-js";
+
+function batch<T>(fn: () => T): T;
 ```
 
-Groupe les mises à jour dans le bloc jusqu'à la fin pour éviter des calculs inutiles. Cela veut dire que la lecture des valeurs dans les lignes suivantes ne seront pas à jour. Les [Stores de Solid](https://www.solidjs.com/docs/latest/api#createstore) utilise cette méthode pour affecter des valeurs et les Effets enrobent automatiquement leur code dans un `batch`.
+Maintient l'exécution des calculs en aval dans le bloc jusqu'à la fin pour éviter tout recalcul inutile. La méthode set des [Stores de Solid](#createstore), les méthodes de tableau de [Mutable Store](#createmutable) et les Effets enveloppent automatiquement leur code dans un `batch`.
 
 ## `on`
 
 ```ts
-export function on<T extends Array<() => any> | (() => any), U>(
+import { on } from "solid-js";
+
+function on<T extends Array<() => any> | (() => any), U>(
   deps: T,
   fn: (input: T, prevInput: T, prevValue?: U) => U,
   options: { defer?: boolean } = {}
@@ -205,29 +510,88 @@ createEffect(() => {
 });
 ```
 
-Vous pouvez aussi ne pas exécuter le calcul immédiatement et à la place choisir de l'exécuter au changement en passant l'option de `defer: true`
+Vous pouvez aussi ne pas exécuter le calcul immédiatement et à la place choisir de l'exécuter au changement en passant l'option `defer: true`
 
 ```js
-// Ne s'exécute pas immédiatement
+// Ne s'exécute pas immédiatement.
 createEffect(on(a, (v) => console.log(v), { defer: true }));
 
-setA("new"); // Maintenant elle s'exécute
+setA("new"); // Maintenant elle s'exécute.
 ```
+
+Veuillez noter que pour les `stores` et `mutable`, l'ajout ou la suppression d'une propriété de l'objet parent déclenchera un effet. Voir [`createMutable`](#createMutable)
 
 ## `createRoot`
 
 ```ts
-export function createRoot<T>(fn: (dispose: () => void) => T): T;
+import { createRoot } from "solid-js";
+
+function createRoot<T>(fn: (dispose: () => void) => T): T;
 ```
 
-Créer un nouveau contexte qui ne sera pas surveillé et qui ne se détruira pas automatiquement. C'est utile pour les contextes réactifs imbriqués que vous ne voulez pas détruire lorsque le parent se réévalue. C'est un pattern puissant pour mettre en cache des données.
+Créer un nouveau contexte qui ne sera pas surveillé et qui ne se détruira pas automatiquement. C'est utile pour les contextes réactifs imbriqués que vous ne voulez pas détruire lorsque le parent se réévalue.
 
-Tous les projets Solid devraient être enrobés de cette fonction à haut niveau pour s'assurer que toute la mémoire/calcul soit libérée. Normalement, vous n'avez à vous soucier de ceci, car `createRoot` est embarqué dans la fonction d'entrée `render`.
+Tous les projets Solid devraient être enrobés de cette fonction à haut niveau pour s'assurer que toute la mémoire/calcul soit libérée. Normalement, vous n'avez pas à vous soucier de ceci, car `createRoot` est embarqué dans la fonction d'entrée `render`.
+
+## `getOwner`
+
+```ts
+import { getOwner } from "solid-js";
+
+function getOwner(): Owner;
+```
+
+Obtient la portée réactive qui possède le code en cours d'exécution, par exemple, pour passer dans un appel ultérieur à `runWithOwner` en dehors de la portée actuelle.
+
+En interne, les calculs (effets, mémos, etc.) créent des propriétaires qui sont les enfants de leur propriétaire, jusqu'au propriétaire racine créé par `createRoot` ou `render`. En particulier, cet arbre de propriété permet à Solid de nettoyer automatiquement un calcul supprimé en parcourant son sous-arbre et en appelant tous les rappels [`onCleanup`](#oncleanup).
+Par exemple, lorsque les dépendances d'un `createEffect` changent, l'effet appelle tous les rappels descendants `onCleanup` avant d'exécuter à nouveau la fonction d'effet. L'appel de `getOwner` renvoie le nœud propriétaire actuel responsable de la suppression du bloc d'exécution actuel.
+
+Les composants ne sont pas des calculs, donc ne créent pas de noeud propriétaire, mais ils sont typiquement rendus à partir d'un `createEffect` qui le fait, donc le résultat est similaire : quand un composant est démonté, tous les callbacks `onCleanup` descendants sont appelés. L'appel de `getOwner` à partir d'un composant renvoie le propriétaire qui est responsable du rendu et du démontage de ce composant.
+
+Notez que la portée réactive propriétaire n'est pas nécessairement _suivie_. Par exemple, [`untrack`](#untrack) désactive le suivi pendant la durée d'une fonction (sans créer une nouvelle portée réactive), tout comme les composants créés via JSX (`<Component ...>`).
+
+## `runWithOwner`
+
+```ts
+import { runWithOwner } from 'solid-js';
+
+function runWithOwner<T>(owner: Owner, fn: (() => void) => T): T;
+```
+
+Exécute la fonction donnée sous le propriétaire fourni,
+à la place du propriétaire de la portée externe (et sans l'affecter).
+Par défaut, les calculs créés par `createEffect`, `createMemo`, etc. appartiennent au propriétaire du code en cours d'exécution (la valeur de retour de `getOwner`), et seront donc éliminés lorsque leur propriétaire le fera. L'appel à `runWithOwner` fournit un moyen de remplacer cette valeur par défaut par un propriétaire spécifié manuellement (typiquement, la valeur de retour d'un appel précédent à `getOwner`), permettant un contrôle plus précis du moment où les calculs sont éliminés.
+
+Il est important d'avoir un propriétaire (correct) pour deux raisons:
+
+- Les calculs sans propriétaire ne peuvent pas être éliminés. Par exemple, si vous appelez `createEffect` sans propriétaire (par exemple, dans la portée globale), l'effet continuera à fonctionner pour toujours, au lieu d'être éliminé lorsque son propriétaire sera éliminé.
+-  [`useContext`](#usecontext) obtient le contexte en remontant l'arbre des propriétaires pour trouver l'ancêtre le plus proche fournissant le contexte désiré. Donc, sans propriétaire, vous ne pouvez pas chercher un contexte fourni (et avec le mauvais propriétaire, vous pourriez obtenir le mauvais contexte).
+
+Définir manuellement le propriétaire est particulièrement utile lorsque l'on fait de la réactivité en dehors de toute portée de propriétaire. En particulier, les calculs asynchrones (via les fonctions `async` ou les callbacks comme `setTimeout`) perdent le propriétaire automatiquement défini, donc se souvenir du propriétaire original via `getOwner` et le restaurer via `runWithOwner` est nécessaire dans ces cas.
+Par exemple:
+
+```js
+const owner = getOwner();
+setTimeout(() => {
+  // Ce callback est exécuté sans propriétaire.
+  // Restaurer le propriétaire via runWithOwner:
+  runWithOwner(owner, () => {
+    const foo = useContext(FooContext);
+    createEffect(() => {
+      console.log(foo);
+    });
+  });
+}, 1000);
+```
+
+Notez que les propriétaires ne sont pas ce qui détermine le suivi des dépendances, donc `runWithOwner` n'aide pas au suivi dans les fonctions asynchrones ; l'utilisation d'un état réactif dans la partie asynchrone (par exemple, après le premier `await`) ne sera pas suivie comme une dépendance.
 
 ## `mergeProps`
 
 ```ts
-export function mergeProps(...sources: any): any;
+import { mergeProps } from "solid-js";
+
+function mergeProps(...sources: any): any;
 ```
 
 Une méthode `merge` qui va fusionner des objets réactifs. C'est utile pour associer des valeurs par défaut aux props de composants dans le cas où le parent ne les fournit pas. Ou cloner l'objet props en incluant des propriétés réactives.
@@ -235,20 +599,22 @@ Une méthode `merge` qui va fusionner des objets réactifs. C'est utile pour ass
 Cette méthode fonctionne en utilisant les proxies et associant les propriétés dans l'ordre inverse. Cela permet de dynamiquement surveiller les propriétés qui ne sont pas présentes quand l'objet prop est fusionné la première fois.
 
 ```js
-// props par défault
+// Props par défault.
 props = mergeProps({ name: "Smith" }, props);
 
-// cloner l'objet props
+// Cloner l'objet `props`.
 newProps = mergeProps(props);
 
-// fusionner l'objet props
+// Fusionner l'objet `props`
 props = mergeProps(props, otherProps);
 ```
 
 ## `splitProps`
 
 ```ts
-export function splitProps<T>(
+import { splitProps } from "solid-js";
+
+function splitProps<T>(
   props: T,
   ...keys: Array<(keyof T)[]>
 ): [...parts: Partial<T>];
@@ -256,21 +622,50 @@ export function splitProps<T>(
 
 C'est un remplacement de la déstructuration. Elle va séparer un objet réactif par une liste de clés pour maintenir la réactivité.
 
-```js
-const [local, others] = splitProps(props, ["children"]);
+Elle prend un objet réactif et un nombre quelconque de tableaux de clés ; pour chaque tableau de clés, elle renvoie un objet réactif avec uniquement les propriétés de l'objet original. Le dernier objet réactif dans le tableau retourné aura toutes les propriétés restantes de l'objet original.
 
-<>
-  <Child {...others} />
-  <div>{local.children}<div>
-</>
+Cela peut être utile si vous voulez consommer un sous-ensemble de props et passer le reste à un enfant.
+
+```js
+function MyComponent(props) {
+  const [local, others] = splitProps(props, ["children"]);
+
+  return (
+    <>
+      <div>{local.children}</div>
+      <Child {...others} />
+    </>
+  );
+}
+```
+
+Parce que `splitProps` prend n'importe quel nombre de tableaux, nous pouvons diviser un objet props autant que nous le souhaitons (si, par exemple, nous avons plusieurs composants enfants qui nécessitent chacun un sous-ensemble des props).
+
+Disons qu'un composant a reçu six props:
+
+```js
+<MyComponent a={1} b={2} c={3} d={4} e={5} foo="bar" />;
+function MyComponent(props) {
+  console.log(props); // {a: 1, b: 2, c: 3, d: 4, e: 5, foo: "bar"}
+  const [voyelles, consonnes, reste] = splitProps(
+    props,
+    ["a", "e"],
+    ["b", "c", "d"]
+  );
+  console.log(voyelles); // {a: 1, e: 5}
+  console.log(consonnes); // {b: 2, c: 3, d: 4}
+  console.log(reste.foo); // bar
+}
 ```
 
 ## `useTransition`
 
 ```ts
-export function useTransition(): [
-  () => boolean,
-  (fn: () => void, cb?: () => void) => void
+import { useTransition } from "solid-js";
+
+function useTransition(): [
+  pending: () => boolean,
+  startTransition: (fn: () => void) => Promise<void>
 ];
 ```
 
@@ -282,19 +677,36 @@ const [isPending, start] = useTransition();
 // Vérifie si entrain de transitionner.
 isPending();
 
-// Enrobe dans une transition
-start(() => setSignal(newValue), () => /* la transition est terminée */)
+// Enrobe dans une transition.
+start(() => setSignal(newValue), () => /* La transition est terminée. */)
 ```
+
+## `startTransition`
+
+**Nouveau depuis la v1.1.0**
+
+```ts
+import { startTransition } from 'solid-js';
+
+function startTransition: (fn: () => void) => Promise<void>;
+```
+
+Similaire à `useTransition` sauf qu'il n'y a pas d'état en attente associé. Celui-ci peut simplement être utilisé directement pour lancer la transition.
 
 ## `observable`
 
 ```ts
-export function observable<T>(input: () => T): Observable<T>;
+import { observable } from "solid-js";
+
+function observable<T>(input: () => T): Observable<T>;
 ```
 
-Cette méthode prend un signal et produit un simple objet Observable. Vous pouvez l'utiliser avec une librairie Observable de votre choix typiquement avec l'opérateur `from`.
+Cette méthode prend un signal et produit un simple objet Observable.
+Vous pouvez l'utiliser avec une librairie Observable de votre choix typiquement avec l'opérateur `from`.
 
 ```js
+// Intégrer rxjs avec un Signal Solid
+import { observable } from "solid-js";
 import { from } from "rxjs";
 
 const [s, set] = createSignal(0);
@@ -304,10 +716,49 @@ const obsv$ = from(observable(s));
 obsv$.subscribe((v) => console.log(v));
 ```
 
+Vous pouvez également utiliser `from` sans `rxjs` ; voir ci-dessous.
+
+## `from`
+
+**Nouveau depuis la v1.1.0**
+
+```ts
+import { from } from "solid-js";
+
+function from<T>(
+  producer:
+    | ((setter: (v: T) => T) => () => void)
+    | {
+        subscribe: (
+          fn: (v: T) => void
+        ) => (() => void) | { unsubscribe: () => void };
+      }
+): () => T;
+```
+
+Un helper pour faciliter à opérer avec des producteurs externes comme les observables RxJS ou avec Svelte Stores. En gros, cela transforme n'importe quel objet pouvant être abonné (objet avec une méthode `subscribe`) en un Signal et gère l'abonnement et la destruction.
+
+```js
+const signal = from(obsv$);
+```
+
+Il peut également prendre une fonction de producteur personnalisée où la fonction est passée à une fonction setter qui renvoie une fonction de désabonnement:
+
+```js
+const clock = from((set) => {
+  const t = setInterval(() => set(1), 1000);
+  return () => clearInterval(t);
+});
+```
+
+> Note: Les contrôles d'égalité des Signaux créés par `from` sont désactivés afin de mieux s'interfacer avec les flux et sources externes.
+
 ## `mapArray`
 
 ```ts
-export function mapArray<T, U>(
+import { mapArray } from "solid-js";
+
+function mapArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: T, i: () => number) => U
 ): () => U[];
@@ -339,7 +790,9 @@ const mapped = mapArray(source, (model) => {
 ## `indexArray`
 
 ```ts
-export function indexArray<T, U>(
+import { indexArray } from "solid-js";
+
+function indexArray<T, U>(
   list: () => readonly T[],
   mapFn: (v: () => T, i: number) => U
 ): () => U[];
@@ -367,44 +820,77 @@ const mapped = indexArray(source, (model) => {
 
 # Stores
 
-Ces APIs sont disponibles sous `solid-js/store`.
-
 ## `createStore`
 
 ```ts
-export function createStore<T extends StoreNode>(
-  state: T | Store<T>,
-  options?: { name?: string }
+import { createStore } from "solid-js/store";
+import type { StoreNode, Store, SetStoreFunction } from "solid-js/store";
+
+function createStore<T extends StoreNode>(
+  state: T | Store<T>
 ): [get: Store<T>, set: SetStoreFunction<T>];
+type Store<T> = T;  // conceptuellement en lecture seule, mais pas typée comme telle.
 ```
 
-Cette fonction va créer un arbre de Signaux en tant que proxy pour permettre des valeurs individuelles dans une structure de données imbriquées d'être indépendamment surveillé. La fonction de création retourne un objet proxy en lecture seule et une fonction de mise à jour.
+La fonction create prend un état initial, l'enveloppe dans un store et renvoie un objet proxy en lecture seule et une fonction de mise à jour (setter).
 
 ```js
 const [state, setState] = createStore(initialValue);
 
-// Lis une valeur
+// Lis une valeur.
 state.someValue;
 
-// met à jour une valeur
+// Met à jour une valeur.
 setState({ merge: "thisValue" });
 
 setState("path", "to", "value", newValue);
 ```
 
-Les objets Store sont des proxies qui sont surveillés seulement sur l'accès aux propriétés. Et à l'accès, les Stores produisent récursivement des objets Store imbriqués sur les données imbriquées. Cependant, ça ne peut enrober que des tableaux et de simples objets. Les classes ne sont pas enrobées. Donc les `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` ne sont pas réactifs. De plus, les objets de haut niveau ne peuvent pas être surveillés sans accéder à une de leurs propriétés. Donc il ne convient pas de les utiliser pour des éléments sur lesquels on va itérer, car l'ajout de nouvelles clés ou d'index ne va pas engendrer une mise à jour. Donc mettez vos listes dans une clé de votre état au lieu d'essayer d'utiliser l'objet état directement.
+En tant que proxies, les objets Store ne suivent que lorsqu'une propriété est accédée.
+
+En cas d'accès à des objets imbriqués, les Stores produisent des objets Store imbriqués, et ce, tout au long de l'arbre. Toutefois, cela ne s'applique qu'aux tableaux et aux objets ordinaires. Les classes ne sont pas envelopées donc les `Date`, `HTMLElement`, `RegExp`, `Map`, `Set` ne sont pas réactifs.
+
+#### Tableaux dans les Stores
+
+Depuis la version **1.4.0**, l'objet d'état de niveau supérieur peut être un tableau. Dans les versions précédentes, il fallait créer un objet pour envelopper le tableau:
+
+```jsx
+// Après Solid 1.4.0
+const [todos, setTodos] = createStore([
+  { id: 1, title: "Chose que je dois faire", done: false },
+  { id: 2, title: "Apprendre un nouveau Framework", done: false },
+]);
+...
+<For each={todos}>{todo => <Todo todo={todo} />}</For>;
+```
+
+```jsx
+// Avant Solid 1.4.0
+const [state, setState] = createStore({
+  todos: [
+    { id: 1, title: "Chose que je dois faire", done: false },
+    { id: 2, title: "Apprendre un nouveau Framework", done: false },
+  ],
+});
+<For each={state.todos}>{(todo) => <Todo todo={todo} />}<For>;
+```
+
+Notez que la modification d'un tableau dans un Store ne déclenchera pas les calculs qui s'abonnent directement au tableau. Par exemple:
 
 ```js
-// mettez la liste dans une clé sur l'objet store
-const [state, setState] = createStore({ list: [] });
+createEffect(() => {
+  console.log(state.todos);
+});
 
-// accéder à la propriété `list` sur l'objet état
-<For each={state.list}>{item => /*...*/}</For>
+// Cela ne déclenchera pas l'effet:
+setState(todos, state.todos.length, { id: 3 });
+// Cela va déclencher l'effet, parce que la référence du tableau change:
+setState("todos", (prev) => [...prev, { id: 3 }]);
 ```
 
 ### Getters
 
-Les objets Store supportent l'utilisation d'accesseur pour calculer des valeurs.
+Les objets Store supportent l'utilisation d'accesseur (getters) pour calculer des valeurs.
 
 ```js
 const [state, setState] = createStore({
@@ -418,7 +904,7 @@ const [state, setState] = createStore({
 });
 ```
 
-Ce sont de simples accesseurs, donc vous avez besoin d'utiliser Mémo si vous souhaitez garder en cache la valeur ;
+Ce sont de simples accesseurs qui s'exécutent à nouveau lorsqu'on y accède, donc vous avez toujours besoin d'utiliser un mémo si vous souhaitez garder en cache la valeur ;
 
 ```js
 let fullName;
@@ -434,7 +920,7 @@ const [state, setState] = createStore({
 fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 ```
 
-### Updating Stores
+### Mise à jour des Stores
 
 Les changements peuvent prendre la forme de fonction qui passe en paramètre la valeur de l'état précédent et retourne un nouvel état ou une valeur. Les objets sont toujours superficiellement fusionnés. Affecter une valeur `undefined` pour les supprimer du Store.
 
@@ -482,53 +968,57 @@ Le chemin peut être des clés en chaîne de caractère, des clés de tableau, d
 ```js
 const [state, setState] = createStore({
   todos: [
-    { task: 'Finish work', completed: false }
-    { task: 'Go grocery shopping', completed: false }
-    { task: 'Make dinner', completed: false }
+    { task: 'Finir le travail', completed: false }
+    { task: 'Faire les courses', completed: false }
+    { task: 'Faire le dinner', completed: false }
   ]
 });
 
 setState('todos', [0, 2], 'completed', true);
 // {
 //   todos: [
-//     { task: 'Finish work', completed: true }
-//     { task: 'Go grocery shopping', completed: false }
-//     { task: 'Make dinner', completed: true }
+//     { task: 'Finir le travail', completed: true }
+//     { task: 'Faire les courses', completed: false }
+//     { task: 'Faire le dinner', completed: true }
 //   ]
 // }
 
 setState('todos', { from: 0, to: 1 }, 'completed', c => !c);
 // {
 //   todos: [
-//     { task: 'Finish work', completed: false }
-//     { task: 'Go grocery shopping', completed: true }
-//     { task: 'Make dinner', completed: true }
+//     { task: 'Finir le travail', completed: false }
+//     { task: 'Faire les courses', completed: true }
+//     { task: 'Faire le dinner', completed: true }
 //   ]
 // }
 
 setState('todos', todo => todo.completed, 'task', t => t + '!')
 // {
 //   todos: [
-//     { task: 'Finish work', completed: false }
-//     { task: 'Go grocery shopping!', completed: true }
-//     { task: 'Make dinner!', completed: true }
+//     { task: 'Finir le travail', completed: false }
+//     { task: 'Faire les courses!', completed: true }
+//     { task: 'Faire le dinner!', completed: true }
 //   ]
 // }
 
 setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 // {
 //   todos: [
-//     { task: 'Finish work', completed: true, marked: true }
-//     { task: 'Go grocery shopping!', completed: false, marked: true }
-//     { task: 'Make dinner!', completed: false, marked: true }
+//     { task: 'Finir le travail', completed: true, marked: true }
+//     { task: 'Faire les courses!', completed: false, marked: true }
+//     { task: 'Faire le dinner!', completed: false, marked: true }
 //   ]
 // }
 ```
 
-## `produce`
+## Utilitaires de Store
+
+### `produce`
 
 ```ts
-export function produce<T>(
+import { produce } from "solid-js/store";
+
+function produce<T>(
   fn: (state: T) => void
 ): (
   state: T extends NotWrappable ? T : Store<T>
@@ -546,10 +1036,12 @@ setState(
 );
 ```
 
-## `reconcile`
+### `reconcile`
 
 ```ts
-export function reconcile<T>(
+import { reconcile } from "solid-js/store";
+
+function reconcile<T>(
   value: T | Store<T>,
   options?: {
     key?: string | null;
@@ -565,20 +1057,31 @@ La comparaison de données n'est pas appliquée lorsque l'on ne peut pas appliqu
 La clé est utilisée quand les éléments associés sont disponibles. Par défaut `merge: false` fais une vérification de référence quand c'est possible pour déterminer l'égalité et replace lorsque la référence n'est pas égale. `merge: true` pousse toutes les comparaisons aux feuilles de l'arbre de données et remplace la donnée précédente par la nouvelle valeur de manière efficace.
 
 ```js
-// s'abonner à un observable
+// S'abonner à un observable.
 const unsubscribe = store.subscribe(({ todos }) => (
   setState('todos', reconcile(todos)));
 );
 onCleanup(() => unsubscribe());
 ```
 
-## `createMutable`
+### `unwrap`
 
 ```ts
-export function createMutable<T extends StoreNode>(
+import { unwrap } from "solid-js/store";
+
+function unwrap(store: Store<T>): T;
+```
+
+Retourne les données sous-jacentes dans le Store sans proxy.
+
+### `createMutable`
+
+```ts
+import { createMutable } from 'solid-js/store';
+
+function createMutable<T extends StoreNode>(
   state: T | Store<T>,
-  options?: { name?: string }
-): Store<T> {
+): Store<T>;
 ```
 
 Créer un nouvel objet Store mutable. Les stores se mettent à jour seulement quand les valeurs changent. Le traçage est fait par l'interception de l'accès de propriété et automatiquement tracé dans des imbrications profondes en utilisant un proxy.
@@ -590,10 +1093,10 @@ Utile pour l'intégration de système externe ou en tant que couche de compatibi
 ```js
 const state = createMutable(initialValue);
 
-// lecture de la valeur
+// Lecture de la valeur.
 state.someValue;
 
-// affectation d'une valeur
+// Affectation d'une valeur.
 state.someValue = 5;
 
 state.list.push(anotherValue);
@@ -614,17 +1117,81 @@ const user = createMutable({
 });
 ```
 
+### `modifyMutable`
+
+**Nouveau depuis la v1.4.0**
+
+```ts
+import { modifyMutable } from 'solid-js/store';
+
+function modifyMutable<T>(mutable: T, modifier: (state: T) => T): void;
+```
+
+Ce helper simplifie la modification multiple d'un Store mutable (tel que retourné par [`createMutable`](#createmutable)) en un seul [`batch`](#batch), de sorte que les calculs dépendants ne soient mis à jour qu'une seule fois au lieu d'une fois par mise à jour.
+Le premier argument est le Store mutable à modifier, et le second argument est un modificateur de Store tel que ceux renvoyés par [`reconcile`](#reconcile) ou [`produce`](#produce).
+(Si vous passez votre propre fonction modificatrice, faites attention que son argument est
+une version non enveloppée du magasin.)
+
+Par exemple, supposons que nous ayons une interface utilisateur dépendant de plusieurs champs d'un mutable:
+
+```tsx
+const state = createMutable({
+  user: {
+    firstName: "John",
+    lastName: "Smith",
+  },
+});
+
+<h1>Bienvenue {state.user.firstName + ' ' + state.user.lastName}</h1>
+```
+
+En modifiant *n* champs en séquence, l'interface utilisateur sera mise à jour *n* fois:
+
+```ts
+state.user.firstName = "Jake";  // Déclenche mise à jour.
+state.user.lastName = "Johnson";  // Déclenche une autre mise à jour.
+```
+
+Pour déclencher une seule mise à jour, nous pourrions modifier les champs dans un `batch`:
+
+```ts
+batch(() => {
+  state.user.firstName = "Jake";
+  state.user.lastName = "Johnson";
+});
+```
+
+`modifyMutable` combiné avec `reconcile` ou `produce` fournit deux façons alternatives de faire des choses similaires:
+
+```ts
+// Remplace state.user avec l'objet spécifié (suprimant tout autre champs)
+modifyMutable(state.user, reconcile({
+  firstName: "Jake",
+  lastName: "Johnson",
+}));
+
+// Modifie les deux champs dans un `batch`, déclenchant une seule mise à jour.
+modifyMutable(state.user, produce((u) => {
+  u.firstName = "Jake";
+  u.lastName = "Johnson";
+}));
+```
+
 # APIs de Composant
 
 ## `createContext`
 
 ```ts
+import { createContext } from "solid-js";
+import type { Context } from "solid-js";
+
 interface Context<T> {
   id: symbol;
   Provider: (props: { value: T; children: any }) => any;
   defaultValue: T;
 }
-export function createContext<T>(defaultValue?: T): Context<T | undefined>;
+
+function createContext<T>(defaultValue?: T): Context<T | undefined>;
 ```
 
 Un Contexte permet une forme d'injection de dépendance dans Solid. Il est utilisé pour éviter de devoir passer des données en tant que props à travers plusieurs composants intermédiaires.
@@ -661,10 +1228,12 @@ La valeur donnée au `Provider` est passée telle quelle à `useContext`. Cela s
 ## `useContext`
 
 ```ts
-export function useContext<T>(context: Context<T>): T;
+import { useContext } from "solid-js";
+
+function useContext<T>(context: Context<T>): T;
 ```
 
-Utiliser pour récupérer un contexte, et d'éviter de passer des données via les props dans chaque fonction Composant.
+Utilisé pour récupérer un contexte afin de permettre le passage de données sans avoir à les faire passer par chaque fonction Composant.
 
 ```js
 const [state, { increment, decrement }] = useContext(CounterContext);
@@ -673,48 +1242,136 @@ const [state, { increment, decrement }] = useContext(CounterContext);
 ## `children`
 
 ```ts
-export function children(fn: () => any): () => any;
+import { children } from "solid-js";
+import type { JSX, ResolvedChildren } from "solid-js";
+
+function children(fn: () => JSX.Element): () => ResolvedChildren;
 ```
 
-Utiliser pour faciliter l'interaction avec `props.children`. Cette fonction d'aide résout n'importe quelle réactivité imbriquée et retourne un mémo. Cette approche est recommandée pour utiliser `props.children` dans autre chose que l'utiliser directement dans le JSX.
+Le helper `children` est conçu pour les interactions complexes avec `props.children`, lorsque vous ne faites pas que passer des enfants à un autre composant en utilisant `{props.children}` une fois dans le JSX.
+Normalement vous passez un getter pour `props.children` comme ça:
 
 ```js
-const list = children(() => props.children);
+const resolved = children(() => props.children);
+```
 
-// faire quelque chose avec la donnée
-createEffect(() => list());
+La valeur de retour est un [memo](#creatememo) évaluant les enfants résolus, qui est mis à jour à chaque fois que les enfants changent.
+Utiliser ce mémo au lieu d'accéder directement à `props.children` présente des avantages importants dans certains scénarios.
+Le problème sous-jacent est que, lorsque vous spécifiez des enfants de composants via JSX, Solid définit automatiquement `props.children` comme un getter de propriété, de sorte que les enfants sont créés (en particulier, DOM est créé) à chaque fois qu'on accède à `props.children`. Deux conséquences particulières:
+
+- Si vous accédez plusieurs fois à `props.children`, les enfants (et le DOM associé) seront créés plusieurs fois.
+  Ceci est utile si vous voulez que le DOM soit dupliqué (car les noeuds DOM peuvent apparaître
+  dans un seul élément parent), mais dans de nombreux cas, cela crée des noeuds DOM redondants.
+  Si vous appelez plutôt `resolved()` plusieurs fois, vous réutilisez les mêmes enfants.
+- Si vous accédez à `props.children` en dehors d'une portée de suivi (par exemple, dans un event handler), alors vous créez des enfants qui ne seront jamais éliminés.
+  Si vous appelez plutôt `resolved()`, vous réutilisez les enfants déjà résolus.
+  Vous garantissez également que les enfants sont suivis dans le composant actuel,
+  par opposition à une autre portée de suivi telle qu'un autre composant.
+
+De plus, le helper `children` "résout" les enfants en appelant des fonctions sans argument et en aplatissant des tableaux de tableaux en un tableau.
+Par exemple, un enfant spécifié avec un JSX comme `{signal() * 2}` sera transformé en
+une fonction getter `() => count() * 2` dans `props.children`, mais elle est évaluée
+en un nombre réel dans `resolved`, dépendant correctement d'un signal `count`.
+
+Si le `props.children` donné n'est pas un tableau (ce qui se produit lorsque la balise JSX a un seul enfant), alors le helper `children` ne le normalisera pas en un tableau.
+C'est un comportement utile, par exemple lorsque l'intention est de passer une seule fonction comme enfant, ce qui peut être détecté par `typeof resolved() === 'function'`.
+Si vous souhaitez normaliser un tableau, le mémo renvoyé a une méthode `toArray` (*nouveau depuis la 1.5*).
+
+Voici un exemple de l'ajout automatique de l'attribut `class` de tout enfant
+qui se résout en un `Element`, en plus du rendu des enfants:
+
+```tsx
+const resolved = children(() => props.children);
+
+createEffect(() => {
+  let list = resolved.toArray();
+  for (let child of list) child?.setAttribute?.("class", myClass());
+});
+
+return <div>{resolved()}</div>;
+```
+
+(Notez que cette approche n'est pas particulièrement recommandée:
+il est généralement préférable de suivre une approche déclarative consistant à passer
+la classe souhaitée via les props ou le contexte aux composants enfants.)
+
+D'un autre côté, vous n'avez pas besoin (et dans certains cas, ne voulez pas) utiliser le helper `children` si vous transmettez simplement `props.children` à un autre composant ou élément via JSX:
+
+```tsx
+const Wrapper = (props) => {
+  return <div>{props.children}</div>;
+};
+```
+
+Un aspect important du helper `children` est qu'il force la création et la résolution des enfants, car il accède à `props.children` immédiatement.
+Cela peut être indésirable pour le rendu conditionnel, par exemple, lorsque vous utilisez les enfants dans un composant [`<Show>`](#<show>).
+Par exemple, le code suivant évalue toujours les enfants:
+
+```tsx
+const resolved = children(() => props.children);
+
+return <Show when={visible()}>{resolved()}</Show>;
+```
+
+Pour évaluer les enfants uniquement lorsque `<Show>` les rendra, vous pouvez
+pousser l'appel à `children` dans un composant ou une fonction de `<Show>`,
+qui n'évalue ses enfants que lorsque la condition `when` est vraie.
+Une autre solution consiste à passer `props.children` au helper `children`
+uniquement lorsque vous souhaitez réellement évaluer les enfants:
+
+```ts
+const resolved = children(() => visible() && props.children);
 ```
 
 ## `lazy`
 
 ```ts
-export function lazy<T extends Component<any>>(
+import { lazy } from "solid-js";
+
+function lazy<T extends Component<any>>(
   fn: () => Promise<{ default: T }>
 ): T & { preload: () => Promise<T> };
 ```
 
-Utiliser le chargement de composant en mode paresseux pour permettre le découpage dynamique de code. Les composants ne sont chargés qu'une fois utilisée. Les composants chargés paresseusement peuvent être utilisé de la même manière qu'un composant importé normalement, il peut recevoir des props, etc. Les composants paresseux déclenchent les `<Suspense />`
+Utilisé pour charger paresseusement les composants afin de permettre le fractionnement du code. Les composants ne sont pas chargés avant d'être rendus. Les composants chargés paresseusement peuvent être utilisés de la même manière qu'un composant importé normalement, il peut recevoir des props, etc... Les composants paresseux déclenchent `<Suspense>`.
 
 ```js
-// Enrobe l'import
+// Enrobe l'import.
 const ComponentA = lazy(() => import("./ComponentA"));
 
-// utiliser dans le JSX
+// Utilisation dans le JSX.
 <ComponentA title={props.title} />;
 ```
 
+## `createUniqueId`
+
+```ts
+import { createUniqueId } from "solid-js";
+
+function createUniqueId(): string;
+```
+
+Un générateur d'ID universel stable sur le serveur/navigateur.
+
+```js
+const id = createUniqueId();
+```
+
+> **Note**: sur le serveur, cela ne fonctionne que sous les composants hydratables.
+
 # Primitives secondaires
 
-Vous n'en aurez sûrement pas besoin pour votre première app, mais ce sont des outils utiles à avoir sous le coude.
+Vous n'en aurez sûrement pas besoin pour votre première application, mais ce sont des outils utiles à avoir sous le coude.
 
 ## `createDeferred`
 
 ```ts
-export function createDeferred<T>(
+import { createDeferred } from "solid-js";
+
+function createDeferred<T>(
   source: () => T,
   options?: {
     timeoutMs?: number;
-    name?: string;
     equals?: false | ((prev: T, next: T) => boolean);
   }
 ): () => T;
@@ -722,41 +1379,127 @@ export function createDeferred<T>(
 
 Créer une valeur en lecture seule qui va notifier les changements en aval quand le navigateur est inactif. `timeoutMs` est le temps maximum attendu avant de forcer la mise à jour.
 
-## `createComputed`
-
-```ts
-export function createComputed<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
-```
-
-Crée une nouvelle fonction de calcul qui va automatiquement tracer les dépendances et s'exécuter immédiatement avant le rendu. L'utiliser pour écrire sur d'autres primitives réactives. Quand c'est possible, utiliser plutôt `createMemo` car écrire sur un signal en milieu de mise à jour peut causer d'autres fonctions à se recalculer.
-
 ## `createRenderEffect`
 
 ```ts
-export function createRenderEffect<T>(
-  fn: (v: T) => T,
-  value?: T,
-  options?: { name?: string }
-): void;
+import { createRenderEffect } from "solid-js";
+
+function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-Créer un nouveau calcul qui va automatiquement tracer ces dépendances et s'exécuter durant la phase de rendu pendant que les éléments de DOM sont créés et mis à jour, mais pas nécessairement connecté. Toutes les mises à jour du DOM interne se passent à ce moment-là.
+Un effet de rendu est un calcul similaire à un effet régulier (tel que créé par [`createEffect`](#createeffect)), mais diffère par le moment où Solid programme la première exécution de la fonction d'effet.
+Alors que `createEffect` attend que la phase de rendu en cours soit terminée, `createRenderEffect` appelle immédiatement la fonction.
+Ainsi, l'effet s'exécute pendant que les éléments du DOM sont créés et mis à jour, mais possiblement avant que les éléments spécifiques d'intérêt aient été créés, et probablement avant que ces éléments aient été connectés au document.
+En particulier, les [`ref`](#ref)s ne seront pas définis avant l'appel initial de l'effet.
+En effet, Solid utilise `createRenderEffect` pour mettre en oeuvre la phase de rendu elle-même, y compris la définition des `ref`s.
+
+Reactive updates to render effects are identical to effects: they queue up in
+response to a reactive change (e.g., a single signal update, or a `batch` of
+changes, or collective changes during an entire render phase) and run in a
+single [`batch`](#batch) afterward (together with effects).
+In particular, all signal updates within a render effect are batched.
+
+Les mises à jour réactives des effets de rendu sont identiques aux effets : elles sont mises en file d'attente en réponse à un changement réactif (par exemple, une mise à jour unique d'un Signal, ou d'un `batch` de changements, ou des changements collectifs durant une phase de rendu entière) et s'exécutent dans un
+unique [`batch`](#batch) par la suite (avec les effets).
+En particulier, toutes les mises à jour de Signaux dans un effet de rendu sont groupées.
+
+Voici un exemple de ce comportement.
+(Comparez avec l'exemple dans [`createEffect`](#createeffect).)
+
+```js
+// Supposez que ce code est dans une fonction de composant, donc fait partie d'une phase de rendu.
+const [count, setCount] = createSignal(0);
+
+// Cet effet log le compte au début et quand il change.
+createRenderEffect(() => console.log("count =", count()));
+// L'effet de rendu s'exécute immédiatement, donnant `count = 0`.
+console.log("hello");
+setCount(1); // L'effet ne se produit pas encore.
+setCount(2); // L'effet ne se produit pas encore.
+
+queueMicrotask(() => {
+  // Maintenant, `count = 2` va s'afficher.
+  console.log("microtask");
+  setCount(3); // Affiche immédiatement `count = 3`.
+  console.log("goodbye");
+});
+
+// --- overall output: ---
+// count = 0   [C'est la seule ligne ajoutée par rapport à createEffect]
+// hello
+// count = 2
+// microtask
+// count = 3
+// goodbye
+```
+
+Tout comme `createEffect`, la fonction d'effet est appelée avec un argument égal à la valeur retournée lors de la dernière exécution de la fonction d'effet, ou lors du premier appel, égal au second argument optionnel de `createRenderEffect`.
+
+## `createComputed`
+
+```ts
+import { createComputed } from "solid-js";
+
+function createComputed<T>(fn: (v: T) => T, value?: T): void;
+```
+
+`createComputed` crée un nouveau calcul qui exécute immédiatement la fonction donnée dans une portée de suivi, ce qui permet de suivre automatiquement ses dépendances, et réexécute automatiquement la fonction dès que les dépendances changent.
+La fonction est appelée avec un argument égal à la valeur retournée lors de la dernière exécution de la fonction, ou lors du premier appel, égal au second argument optionnel de `createComputed`.
+Notez que la valeur de retour de la fonction n'est pas autrement exposée ; en particulier, `createComputed` n'a pas de valeur de retour.
+
+`createComputed` est la forme la plus immédiate de réactivité dans Solid, et est plus utile pour construire d'autres primitives réactives.
+(Par exemple, certaines autres primitives de Solid sont construites à partir de `createComputed`.)
+Mais elle doit être utilisée avec précaution, car `createComputed` peut facilement provoquer plus de mises à jour inutiles que les autres primitives réactives.
+Avant de l'utiliser, considérez les primitives étroitement liées suivantes [`createMemo`](#creatememo) et [`createRenderEffect`](#createrendereffect).
+
+Comme `createMemo`, `createComputed` appelle sa fonction immédiatement lors des mises à jour
+(sauf si vous êtes dans un [batch](#batch), un [effet](#createEffect), ou une [transition](#use-transition)).
+Cependant, alors que les fonctions `createMemo` doivent être pures (ne pas définir de Signaux), les fonctions `createComputed` peuvent définir des Signaux.
+En relation, `createMemo` offre un signal en lecture seule pour la valeur de retour de la fonction, alors que pour faire la même chose avec `createComputed`, vous devez définir un Signal dans la fonction.
+S'il est possible d'utiliser des fonctions pures et `createMemo`, c'est probablement plus efficace, car Solid optimise l'ordre d'exécution des mises à jour des mémos, tandis que la mise à jour d'un signal dans `createComputed` déclenchera immédiatement des mises à jour réactives dont certaines peuvent s'avérer inutiles.
+
+Comme `createRenderEffect`, `createComputed` appelle sa fonction pour la première fois fois immédiatement.
+Mais ils diffèrent dans la façon dont les mises à jour sont effectuées.
+Alors que `createComputed` met généralement à jour immédiatement, `createRenderEffect` met à jour la file d'attente pour s'exécuter (avec les `createEffect`) après la phase de rendu en cours.
+Ainsi, `createRenderEffect` peut effectuer moins de mises à jour globales, mais est légèrement moins immédiat.
+
+## `createReaction`
+
+**Nouveau depuis la v1.3.0**
+
+```ts
+import { createReaction } from "solid-js";
+
+function createReaction(onInvalidate: () => void): (fn: () => void) => void;
+```
+
+Il est parfois utile de séparer le suivi de la ré-exécution. Cette primitive enregistre un effet secondaire qui est exécuté la première fois que l'expression enveloppée par la fonction de suivi retournée est notifiée d'un changement.
+
+```js
+const [s, set] = createSignal("start");
+
+const track = createReaction(() => console.log("quelque chose"));
+
+// La prochaine fois que `s` change, exécuter la réaction.
+track(() => s());
+
+set("end"); // "quelque chose"
+
+set("final"); // Aucune opération car la réaction ne fonctionne que lors de la première mise à jour, il faut rappeler `track` à nouveau.
+```
 
 ## `createSelector`
 
 ```ts
-export function createSelector<T, U>(
+import { createSelector } from "solid-js";
+
+function createSelector<T, U>(
   source: () => T,
-  fn?: (a: U, b: T) => boolean,
-  options?: { name?: string }
+  fn?: (a: U, b: T) => boolean
 ): (k: U) => boolean;
 ```
 
-Créer un signal conditionnel qui va seulement notifier les abonnées quand un élément entré ou sorti correspond à la valeur de la clé. Utile pour déléguer la sélection d'états, car l'opération devient O(1) au lieu de O(n).
+Créé un signal conditionnel qui va seulement notifier les abonnées quand un élément entré ou sorti correspond à la valeur de la clé. Utile pour déléguer la sélection d'états, car l'opération devient O(1) au lieu de O(n).
 
 ```js
 const isSelected = createSelector(selectedId);
@@ -766,8 +1509,6 @@ const isSelected = createSelector(selectedId);
 </For>;
 ```
 
-# Rendering
-
 # Rendu
 
 Ces imports sont exposés depuis `solid-js/web`.
@@ -775,25 +1516,30 @@ Ces imports sont exposés depuis `solid-js/web`.
 ## `render`
 
 ```ts
-export function render(
-  code: () => JSX.Element,
-  element: MountableElement
-): () => void;
+import { render } from "solid-js/web";
+import type { JSX, MountableElement } from "solid-js/web";
+
+function render(code: () => JSX.Element, element: MountableElement): () => void;
 ```
 
-Le point d'entrée de l'application côté navigateur. Il faut fournir une définition de composant de haut niveau ou une fonction et un élément sur lequel monter l'application. Il est recommandé que cet élément soit vide, car la fonction de disposition va effacer tous les enfants.
+Le point d'entrée de l'application côté navigateur. Il faut fournir une définition de composant de haut niveau ou une fonction et un élément sur lequel monter l'application. Il est recommandé que cet élément soit vide, car la fonction de disposition (ici, `dispose`) va effacer tous les enfants.
 
 ```js
 const dispose = render(App, document.getElementById("app"));
+// ou
+const dispose = render(() => <App />, document.getElementById("app"));
 ```
+
+Il est important que le premier argument soit une fonction: ne pas passer directement le JSX
+(comme dans `render(<App />, ...)`), parce que cela appellera `App` avant que `render` puisse
+mettre en place une racine pour suivre les dépendances de signal dans `App`.
 
 ## `hydrate`
 
 ```ts
-export function hydrate(
-  fn: () => JSX.Element,
-  node: MountableElement
-): () => void;
+import { hydrate } from "solid-js/web";
+
+function hydrate(fn: () => JSX.Element, node: MountableElement): () => void;
 ```
 
 Cette méthode est similaire à `render` sauf qu'elle essaye d'hydrater ce qui est déjà rendu dans le DOM. Quand elle est initialisée dans le navigateur, une page a déjà été rendue côté serveur.
@@ -805,16 +1551,20 @@ const dispose = hydrate(App, document.getElementById("app"));
 ## `renderToString`
 
 ```ts
-export function renderToString<T>(
+import { renderToString } from "solid-js/web";
+
+function renderToString<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
     nonce?: string;
+    renderId?: string;
   }
 ): string;
 ```
 
-Effectue un rendu en tant que chaîne de caractères de manière synchrone. La fonction génère aussi une balise script pour l'hydratation progressive. Les options incluses `eventNames` pour écouter des évènements avant que la page ne se charge et à l'exécution de l'hydrations et annoncer l'ajout de la balise tag.
+Effectue un rendu en tant que chaîne de caractères de manière synchrone. La fonction génère aussi une balise script pour l'hydratation progressive. Les options incluent `eventNames` pour écouter des évènements avant que la page ne se charge et à l'exécution de l'hydrations et annoncer l'ajout de la balise tag.
+
+`renderId` est utilisé pour nommer les rendus lorsqu'ils ont plusieurs racines de haut niveau.
 
 ```js
 const html = renderToString(App);
@@ -823,102 +1573,120 @@ const html = renderToString(App);
 ## `renderToStringAsync`
 
 ```ts
-export function renderToStringAsync<T>(
+import { renderToStringAsync } from "solid-js/web";
+
+function renderToStringAsync<T>(
   fn: () => T,
   options?: {
-    eventNames?: string[];
     timeoutMs?: number;
+    renderId?: string;
     nonce?: string;
   }
 ): Promise<string>;
 ```
 
-Similaire à `renderToString` sauf qu'elle va attendre que toutes les limites de `<Suspense/>` soit résolues avant de retourner le résultat. Les données des ressources sont automatiquement sérialisées dans une balise script et seront hydratées au chargement du client.
+Similaire à `renderToString` sauf qu'elle va attendre que toutes les limites de `<Suspense>` soit résolues avant de retourner le résultat. Les données des ressources sont automatiquement sérialisées dans une balise script et seront hydratées au chargement du client.
 
 ```js
 const html = await renderToStringAsync(App);
 ```
 
-## `pipeToNodeWritable`
+## `renderToStream`
+
+**Nouveau depuis la v1.3.0**
 
 ```ts
-export type PipeToWritableResults = {
-  startWriting: () => void;
-  write: (v: string) => void;
-  abort: () => void;
-};
-export function pipeToNodeWritable<T>(
+import { renderToStream } from "solid-js/web";
+
+function renderToStream<T>(
   fn: () => T,
-  writable: { write: (v: string) => void },
   options?: {
-    eventNames?: string[];
     nonce?: string;
-    noScript?: boolean;
-    onReady?: (r: PipeToWritableResults) => void;
-    onComplete?: (r: PipeToWritableResults) => void | Promise<void>;
+    renderId?: string;
+    onCompleteShell?: () => void;
+    onCompleteAll?: () => void;
   }
-): void;
+): {
+  pipe: (writable: { write: (v: string) => void }) => void;
+  pipeTo: (writable: WritableStream) => void;
+};
 ```
 
-Cette méthode traduit en flux Node. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continus vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
+Cette méthode effectue le rendu dans un flux (stream). Elle effectue le rendu du contenu de manière synchrone, y compris les éventuels espaces de repli de `Suspense`, puis continue à diffuser les données et le HTML à partir de toute ressource asynchrone au fur et à mesure de sa réalisation.
 
 ```js
-pipeToNodeWritable(App, res);
-```
+// Mode
+renderToStream(App).pipe(res);
 
-L'option `onReady` est utile pour écrire dans le flux autour du noyau du rendu de l'application. Si vous utilisez `onReady`, vous devez appeler manuellement `startWriting`
-
-## `pipeToWritable`
-
-```ts
-export type PipeToWritableResults = {
-  write: (v: string) => void;
-  abort: () => void;
-  script: string;
-};
-export function pipeToWritable<T>(
-  fn: () => T,
-  writable: WritableStream,
-  options?: {
-    eventNames?: string[];
-    nonce?: string;
-    noScript?: boolean;
-    onReady?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-    onComplete?: (
-      writable: { write: (v: string) => void },
-      r: PipeToWritableResults
-    ) => void;
-  }
-): void;
-```
-
-Cette méthode traduit en flux web. Il traduit le contenu de manière synchrone en incluant tous les contenus de repli des Suspenses, et ensuite continus vers un flux de données provenant des ressources asynchrones au fur et à mesure de leur complétion.
-
-```js
+// Web Stream
 const { readable, writable } = new TransformStream();
-pipeToWritable(App, writable);
+renderToStream(App).pipeTo(writable);
 ```
 
-L'option `onReady` est utile pour écrire dans le flux autour du noyau du rendu de l'application. Si vous utilisez `onReady`, vous devez appeler manuellement `startWriting`
+`onCompleteShell` se déclenche lorsque le rendu synchrone est terminé avant d'écrire le premier flush du flux vers le navigateur. `onCompleteAll` est appelé lorsque toutes les limites de `Suspense` du serveur ont été réglées. `renderId` est utilisé pour nommer les rendus lorsqu'ils ont plusieurs racines de haut niveau.
+
+> Note: Cette API remplace les API précédents `pipeToWritable` et `pipeToNodeWritable`.
 
 ## `isServer`
 
 ```ts
-export const isServer: boolean;
+import { isServer } from "solid-js/web";
+
+const isServer: boolean;
 ```
 
 Cela indique si le code est exécuté côté serveur ou côté navigateur. Comme le système d'exécution exporte ceci en tant que constante booléenne, cela permet aux bundlers d'éliminer le code et leurs imports de leurs bundle respectifs.
 
 ```js
 if (isServer) {
-  // Je ne serais jamais dans le bundle du navigateur
+  // Je ne serais jamais dans le bundle du navigateur.
 } else {
-  // Je ne serais jamais côté serveur
+  // Je ne serais jamais côté serveur.
 }
 ```
+
+## `DEV`
+
+```ts
+import { DEV } from "solid-js";
+
+const DEV: object | undefined;
+```
+
+Sur le client, Solid fournit (via [exportations conditionnelles](https://nodejs.org/api/packages.html#conditional-exports)) différents builds selon que la condition `development` est activée ou non.
+Le mode développement fournit quelques vérifications supplémentaires - par exemple la détection de l'utilisation accidentelle de plusieurs instances de Solid - qui sont supprimées dans les builds de production.
+
+Si vous voulez que le code ne s'exécute qu'en mode développement (le plus utile dans les bibliothèques), vous pouvez vérifier si l'exportation `DEV` est définie.
+Notez qu'elle est toujours définie sur le serveur, vous pouvez donc la combiner avec [`isServer`](#isserver):
+
+```ts
+import { DEV } from "solid-js";
+import { isServer } from "solid-js/web";
+
+if (DEV && !isServer) {
+  console.log(...);
+}
+```
+
+## `HydrationScript`
+
+```ts
+import { generateHydrationScript, HydrationScript } from "solid-js/web";
+
+function generateHydrationScript(options: {
+  nonce?: string;
+  eventNames?: string[];
+}): string;
+
+function HydrationScript(props: {
+  nonce?: string;
+  eventNames?: string[];
+}): JSX.Element;
+```
+
+Hydration Script est un script spécial qui doit être placé une fois sur la page pour amorcer l'hydratation avant que le runtime de Solid ne soit chargé. Il se présente à la fois comme une fonction qui peut être appelée et insérée dans une chaîne HTML, ou comme un Composant si vous rendez le JSX à partir de la balise `<html>`.
+
+Les options sont le `nonce` à mettre sur la balise de script et tout nom d'événement pour lequel Solid devrait capturer avant que les scripts aient été chargés et rejouer pendant l'hydratation. Ces événements sont limités à ceux que Solid délègue, ce qui inclut la plupart des événements de l'interface utilisateur qui sont composés et des bulles. Par défaut, il s'agit uniquement des événements `click` et `input`.
 
 # Control Flow
 
@@ -926,14 +1694,16 @@ Solid utilise les composants pour le contrôle de flux. Pour que la réactivité
 
 Enrober ces composants est un moyen pratique pour réduire le templating et permettre aux utilisateurs de composer et construire leurs propres contrôles de flux.
 
-Ces composants de contrôle de flux sont automatiquement importés. Tous à l'exception de `Portal` et `Dynamic` sont importés depuis `solid-js`. Ces deux-là son spécifique au DOM et sont exportés par `solid-js/web`.
+Ces composants de contrôle de flux sont automatiquement importés. Tous à l'exception de `Portal` et `Dynamic` qui sont exportés par `solid-js` et `solid-js/web`. Ces deux-là sont spécifique au DOM et sont exportés par `solid-js/web`.
 
-> Note : Toutes fonctions enfants au contrôle de flux sont non tracées. Cela permet d'imbriquer des créations d'états, et mieux isoler les réactions.
+> Note: Toutes fonctions enfants au contrôle de flux ne seront pas tracées. Cela permet d'imbriquer des créations d'états, et mieux isoler les réactions.
 
 ## `<For>`
 
 ```ts
-export function For<T, U extends JSX.Element>(props: {
+import { For } from "solid-js";
+
+function For<T, U extends JSX.Element>(props: {
   each: readonly T[];
   fallback?: JSX.Element;
   children: (item: T, index: () => number) => U;
@@ -948,7 +1718,7 @@ Simple référencement de contrôle de flux par boucle.
 </For>
 ```
 
-Le second argument optionnel est un signal index :
+Le second argument optionnel est un Signal index:
 
 ```jsx
 <For each={state.list} fallback={<div>Loading...</div>}>
@@ -963,8 +1733,11 @@ Le second argument optionnel est un signal index :
 ## `<Show>`
 
 ```ts
+import { Show } from "solid-js";
+
 function Show<T>(props: {
   when: T | undefined | null | false;
+  keyed: boolean;
   fallback?: JSX.Element;
   children: JSX.Element | ((item: T) => JSX.Element);
 }): () => JSX.Element;
@@ -973,7 +1746,7 @@ function Show<T>(props: {
 Le contrôle de flux `Show` est utilisée pour afficher conditionnellement une partie de la vue. Ceci est similaire à un opérateur ternaire (`a ? b : c`) mais est idéal pour le templating JSX.
 
 ```jsx
-<Show when={state.count > 0} fallback={<div>Loading...</div>}>
+<Show when={state.count > 0} fallback={<div>Chargement...</div>}>
   <div>My Content</div>
 </Show>
 ```
@@ -981,7 +1754,7 @@ Le contrôle de flux `Show` est utilisée pour afficher conditionnellement une p
 `Show` peut aussi être utilisé comme un moyen d'associé une clé d'un modèle de données spécifique à un bloc. Par exemple, la fonction est réexécutée quand le modèle est remplacé.
 
 ```jsx
-<Show when={state.user} fallback={<div>Loading...</div>}>
+<Show when={state.user} fallback={<div>Chargement...</div>} keyed>
   {(user) => <div>{user.firstName}</div>}
 </Show>
 ```
@@ -989,7 +1762,10 @@ Le contrôle de flux `Show` est utilisée pour afficher conditionnellement une p
 ## `<Switch>`/`<Match>`
 
 ```ts
-export function Switch(props: {
+import { Switch, Match } from "solid-js";
+import type { MatchProps } from "solid-js";
+
+function Switch(props: {
   fallback?: JSX.Element;
   children: JSX.Element;
 }): () => JSX.Element;
@@ -998,7 +1774,7 @@ type MatchProps<T> = {
   when: T | undefined | null | false;
   children: JSX.Element | ((item: T) => JSX.Element);
 };
-export function Match<T>(props: MatchProps<T>);
+function Match<T>(props: MatchProps<T>);
 ```
 
 Utile quand il y a plus de 2 conditions mutuelles exclusives. Peut-être utiliser pour faire un système de routage simple par exemple.
@@ -1019,7 +1795,9 @@ Utile quand il y a plus de 2 conditions mutuelles exclusives. Peut-être utilise
 ## `<Index>`
 
 ```ts
-export function Index<T, U extends JSX.Element>(props: {
+import { Index } from "solid-js";
+
+function Index<T, U extends JSX.Element>(props: {
   each: readonly T[];
   fallback?: JSX.Element;
   children: (item: () => T, index: number) => U;
@@ -1028,7 +1806,7 @@ export function Index<T, U extends JSX.Element>(props: {
 
 Une fonction d'itération sur des listes sans clé (les lignes sont associées à un index au lieu d'une clé). Ceci est utile quand il n'y a pas de clé conceptuelle, par exemple si la donnée est composée de primitives et c'est l'index qui est fixe au lieu de la valeur.
 
-L'élément est un signal :
+L'élément est un Signal:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1036,7 +1814,7 @@ L'élément est un signal :
 </Index>
 ```
 
-Le second argument optionnel est un index de type `number` :
+Le second argument optionnel est un index de type `number`:
 
 ```jsx
 <Index each={state.list} fallback={<div>Loading...</div>}>
@@ -1051,6 +1829,8 @@ Le second argument optionnel est un index de type `number` :
 ## `<ErrorBoundary>`
 
 ```ts
+import { ErrorBoundary } from "solid-js";
+
 function ErrorBoundary(props: {
   fallback: JSX.Element | ((err: any, reset: () => void) => JSX.Element);
   children: JSX.Element;
@@ -1060,7 +1840,7 @@ function ErrorBoundary(props: {
 Intercepte les erreurs qui ne sont pas traitées et affiche un contenu de repli.
 
 ```jsx
-<ErrorBoundary fallback={<div>Something went terribly wrong</div>}>
+<ErrorBoundary fallback={<div>Quelque chose a terriblement mal tourné</div>}>
   <MyComp />
 </ErrorBoundary>
 ```
@@ -1069,7 +1849,7 @@ Il est aussi possible de passer une fonction qui va recevoir l'erreur ainsi qu'u
 
 ```jsx
 <ErrorBoundary
-  fallback={(err, reset) => <div onClick={reset}>Error: {err.toString()}</div>}
+  fallback={(err, reset) => <div onClick={reset}>Erreur: {err.toString()}</div>}
 >
   <MyComp />
 </ErrorBoundary>
@@ -1078,7 +1858,9 @@ Il est aussi possible de passer une fonction qui va recevoir l'erreur ainsi qu'u
 ## `<Suspense>`
 
 ```ts
-export function Suspense(props: {
+import { Suspense } from "solid-js";
+
+function Suspense(props: {
   fallback?: JSX.Element;
   children: JSX.Element;
 }): JSX.Element;
@@ -1095,6 +1877,8 @@ Un composant qui garde une trace de toutes les ressources lues dans sa portée e
 ## `<SuspenseList>` (Expérimental)
 
 ```ts
+import { SuspenseList } from "solid-js";
+
 function SuspenseList(props: {
   children: JSX.Element;
   revealOrder: "forwards" | "backwards" | "together";
@@ -1121,6 +1905,8 @@ function SuspenseList(props: {
 ## `<Dynamic>`
 
 ```ts
+import { Dynamic } from "solid-js/web";
+
 function Dynamic<T>(
   props: T & {
     children?: any;
@@ -1138,7 +1924,9 @@ Ce composant vous laisse insérer un composant ou une balise arbitraire avec des
 ## `<Portal>`
 
 ```ts
-export function Portal(props: {
+import { Portal } from "solid-js/web";
+
+function Portal(props: {
   mount?: Node;
   useShadow?: boolean;
   isSVG?: boolean;
@@ -1194,6 +1982,7 @@ let myDiv;
 
 // utilisation de `onMount` ou `createEffect` pour lire après la connexion au DOM
 onMount(() => console.log(myDiv));
+
 <div ref={myDiv} />
 
 // Ou utilisation d'une fonction (appelé avant la connexion au DOM)
@@ -1216,7 +2005,25 @@ function App() {
 
 ## `classList`
 
-Un attribut d'aide pour utiliser `element.classList.toggle`. Il va prendre un objet dont la clé est un nom de classes et l'assigner quand la condition sera considérée `true`
+Solid propose deux façons de définir la `class` d'un élément: les attributs `class` et `classList`.
+
+Premièrement, vous pouvez utiliser `class=...` comme n'importe quel autre attribut. Par exemple:
+
+```jsx
+// Deux classes statiques.
+<div class="active editing" />
+
+// Une classe dynamique que l'on supprime si on n'en a pas besoin.
+<div class={state.active ? 'active' : undefined} />
+
+// Deux classes dynamiques.
+<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}} />
+```
+
+(Notez que `className=...` a été déprécié depuis Solid 1.4.)
+
+Alternativement, le pseudo-attribut `classList` vous permet de spécifier un objet, où chaque clé est une classe et la valeur est traitée comme un booléen représentant si cette classe doit être incluse.
+Par exemple (correspondant au dernier exemple):
 
 ```jsx
 <div
@@ -1224,9 +2031,47 @@ Un attribut d'aide pour utiliser `element.classList.toggle`. Il va prendre un ob
 />
 ```
 
+Cet exemple se compile en un [effet de rendu](#createrendereffect) qui appelle dynamiquement [`element.classList.toggle`](https://developer.mozilla.org/en-US/docs/Web/API/DOMTokenList/toggle) pour activer ou désactiver chaque classe, uniquement lorsque le booléen correspondant change.
+Par exemple, lorsque `state.active` devient `true` [`false`], l'élément gagne [perd] la classe `active`.
+
+La valeur passée dans `classList` peut être n'importe quelle expression (y compris un Signal) qui est évaluée à un objet approprié. Quelques exemples:
+
+```jsx
+// Nom et valeur de la classe dynamique.
+<div classList={{ [className()]: classOn() }} />;
+
+// Liste de classes avec des Signaux.
+const [classes, setClasses] = createSignal({});
+setClasses((c) => ({ ...c, active: true }));
+<div classList={classes()} />;
+```
+
+Il est également possible, mais dangereux, de mélanger `class` et `classList`.
+La principale situation sûre est lorsque `class` est défini à une chaîne statique (ou rien), et que `classList` est réactive.
+(`class` peut aussi être défini comme une valeur statique calculée comme dans `class={baseClass()}`, mais alors il devrait apparaître avant tout pseudo-attribut `classList`).
+Si `class` et `classList` sont tous deux réactifs, vous pouvez obtenir un comportement inattendu: lorsque la valeur de `class` change, Solid définit l'attribut `class` entier, ce qui écrasera tous les basculements effectués par `classList`.
+
+Parce que `classList` est un pseudo-attribut de compilation, il ne fonctionne pas dans un prop spread comme `<div {...props} />` ou dans `<Dynamic>`.
+
 ## `style`
 
-L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec un objet. À la différence de React, Solid utilise `element.style.setProperty` en coulisse. Cela signifie que les variables CSS sont supportées, mais aussi que nous devons utiliser la version dash-case des propriétés. Cela donne de meilleures performances et une meilleure cohésion avec le résultat du rendu côté serveur.
+L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec un objet. 
+
+```jsx
+// chaine de caractère
+<div style={`color: green; height: ${state.height}px`} />
+
+// objet
+<div style={{
+  color: "green",
+  height: state.height + "px" }}
+/>
+
+// variable css
+<div style={{ "--my-custom-color": state.themeColor }} />
+```
+
+À la différence de [l'attribut `style` de React](https://fr.reactjs.org/docs/dom-elements.html#style), Solid utilise `element.style.setProperty` en coulisse. Cela signifie que nous devons utiliser la version dash-case des propriétés. Cela donne de meilleures performances et une meilleure cohésion avec le résultat du rendu côté serveur.
 
 ```jsx
 // chaine de caractère
@@ -1238,8 +2083,12 @@ L'attribut style fonctionne soit comme avec une chaîne de caractère soit avec 
   "background-color": state.color,
   height: state.height + "px" }}
 />
+```
 
-// variable css
+Cela signifie aussi que les variables CSS sont supportées! Par exemple:
+
+```jsx
+// Attribuer une variable CSS.
 <div style={{ "--my-custom-color": state.themeColor }} />
 ```
 
@@ -1253,7 +2102,9 @@ Ils fonctionnent de la même manière que la propriété. Passez une chaîne de 
 
 ## `on___`
 
-Les gestionnaires d'évènement dans Solid prennent typiquement la forme de `onclick` ou `onClick` en fonction du style du code. Le nom de l'évènement est en minuscule. Solid utilise une délégation d'évènement semi-synthétique pour les évènements communs à l'interface utilisateur qui ne sont pas composés et remontés. Cela améliore les performances pour les évènements communs.
+Les gestionnaires d'évènement dans Solid prennent typiquement la forme de `onclick` ou `onClick` en fonction du style du code. Le nom de l'évènement est en minuscule.
+
+Solid utilise une délégation d'évènement semi-synthétique pour les évènements communs à l'interface utilisateur qui ne sont pas composés et remontés. Cela améliore les performances pour les évènements communs.
 
 ```jsx
 <div onClick={(e) => console.log(e.currentTarget)} />
@@ -1277,6 +2128,8 @@ Les évènements ne peuvent pas rebondir et l'association n'est pas réactive, c
 // si défini, l'appeler, sinon ne rien faire.
 <div onClick={() => props.handleClick?.()} />
 ```
+
+Notez que `onChange` et `onInput` fonctionnent selon leur comportement natif. `onInput` se déclenchera immédiatement après que la valeur ait changé ; pour les champs `<input>`, `onChange` ne se déclenchera qu'après que le champ ait perdu le focus.
 
 ## `on:___`/`oncapture:___`
 
@@ -1333,7 +2186,7 @@ Force la prop à être traitée comme une propriété au lieu d'un attribut.
 Force la prop à être traitée comme un attribut au lieu d'une propriété. C'est utile pour les Web Components où vous voulez associer un attribut.
 
 ```jsx
-<my-element attr:status={props.status} />
+<mon-web-component attr:status={props.status} />
 ```
 
 ## `/* @once */`
@@ -1343,11 +2196,11 @@ Le compilateur de Solid utilise une façon heuristique pour enrober la réactivi
 En sachant ça, nous pouvons réduire la pénalisation effective pour les choses qui ne vont pas changer en y accédant depuis l'extérieur de JSX. Une simple variable ne sera jamais enrobée. Nous pouvons aussi dire au compilateur de ne pas les enrober en commençant une expression avec un commentaire décoratif `/_ @once _/`.
 
 ```jsx
-<MyComponent static={/*@once*/ state.wontUpdate} />
+<MonComposant static={/*@once*/ state.wontUpdate} />
 ```
 
 Cela fonctionne aussi sur les enfants.
 
 ```jsx
-<MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
+<MonComposant>{/*@once*/ state.wontUpdate}</MonComposant>
 ```

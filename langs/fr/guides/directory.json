@@ -20,6 +20,16 @@
     "description": "Une explication des capacités côté serveur de Solid"
   },
   {
+    "resource": "typescript",
+    "title": "TypeScript",
+    "description": "Conseils pour utiliser Solid avec TypeScript"
+  },
+  {
+    "resource": "testing",
+    "title": "Testing Solid",
+    "description": "Comment tester votre application Solid"
+  },
+  {
     "resource": "comparison",
     "title": "Comparaison",
     "description": "Comparaison de Solid avec les autres frameworks."

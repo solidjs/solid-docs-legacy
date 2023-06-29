@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "name": "main",
+      "content": "import { render } from \"solid-js/web\";\nimport { createSignal, Switch, Match } from \"solid-js\";\n\nfunction App() {\n  const [x] = createSignal(7);\n\n  return (\n    <Switch fallback={<p>{x()} est entre 5 et 10</p>}>\n      <Match when={x() > 10} >\n        <p>{x()} est plus grand que 10</p>\n      </Match>\n      <Match when={5 > x()}>\n        <p>{x()} est plus petit que 5</p>\n      </Match>\n    </Switch>\n  );\n}\n\nrender(() => <App />, document.getElementById(\"app\"));\n"
+    }
+  ]
+}

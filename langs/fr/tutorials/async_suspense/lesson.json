@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "name": "main",
+      "content": "import { render } from \"solid-js/web\";\nimport { lazy, Suspense } from \"solid-js\";\n\nconst Accueilir = lazy(async () => {\n  // Simuler un délai de 1000 millisecondes.\n  await new Promise(r => setTimeout(r, 1000))\n  return import(\"./accueilir\")\n});\n\nfunction App() {\n  return (\n    <>\n      <h1>Bienvenue</h1>\n      <Accueilir name=\"Jake\" />\n    </>\n  );\n}\n\nrender(() => <App />, document.getElementById(\"app\"));\n"
+    },
+    {
+      "name": "accueilir",
+      "content": "export default function Accueilir(props) {\n  return <h3>Coucou, {props.name}</h3>\n}"
+    }
+  ]
+}
