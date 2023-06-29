@@ -341,7 +341,7 @@ import type { ResourceReturn } from "solid-js";
 type ResourceReturn<T> = [
   {
     (): T | undefined;
-    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored"
+    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored";
     loading: boolean;
     error: any;
     latest: T | undefined;
