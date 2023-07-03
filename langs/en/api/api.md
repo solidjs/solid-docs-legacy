@@ -1548,7 +1548,7 @@ Here is an example of the behavior.
 const [count, setCount] = createSignal(0);
 
 // this effect prints count at the beginning and when it changes
-createRenderEffect(() => console.log("count =", count()));
+createRenderEffect(() => console.log("count = ", count()));
 // render effect runs immediately, printing `count = 0`
 console.log("hello");
 setCount(1); // effect won't run yet
