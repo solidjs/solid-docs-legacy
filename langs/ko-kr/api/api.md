@@ -114,7 +114,7 @@ const [depend, rerun] = createSignal(undefined, { equals: false });
 
 // 문자열의 길이에 따라 동등성 비교 정의:
 const [myString, setMyString] = createSignal("string", {
-  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+  equals: (oldVal, newVal) => newVal.length === oldVal.length,
 });
 
 setMyString("strung"); // 이전 값과 동일한 것으로 판단해 업데이트가 발생하지 않습니다.
