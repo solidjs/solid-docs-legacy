@@ -87,7 +87,7 @@ const [depend, rerun] = createSignal(undefined, { equals: false });
 
 // 根据字符串长度定义相等：
 const [myString, setMyString] = createSignal("string", {
-  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+  equals: (oldVal, newVal) => newVal.length === oldVal.length,
 });
 
 setMyString("strung"); // 被认为等于最后一个值并且不会导致更新
