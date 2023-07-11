@@ -131,7 +131,7 @@ const [depend, rerun] = createSignal(undefined, { equals: false });
 
 // Равенство определяется длиной строк
 const [myString, setMyString] = createSignal("string", {
-  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+  equals: (oldVal, newVal) => newVal.length === oldVal.length,
 });
 
 setMyString("strung"); // не вызовет обновления, поскольку будет рассматриваться равной (на основе длины строк)
