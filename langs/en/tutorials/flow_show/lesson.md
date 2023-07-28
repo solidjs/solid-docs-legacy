@@ -1,4 +1,4 @@
-JSX allows you to use JavaScript to control the logic flow in the templates. However, without a Virtual DOM, naive use of things like `Array.prototype.map` would wastefully recreate all the DOM nodes on every update. Instead it is common for Reactive libraries to use template helpers. In Solid we wrap them in components.
+JSX allows you to use JavaScript to control the logic flow in the templates. However, without a Virtual DOM, using things like `Array.prototype.map` would wastefully recreate all the DOM nodes on every update. Instead it is common for Reactive libraries to use template helpers. In Solid we wrap them in components.
 
 The most basic control flow is the conditional. Solid's compiler is smart enough to optimally handle ternaries (`a ? b : c`) and boolean expressions (`a && b`). However, often it is more readable to use Solid's `<Show>` component.
 
