@@ -341,14 +341,14 @@ import type { ResourceReturn } from "solid-js";
 type ResourceReturn<T> = [
   {
     (): T | undefined;
-    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored"
+    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored";
     loading: boolean;
     error: any;
     latest: T | undefined;
   },
   {
     mutate: (v: T | undefined) => T | undefined;
-    refetch: (info: unknown) => Promise<T> | T;
+    refetch: (info?: unknown) => Promise<T> | T;
   }
 ];
 
@@ -2401,4 +2401,16 @@ This also works on children.
 
 ```jsx
 <MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
+```
+
+[`style`](#style) and [`classList`](#classlist) attributes are special
+in that `/*@once*/` applies to each object property value separately,
+and (currently) cannot be applied to the entire attribute. For example:
+
+```jsx
+<div style={{
+  width: /*@once*/ props.width,   // not reactive
+  height: /*@once*/ props.height, // not reactive
+  color: props.color,             // reactive
+}} />
 ```
