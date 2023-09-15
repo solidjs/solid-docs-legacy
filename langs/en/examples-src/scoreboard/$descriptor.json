@@ -1,0 +1,5 @@
+{
+  "name": "Complex/Scoreboard",
+  "description": "Make use of hooks to do simple transitions",
+  "files": ["main.jsx"]
+}

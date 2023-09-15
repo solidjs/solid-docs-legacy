@@ -1,0 +1,5 @@
+{
+  "name": "Basic/Counter",
+  "description": "A simple standard counter example",
+  "files": ["main.jsx"]
+}

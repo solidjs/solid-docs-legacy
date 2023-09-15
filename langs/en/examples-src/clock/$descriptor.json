@@ -1,0 +1,5 @@
+{
+  "name": "Complex/Clock",
+  "description": "Demonstrates Solid reactivity with a real-time clock example",
+  "files": ["main.tsx","Clock.tsx","Lines.tsx","Hand.tsx","utils.tsx","styles.css"]
+}

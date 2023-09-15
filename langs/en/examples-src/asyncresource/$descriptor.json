@@ -1,0 +1,5 @@
+{
+  "name": "Complex/Async Resource",
+  "description": "Ajax requests to SWAPI with Promise cancellation",
+  "files": ["main.jsx"]
+}

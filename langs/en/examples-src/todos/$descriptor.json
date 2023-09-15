@@ -1,0 +1,5 @@
+{
+  "name": "Basic/Simple Todos",
+  "description": "Todos with LocalStorage persistence",
+  "files": ["main.tsx","utils.tsx"]
+}

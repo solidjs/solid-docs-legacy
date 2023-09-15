@@ -1,6 +1,6 @@
-import { DocFile, LessonFile, LessonLookup, ResourceMetadata } from "./types";
+import { DocFile, LessonFile, LessonLookup, ResourceMetadata, SourceFile, Example } from "./types";
 
-export { DocFile, LessonFile, LessonLookup, ResourceMetadata };
+export { DocFile, LessonFile, LessonLookup, ResourceMetadata, SourceFile, Example };
 
 function noThrow<T>(x: Promise<T>): Promise<T | undefined> {
   return x.catch(() => undefined);
@@ -48,5 +48,20 @@ export async function getTutorialDirectory(
   const directory = await noThrow(
     import(`../langs/${lang}/tutorials/directory.json`)
   );
+  return directory?.default;
+}
+
+export async function getExample(
+  lang: string,
+  id: string
+): Promise<Example | undefined> {
+  const example = await noThrow(import(`../langs/${lang}/examples/${id}.json`));
+  return example?.default;
+}
+
+export async function getExamplesDirectory(
+  lang: string
+): Promise<Example[] | undefined> {
+  const directory = await noThrow(import(`../langs/${lang}/examples/$descriptor.json`));
   return directory?.default;
 }

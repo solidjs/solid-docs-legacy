@@ -1,0 +1,5 @@
+{
+  "name": "Complex/Simple Todos Template Literals",
+  "description": "Simple Todos using Lit DOM Expressions",
+  "files": ["main.jsx"]
+}
