@@ -285,7 +285,7 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 
 在第二种情况下，一旦 `sourceSignal` 具有除 `false`、`null` 或 `undefined` 之外的任何值，`fetchData` 将被调用。
 
-每当 `sourceSignal` 的值发生变化时，都会再次调用它，并且该值将始终作为第一个参数传递给 `fetchData`。
+每当 `sourceSignal` 的值发生变化时，都会再次调用它，并且该值将始终作为第一个参数传递给 `fetchData`。要在 `store` 中的一个属性当作 `sourceSignal`使用，您必须用一个函数封装起来。
 
 您可以调用 `mutate` 来直接更新 `data` signal（它的工作方式与任何其他 signal setter 一样）。您还可以调用 `refetch` 直接重新运行 fetcher，并传递一个可选参数以向 fetcher 提供附加信息：`refetch(info)`。
 
@@ -401,16 +401,6 @@ function onCleanup(fn: () => void): void;
 
 注册一个清理方法，该方法在当前反应范围的清除或重新计算时执行。可以在任何组件或 Effect 中使用。
 
-## `onError`
-
-```ts
-import { onError } from "solid-js";
-
-function onError(fn: (err: any) => void): void;
-```
-
-注册在子作用域出错时执行的错误处理程序方法。仅执行最近的作用域错误处理程序。重新抛出可以向上触发。
-
 # 响应性工具类
 
 这些工具类提供了更好地安排更新和控制如何跟踪响应性的能力。
@@ -469,6 +459,29 @@ setA("new"); // 现在会运行了
 ```
 
 请注意，在 `stores` 和 `mutable` 上，从父对象中添加或删除属性会触发 effect。参见[`createMutable`](#createMutable)
+
+## `catchError`
+
+**v1.7.0 新特性**
+
+```ts
+import { catchError } from "solid-js";
+function catchError<T>(tryFn: () => T, onError: (err: any) => void): T;
+```
+
+将 `tryFn` 用错误处理程序进行包装，如果在该层级以下发生错误，则会触发错误处理程序。仅最近的作用域错误处理程序会执行。重新抛出以触发上一层级。
+
+## `onError`
+
+**因 catchError，在 v1.7.0 弃用**
+
+```ts
+import { onError } from "solid-js";
+
+function onError(fn: (err: any) => void): void;
+```
+
+注册在子作用域出错时执行的错误处理程序方法。仅执行最近的作用域错误处理程序。重新抛出可以向上触发。
 
 ## `createRoot`
 
@@ -871,7 +884,7 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 
 ### 修改 Store
 
-可以采用传递先前状态并返回新状态或值的函数的形式。对象总是浅合并。将值设置为 `undefined` 可以把它们从 store 中删除。
+可以采用传递先前状态并返回新状态或值的函数的形式。对象总是浅合并。将值设置为 `undefined` 可以把它们从 store 中删除。在 `TypeScript`，你可以使用非 `null` 断言来删除值，例如`undefined!`。
 
 ```js
 const [state, setState] = createStore({
@@ -967,11 +980,7 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ```ts
 import { produce } from "solid-js/store";
 
-function produce<T>(
-  fn: (state: T) => void
-): (
-  state: T extends NotWrappable ? T : Store<T>
-) => T extends NotWrappable ? T : Store<T>;
+function produce<T>(fn: (state: T) => void): (state: T) => T;
 ```
 
 Solid Store 对象的 API 受 Immer 启发，允许使用下面的代码修改数据
@@ -1918,7 +1927,7 @@ Solid 提供了 `class` 和 `classList` 两个属性来设置元素的 class。
 <div class={state.active ? 'active' : undefined} />
 
 // 两个动态的 class
-<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}} />
+<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}`} />
 ```
 
 （注意 `className=...` 在 Solid 1.4 中已弃用。）
