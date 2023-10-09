@@ -7,7 +7,7 @@ De longe, a maneira mais fácil de começar a usar o Solid é experimentá-lo on
 Como alternativa, você pode usar nossos modelos simples [Vite](https://vitejs.dev/) executando estes comandos em seu terminal:
 
 ```sh
-> npx degit solidjs/templates/js my-app
+> npm create vite@latest my-app -- --template solid
 > cd my-app
 > npm i # ou yarn ou pnpm
 > npm run dev # ou yarn ou pnpm
@@ -16,7 +16,7 @@ Como alternativa, você pode usar nossos modelos simples [Vite](https://vitejs.d
 Ou para TypeScript:
 
 ```sh
-> npx degit solidjs/templates/ts my-app
+> npm create vite@latest my-app -- --template solid-ts
 > cd my-app
 > npm i # ou yarn ou pnpm
 > npm run dev # ou yarn ou pnpm

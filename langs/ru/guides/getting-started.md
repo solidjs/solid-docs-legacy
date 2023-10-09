@@ -7,7 +7,7 @@
 Кроме того, вы можете использовать наши простые [Vite](https://vitejs.dev/) шаблоны, выполнив следующие команды в своем терминале:
 
 ```sh
-> npx degit solidjs/templates/js my-app
+> npm create vite@latest my-app -- --template solid
 > cd my-app
 > npm i #  yarn/pnpm
 > npm run dev #  yarn/pnpm
@@ -16,7 +16,7 @@
 Или с поддержкой TypeScript:
 
 ```sh
-> npx degit solidjs/templates/ts my-app
+> npm create vite@latest my-app -- --template solid-ts
 > cd my-app
 > npm i # yarn/pnpm
 > npm run dev # yarn/pnpm

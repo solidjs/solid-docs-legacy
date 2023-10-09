@@ -16,7 +16,7 @@
 或者，您可以通过在终端中运行以下命令来使用我们的 [Vite 模板](https://github.com/solidjs/templates)：
 
 ```sh
-> npx degit solidjs/templates/js my-app
+> npm create vite@latest my-app -- --template solid
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
@@ -25,7 +25,7 @@
 或者使用 TypeScript:
 
 ```sh
-> npx degit solidjs/templates/ts my-app
+> npm create vite@latest my-app -- --template solid-ts
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
