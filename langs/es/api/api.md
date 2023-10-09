@@ -46,7 +46,7 @@ De forma predeterminada, cuando se llama al setter de una señal, las dependenci
 
 ```js
 const [miString, setMiString] = createSignal("string", {
-	equals: (newVal, oldVal) => newVal.length === oldVal.length,
+	equals: (oldVal, newVal) => newVal.length === oldVal.length,
 });
 
 setMyString("strung"); //es considerado igual al ultimo valor y no generará actualizaciones

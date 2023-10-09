@@ -146,7 +146,7 @@ const [depend, rerun] = createSignal(undefined, { equals: false });
 
 // 文字列の長さに基づいて「等しいかどうか」を定義する:
 const [myString, setMyString] = createSignal("string", {
-  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+  equals: (oldVal, newVal) => newVal.length === oldVal.length,
 });
 
 setMyString("strung"); // 最後の値と等しいと見なされ、更新は発生しません
