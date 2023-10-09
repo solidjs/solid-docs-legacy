@@ -1,6 +1,6 @@
 # はじめに
 
-**私たちは新しいドキュメントに取り組んでいます。** 新しい初心者向けチュートリアルは[こちら](https://docs.solidjs.com/tutorials/getting-started-with-solid/)チェックできます。また、[Discord](http://discord.com/invite/solidjs) で私たちの活動に参加してください！
+**私たちは新しいドキュメントに取り組んでいます。** 新しい初心者向けチュートリアルは[こちら](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/welcome)チェックできます。また、[Discord](http://discord.com/invite/solidjs) で私たちの活動に参加してください！
 
 ## Solid を見る
 
@@ -16,7 +16,7 @@ Solid を使い始める最も簡単な方法は、オンラインで試すこ�
 また、ターミナルで以下のコマンドを実行して、 [Vite テンプレート](https://github.com/solidjs/templates) を使用することもできます:
 
 ```sh
-> npx degit solidjs/templates/js my-app
+> npm create vite@latest my-app -- --template solid
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
@@ -25,7 +25,7 @@ Solid を使い始める最も簡単な方法は、オンラインで試すこ�
 または TypeScript 向けに:
 
 ```sh
-> npx degit solidjs/templates/ts my-app
+> npm create vite@latest my-app -- --template solid-ts
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm

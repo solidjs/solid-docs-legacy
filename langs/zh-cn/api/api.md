@@ -87,7 +87,7 @@ const [depend, rerun] = createSignal(undefined, { equals: false });
 
 // 根据字符串长度定义相等：
 const [myString, setMyString] = createSignal("string", {
-  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+  equals: (oldVal, newVal) => newVal.length === oldVal.length,
 });
 
 setMyString("strung"); // 被认为等于最后一个值并且不会导致更新
@@ -462,7 +462,7 @@ createEffect(() => {
 你也可以不用立即执行计算，而是通过将 defer 选项设置为 true 来选择仅在更改时运行计算。
 
 ```js
-// 现在会运行了
+// 不会立即运行
 createEffect(on(a, (v) => console.log(v), { defer: true }));
 
 setA("new"); // 现在会运行了

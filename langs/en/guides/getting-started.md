@@ -1,13 +1,12 @@
 # Getting Started
 
-**We're working on new docs.** You can check out our new beginner tutorial [here](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/), and join our efforts on [Discord!](http://discord.com/invite/solidjs)
+**We're working on new docs.** You can check out our new beginner tutorial [here](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/welcome), and join our efforts on [Discord!](http://discord.com/invite/solidjs)
 
 ## See Solid
 
 For quick video overviews of Solid's core concepts, check out:
 
 - [Solid in 100 seconds](https://youtu.be/hw3Bx5vxKl0)
-- [Solid reactivity in 10 minutes](https://youtu.be/J70HXl1KhWE)
 
 ## Try Solid
 
@@ -16,7 +15,7 @@ By far the easiest way to get started with Solid is to try it online. Our REPL a
 Alternatively, you can use our [Vite templates](https://github.com/solidjs/templates) by running these commands in your terminal:
 
 ```sh
-> npx degit solidjs/templates/js my-app
+> npm create vite@latest my-app -- --template solid
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
@@ -25,7 +24,7 @@ Alternatively, you can use our [Vite templates](https://github.com/solidjs/templ
 Or for TypeScript:
 
 ```sh
-> npx degit solidjs/templates/ts my-app
+> npm create vite@latest my-app -- --template solid-ts
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm

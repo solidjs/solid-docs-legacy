@@ -2,7 +2,7 @@
 
 この対話型ガイドでは、Solid の主な機能をご紹介します。Solid の仕組みをより詳しく知るには、API やガイドを参照してください。
 
-また、新しい初心者向けチュートリアル（作業中!）は[こちら](https://docs.solidjs.com/tutorials/getting-started-with-solid/)でご覧いただけます。
+また、新しい初心者向けチュートリアル（作業中!）は[こちら](https://docs.solidjs.com/guides/tutorials/getting-started-with-solid/welcome)でご覧いただけます。
 
 # Solid とは？
 

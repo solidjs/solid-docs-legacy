@@ -16,7 +16,7 @@ Il modo migliore per imparare Solid è provarlo online. Il nostro REPL su https:
 In alternativa, puoi utilizzare i nostri semplici modelli [Vite](https://vitejs.dev/) eseguendo questi comandi nel tuo terminale:
 
 ```sh
-> npx degit solidjs/templates/js my-app
+> npm create vite@latest my-app -- --template solid
 > cd mia-app
 > npm i # o yarn o pnpm
 > npm run dev # o yarn o pnpm
@@ -25,7 +25,7 @@ In alternativa, puoi utilizzare i nostri semplici modelli [Vite](https://vitejs.
 O per TypeScript:
 
 ```sh
-> npx degit solidjs/templates/ts my-app
+> npm create vite@latest my-app -- --template solid-ts
 > cd mia-app
 > npm i # o yarn o pnpm
 > npm run dev # o fyarn o pnpm

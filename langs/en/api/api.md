@@ -132,7 +132,7 @@ const [depend, rerun] = createSignal(undefined, { equals: false });
 
 // define equality based on string length:
 const [myString, setMyString] = createSignal("string", {
-  equals: (newVal, oldVal) => newVal.length === oldVal.length,
+  equals: (oldVal, newVal) => newVal.length === oldVal.length,
 });
 
 setMyString("strung"); // considered equal to the last value and won't cause updates
@@ -341,14 +341,14 @@ import type { ResourceReturn } from "solid-js";
 type ResourceReturn<T> = [
   {
     (): T | undefined;
-    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored"
+    state: "unresolved" | "pending" | "ready" | "refreshing" | "errored";
     loading: boolean;
     error: any;
     latest: T | undefined;
   },
   {
     mutate: (v: T | undefined) => T | undefined;
-    refetch: (info: unknown) => Promise<T> | T;
+    refetch: (info?: unknown) => Promise<T> | T;
   }
 ];
 
@@ -395,7 +395,7 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 
 In these snippets, the fetcher is the function `fetchData`, and `data()` is undefined until `fetchData` finishes resolving. In the first case, `fetchData` will be called immediately.
 In the second, `fetchData` will be called as soon as `sourceSignal` has any value other than `false`, `null`, or `undefined`.
-It will be called again whenever the value of `sourceSignal` changes, and that value will always be passed to `fetchData` as its first argument.
+It will be called again whenever the value of `sourceSignal` changes, and that value will always be passed to `fetchData` as its first argument. To use a property on a store as the `sourceSignal`, you must wrap the property access in a function.
 
 You can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
@@ -515,16 +515,6 @@ function onCleanup(fn: () => void): void;
 
 Registers a cleanup method that executes on disposal or recalculation of the current reactive scope. Can be used in any Component or Effect.
 
-## `onError`
-
-```ts
-import { onError } from "solid-js";
-
-function onError(fn: (err: any) => void): void;
-```
-
-Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
-
 # Reactive Utilities
 
 These helpers provide the ability to better schedule updates and control how reactivity is tracked.
@@ -583,6 +573,28 @@ setA("new"); // now it runs
 ```
 
 Please note that on `stores` and `mutable`, adding or removing a property from the parent object will trigger an effect. See [`createMutable`](#createMutable)
+
+## `catchError`
+**New in v1.7.0**
+
+```ts
+import { catchError } from "solid-js";
+
+function catchError<T>(tryFn: () => T, onError: (err: any) => void): T;
+```
+
+Wraps a `tryFn` with an error handler that fires if an error occurs below that point. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
+
+## `onError`
+**Deprecated for catchError in v1.7**
+
+```ts
+import { onError } from "solid-js";
+
+function onError(fn: (err: any) => void): void;
+```
+
+Registers an error handler method that executes when child scope errors. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
 
 ## `createRoot`
 
@@ -1026,7 +1038,7 @@ fullName = createMemo(() => `${state.user.firstName} ${state.user.lastName}`);
 
 ### Updating Stores
 
-Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store.
+Changes can take the form of function that passes previous state and returns new state or a value. Objects are always shallowly merged. Set values to `undefined` to delete them from the Store. In TypeScript, you can delete a value by using a non-null assertion, like `undefined!`.
 
 ```js
 const [state, setState] = createStore({
@@ -1122,11 +1134,7 @@ setState('todos', {}, todo => ({ marked: true, completed: !todo.completed }))
 ```ts
 import { produce } from "solid-js/store";
 
-function produce<T>(
-  fn: (state: T) => void
-): (
-  state: T extends NotWrappable ? T : Store<T>
-) => T extends NotWrappable ? T : Store<T>;
+function produce<T>(fn: (state: T) => void): (state: T) => T;
 ```
 
 Immer inspired API for Solid's Store objects that allows for localized mutation.
@@ -1219,6 +1227,34 @@ const user = createMutable({
     [this.firstName, this.lastName] = value.split(" ");
   },
 });
+```
+
+#### Gotchas
+
+Note that expressions like `state.someValue++` are equivalent to `state.someValue = state.someValue + 1`, which is both a read and a write. If you read and write to the same signal in an effect, it will be an infinite loop until a maximum call stack size error happens:
+
+```js
+// Inifinite loop crash:
+createEffect(() => {
+  state.someValue = state.someValue + 1
+})
+
+// Inifinite loop crash:
+createEffect(() => {
+  state.someValue++
+})
+```
+
+The solution for these cases is using `untrack`:
+
+```js
+createEffect(() => {
+  state.someValue = untrack(() => state.someValue + 1)
+})
+
+createEffect(() => {
+  untrack(() => state.someValue++)
+})
 ```
 
 ### `modifyMutable`
@@ -1900,8 +1936,8 @@ function Show<T>(props: {
   when: T | undefined | null | false;
   keyed: boolean;
   fallback?: JSX.Element;
-  children: JSX.Element | ((item: T) => JSX.Element);
-}): () => JSX.Element;
+  children: JSX.Element | ((item: () => T) => JSX.Element) | ((item: T) => JSX.Element);
+}): JSX.Element;
 ```
 
 The Show control flow is used to conditional render part of the view: it renders `children` when the `when` is truthy, an `fallback` otherwise. It is similar to the ternary operator (`when ? children : fallback`) but is ideal for templating JSX.
@@ -1909,6 +1945,14 @@ The Show control flow is used to conditional render part of the view: it renders
 ```jsx
 <Show when={state.count > 0} fallback={<div>Loading...</div>}>
   <div>My Content</div>
+</Show>
+```
+
+Show can also be used with a callback that returns a null asserted accessor. Remember to only use this accessor when the condition is true or it will throw.
+
+```jsx
+<Show when={state.user} fallback={<div>Loading...</div>}>
+  {(user) => <div>{user().firstName}</div>}
 </Show>
 ```
 
@@ -2180,7 +2224,7 @@ First, you can set `class=...` like any other attribute. For example:
 <div class={state.active ? 'active' : undefined} />
 
 // Two dynamic classes
-<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}} />
+<div class={`${state.active ? 'active' : ''} ${state.currentId === row.id ? 'editing' : ''}`} />
 ```
 
 (Note that `className=...` was deprecated in Solid 1.4.)
@@ -2385,4 +2429,16 @@ This also works on children.
 
 ```jsx
 <MyComponent>{/*@once*/ state.wontUpdate}</MyComponent>
+```
+
+[`style`](#style) and [`classList`](#classlist) attributes are special
+in that `/*@once*/` applies to each object property value separately,
+and (currently) cannot be applied to the entire attribute. For example:
+
+```jsx
+<div style={{
+  width: /*@once*/ props.width,   // not reactive
+  height: /*@once*/ props.height, // not reactive
+  color: props.color,             // reactive
+}} />
 ```

@@ -338,7 +338,7 @@ could be any `DOMElement`.
 This is because `currentTarget` is the element that the
 event handler was attached to, so has a known type, whereas `target` is
 whatever the user interacted with that caused the event to bubble to or get
-captured by the event handler, which can be any DOM element.
+captured by the event handler, which can be any DOM element. One exception is Input and Focus Events when attached directly to `input` elements will have HTMLInputElement as a `target`.
 
 ## The ref Attribute
 
@@ -500,7 +500,7 @@ Here are two workarounds for this issue:
    return (
      <Show when={name()}>
        {(n) =>
-         <>Hello {n.replace(/\s+/g, '\xa0')}!</>
+         <>Hello {n().replace(/\s+/g, '\xa0')}!</>
        }
      </Show>
    );
@@ -508,13 +508,7 @@ Here are two workarounds for this issue:
 
    In this case, the typing of the `Show` component is clever enough to tell
    TypeScript that `n` is truthy, so it can't be `undefined` (or `null` or
-   `false`).
-
-   Note, however, that this form of `<Show>` forces the entirety of the 
-   children to render
-   from scratch every time `name()` changes, instead of doing this just when `name()` changes from a falsy to a truthy value.
-   This means that the children don't have the full benefits of fine-grained
-   reactivity (re-using unchanged parts and updating just what changed).
+   `false`). Remember this null asserted form will throw if accessed when the condition is no longer true.
 
 ## Special JSX Attributes and Directives
 
@@ -581,7 +575,7 @@ declare module "solid-js" {
 
 If you define custom directives for Solid's
 [`use:___` attributes](https://www.solidjs.com/docs/latest/api#use%3A___),
-you can type them in the `Directives` interface, like so:
+you can type them by extending the `DirectiveFunctions` interface, like so:
 
 ```tsx
 function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
@@ -592,8 +586,8 @@ function model(element: HTMLInputElement, value: Accessor<Signal<string>>) {
 
 declare module "solid-js" {
   namespace JSX {
-    interface Directives {  // use:model
-      model: Signal<string>;
+    interface DirectiveFunctions {  // use:model
+      model: typeof model;
     }
   }
 }
@@ -601,6 +595,19 @@ declare module "solid-js" {
 let [name, setName] = createSignal('');
 
 <input type="text" use:model={[name, setName]} />;
+```
+
+If you just want to constrain the second argument to the directive function,
+you can extend the older `Directives` interface:
+
+```tsx
+declare module "solid-js" {
+  namespace JSX {
+    interface Directives {  // use:model
+      model: Signal<string>;
+    }
+  }
+}
 ```
 
 If you're `import`ing a directive `d` from another module, and `d` is used only
