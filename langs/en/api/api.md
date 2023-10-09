@@ -1229,6 +1229,34 @@ const user = createMutable({
 });
 ```
 
+#### Gotchas
+
+Note that expressions like `state.someValue++` are equivalent to `state.someValue = state.someValue + 1`, which is both a read and a write. If you read and write to the same signal in an effect, it will be an infinite loop until a maximum call stack size error happens:
+
+```js
+// Inifinite loop crash:
+createEffect(() => {
+  state.someValue = state.someValue + 1
+})
+
+// Inifinite loop crash:
+createEffect(() => {
+  state.someValue++
+})
+```
+
+The solution for these cases is using `untrack`:
+
+```js
+createEffect(() => {
+  state.someValue = untrack(() => state.someValue + 1)
+})
+
+createEffect(() => {
+  untrack(() => state.someValue++)
+})
+```
+
 ### `modifyMutable`
 
 **New in v1.4.0**
