@@ -127,12 +127,9 @@ You can run them straight from the browser using [Skypack](https://www.skypack.d
 <html>
   <body>
     <script type="module">
-      import {
-        createSignal,
-        onCleanup,
-      } from "https://cdn.skypack.dev/solid-js";
-      import { render } from "https://cdn.skypack.dev/solid-js/web";
-      import html from "https://cdn.skypack.dev/solid-js/html";
+      import { onCleanup, createSignal } from "https://esm.sh/solid-js@1.8.1";
+      import { render } from "https://esm.sh/solid-js@1.8.1/web";
+      import html from "https://esm.sh/solid-js@1.8.1/html";
 
       const App = () => {
         const [count, setCount] = createSignal(0),
@@ -146,6 +143,7 @@ You can run them straight from the browser using [Skypack](https://www.skypack.d
     </script>
   </body>
 </html>
+
 ```
 
 The advantages of going buildless come with tradeoffs:
