@@ -156,7 +156,7 @@ En el segundo, se llamará a `fetchData` tan pronto como `sourceSignal` tenga cu
 De cualquier manera, puede llamar a `mutate` para actualizar directamente la signal `data` (funciona como cualquier otro emisor de signals). También puede llamar a `refetch` para volver a ejecutar el buscador directamente y pasar un argumento opcional para proporcionar información adicional al buscador: `refetch(info)`.
 
 `data` funciona como un receptor de señal normal: usa `data()` para leer el último valor devuelto de `fetchData`.
-Pero también tiene dos propiedades extra: `data.loading` te dice si el buscador ha sido llamado pero no devuelto, y `data.error` te dice si la solicitud ha fallado; si es así, contiene el error arrojado por el buscador. (Nota: si prevé errores, es posible que desee incluir `createResource` en un [ErrorBoundary](#<errorboundary>).)
+Pero también tiene dos propiedades extra: `data.loading` te dice si el buscador ha sido llamado pero no devuelto, y `data.error` te dice si la solicitud ha fallado; si es así, contiene el error arrojado por el buscador. (Nota: si prevé errores, es posible que desee incluir `createResource` en un [ErrorBoundary](#errorboundary).)
 
 `loading` y `error` son getters reactivos y pueden recibir seguimiento.
 

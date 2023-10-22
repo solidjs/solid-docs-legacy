@@ -578,7 +578,7 @@ onCleanup(() => unsubscribe());
 export function createMutable<T extends StoreNode>(
   state: T | Store<T>,
   options?: { name?: string }
-): Store<T> {
+): Store<T>;
 ```
 
 Créer un nouvel objet Store mutable. Les stores se mettent à jour seulement quand les valeurs changent. Le traçage est fait par l'interception de l'accès de propriété et automatiquement tracé dans des imbrications profondes en utilisant un proxy.

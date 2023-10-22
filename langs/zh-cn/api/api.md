@@ -1,6 +1,6 @@
 # 响应性基础
 
-Solid 响应性原理大致上是将任何响应性计算封装在函数中，并在其依赖关系更新时重新运行该函数。Solid JSX 编译器还用一个函数包装了大多数 JSX 表达式（括号中的代码），因此当依赖关系发生变化时，它们会自动更新（并触发相应的 DOM 更新）。更准确地说，每当函数在跟踪范围内被调用时，就会自动重新运行该函数，例如 JSX 表达式或构建 “计算” 的 API 调用（`createEffect`, `createMemo` 等）。默认情况下，在跟踪范围内调用函数时，通过检测函数何时读取反应状态（例如，通过 signal getter 或 Store 属性），自动跟踪函数的依赖关系。因此，您通常不需要担心依赖关系。（但是，如果自动依赖项跟踪无法产生您想要的结果，您可以 [覆盖依赖项跟踪](#reactive-utilities)）这种方法使响应性可组合：在另一个函数中调用一个函数通常会导致调用函数继承被调用函数的依赖关系。
+Solid 响应性原理大致上是将任何响应性计算封装在函数中，并在其依赖关系更新时重新运行该函数。Solid JSX 编译器还用一个函数包装了大多数 JSX 表达式（括号中的代码），因此当依赖关系发生变化时，它们会自动更新（并触发相应的 DOM 更新）。更准确地说，每当函数在跟踪范围内被调用时，就会自动重新运行该函数，例如 JSX 表达式或构建 “计算” 的 API 调用（`createEffect`, `createMemo` 等）。默认情况下，在跟踪范围内调用函数时，通过检测函数何时读取反应状态（例如，通过 signal getter 或 Store 属性），自动跟踪函数的依赖关系。因此，您通常不需要担心依赖关系。（但是，如果自动依赖项跟踪无法产生您想要的结果，您可以 [覆盖依赖项跟踪](#响应性工具类)）这种方法使响应性可组合：在另一个函数中调用一个函数通常会导致调用函数继承被调用函数的依赖关系。
 
 ## `createSignal`
 
@@ -289,9 +289,9 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 
 您可以调用 `mutate` 来直接更新 `data` signal（它的工作方式与任何其他 signal setter 一样）。您还可以调用 `refetch` 直接重新运行 fetcher，并传递一个可选参数以向 fetcher 提供附加信息：`refetch(info)`。
 
-`data` 像一个普通的 signal getter 一样工作：使用 `data()` 来读取 `fetchData` 的最后一个返回值。但它还有额外的响应属性：`data.loading` 告诉你是否调用了 fetcher 但没有返回。`data.error` 告诉你请求是否出错，如果出错，它将包含 fetcher 抛出的错误。（注意：如果您预计会出现错误，您可能需要将 `createResource` 包装在 [ErrorBoundary](#<errorboundary>) 中
+`data` 像一个普通的 signal getter 一样工作：使用 `data()` 来读取 `fetchData` 的最后一个返回值。但它还有额外的响应属性：`data.loading` 告诉你是否调用了 fetcher 但没有返回。`data.error` 告诉你请求是否出错，如果出错，它将包含 fetcher 抛出的错误。（注意：如果您预计会出现错误，您可能需要将 `createResource` 包装在 [ErrorBoundary](#errorboundary) 中
 
-从 **1.4.0** 开始，`data.latest` 将返回最后一个返回值，不会触发 [Suspense](#<suspense>) 和 [transitions](#usetransition)。如果还没有返回值，`data.latest` 的行为与 `data()` 相同。如果您想在加载新数据时显示过期数据，这将很有用。
+从 **1.4.0** 开始，`data.latest` 将返回最后一个返回值，不会触发 [Suspense](#suspense) 和 [transitions](#usetransition)。如果还没有返回值，`data.latest` 的行为与 `data()` 相同。如果您想在加载新数据时显示过期数据，这将很有用。
 
 `loading`、`error` 和 `latest` 是响应式 getter，可以被跟踪。
 
@@ -458,7 +458,7 @@ createEffect(on(a, (v) => console.log(v), { defer: true }));
 setA("new"); // 现在会运行了
 ```
 
-请注意，在 `stores` 和 `mutable` 上，从父对象中添加或删除属性会触发 effect。参见[`createMutable`](#createMutable)
+请注意，在 `stores` 和 `mutable` 上，从父对象中添加或删除属性会触发 effect。参见[`createMutable`](#createmutable)
 
 ## `catchError`
 
@@ -1123,13 +1123,13 @@ batch(() => {
 modifyMutable(state.user, reconcile({
   firstName: "Jake",
   lastName: "Johnson",
-});
+}));
 
 // 批量修改两个字段，只触发一次更新
 modifyMutable(state.user, produce((u) => {
   u.firstName = "Jake";
   u.lastName = "Johnson";
-});
+}));
 ```
 
 # 组件 API
@@ -1241,7 +1241,7 @@ const Wrapper = (props) => {
 };
 ```
 
-`children` 工具类的一个重要方面是它强制创建和解析 children，因为它立即访问 `props.children`。这对于条件渲染可能是不可取的，例如，在 [`<Show>`](#<show>) 组件中使用 children 时。下面的代码总是计算 children：
+`children` 工具类的一个重要方面是它强制创建和解析 children，因为它立即访问 `props.children`。这对于条件渲染可能是不可取的，例如，在 [`<Show>`](#show) 组件中使用 children 时。下面的代码总是计算 children：
 
 ```tsx
 const resolved = children(() => props.children);
@@ -1319,7 +1319,7 @@ import { createRenderEffect } from "solid-js";
 function createRenderEffect<T>(fn: (v: T) => T, value?: T): void;
 ```
 
-render effect 是一种类似于常规 effect 的计算（由 [`createEffect`](#createeffect)) 创建），但在 Solid 计划第一次执行 effect 函数时有所不同。当 `createEffect` 等待当前渲染阶段完成时，`createRenderEffect` 立即调用该函数。因此，effect 在创建和更新 DOM 元素时运行，但可能在创建特定的感兴趣元素之前，并且可能在这些元素连接到文档之前。特别是，[`ref`](#ref) 不会在初始 effect 调用之前设置。事实上，Solid 使用`createRenderEffect` 来实现渲染阶段本身，包括 `ref` 的设置。
+render effect 是一种类似于常规 effect 的计算（由 [`createEffect`](#createeffect) 创建），但在 Solid 计划第一次执行 effect 函数时有所不同。当 `createEffect` 等待当前渲染阶段完成时，`createRenderEffect` 立即调用该函数。因此，effect 在创建和更新 DOM 元素时运行，但可能在创建特定的感兴趣元素之前，并且可能在这些元素连接到文档之前。特别是，[`ref`](#ref) 不会在初始 effect 调用之前设置。事实上，Solid 使用`createRenderEffect` 来实现渲染阶段本身，包括 `ref` 的设置。
 
 render effect 的响应式更新与 effect 相同：它们排队以响应响应式更改（例如，单个 single 更新，或 `batch` 更改，或整个渲染阶段期间的集体更改）并在单个 [`batch`](#batch) 之后（连同效果）。特别是，render effect 中的所有 single 更新都是批处理的。
 
@@ -1367,7 +1367,7 @@ function createComputed<T>(fn: (v: T) => T, value?: T): void;
 `createComputed` 是 Solid 中最直接的响应形式，对于构建其他响应性 API 最有用。（例如，其他一些 Solid API 是从 `createComputed` 构建的。）但应该小心使用，因为 `createComputed` 很容易导致比其他响应性 API 更多不必要的更新。在使用它之前，请考虑密切相关的 API [`createMemo`](#creatememo) 和 [`createRenderEffect`](#createrendereffect)。
 
 
-与 `createMemo` 一样，`createComputed` 会在更新时立即调用其函数（除非您在 [batch](#batch)、[effect](#createEffect) 或 [transition](#use-transition) 中）。然而，虽然 `createMemo` 函数应该是纯函数（不修改任何 signal），但 `createComputed` 函数可以修改 signal。相关的，`createMemo` 为函数的返回值提供了一个只读 signal，而要对 `createComputed` 做同样的事情，你需要在函数中修改一个 signal。如果可以使用纯函数和`createMemo`，这可能更有效，因为 Solid 优化了 memo 更新的执行顺序，而更新 `createComputed` 中的信号将立即触发响应更新，其中一些可能会变成不必要。
+与 `createMemo` 一样，`createComputed` 会在更新时立即调用其函数（除非您在 [batch](#batch)、[effect](#createeffect) 或 [transition](#usetransition) 中）。然而，虽然 `createMemo` 函数应该是纯函数（不修改任何 signal），但 `createComputed` 函数可以修改 signal。相关的，`createMemo` 为函数的返回值提供了一个只读 signal，而要对 `createComputed` 做同样的事情，你需要在函数中修改一个 signal。如果可以使用纯函数和`createMemo`，这可能更有效，因为 Solid 优化了 memo 更新的执行顺序，而更新 `createComputed` 中的信号将立即触发响应更新，其中一些可能会变成不必要。
 
 
 与 `createRenderEffect` 一样，`createComputed` 第一次立即调用它的函数。但它们在更新的执行方式上有所不同。虽然 `createComputed` 通常会立即更新，但 `createRenderEffect` 会更新队列以在当前渲染阶段之后运行（与 `createEffect` 一起）。因此，`createRenderEffect` 可以执行更少的整体更新，但稍微不那么即时。

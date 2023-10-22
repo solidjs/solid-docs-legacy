@@ -73,7 +73,7 @@ const newCount = setCount((prev) => prev + 1);
 > const [func, setFunc] = createSignal(myFunction);
 > ```
 
-[batch](#batch), [effect](#createEffect), [transition](#use-transition)에 있는 것이 아니라면, 시그널은 설정하는 즉시 업데이트됩니다.
+[batch](#batch), [effect](#createeffect), [transition](#usetransition)에 있는 것이 아니라면, 시그널은 설정하는 즉시 업데이트됩니다.
 예를 들어:
 
 ```js
@@ -162,7 +162,7 @@ createEffect((prev) => {
 
 이펙트 함수의 _첫 번째_ 실행은 바로 실행되지 않으며, 현재 렌더링 단계 이후에 실행되도록 예약됩니다(예: [`render`](#render), [`createRoot`](#createroot), [`runWithOwner`](#runwithowner) 에 전달된 함수를 호출한 후).
 첫 번째 실행시까지 대기하려면, 브라우저가 DOM을 렌더링하기 전에 실행되는 [`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/queueMicrotask) 를 사용하거나, 브라우저 렌더링 후에 실행되는 `await Promise.resolve()` 혹은 `setTimeout(..., 0)` 을 사용하세요.
-첫 번째 실행 후, 이펙트는 일반적으로 디펜던시가 업데이트될 때 즉시 실행됩니다([batch](#batch) 혹은 [transition](#use-transition)인 경우는 예외입니다).
+첫 번째 실행 후, 이펙트는 일반적으로 디펜던시가 업데이트될 때 즉시 실행됩니다([batch](#batch) 혹은 [transition](#usetransition)인 경우는 예외입니다).
 예를 들어:
 
 ```js
@@ -327,13 +327,13 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 두 번째 경우, `sourceSignal`이 `false`, `null`, `undefined` 이외의 값을 갖는 즉시 `fetchData`가 호출됩니다.
 `sourceSignal` 값이 변경될 때마다 다시 호출되며, 그 값은 항상 `fetchData` 함수의 첫 번째 인수로 전달됩니다.
 
-`mutate`를 호출해 `data` 시그널을 직접 업데이트((다른 시그널 setter 처럼 동작)할 수 있습니다.
+`mutate`를 호출해 `data` 시그널을 직접 업데이트(다른 시그널 setter 처럼 동작)할 수 있습니다.
 `refetch`를 호출해 fetcher를 직접 다시 실행하고, `refetch(info)`와 같이 옵셔널 인수를 전달하여 fetcher에 추가 정보를 제공할 수 있습니다: .
 
 `data`는 일반 시그널 getter처럼 작동합니다: `data()`를 사용해 `fetchData`의 마지막 반환 값을 읽습니다.
-하지만 두 가지 추가 리액티브 속성이 있습니다: `data.loading`은 fetcher가 호출되었지만 아직 반환되지 않았는지를 알려주며, `data.error`는 요청에 에러가 발생했는지 알려줍니다; 에러에는 fetcher에서 발생한 오류도 포합됩니다. (참고: 에러가 예상된다면, [ErrorBoundary](#<errorboundary>)에 `createResource`를 래핑할 수 있습니다.)
+하지만 두 가지 추가 리액티브 속성이 있습니다: `data.loading`은 fetcher가 호출되었지만 아직 반환되지 않았는지를 알려주며, `data.error`는 요청에 에러가 발생했는지 알려줍니다; 에러에는 fetcher에서 발생한 오류도 포합됩니다. (참고: 에러가 예상된다면, [ErrorBoundary](#errorboundary)에 `createResource`를 래핑할 수 있습니다.)
 
-**1.4.0** 버전에서는, `data.latest`는 마지막으로 반환된 값을 반환하며, [Suspense](#<suspense>)와 [트랜지션](#usetransition)을 트리거하지 않습니다; 아직 값이 반환된 적이 없다면, `data.latest`는 `data()`와 동일하게 작동합니다. 이는 새 데이터를 로딩하는 도중에는 이전 데이터를 보여주고자 하는 경우 유용합니다.
+**1.4.0** 버전에서는, `data.latest`는 마지막으로 반환된 값을 반환하며, [Suspense](#suspense)와 [트랜지션](#usetransition)을 트리거하지 않습니다; 아직 값이 반환된 적이 없다면, `data.latest`는 `data()`와 동일하게 작동합니다. 이는 새 데이터를 로딩하는 도중에는 이전 데이터를 보여주고자 하는 경우 유용합니다.
 
 `loading`, `error`, `latest`는 리액티브 getter이며 추적 가능합니다.
 
@@ -479,7 +479,7 @@ setA("new"); // 여기서 실행됩니다.
 ```
 
 `stores`와 `mutable`에서 부모 객체에서 속성을 추가하거나 삭제하면 이펙트가 트리거됩니다.
-[`createMutable`](#createMutable) 참조.
+[`createMutable`](#createmutable) 참조.
 
 ## `createRoot`
 
@@ -1159,13 +1159,13 @@ batch(() => {
 modifyMutable(state.user, reconcile({
   firstName: "Jake",
   lastName: "Johnson",
-});
+}));
 
 // batch에서 두 필드를 수정하며, 한 번의 업데이트만 트리거
 modifyMutable(state.user, produce((u) => {
   u.firstName = "Jake";
   u.lastName = "Johnson";
-});
+}));
 ```
 
 # Component APIs
@@ -1292,8 +1292,8 @@ const Wrapper = (props) => {
 };
 ```
 
-`children` 헬퍼의 중요한 측면은 `props.children`에 바로 액세스하므로 자식을 강제로 생성하고 결정해야 한다는 것입니다. 
-이는 [`<Show>`](#<show>) 컴포넌트 내에서 자식을 사용하는 것과 같은 조건부 렌더링시에는 바람직하지 않을 수 있습니다.
+`children` 헬퍼의 중요한 측면은 `props.children`에 바로 액세스하므로 자식을 강제로 생성하고 결정해야 한다는 것입니다.
+이는 [`<Show>`](#show) 컴포넌트 내에서 자식을 사용하는 것과 같은 조건부 렌더링시에는 바람직하지 않을 수 있습니다.
 예를 들어, 다음 코드는 항상 자식을 평가합니다:
 
 ```tsx
@@ -1434,7 +1434,7 @@ function createComputed<T>(fn: (v: T) => T, value?: T): void;
 하지만, `createComputed`는 다른 리액티브 프리미티브보다 더 많은 불필요한 업데이트를 쉽게 일으킬 수 있기 때문에 주의해서 사용해야 합니다.
 사용 전에, 밀접하게 관련되어 있는 [`createMemo`](#creatememo)와 [`createRenderEffect`](#createrendereffect)을 고려해보세요.
 
-`createMemo`와 마찬가지로, `createComputed`는 업데이트시 ([batch](#batch), [이펙트](#createEffect), [트랜지션](#use-transition)이 아닌 경우) 즉시 함수를 호출합니다.
+`createMemo`와 마찬가지로, `createComputed`는 업데이트시 ([batch](#batch), [이펙트](#createeffect), [트랜지션](#usetransition)이 아닌 경우) 즉시 함수를 호출합니다.
 하지만 `createMemo` 함수는 순수(어떤 시그널도 설정하지 않아야 함)해야 하지만, `createComputed` 함수는 시그널을 설정할 수 있습니다.
 이와 관련해, `createMemo`는 함수 반환 값에 대해 읽기 전용 시그널을 제공하는 반면, `createComputed`로 동일한 작업을 수행하려면 함수 내에서 시그널을 설정해야 합니다.
 
