@@ -12,7 +12,7 @@ Solid の JSX コンパイラーは、ほとんどの JSX 式（中括弧内の�
 
 
 その結果、通常は依存関係のことを気にする必要はありません。
-（しかし、自動的な依存関係追跡が目的の結果をもたらさない場合は、[依存関係追跡をオーバーライド](#reactive-utilities)できます）
+（しかし、自動的な依存関係追跡が目的の結果をもたらさない場合は、[依存関係追跡をオーバーライド](#リアクティブのユーティリティ)できます）
 
 このアプローチにより、リアクティビティがコンポーザブルになります。ある関数を別の関数内で呼び出すと、一般に呼び出した関数は呼び出された関数の依存関係を継承することになります。
 
@@ -95,7 +95,7 @@ const newCount = setCount((prev) => prev + 1);
 > const [func, setFunc] = createSignal(myFunction);
 > ```
 
-[バッチ](#batch)、[Effect](#createEffect)、[トランジション](#use-transition)の中でなければ、Signal は設定するとすぐに更新されます。
+[バッチ](#batch)、[Effect](#createeffect)、[トランジション](#usetransition)の中でなければ、Signal は設定するとすぐに更新されます。
 
 例えば:
 
@@ -214,7 +214,7 @@ Effect 関数の最初の実行は即時ではありません。現在のレン�
 
 
 
-この最初の実行の後、通常、Effect は依存関係が更新されるとすぐに実行されます（[batch](#batch) や [transition](#use-transition) をしている場合を除く）。例えば:
+この最初の実行の後、通常、Effect は依存関係が更新されるとすぐに実行されます（[batch](#batch) や [transition](#usetransition) をしている場合を除く）。例えば:
 
 
 
@@ -415,9 +415,9 @@ const [data, { mutate, refetch }] = createResource(sourceSignal, fetchData);
 `mutate` を呼び出すことで、`data` Signal を直接更新できます（他の Signal セッターと同じように動作します）。また、`refetch` を呼び出すことでフェッチャーを直接再実行でき、`refetch(info)` のように追加の引数を渡すことで、フェッチャーに追加情報を提供できます。
 
 `data` は通常の Signal のゲッターのように動作します。 `fetchData` の最後の戻り値を読み取るには `data()` を使用します。
-しかし、これには追加のリアクティブなプロパティがあり、`data.loading` はフェッチャーが呼び出されたが返されていないかどうかを示します。そして、`data.error` はリクエストがエラーになったかどうかを示します（注意: もしエラーが予想される場合は `createResource` を [ErrorBoundary](#<errorboundary>)でラップするとよいでしょう）。
+しかし、これには追加のリアクティブなプロパティがあり、`data.loading` はフェッチャーが呼び出されたが返されていないかどうかを示します。そして、`data.error` はリクエストがエラーになったかどうかを示します（注意: もしエラーが予想される場合は `createResource` を [ErrorBoundary](#errorboundary)でラップするとよいでしょう）。
 
-**1.4.0** では、`data.latest` は最後に返された値を返し、[Suspension](#<suspense>) や [transitions](#usetransition) をトリガーしません。まだ値が返されていない場合は `data()` と同じ動作をします。これは、新しいデータを読み込んでいる間、古くなったデータを表示させたい場合に便利です。
+**1.4.0** では、`data.latest` は最後に返された値を返し、[Suspension](#suspense) や [transitions](#usetransition) をトリガーしません。まだ値が返されていない場合は `data()` と同じ動作をします。これは、新しいデータを読み込んでいる間、古くなったデータを表示させたい場合に便利です。
 
 `loading` と `error` と `latest` はリアクティブゲッターで、追跡が可能です。
 
@@ -556,7 +556,7 @@ createEffect(on(a, (v) => console.log(v), { defer: true }));
 setA("new"); // ここで実行される
 ```
 
-なお、 `stores` と `mutable` では、親オブジェクトのプロパティを追加したり削除したりすると、Effect が発生することに注意してください。[`createMutable`](#createMutable) を参照してください。
+なお、 `stores` と `mutable` では、親オブジェクトのプロパティを追加したり削除したりすると、Effect が発生することに注意してください。[`createMutable`](#createmutable) を参照してください。
 
 ## `createRoot`
 
@@ -581,7 +581,7 @@ function getOwner(): Owner;
 現在実行中のコードを所有するリアクティブスコープを取得します。例えば、現在のスコープ外で後から `runWithOwner` を呼び出す際に渡します。
 
 
-内部的には、計算 (Effect、Memo など）は自分のオーナーの子であるオーナーを作成し、`createRoot` や `render` で作成したルートオーナーまでさかのぼります。特に、このオーナーシップツリーによって、Solid はそのサブツリーをトラバースして、すべての [`onCleanup`](#oncleanup) コールバックを呼び出すことによって、破棄された計算を自動的にクリーンアップできます。
+内部的には、計算 （Effect、Memo など）は自分のオーナーの子であるオーナーを作成し、`createRoot` や `render` で作成したルートオーナーまでさかのぼります。特に、このオーナーシップツリーによって、Solid はそのサブツリーをトラバースして、すべての [`onCleanup`](#oncleanup) コールバックを呼び出すことによって、破棄された計算を自動的にクリーンアップできます。
 
 
 
@@ -1252,13 +1252,13 @@ batch(() => {
 modifyMutable(state.user, reconcile({
   firstName: "Jake",
   lastName: "Johnson",
-});
+}));
 
 // 2 つのフィールドを一括で変更し、1回だけ更新をトリガーする
 modifyMutable(state.user, produce((u) => {
   u.firstName = "Jake";
   u.lastName = "Johnson";
-});
+}));
 ```
 
 # コンポーネント API
@@ -1406,7 +1406,7 @@ const Wrapper = (props) => {
 
 `children` ヘルパーの重要な点は、 `props.children` にすぐにアクセスして、強制的に子を作成し解決することです。
 
-これは、例えば、[`<Show>`](#<show>) コンポーネント内で子を使用する場合など、条件付きレンダリングには望ましくない場合があります。
+これは、例えば、[`<Show>`](#show) コンポーネント内で子を使用する場合など、条件付きレンダリングには望ましくない場合があります。
 
 たとえば、次のコードは常に子を評価します:
 
@@ -1568,7 +1568,7 @@ function createComputed<T>(fn: (v: T) => T, value?: T): void;
 使用する前に、密接に関連するプリミティブである [`createMemo`](#creatememo) と [`createRenderEffect`](#createrendereffect) を検討してみてください。
 
 
-`createMemo` と同様に、 `createComputed` は更新があるとすぐにその関数を呼び出します（ただし、[batch](#batch)、[effect](#createEffect)、または [transition](#use-transition) を使用している場合は除く）。
+`createMemo` と同様に、 `createComputed` は更新があるとすぐにその関数を呼び出します（ただし、[batch](#batch)、[effect](#createeffect)、または [transition](#usetransition) を使用している場合は除く）。
 
 
 ただし、`createMemo` 関数は純粋であるべき（シグナルを更新してはいけません）である一方、 `createComputed` 関数はシグナルを更新できます。

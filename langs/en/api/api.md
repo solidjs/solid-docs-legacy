@@ -400,9 +400,9 @@ It will be called again whenever the value of `sourceSignal` changes, and that v
 You can call `mutate` to directly update the `data` signal (it works like any other signal setter). You can also call `refetch` to rerun the fetcher directly, and pass an optional argument to provide additional info to the fetcher: `refetch(info)`.
 
 `data` works like a normal signal getter: use `data()` to read the last returned value of `fetchData`.
-But it also has extra reactive properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#<errorboundary>).)
+But it also has extra reactive properties: `data.loading` tells you if the fetcher has been called but not returned, and `data.error` tells you if the request has errored out; if so, it contains the error thrown by the fetcher. (Note: if you anticipate errors, you may want to wrap `createResource` in an [ErrorBoundary](#errorboundary).)
 
-As of **1.4.0**, `data.latest` will return the last returned value and won't trigger [Suspense](#<suspense>) and [transitions](#usetransition); if no value has been returned yet, `data.latest` acts the same as `data()`. This can be useful if you want to show the out-of-date data while the new data is loading.
+As of **1.4.0**, `data.latest` will return the last returned value and won't trigger [Suspense](#suspense) and [transitions](#usetransition); if no value has been returned yet, `data.latest` acts the same as `data()`. This can be useful if you want to show the out-of-date data while the new data is loading.
 
 `loading`, `error`, and `latest` are reactive getters and can be tracked.
 
@@ -572,9 +572,10 @@ createEffect(on(a, (v) => console.log(v), { defer: true }));
 setA("new"); // now it runs
 ```
 
-Please note that on `stores` and `mutable`, adding or removing a property from the parent object will trigger an effect. See [`createMutable`](#createMutable)
+Please note that on `stores` and `mutable`, adding or removing a property from the parent object will trigger an effect. See [`createMutable`](#createmutable)
 
 ## `catchError`
+
 **New in v1.7.0**
 
 ```ts
@@ -586,6 +587,7 @@ function catchError<T>(tryFn: () => T, onError: (err: any) => void): T;
 Wraps a `tryFn` with an error handler that fires if an error occurs below that point. Only the nearest scope error handlers execute. Rethrow to trigger up the line.
 
 ## `onError`
+
 **Deprecated for catchError in v1.7**
 
 ```ts
@@ -1314,13 +1316,13 @@ provides two alternate ways to do similar things:
 modifyMutable(state.user, reconcile({
   firstName: "Jake",
   lastName: "Johnson",
-});
+}));
 
 // Modify two fields in batch, triggering just one update
 modifyMutable(state.user, produce((u) => {
   u.firstName = "Jake";
   u.lastName = "Johnson";
-});
+}));
 ```
 
 # Component APIs
@@ -1629,8 +1631,8 @@ Before using it, consider the closely related primitives
 [`createMemo`](#creatememo) and [`createRenderEffect`](#createrendereffect).
 
 Like `createMemo`, `createComputed` calls its function immediately on updates
-(unless you're in a [batch](#batch), [effect](#createEffect), or
-[transition](#use-transition)).
+(unless you're in a [batch](#batch), [effect](#createeffect), or
+[transition](#usetransition)).
 However, while `createMemo` functions should be pure (not set any signals),
 `createComputed` functions can set signals.
 Related, `createMemo` offers a readonly signal for the return value of the
