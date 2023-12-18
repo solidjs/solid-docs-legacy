@@ -9,7 +9,7 @@ with:
 const Greeting = lazy(() => import("./greeting"));
 ```
 
-This will likely still load too quickly to see. But you add a fake delay if you wish to make the loading more visible.
+This will likely still load too quickly to see. But you can add a fake delay if you wish to make the loading more visible.
 
 ```js
 const Greeting = lazy(async () => {
