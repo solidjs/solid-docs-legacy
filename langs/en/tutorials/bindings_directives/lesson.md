@@ -1,6 +1,6 @@
 Solid supports custom directives through the `use:` namespace. This is just a syntactic sugar over `ref`, but is useful in that it resembles typical bindings and there can be multiple bindings on the same element without conflict. This makes it a better tool for reusable DOM element behavior.
 
-A custom directive is a function taking arguments `(element, valueAccesor)`, where `element` is the DOM element with the `use:` attribute, and `valueAccessor` is a getter function for the value assigned to the attribute. As long as the function is imported in scope, you can use it with `use:`.
+A custom directive is a function taking arguments `(element, valueAccessor)`, where `element` is the DOM element with the `use:` attribute, and `valueAccessor` is a getter function for the value assigned to the attribute. As long as the function is imported in scope, you can use it with `use:`.
 
 > Important: `use:` is detected by the compiler to be transformed, and the function is required to be in scope, so it cannot be part of spreads or applied to a component.
 
