@@ -16,7 +16,7 @@ Solid を使い始める最も簡単な方法は、オンラインで試すこ�
 また、ターミナルで以下のコマンドを実行して、 [Vite テンプレート](https://github.com/solidjs/templates) を使用することもできます:
 
 ```sh
-> npm create vite@latest my-app -- --template solid
+> npx degit solidjs/templates/js my-app
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
@@ -25,7 +25,7 @@ Solid を使い始める最も簡単な方法は、オンラインで試すこ�
 または TypeScript 向けに:
 
 ```sh
-> npm create vite@latest my-app -- --template solid-ts
+> npx degit solidjs/templates/ts my-app
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm

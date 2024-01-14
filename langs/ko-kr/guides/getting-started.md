@@ -16,7 +16,7 @@ Solid를 사용하기 위한 가장 쉬운 방법은 온라인으로 시도해 �
 또한, 터미널에서 다음 명령을 실행해서 간단한 [Vite 템플릿](https://github.com/solidjs/templates)을 사용할 수 있습니다:
 
 ```sh
-> npm create vite@latest my-app -- --template solid
+> npx degit solidjs/templates/js my-app
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
@@ -25,7 +25,7 @@ Solid를 사용하기 위한 가장 쉬운 방법은 온라인으로 시도해 �
 타입스크립트를 사용하려면 다음과 같이 실행합니다:
 
 ```sh
-> npm create vite@latest my-app -- --template solid-ts
+> npx degit solidjs/templates/ts my-app
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm

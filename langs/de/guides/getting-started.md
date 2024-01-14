@@ -7,7 +7,7 @@ Mit Abstand die einfachste Möglichkeit, in Solid einzusteigen, ist, es online a
 Alternativ kann man auch unsere einfachen [Vite](https://vitejs.dev/)-Vorlagen nutzen, indem man folgende Anweisungen ins Terminal eingibt:
 
 ```sh
-> npm create vite@latest my-app -- --template solid
+> npx degit solidjs/templates/js my-app
 > cd my-app
 > npm i # oder yarn oder pnpm
 > npm run dev # oder yarn oder pnpm
@@ -16,7 +16,7 @@ Alternativ kann man auch unsere einfachen [Vite](https://vitejs.dev/)-Vorlagen n
 Oder für TypeScript:
 
 ```sh
-> npm create vite@latest my-app -- --template solid-ts
+> npx degit solidjs/templates/ts my-app
 > cd my-app
 > npm i # oder yarn oder pnpm
 > npm run dev # oder yarn oder pnpm

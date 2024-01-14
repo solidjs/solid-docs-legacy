@@ -15,7 +15,7 @@ By far the easiest way to get started with Solid is to try it online. Our REPL a
 Alternatively, you can use our [Vite templates](https://github.com/solidjs/templates) by running these commands in your terminal:
 
 ```sh
-> npm create vite@latest my-app -- --template solid
+> npx degit solidjs/templates/js my-app
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
@@ -24,7 +24,7 @@ Alternatively, you can use our [Vite templates](https://github.com/solidjs/templ
 Or for TypeScript:
 
 ```sh
-> npm create vite@latest my-app -- --template solid-ts
+> npx degit solidjs/templates/ts my-app
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
