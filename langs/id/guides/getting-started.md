@@ -7,7 +7,7 @@ Sejauh ini cara termudah untuk mulai menggunakan Solid adalah dengan mencobanya 
 Atau, kamu juga dapat menggunakan template-template [Vite](https://vitejs.dev/) sederhana kami dengan menjalankan perintah-perintah dibawah ini pada terminal kamu:
 
 ```sh
-> npm create vite@latest my-app -- --template solid
+> npx degit solidjs/templates/js my-app
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
@@ -16,7 +16,7 @@ Atau, kamu juga dapat menggunakan template-template [Vite](https://vitejs.dev/) 
 Atau untuk pengguna TypeScript:
 
 ```sh
-> npm create vite@latest my-app -- --template solid-ts
+> npx degit solidjs/templates/ts my-app
 > cd my-app
 > npm i # or yarn or pnpm
 > npm run dev # or yarn or pnpm
