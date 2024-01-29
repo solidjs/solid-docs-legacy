@@ -83,7 +83,7 @@ You may want to keep parts of your state separate from the components for ease o
 
 Also, since effects trigger asynchronously, it can help to wrap our assertions in a final effect. Alternatively, to observe a sequence of effects over multiple changes, it can help to return the necessary tools from `createRoot` and execute them in an async test function (as `createRoot` itself cannot take an `async` function).
 
-As an example, let's test `createLocalStorage` from the [todo example](https://www.solidjs.com/examples/todos):
+As an example, let's test `createLocalStore` from the [todo example](https://www.solidjs.com/examples/todos):
 
 ```ts
 import { createEffect } from "solid-js";
