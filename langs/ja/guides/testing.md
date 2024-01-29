@@ -83,7 +83,7 @@ HTML 形式のカバレッジレポートが欲しい場合は、`c8` の代わ�
 
 また、Effect は非同期でトリガーされるので、最終的な Effect にアサーションをラップするのに役立ちます。また、複数の変更に対する一連の Effect を観察するには、`createRoot` から必要なツールを返して、非同期のテスト関数で実行すると便利です（`createRoot` 自体は `async` 関数を受け取ることができないので）。
 
-例として、[ToDo のサンプル](https://www.solidjs.com/examples/todos)にある `createLocalStorage` をテストしてみましょう:
+例として、[ToDo のサンプル](https://www.solidjs.com/examples/todos)にある `createLocalStore` をテストしてみましょう:
 
 ```ts
 import { createEffect } from "solid-js";
