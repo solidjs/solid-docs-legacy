@@ -83,7 +83,7 @@ Es posible que desee mantener partes de su estado separadas de los componentes p
 
 Además, dado que los efectos se activan asincrónicamente, puede ser útil envolver nuestras afirmaciones en un efecto final. Alternativamente, para observar una secuencia de efectos sobre múltiples cambios, puede ayudar retornar las herramientas necesarias desde `createRoot` y ejecutarlas en una función de prueba asíncrona (ya que `createRoot` en sí no puede tomar una función `asíncrona`).
 
-Como ejemplo, probemos `createLocalStorage` del [ejemplo de tareas pendientes](https://www.solidjs.com/examples/todos):
+Como ejemplo, probemos `createLocalStore` del [ejemplo de tareas pendientes](https://www.solidjs.com/examples/todos):
 
 ```ts
 import { createEffect } from "solid-js";

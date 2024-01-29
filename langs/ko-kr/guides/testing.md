@@ -270,7 +270,7 @@ export default defineConfig({
 또한, 이펙트는 비동기로 트리거되기 때문에, 최종 이펙트에서 어설션을 래핑하는 것이 도움이 됩니다.
 또는, 여러 변경 사항에 걸친 일련의 이펙트를 관찰하려면, `createRoot`에서 필요한 도구를 반환하고, 비동기 테스트 함수에서 이를 실행하는 것이 도움이 될 수 있습니다. (이는 `createRoot` 자체는 비동기 함수를 받을 수 없기 때문입니다).
 
-예를 들어, [todo 예제](https://www.solidjs.com/examples/todos)에서 `createLocalStorage` 를 테스트 하려면:
+예를 들어, [todo 예제](https://www.solidjs.com/examples/todos)에서 `createLocalStore` 를 테스트 하려면:
 
 ```ts
 import { createEffect } from "solid-js";
