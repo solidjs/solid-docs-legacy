@@ -83,7 +83,7 @@ $ npm install # or pnpm install or yarn install
 
 此外，由于 effect 是异步触发的，它可以帮助将我们的断言包装在最终 effect 中。或者，要观察多个更改的一系列 effect，它可以帮助从 `createRoot` 返回必要的工具并在异步测试函数中执行它们（因为`createRoot`本身不能接受`async`函数）。
 
-作为示例，让我们测试 [todo 示例](https://www.solidjs.com/examples/todos) 中的 `createLocalStorage`：
+作为示例，让我们测试 [todo 示例](https://www.solidjs.com/examples/todos) 中的 `createLocalStore`：
 
 ```ts
 import { createEffect } from "solid-js";
