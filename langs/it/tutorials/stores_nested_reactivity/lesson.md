@@ -23,8 +23,7 @@ Now we can update the completion state by calling `setCompleted` without any add
 
 ```js
 const toggleTodo = (id) => {
-  const index = todos().findIndex((t) => t.id === id);
-  const todo = todos()[index];
+  const todo = todos().find((t) => t.id === id);
   if (todo) todo.setCompleted(!todo.completed())
 }
 ```
