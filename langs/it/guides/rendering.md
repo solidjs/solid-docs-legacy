@@ -139,7 +139,7 @@ export default function Modulo() {
       <ComponenteBase value={valore()} />
       <input
         type="text"
-        oninput={(e) => impostareValore(e.currentTarget.value)}
+        onInput={(e) => impostareValore(e.currentTarget.value)}
       />
     </div>
   );
