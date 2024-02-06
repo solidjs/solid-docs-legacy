@@ -141,7 +141,7 @@ export default function Form() {
   return (
     <div>
       <BasicComponent value={value()} />
-      <input type="text" oninput={(e) => setValue(e.currentTarget.value)} />
+      <input type="text" onInput={(e) => setValue(e.currentTarget.value)} />
     </div>
   );
 }
