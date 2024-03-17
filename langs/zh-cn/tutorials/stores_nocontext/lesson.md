@@ -14,7 +14,7 @@ const [count, setCount] = counter;
 
 Solid 的响应性是一个普遍的概念。它跟是内部组件还是外部组件都没有关系。全局状态和局部状态没有不同的概念。都是一样的。
 
-唯一的限制是所有计算（Effect/Momo）都需要在响应顶层即 —— `createRoot` 下创建。Solid 的 `render` 会自动执行此操作。
+唯一的限制是所有计算（Effect/Memo）都需要在响应顶层即 —— `createRoot` 下创建。Solid 的 `render` 会自动执行此操作。
 
 在本教程中，`counter.tsx` 就是这样一个全局 Store。我们可以将 `main.tsx` 中的组件修改为：
 
